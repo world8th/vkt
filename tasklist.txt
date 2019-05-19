@@ -1,0 +1,48 @@
+1. Try just modify exist...
+
+Possible solutions... 
+- https://github.com/jpbruyere/vkvg (require Linux)
+- https://github.com/nyorain/rvg (require Linux)
+
+2. Search or write dependencies...
+
+Possible solutions... 
+
+For C++ way
+- https://github.com/delfrrr/delaunator-cpp
+- https://github.com/I3ck/lib_2d 
+- https://github.com/mapbox/earcut.hpp
+- https://github.com/KhronosGroup/Vulkan-Hpp
+- https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator
+- https://github.com/svgpp/svgpp
+
+For Rust way
+- https://github.com/nical/lyon
+- https://github.com/vulkano-rs/vulkano
+- https://github.com/gwihlidal/vk-mem-rs
+- https://github.com/MaikKlein/ash
+
+For Node.JS way
+- https://github.com/mattdesl/shape2d-triangulate
+- https://github.com/mattdesl/fontpath-shape2d
+- https://github.com/maierfelix/nvk
+- (no memory allocator currently)
+
+3. Write vector graphics with ray-tracing itself 
+- [ ] Renderer with computing...
+- [ ] RTX ON?
+- [ ] How it fast?
+- [ ] Write test suite!
+
+Write effects, such as...
+- [ ] Write bit stress example
+- [ ] Local vector scaling demo
+- [ ] Aero blur effect
+
+Also, add in future features, like...
+- [ ] DLSS
+- [ ] Denoiser
+
+4. Propose to Direct2D competition (in far future)
+5. Write simple GUI with simple application, based in that library!
+

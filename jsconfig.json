@@ -1,0 +1,4 @@
+{
+    "compilerOptions": {"target": "es2018"},
+    "exclude": ["node_modules"]
+}
