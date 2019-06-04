@@ -207,11 +207,11 @@ namespace radx {
 
         if (!this->allocator)
         {
+#ifdef VOLK_H_
             // load API calls for context
             volkLoadDevice(VkDevice(*this));
 
             // create VMA memory allocator (with Volk support)
-#ifdef VOLK_H_
             VolkDeviceTable vktable;
             volkLoadDeviceTable(&vktable, VkDevice(*this));
 
