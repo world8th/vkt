@@ -24,5 +24,5 @@ Writing for C++20 prior...
 - Based On        : Vulkan.H, C++20, STL
 - General To Do   : Complete Bitfields and Structures, make more compatible with Vulkan-HPP
 
-Date: 02.01.2020 @helixd-2k18
+Date: 02.01.2020 helixd2k18@IMN
 ```
