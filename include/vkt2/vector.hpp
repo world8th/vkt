@@ -156,8 +156,15 @@ namespace vkt {
         operator vk::DescriptorImageInfo&() { return this->imgInfo; };
         operator vk::ImageSubresourceRange&() { return this->subresourceRange; };
         operator vk::ImageView&() { return reinterpret_cast<vk::ImageView&>(this->imgInfo.imageView); };
+        operator vk::ImageLayout&() { return reinterpret_cast<vk::ImageLayout&>(this->imgInfo.imageLayout); };
         operator vk::Image&() { return *allocation; };
         operator vk::Device&() { return *allocation; };
+        operator VkDescriptorImageInfo&() { return this->imgInfo; };
+        operator VkImageSubresourceRange&() { return this->subresourceRange; };
+        operator VkImageView&() { return reinterpret_cast<VkImageView&>(this->imgInfo.imageView); };
+        operator VkImageLayout&() { return reinterpret_cast<VkImageLayout&>(this->imgInfo.imageLayout); };
+        operator VkImage&() { return *allocation; };
+        operator VkDevice&() { return *allocation; };
 
         // 
         operator const std::shared_ptr<VmaImageAllocation>&() const { return this->allocation; };
@@ -166,8 +173,15 @@ namespace vkt {
         operator const vk::DescriptorImageInfo&() const { return this->imgInfo; };
         operator const vk::ImageSubresourceRange&() const { return this->subresourceRange; };
         operator const vk::ImageView&() const { return reinterpret_cast<const vk::ImageView&>(this->imgInfo.imageView); };
+        operator const vk::ImageLayout&() const { return reinterpret_cast<const vk::ImageLayout&>(this->imgInfo.imageLayout); };
         operator const vk::Image&() const { return *allocation; };
         operator const vk::Device&() const { return *allocation; };
+        operator const VkDescriptorImageInfo&() const { return this->imgInfo; };
+        operator const VkImageSubresourceRange&() const { return this->subresourceRange; };
+        operator const VkImageView&() const { return reinterpret_cast<const VkImageView&>(this->imgInfo.imageView); };
+        operator const VkImageLayout&() const { return reinterpret_cast<const VkImageLayout&>(this->imgInfo.imageLayout); };
+        operator const VkImage&() const { return *allocation; };
+        operator const VkDevice&() const { return *allocation; };
 
         // 
         VmaImageAllocation* operator->() { return &(*allocation); };

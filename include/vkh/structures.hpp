@@ -786,6 +786,24 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
     } VkRenderPassCreateInfo;
 
     // 
+    typedef struct VkFramebufferCreateInfo {
+        VkStructureType             sType           = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+        const void*                 pNext           = nullptr;
+        VkFramebufferCreateFlags    flags           = {};
+        VkRenderPass                renderPass      = VK_NULL_HANDLE;
+        uint32_t                    attachmentCount = 0u;
+        const VkImageView*          pAttachments    = nullptr;
+        uint32_t                    width           = 1u;
+        uint32_t                    height          = 1u;
+        uint32_t                    layers          = 1u;
+
+        VkFramebufferCreateInfo& setAttachments(const std::vector<VkImageView>& V = {}) { pAttachments = V.data(); attachmentCount = V.size(); return *this; };
+
+        STRUCT_OPERATORS(VkFramebufferCreateInfo)
+        VK_HPP_STRUCT_OPERATORS(VkFramebufferCreateInfo,vk::FramebufferCreateInfo)
+    } VkFramebufferCreateInfo;
+
+    // 
     typedef struct VkAccelerationStructureMemoryRequirementsInfoNV {
         VkStructureType                                    sType                    = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_MEMORY_REQUIREMENTS_INFO_NV;
         const void*                                        pNext                    = nullptr;
