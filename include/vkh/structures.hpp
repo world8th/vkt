@@ -288,6 +288,17 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
     } VkImageSubresourceRange;
 
     // 
+    typedef struct VkImageSubresourceLayers {
+        VkImageAspectFlags    aspectMask     = {};
+        uint32_t              mipLevel       = 0u;
+        uint32_t              baseArrayLayer = 0u;
+        uint32_t              layerCount     = 1u;
+        
+        STRUCT_OPERATORS(VkImageSubresourceLayers)
+        VK_HPP_STRUCT_OPERATORS(VkImageSubresourceLayers,vk::ImageSubresourceLayers)
+    } VkImageSubresourceLayers;
+
+    // 
     typedef struct VkComponentMapping {
         VkComponentSwizzle r = VK_COMPONENT_SWIZZLE_R;
         VkComponentSwizzle g = VK_COMPONENT_SWIZZLE_G;
@@ -312,17 +323,6 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         STRUCT_OPERATORS(VkImageViewCreateInfo)
         VK_HPP_STRUCT_OPERATORS(VkImageViewCreateInfo,vk::ImageViewCreateInfo)
     } VkImageViewCreateInfo;
-
-    // 
-    typedef struct VkImageSubresourceLayers {
-        VkImageAspectFlags    aspectMask     = {};
-        uint32_t              mipLevel       = 0u;
-        uint32_t              baseArrayLayer = 0u;
-        uint32_t              layerCount     = 1u;
-        
-        STRUCT_OPERATORS(VkImageSubresourceLayers)
-        VK_HPP_STRUCT_OPERATORS(VkImageSubresourceLayers,vk::ImageSubresourceLayers)
-    } VkImageSubresourceLayers;
 
     // 
     typedef struct VkBufferImageCopy {
