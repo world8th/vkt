@@ -16,8 +16,8 @@ namespace vkh {
     // W - Work in Progress, V - Verified, D - deprecated...
 
     // TODO: REMOVE CODE TAFTOLOGY
-    class VsRayTracingPipelineCreateInfoHelper { protected: 
-        VkRayTracingPipelineCreateInfoNV vk_info = {};
+    class VsRayTracingPipelineCreateInfoHelper { 
+    protected: 
         VkRayTracingShaderGroupCreateInfoNV raygen_shader_group = {};
         std::vector<VkPipelineShaderStageCreateInfo> stages = {};
         std::vector<VkRayTracingShaderGroupCreateInfoNV> miss_shader_groups = {};
@@ -25,12 +25,14 @@ namespace vkh {
         std::vector<VkRayTracingShaderGroupCreateInfoNV> compiled_shader_groups = {};
 
     public: // get offsets of shader groups
+        VkRayTracingPipelineCreateInfoNV vkInfo = {};
         uintptr_t raygenOffsetIndex() { return 0u; };
         uintptr_t missOffsetIndex() {return 1u; };
         uintptr_t hitOffsetIndex() { return miss_shader_groups.size()+missOffsetIndex(); };
+        uintptr_t groupCount() { return compiled_shader_groups.size(); };
 
         // 
-        VsRayTracingPipelineCreateInfoHelper(const VkRayTracingPipelineCreateInfoNV& info = {}) : vk_info(info) {};
+        VsRayTracingPipelineCreateInfoHelper(const VkRayTracingPipelineCreateInfoNV& info = {}) : vkInfo(info) {};
 
         // result groups
         inline std::vector<VkRayTracingShaderGroupCreateInfoNV>& compileGroups() {
@@ -85,31 +87,31 @@ namespace vkh {
         // 
         inline VkRayTracingPipelineCreateInfoNV& format() {
             auto& groups = compileGroups();
-            vk_info.pGroups = groups.data();
-            vk_info.pStages = stages.data();
-            vk_info.stageCount = stages.size();
-            vk_info.groupCount = groups.size();
-            return vk_info;
+            vkInfo.pGroups = groups.data();
+            vkInfo.pStages = stages.data();
+            vkInfo.stageCount = stages.size();
+            vkInfo.groupCount = groups.size();
+            return vkInfo;
         };
 
         // 
-        inline operator const ::VkRayTracingPipelineCreateInfoNV* () const { return vk_info; };
-        inline operator const VkRayTracingPipelineCreateInfoNV* () { return &vk_info; };
+        inline operator const ::VkRayTracingPipelineCreateInfoNV* () const { return vkInfo; };
+        inline operator const VkRayTracingPipelineCreateInfoNV* () { return &vkInfo; };
 
         // 
         inline operator ::VkRayTracingPipelineCreateInfoNV* () { return format(); };
         inline operator VkRayTracingPipelineCreateInfoNV* () { return &format(); };
 
         // 
-        inline operator const ::VkRayTracingPipelineCreateInfoNV&() const { return vk_info; };
-        inline operator const VkRayTracingPipelineCreateInfoNV&() { return vk_info; };
+        inline operator const ::VkRayTracingPipelineCreateInfoNV&() const { return vkInfo; };
+        inline operator const VkRayTracingPipelineCreateInfoNV&() { return vkInfo; };
 
         // 
         inline operator ::VkRayTracingPipelineCreateInfoNV&() { return format(); };
         inline operator VkRayTracingPipelineCreateInfoNV&() { return format(); };
 
         // Vulkan-HPP
-        inline operator const vk::RayTracingPipelineCreateInfoNV& () const { return vk_info; };
+        inline operator const vk::RayTracingPipelineCreateInfoNV& () const { return vkInfo; };
         inline operator vk::RayTracingPipelineCreateInfoNV& () { return format(); };
     };
 
@@ -131,10 +133,9 @@ namespace vkh {
 
     // TODO: REMOVE CODE TAFTOLOGY
     class VsDescriptorSetCreateInfoHelper { public: uint32_t flags = 0u; using T = uintptr_t; // 
-
-         VsDescriptorSetCreateInfoHelper& reset() { heap.clear(); entries.clear(); handles.clear(); writes.clear(); writes_acs.clear(); format(); return *this; };
-        ~VsDescriptorSetCreateInfoHelper() { reset(); };
-         VsDescriptorSetCreateInfoHelper(const VkDescriptorSetLayout& layout = {}, const VkDescriptorPool& pool = {}) {
+        inline  VsDescriptorSetCreateInfoHelper& reset() { heap.clear(); entries.clear(); handles.clear(); writes.clear(); writes_acs.clear(); format(); return *this; };
+        inline ~VsDescriptorSetCreateInfoHelper() { reset(); };
+        inline  VsDescriptorSetCreateInfoHelper(const VkDescriptorSetLayout& layout = {}, const VkDescriptorPool& pool = {}) {
             template_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_UPDATE_TEMPLATE_CREATE_INFO;
             template_info.pNext = nullptr;
             template_info.flags = flags;
@@ -162,6 +163,11 @@ namespace vkh {
             } else {
                 return _push_description<VkDescriptorImageInfo>(entry);
             };
+        };
+
+        // 
+        inline VsDescriptorSetCreateInfoHelper& setDescriptorSet(const vk::DescriptorSet& set = {}) {
+            this->set = set; return *this;
         };
 
         // 
@@ -219,6 +225,7 @@ namespace vkh {
         inline std::vector<VkWriteDescriptorSet>& mapWriteDescriptorSet() {
             uint32_t I=0; for (auto& entry : entries) { const uint32_t i = I++;
                 const uintptr_t& pt0 = entry.offset;
+                writes[i].dstSet = this->set;
                 if (entry.descriptorType == VK_DESCRIPTOR_TYPE_STORAGE_BUFFER || entry.descriptorType == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER) { // Map Buffers
                     writes[i].pBufferInfo = (VkDescriptorBufferInfo*)(heap.data()+pt0);
                 } else 
@@ -236,8 +243,8 @@ namespace vkh {
         };
 
         // Export By Operator
-        operator std::vector<VkWriteDescriptorSet>&() { return mapWriteDescriptorSet(); };
-        operator const std::vector<VkWriteDescriptorSet>&() const { return writes; };
+        inline operator std::vector<VkWriteDescriptorSet>&() { return mapWriteDescriptorSet(); };
+        inline operator const std::vector<VkWriteDescriptorSet>&() const { return writes; };
 
 
     protected: template<class T = T> // 
@@ -249,6 +256,7 @@ namespace vkh {
             entries.back().stride = sizeof(T);
             handles.push_back({ &entries.back(), &heap.back() });
             writes.push_back({
+                .dstSet = this->set,
                 .dstBinding = entry.dstBinding,
                 .dstArrayElement = entry.dstArrayElement,
                 .descriptorCount = entry.descriptorCount,
@@ -263,6 +271,7 @@ namespace vkh {
         // 
         VkDescriptorSetAllocateInfo allocate_info = {};
         VkDescriptorUpdateTemplateCreateInfo template_info = {};
+        VkDescriptorSet set = {};
 
         // 
         std::vector<uint8_t> heap = {};

@@ -130,18 +130,18 @@ namespace vkt {
         };
         ImageRegion(const ImageRegion& region) { 
             this->allocation = region; 
-            this->subresourceRange = region;
+            this->subresourceRange = (vk::ImageSubresourceRange&)region;
             this->imgInfo = (vk::DescriptorImageInfo&)(region); 
         };
         ImageRegion& operator=(const ImageRegion& region){
             this->allocation = region; 
-            this->subresourceRange = region; 
+            this->subresourceRange = (vk::ImageSubresourceRange&)region;
             this->imgInfo = (vk::DescriptorImageInfo&)(region); 
             return *this;
         };
 
         // 
-        vkh::VkImageSubresourceRange& subresourceRange() { return this->subresourceRange; };
+        //vkh::VkImageSubresourceRange& subresourceRange() { return this->subresourceRange; };
         vkh::VkImageSubresourceLayers subresourceLayers(const uint32_t mipLevel =  0u) const { return {
             .aspectMask = this->subresourceRange.aspectMask,
             .mipLevel = this->subresourceRange.baseMipLevel + mipLevel,
@@ -188,11 +188,12 @@ namespace vkt {
         VmaImageAllocation& operator*() { return (*allocation); };
         const VmaImageAllocation* operator->() const { return &(*allocation); };
         const VmaImageAllocation& operator*() const { return (*allocation); };
-
+        
+        // 
+        vkh::VkImageSubresourceRange subresourceRange = {};
     // 
     protected: friend VmaImageAllocation; // 
         vkh::VkDescriptorImageInfo imgInfo = {};
-        vkh::VkImageSubresourceRange subresourceRange = {};
         std::shared_ptr<VmaImageAllocation> allocation = {};
     };
 
@@ -205,7 +206,7 @@ namespace vkt {
 
         // 
         template<class Tm = T> Vector(const Vector<Tm>& V) : allocation(V), bufInfo({V,V.offset(),V.range()}) {};
-        template<class Tm = T> Vector<T>& operator=(const Vector<Tm>& V) { allocation = V, bufInfo = {V,V.offset(),V.range()}; return *this; };
+        template<class Tm = T> Vector<T>& operator=(const Vector<Tm>& V) { allocation = V, bufInfo = vkh::VkDescriptorBufferInfo{V,V.offset(),V.range()}; return *this; };
 
         // 
         void unmap() { allocation->unmap(); };
@@ -228,11 +229,11 @@ namespace vkt {
         // 
         vk::BufferView& createBufferView(const vk::Format& format = vk::Format::eUndefined) {
             vkh::VkBufferViewCreateInfo info = {};
-            info.buffer = *region;
-            info.offset = region->offset();
-            info.range = region->range();
+            info.buffer = bufInfo.buffer;
+            info.offset = bufInfo.offset;
+            info.range = bufInfo.range;
             info.format = format; // TODO: AUTO-FORMAT
-            return (view = (const vk::Device&)(*region).createBufferView(info));
+            return (view = (vk::Device&)(bufInfo.buffer).createBufferView(info));
         };
 
         // at function 
@@ -255,7 +256,7 @@ namespace vkt {
         operator std::shared_ptr<VmaBufferAllocation>& () { return allocation; };
         operator vkh::VkDescriptorBufferInfo& () { bufInfo.buffer = (vk::Buffer&)(*allocation); return bufInfo; };
         operator vk::DescriptorBufferInfo& () { bufInfo.buffer = (vk::Buffer&)(*allocation); return bufInfo; };
-        operator vk::Buffer& () { return (bufInfo.buffer = (vk::Buffer&)*allocation); };
+        operator vk::Buffer& () { return (vk::Buffer&)(bufInfo.buffer = (vk::Buffer&)*allocation); };
         operator vk::Device& () { return *allocation; };
         operator vk::BufferView& () { return view; };
         operator VkDescriptorBufferInfo& () { bufInfo.buffer = (vk::Buffer&)(*allocation); return reinterpret_cast<VkDescriptorBufferInfo&>(bufInfo); };
@@ -277,7 +278,8 @@ namespace vkt {
 
         // 
         const vk::DeviceSize& offset() const { return bufInfo.offset; };
-        const vk::DeviceSize& range() const { return bufInfo.range; };
+        const vk::DeviceSize range() const { return (bufInfo.range != VK_WHOLE_SIZE ? std::min(bufInfo.range, allocation->range() - bufInfo.offset) : (allocation->range() - bufInfo.offset)); };
+              vk::DeviceSize range()       { return (bufInfo.range != VK_WHOLE_SIZE ? std::min(bufInfo.range, allocation->range() - bufInfo.offset) : (allocation->range() - bufInfo.offset)); };
 
         // typed casting 
         template<class Tm = T> Vector<Tm>& cast() { return reinterpret_cast<Vector<Tm>&>(*this); };

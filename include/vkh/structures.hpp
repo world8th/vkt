@@ -896,17 +896,6 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
     } VkAccelerationStructureCreateInfoNV;
 
     // 
-    typedef struct VkAccelerationStructureMemoryRequirementsInfoNV {
-        VkStructureType                                    sType                  = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_MEMORY_REQUIREMENTS_INFO_NV;
-        const void*                                        pNext                  = nullptr;
-        VkAccelerationStructureMemoryRequirementsTypeNV    type                   = VK_ACCELERATION_STRUCTURE_MEMORY_REQUIREMENTS_TYPE_OBJECT_NV;
-        VkAccelerationStructureNV                          accelerationStructure  = VK_NULL_HANDLE;
-
-        STRUCT_OPERATORS(VkAccelerationStructureMemoryRequirementsInfoNV)
-        VK_HPP_STRUCT_OPERATORS(VkAccelerationStructureMemoryRequirementsInfoNV,vk::AccelerationStructureMemoryRequirementsInfoNV)
-    } VkAccelerationStructureMemoryRequirementsInfoNV;
-
-    // 
     typedef struct VkBindAccelerationStructureMemoryInfoNV {
         VkStructureType              sType                  = VK_STRUCTURE_TYPE_BIND_ACCELERATION_STRUCTURE_MEMORY_INFO_NV;
         const void*                  pNext                  = nullptr;
