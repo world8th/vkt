@@ -27,7 +27,6 @@
 // 
 #include <vulkan/vulkan.hpp>
 #include <vulkan/vk_mem_alloc.h>
-#include <vkh/helpers.hpp>
 
 // 
 #include <stdio.h>
@@ -59,6 +58,9 @@
 #include <vector>
 #include <thread>
 #include <atomic>
+
+// 
+#include <vkh/helpers.hpp>
 
 
 namespace vkt {

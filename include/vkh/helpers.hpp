@@ -9,8 +9,8 @@ namespace vkh {
     // 2. [W] Descriptor Set Layout aggregator
     // 3. [W] Render Pass helper
     // 4. [W] Descriptor Set aggregate and helper
-    // 5. [ ] Device and driver aggregate
-    // 6. [ ] Buffer and VMA based vectors
+    // 5. [W] Device and driver aggregate
+    // 6. [W] Buffer and VMA based vectors
     // W - Work in Progress, V - Verified, D - deprecated...
 
     // TODO: REMOVE CODE TAFTOLOGY
