@@ -130,6 +130,7 @@ namespace vkt
         vk::Image depthImage = {};
         vk::ImageView depthImageView = {};
         vk::PipelineCache pipelineCache = {};
+        vk::DispatchLoaderDynamic dispatch = {};
         VmaAllocator allocator = {};
         uint32_t queueFamilyIndex = 0;
         uint32_t instanceVersion = 0;
@@ -142,9 +143,10 @@ namespace vkt
 
         //vk::Device createDevice(bool isComputePrior = true, std::string shaderPath = "./", bool enableAdvancedAcceleration = true);
         inline vk::PhysicalDevice& getPhysicalDevice(const uint32_t& gpuID) { physicalDevice = physicalDevices[gpuID]; return physicalDevice; };
+        inline vk::PhysicalDevice& getPhysicalDevice() { if (!physicalDevice) { physicalDevice = physicalDevices[0u]; }; return physicalDevice; };
 
         // 
-        inline vk::PhysicalDevice& getPhysicalDevice() { return physicalDevice; };
+        inline vk::DispatchLoaderDynamic getDispatch() { return dispatch; };
         inline vk::Device& getDevice() { return device; };
         inline vk::Queue& getQueue() { return queue; };
         inline vk::Fence& getFence() { return fence; };
@@ -155,6 +157,7 @@ namespace vkt
         inline VmaAllocator& getAllocator() { return allocator; };
 
         // 
+        inline const vk::DispatchLoaderDynamic getDispatch() const { return dispatch; };
         inline const vk::PhysicalDevice& getPhysicalDevice() const { return physicalDevice; };
         inline const vk::Device& getDevice() const { return device; };
         inline const vk::Queue& getQueue() const { return queue; };
@@ -188,7 +191,7 @@ namespace vkt
         inline operator const VmaAllocator&() const { return allocator; };
 
         // 
-        void submitCommandWithSync(const vk::CommandBuffer & cmdBuf) {
+        inline void submitCommandWithSync(const vk::CommandBuffer & cmdBuf) {
             // submit command
             vk::SubmitInfo sbmi = {};
             sbmi.commandBufferCount = 1;//cmdBuffers.size();
@@ -210,7 +213,7 @@ namespace vkt
         } applicationWindow = {};
 
     public:
-        vk::Instance& createInstance() {
+        inline vk::Instance& createInstance() {
 
 
 #ifdef VOLK_H_
@@ -282,7 +285,7 @@ namespace vkt
         };
 
         // TODO: REMAKE MAKING
-        vk::Device createDevice(bool isComputePrior, std::string shaderPath, bool enableAdvancedAcceleration) {
+        inline vk::Device createDevice(bool isComputePrior, std::string shaderPath, bool enableAdvancedAcceleration) {
 
             // use extensions
             auto deviceExtensions = std::vector<const char*>();
@@ -356,10 +359,11 @@ namespace vkt
                 });
                 this->pipelineCache = this->device.createPipelineCache(vk::PipelineCacheCreateInfo());
             };
-            //this->device->linkPhysicalHelper(this->physicalHelper)->create()->cache(std::vector<uint8_t>{ 0u,0u,0u,0u });
+            
             this->queue = this->device.getQueue(queueFamilyIndex, 0); // 
             this->fence = this->device.createFence(vk::FenceCreateInfo().setFlags({}));
             this->commandPool = this->device.createCommandPool(vk::CommandPoolCreateInfo(vk::CommandPoolCreateFlags(vk::CommandPoolCreateFlagBits::eResetCommandBuffer), queueFamilyIndex));
+            this->dispatch = vk::DispatchLoaderDynamic(this->instance, this->device); // 
 
             VmaAllocatorCreateInfo vma_info = {};
             vma_info.device = this->device;
@@ -405,14 +409,14 @@ namespace vkt
         }
 
         // getters
-        vk::SurfaceKHR surface() const { return applicationWindow.surface; }
-        GLFWwindow* window() const { return applicationWindow.window; }
-        const SurfaceFormat& format() const { return applicationWindow.surfaceFormat; }
-        const vk::Extent2D& size() const { return applicationWindow.surfaceSize; }
+        inline vk::SurfaceKHR surface() const { return applicationWindow.surface; }
+        inline GLFWwindow* window() const { return applicationWindow.window; }
+        inline const SurfaceFormat& format() const { return applicationWindow.surfaceFormat; }
+        inline const vk::Extent2D& size() const { return applicationWindow.surfaceSize; }
 
         // setters
-        void format(SurfaceFormat format) { applicationWindow.surfaceFormat = format; }
-        void size(const vk::Extent2D & size) { applicationWindow.surfaceSize = size; }
+        inline void format(SurfaceFormat format) { applicationWindow.surfaceFormat = format; }
+        inline void size(const vk::Extent2D & size) { applicationWindow.surfaceSize = size; }
 
         // 
         inline SurfaceFormat& getSurfaceFormat(vk::PhysicalDevice gpu)

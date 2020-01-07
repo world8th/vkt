@@ -140,7 +140,6 @@ namespace vkt {
             return *this;
         };
 
-        // 
         //vkh::VkImageSubresourceRange& subresourceRange() { return this->subresourceRange; };
         vkh::VkImageSubresourceLayers subresourceLayers(const uint32_t mipLevel =  0u) const { return {
             .aspectMask = this->subresourceRange.aspectMask,
@@ -148,6 +147,12 @@ namespace vkt {
             .baseArrayLayer = this->subresourceRange.baseArrayLayer,
             .layerCount = this->subresourceRange.layerCount
         };};
+
+        // set methods for direct control
+        ImageRegion& setImageLayout(const VkImageLayout layout = {}) { imgInfo.imageLayout = layout; return *this; };
+        ImageRegion& setSampler(const VkSampler& sampler = {}) { imgInfo.sampler = sampler; return *this; };
+        ImageRegion& setImageLayout(const vk::ImageLayout layout = {}) { imgInfo.imageLayout = (const VkImageLayout&)layout; return *this; };
+        ImageRegion& setSampler(const vk::Sampler& sampler = {}) { imgInfo.sampler = (const VkSampler&)sampler; return *this; };
 
         // 
         operator std::shared_ptr<VmaImageAllocation>&() { return this->allocation; };
@@ -158,12 +163,14 @@ namespace vkt {
         operator vk::ImageView&() { return reinterpret_cast<vk::ImageView&>(this->imgInfo.imageView); };
         operator vk::ImageLayout&() { return reinterpret_cast<vk::ImageLayout&>(this->imgInfo.imageLayout); };
         operator vk::Image&() { return *allocation; };
+        operator vk::Sampler&() { return (vk::Sampler&)imgInfo.sampler; };
         operator vk::Device&() { return *allocation; };
         operator VkDescriptorImageInfo&() { return this->imgInfo; };
         operator VkImageSubresourceRange&() { return this->subresourceRange; };
         operator VkImageView&() { return reinterpret_cast<VkImageView&>(this->imgInfo.imageView); };
         operator VkImageLayout&() { return reinterpret_cast<VkImageLayout&>(this->imgInfo.imageLayout); };
         operator VkImage&() { return *allocation; };
+        operator VkSampler&() { return (VkSampler&)imgInfo.sampler; };
         operator VkDevice&() { return *allocation; };
 
         // 
@@ -175,12 +182,14 @@ namespace vkt {
         operator const vk::ImageView&() const { return reinterpret_cast<const vk::ImageView&>(this->imgInfo.imageView); };
         operator const vk::ImageLayout&() const { return reinterpret_cast<const vk::ImageLayout&>(this->imgInfo.imageLayout); };
         operator const vk::Image&() const { return *allocation; };
+        operator const vk::Sampler&() const { return (vk::Sampler&)imgInfo.sampler; };
         operator const vk::Device&() const { return *allocation; };
         operator const VkDescriptorImageInfo&() const { return this->imgInfo; };
         operator const VkImageSubresourceRange&() const { return this->subresourceRange; };
         operator const VkImageView&() const { return reinterpret_cast<const VkImageView&>(this->imgInfo.imageView); };
         operator const VkImageLayout&() const { return reinterpret_cast<const VkImageLayout&>(this->imgInfo.imageLayout); };
         operator const VkImage&() const { return *allocation; };
+        operator const VkSampler&() const { return (VkSampler&)imgInfo.sampler; };
         operator const VkDevice&() const { return *allocation; };
 
         // 
@@ -220,11 +229,6 @@ namespace vkt {
         // 
         T* const data() { return mapped(); };
         const T* data() const { return mapped(); };
-
-        // return corrected size
-        vk::DeviceSize size() const {
-            return (bufInfo.range != VK_WHOLE_SIZE ? std::min(bufInfo.range, allocation->range() - bufInfo.offset) : (allocation->range() - bufInfo.offset)) / sizeof(T);
-        };
 
         // 
         vk::BufferView& createBufferView(const vk::Format& format = vk::Format::eUndefined) {
@@ -278,8 +282,8 @@ namespace vkt {
 
         // 
         const vk::DeviceSize& offset() const { return bufInfo.offset; };
-        const vk::DeviceSize range() const { return (bufInfo.range != VK_WHOLE_SIZE ? std::min(bufInfo.range, allocation->range() - bufInfo.offset) : (allocation->range() - bufInfo.offset)); };
-              vk::DeviceSize range()       { return (bufInfo.range != VK_WHOLE_SIZE ? std::min(bufInfo.range, allocation->range() - bufInfo.offset) : (allocation->range() - bufInfo.offset)); };
+        vk::DeviceSize range() const { return (bufInfo.range != VK_WHOLE_SIZE ? std::min(bufInfo.range, allocation->range() - bufInfo.offset) : (allocation->range() - bufInfo.offset)); };
+        vk::DeviceSize size() const { return this->range() / sizeof(T); };
 
         // typed casting 
         template<class Tm = T> Vector<Tm>& cast() { return reinterpret_cast<Vector<Tm>&>(*this); };
