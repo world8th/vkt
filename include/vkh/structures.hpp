@@ -1,6 +1,4 @@
 #pragma once
-#include <vulkan/vulkan.h>
-#include <glm/glm.hpp>
 
 #include "./enums.hpp"
 #include "./bitfields.hpp"
