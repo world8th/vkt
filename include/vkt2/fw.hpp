@@ -87,7 +87,8 @@ namespace vkt
             "VK_KHR_shader_float16_int8",
             "VK_KHR_shader_float_controls",
             "VK_KHR_shader_clock",
-            //"VK_KHR_surface",
+            "VK_KHR_imageless_framebuffer",
+            "VK_KHR_storage_buffer_storage_class",
 
             "VK_NV_compute_shader_derivatives",
             "VK_NV_corner_sampled_image",
@@ -314,16 +315,22 @@ namespace vkt
             auto gStorage16 = vk::PhysicalDevice16BitStorageFeatures{};
             auto gStorage8 = vk::PhysicalDevice8BitStorageFeaturesKHR{};
             auto gDescIndexing = vk::PhysicalDeviceDescriptorIndexingFeaturesEXT{};
+
+            // 
             gStorage16.pNext = &gStorage8;
-            gStorage8.pNext = &gDescIndexing;
+            gDescIndexing.descriptorBindingPartiallyBound = true;
+            gDescIndexing.pNext = &gStorage16;
 
             // 
             auto gFeatures = vk::PhysicalDeviceFeatures2{};
-            gFeatures.pNext = &gStorage16;
+            gFeatures.pNext = &gDescIndexing;
             gFeatures.features.shaderInt16 = true;
             gFeatures.features.shaderInt64 = true;
             gFeatures.features.shaderUniformBufferArrayDynamicIndexing = true;
-            physicalDevice.getFeatures2(&gFeatures);
+
+            // 
+            vkGetPhysicalDeviceFeatures2(physicalDevice, &(VkPhysicalDeviceFeatures2&)gFeatures);
+            //physicalDevice.getFeatures2(&gFeatures);
 
             // get features and queue family properties
             //auto gpuFeatures = gpu.getFeatures();
@@ -342,20 +349,21 @@ namespace vkt
                     queueFamilyIndices.push_back(graphicsFamilyIndex);
                     break;
                 };
-            };
+            }; //VkPhysicalDeviceDescriptorIndexingFeaturesEXT
 
             // return device with queue pointer
             const uint32_t qptr = 0;
             if (queueCreateInfos.size() > 0) {
                 this->queueFamilyIndex = queueFamilyIndices[qptr];
                 this->device = this->physicalDevice.createDevice(vkh::VkDeviceCreateInfo{
+                    .pNext = &gFeatures,
                     .queueCreateInfoCount = uint32_t(queueCreateInfos.size()),
                     .pQueueCreateInfos = reinterpret_cast<::VkDeviceQueueCreateInfo*>(queueCreateInfos.data()),
                     .enabledLayerCount = uint32_t(layers.size()),
                     .ppEnabledLayerNames = layers.data(),
                     .enabledExtensionCount = uint32_t(deviceExtensions.size()),
                     .ppEnabledExtensionNames = deviceExtensions.data(),
-                    .pEnabledFeatures = reinterpret_cast<VkPhysicalDeviceFeatures*>(&gFeatures.features)
+                    .pEnabledFeatures = &(VkPhysicalDeviceFeatures&)(gFeatures.features)
                 });
                 this->pipelineCache = this->device.createPipelineCache(vk::PipelineCacheCreateInfo());
             };

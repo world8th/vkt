@@ -300,11 +300,11 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
 
     // 
     typedef struct VkImageSubresourceRange {
-        VkImageAspectFlags    aspectMask = {};
-        uint32_t              baseMipLevel = 0u;
-        uint32_t              levelCount = 1u;
+        VkImageAspectFlags    aspectMask     = { .eColor = 1 };
+        uint32_t              baseMipLevel   = 0u;
+        uint32_t              levelCount     = 1u;
         uint32_t              baseArrayLayer = 0u;
-        uint32_t              layerCount = 1u;
+        uint32_t              layerCount     = 1u;
         
         STRUCT_OPERATORS(VkImageSubresourceRange)
         VK_HPP_STRUCT_OPERATORS(VkImageSubresourceRange,vk::ImageSubresourceRange)
@@ -312,7 +312,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
 
     // 
     typedef struct VkImageSubresourceLayers {
-        VkImageAspectFlags    aspectMask     = {};
+        VkImageAspectFlags    aspectMask     = { .eColor = 1 };
         uint32_t              mipLevel       = 0u;
         uint32_t              baseArrayLayer = 0u;
         uint32_t              layerCount     = 1u;

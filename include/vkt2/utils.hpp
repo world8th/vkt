@@ -195,7 +195,7 @@ namespace vkt {
     };
 
     // create secondary command buffers for batching compute invocations
-    static inline auto createCommandBuffer(const vk::Device& device, const vk::CommandPool& cmdPool, bool secondary = true, bool once = true) {
+    static inline auto createCommandBuffer(const vk::Device& device, const vk::CommandPool& cmdPool, bool secondary = false, bool once = false) {
         vk::CommandBuffer cmdBuffer = {};
 
         vk::CommandBufferAllocateInfo cmdi = vk::CommandBufferAllocateInfo{};
@@ -204,13 +204,13 @@ namespace vkt {
         cmdi.commandBufferCount = 1;
         cmdBuffer = (device.allocateCommandBuffers(cmdi))[0];
 
-        vk::CommandBufferInheritanceInfo inhi = vk::CommandBufferInheritanceInfo{};
-        inhi.pipelineStatistics = vk::QueryPipelineStatisticFlagBits::eComputeShaderInvocations;
+        //vk::CommandBufferInheritanceInfo inhi = vk::CommandBufferInheritanceInfo{};
+        //inhi.pipelineStatistics = vk::QueryPipelineStatisticFlagBits::eComputeShaderInvocations;
 
         vk::CommandBufferBeginInfo bgi = vk::CommandBufferBeginInfo{};
         bgi.flags = {};
         bgi.flags = once ? vk::CommandBufferUsageFlagBits::eOneTimeSubmit : vk::CommandBufferUsageFlagBits::eSimultaneousUse;
-        bgi.pInheritanceInfo = secondary ? &inhi : nullptr;
+        //bgi.pInheritanceInfo = secondary ? &inhi : nullptr;
         cmdBuffer.begin(bgi);
 
         return cmdBuffer;

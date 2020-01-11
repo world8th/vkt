@@ -15,14 +15,16 @@ namespace vkt {
             VmaAllocationCreateInfo vmaInfo = {}; vmaInfo.usage = vmaUsage;
             if (vmaUsage == VMA_MEMORY_USAGE_CPU_TO_GPU || vmaUsage == VMA_MEMORY_USAGE_GPU_TO_CPU) { vmaInfo.flags = VMA_ALLOCATION_CREATE_MAPPED_BIT; };
             assert(vmaCreateBuffer(this->allocator = allocator, createInfo, &vmaInfo, &(VkBuffer&)buffer, &allocation, &allocationInfo) == VK_SUCCESS);
+            this->range = createInfo.size;
         };
-        VmaBufferAllocation(const VmaBufferAllocation& allocation) : buffer(allocation.buffer), allocation(allocation.allocation), allocationInfo(allocation.allocationInfo), allocator(allocation.allocator) {};
+        VmaBufferAllocation(const VmaBufferAllocation& allocation) : buffer(allocation.buffer), allocation(allocation.allocation), allocationInfo(allocation.allocationInfo), allocator(allocation.allocator), range(allocation.range) {};
         VmaBufferAllocation& operator=(const VmaBufferAllocation& allocation) {
             vmaDestroyBuffer(allocator, *this, allocation); // don't assign into already allocated
             this->buffer = allocation.buffer;
             this->allocation = allocation.allocation;
             this->allocationInfo = allocation.allocationInfo;
             this->allocator = allocation.allocator;
+            this->range = allocation.range;
             return *this;
         };
 
@@ -30,6 +32,14 @@ namespace vkt {
         void* map() { void* ptr = nullptr; vmaMapMemory(allocator, allocation, &ptr); return ptr; };
         void* mapped() { if (!allocationInfo.pMappedData) { vmaMapMemory(allocator, allocation, &allocationInfo.pMappedData); }; return allocationInfo.pMappedData; };
         void unmap() { vmaUnmapMemory(allocator, allocation); allocationInfo.pMappedData = nullptr; };
+
+        // 
+        //vk::Buffer& buffer() { return buffer; };
+        //VkBuffer& buffer() { return (VkBuffer&)buffer; };
+
+        // 
+        //const vk::Buffer& buffer() const { return buffer; };
+        //const VkBuffer& buffer() const { return (VkBuffer&)buffer; };
 
         // 
         operator vk::Buffer& () { return buffer; };
@@ -47,13 +57,12 @@ namespace vkt {
         operator const VmaAllocation& () const { return allocation; };
         operator const VmaAllocationInfo& () const { return allocationInfo; };
 
-        // 
-        vk::DeviceSize& range() { return allocationInfo.size; };
-        const vk::DeviceSize& range() const { return allocationInfo.size; };
+    public: // in-variant 
+        vk::Buffer buffer = {};
+        vk::DeviceSize range = 0ull;
 
     // 
     protected: friend VmaBufferAllocation; // 
-        vk::Buffer buffer = {};
         VmaAllocation allocation = {};
         VmaAllocationInfo allocationInfo = {};
         VmaAllocator allocator = {};
@@ -124,7 +133,7 @@ namespace vkt {
         ImageRegion(){};
         ImageRegion(const std::shared_ptr<VmaImageAllocation>& allocation, const vkh::VkImageViewCreateInfo& info = {}, const vk::ImageLayout& layout = vk::ImageLayout::eGeneral) {
             this->allocation = allocation;
-            this->imgInfo.imageView = ((vk::Device&)(allocation)).createImageView(info);
+            this->imgInfo.imageView = ((vk::Device&)(*allocation)).createImageView(vk::ImageViewCreateInfo(info).setImage(*allocation));
             this->imgInfo.imageLayout = VkImageLayout(layout);
             this->subresourceRange = info.subresourceRange;
         };
@@ -134,9 +143,9 @@ namespace vkt {
             this->imgInfo = (vk::DescriptorImageInfo&)(region); 
         };
         ImageRegion& operator=(const ImageRegion& region){
-            this->allocation = region; 
-            this->subresourceRange = (vk::ImageSubresourceRange&)region;
-            this->imgInfo = (vk::DescriptorImageInfo&)(region); 
+            this->allocation = region.allocation;
+            this->subresourceRange = region.subresourceRange;
+            this->imgInfo = region.imgInfo;
             return *this;
         };
 
@@ -165,8 +174,8 @@ namespace vkt {
         operator vk::Image&() { return *allocation; };
         operator vk::Sampler&() { return (vk::Sampler&)imgInfo.sampler; };
         operator vk::Device&() { return *allocation; };
-        operator VkDescriptorImageInfo&() { return this->imgInfo; };
-        operator VkImageSubresourceRange&() { return this->subresourceRange; };
+        operator ::VkDescriptorImageInfo&() { return this->imgInfo; };
+        operator ::VkImageSubresourceRange&() { return this->subresourceRange; };
         operator VkImageView&() { return reinterpret_cast<VkImageView&>(this->imgInfo.imageView); };
         operator VkImageLayout&() { return reinterpret_cast<VkImageLayout&>(this->imgInfo.imageLayout); };
         operator VkImage&() { return *allocation; };
@@ -184,8 +193,8 @@ namespace vkt {
         operator const vk::Image&() const { return *allocation; };
         operator const vk::Sampler&() const { return (vk::Sampler&)imgInfo.sampler; };
         operator const vk::Device&() const { return *allocation; };
-        operator const VkDescriptorImageInfo&() const { return this->imgInfo; };
-        operator const VkImageSubresourceRange&() const { return this->subresourceRange; };
+        operator const ::VkDescriptorImageInfo&() const { return this->imgInfo; };
+        operator const ::VkImageSubresourceRange&() const { return this->subresourceRange; };
         operator const VkImageView&() const { return reinterpret_cast<const VkImageView&>(this->imgInfo.imageView); };
         operator const VkImageLayout&() const { return reinterpret_cast<const VkImageLayout&>(this->imgInfo.imageLayout); };
         operator const VkImage&() const { return *allocation; };
@@ -197,13 +206,13 @@ namespace vkt {
         VmaImageAllocation& operator*() { return (*allocation); };
         const VmaImageAllocation* operator->() const { return &(*allocation); };
         const VmaImageAllocation& operator*() const { return (*allocation); };
-        
-        // 
-        vkh::VkImageSubresourceRange subresourceRange = {};
-    // 
+
     protected: friend VmaImageAllocation; // 
         vkh::VkDescriptorImageInfo imgInfo = {};
         std::shared_ptr<VmaImageAllocation> allocation = {};
+
+    public: // irrevalent sources
+        vkh::VkImageSubresourceRange subresourceRange = {};
     };
 
     // Wrapper Class
@@ -211,11 +220,11 @@ namespace vkt {
     class Vector { // 
     public:
         Vector() {};
-        Vector(const std::shared_ptr<VmaBufferAllocation>& allocation, vk::DeviceSize offset = 0u, vk::DeviceSize size = VK_WHOLE_SIZE) : allocation(allocation), bufInfo({*allocation,offset,size}) {};
+        Vector(const std::shared_ptr<VmaBufferAllocation>& allocation, vk::DeviceSize offset = 0u, vk::DeviceSize size = VK_WHOLE_SIZE) : allocation(allocation), bufInfo({ allocation->buffer,offset,size }) {};
 
         // 
-        template<class Tm = T> Vector(const Vector<Tm>& V) : allocation(V), bufInfo({V,V.offset(),V.range()}) {};
-        template<class Tm = T> Vector<T>& operator=(const Vector<Tm>& V) { allocation = V, bufInfo = vkh::VkDescriptorBufferInfo{V,V.offset(),V.range()}; return *this; };
+        template<class Tm = T> Vector(const Vector<Tm>& V) : allocation(V), bufInfo({ V.buffer(), V.offset(), V.range() }) {};
+        template<class Tm = T> Vector<T>& operator=(const Vector<Tm>& V) { this->allocation = V, this->bufInfo = vk::DescriptorBufferInfo(V.buffer(), V.offset(), V.range()); return *this; };
 
         // 
         void unmap() { allocation->unmap(); };
@@ -258,33 +267,41 @@ namespace vkt {
 
         // 
         operator std::shared_ptr<VmaBufferAllocation>& () { return allocation; };
-        operator vkh::VkDescriptorBufferInfo& () { bufInfo.buffer = (vk::Buffer&)(*allocation); return bufInfo; };
+        operator vkh::VkDescriptorBufferInfo& () { bufInfo.buffer = (vk::Buffer&)(*allocation); return reinterpret_cast<vkh::VkDescriptorBufferInfo&>(bufInfo); };
         operator vk::DescriptorBufferInfo& () { bufInfo.buffer = (vk::Buffer&)(*allocation); return bufInfo; };
         operator vk::Buffer& () { return (vk::Buffer&)(bufInfo.buffer = (vk::Buffer&)*allocation); };
         operator vk::Device& () { return *allocation; };
         operator vk::BufferView& () { return view; };
-        operator VkDescriptorBufferInfo& () { bufInfo.buffer = (vk::Buffer&)(*allocation); return reinterpret_cast<VkDescriptorBufferInfo&>(bufInfo); };
+        operator ::VkDescriptorBufferInfo& () { bufInfo.buffer = (vk::Buffer&)(*allocation); return reinterpret_cast<::VkDescriptorBufferInfo&>(bufInfo); };
         operator VkBuffer& () { return (VkBuffer&)(bufInfo.buffer = (vk::Buffer&) * allocation); };
         operator VkDevice& () { return *allocation; };
         operator VkBufferView& () { return view; };
 
         // 
         operator const std::shared_ptr<VmaBufferAllocation>& () const { return allocation; };
-        operator const vkh::VkDescriptorBufferInfo& () const { return bufInfo; };
+        operator const vkh::VkDescriptorBufferInfo& () const { return reinterpret_cast<const vkh::VkDescriptorBufferInfo&>(bufInfo); };
         operator const vk::DescriptorBufferInfo& () const { return bufInfo; };
         operator const vk::Buffer& () const { return *allocation; };
         operator const vk::Device& () const { return *allocation; };
         operator const vk::BufferView& () const { return view; };
-        operator const VkDescriptorBufferInfo& () const { return reinterpret_cast<const VkDescriptorBufferInfo&>(bufInfo); };
+        operator const ::VkDescriptorBufferInfo& () const { return reinterpret_cast<const ::VkDescriptorBufferInfo&>(bufInfo); };
         operator const VkBuffer&() const { return *allocation; };
         operator const VkDevice&() const { return *allocation; };
         operator const VkBufferView& () const { return reinterpret_cast<const VkBufferView&>(view); };
 
         // 
         const vk::DeviceSize& offset() const { return bufInfo.offset; };
-        vk::DeviceSize range() const { return (bufInfo.range != VK_WHOLE_SIZE ? std::min(bufInfo.range, allocation->range() - bufInfo.offset) : (allocation->range() - bufInfo.offset)); };
+        vk::DeviceSize range() const { return (bufInfo.range != VK_WHOLE_SIZE ? std::min(bufInfo.range, allocation->range - bufInfo.offset) : (allocation->range - bufInfo.offset)); };
         vk::DeviceSize size() const { return this->range() / sizeof(T); };
 
+        // 
+        vk::Buffer& buffer() { return reinterpret_cast<vk::Buffer&>(allocation->buffer); };
+        //VkBuffer& buffer() { return reinterpret_cast<VkBuffer&>(allocation->buffer); };
+
+        // 
+        const vk::Buffer& buffer() const { return reinterpret_cast<vk::Buffer&>(allocation->buffer); };
+        //const VkBuffer& buffer() const { return reinterpret_cast<VkBuffer&>(allocation->buffer); };
+        
         // typed casting 
         template<class Tm = T> Vector<Tm>& cast() { return reinterpret_cast<Vector<Tm>&>(*this); };
         template<class Tm = T> const Vector<Tm>& cast() const { return reinterpret_cast<const Vector<Tm>&>(*this); };
@@ -299,7 +316,8 @@ namespace vkt {
         const VmaBufferAllocation& operator*() const { return (*allocation); };
 
     protected: friend Vector<T>; // 
-        vkh::VkDescriptorBufferInfo bufInfo = {}; vk::BufferView view = {};
+        //vkh::VkDescriptorBufferInfo bufInfo = {}; vk::BufferView view = {};
+        vk::DescriptorBufferInfo bufInfo = {}; vk::BufferView view = {};
         std::shared_ptr<VmaBufferAllocation> allocation = {};
     };
 
