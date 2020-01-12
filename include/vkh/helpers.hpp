@@ -25,9 +25,9 @@ namespace vkh {
     public: // get offsets of shader groups
         VkRayTracingPipelineCreateInfoNV vkInfo = {};
         uintptr_t raygenOffsetIndex() { return 0u; };
-        uintptr_t missOffsetIndex() {return 1u; };
+        uintptr_t missOffsetIndex() { return 1u; };
         uintptr_t hitOffsetIndex() { return miss_shader_groups.size()+missOffsetIndex(); };
-        uintptr_t groupCount() { return compiled_shader_groups.size(); };
+        uintptr_t groupCount() { return miss_shader_groups.size() + hit_shader_groups.size() + 1u; };
 
         // 
         VsRayTracingPipelineCreateInfoHelper(const VkRayTracingPipelineCreateInfoNV& info = {}) : vkInfo(info) {};
@@ -352,7 +352,7 @@ namespace vkh {
     // TODO: REMOVE CODE TAFTOLOGY
     class VsRenderPassCreateInfoHelper { public: 
         VsRenderPassCreateInfoHelper(const VkRenderPassCreateInfo& info = {}) : vk_info(info) {
-
+            
         };
 
         // 
@@ -408,6 +408,17 @@ namespace vkh {
         //
         inline VsRenderPassCreateInfoHelper& beginSubpass() { subpasses.push_back({}); color_attachments.push_back({}); input_attachments.push_back({}); depth_stencil_attachment.push_back({}); return *this; };
         inline VsRenderPassCreateInfoHelper& addSubpassDependency(const VkSubpassDependency& dependency = {}) { dependencies.push_back(dependency); return *this; };
+
+        // 
+        inline VsRenderPassCreateInfoHelper& addInputAttachment(const VkAttachmentDescription& attachment = {}) {
+            uintptr_t ptr = attachments.size(); attachments.push_back(attachment); auto& layout = attachments.back().finalLayout;
+            if (layout == VK_IMAGE_LAYOUT_UNDEFINED) { layout = VK_IMAGE_LAYOUT_GENERAL; };
+            if (subpasses.size() < 1u) { beginSubpass(); };
+            input_attachments.back().push_back({ .attachment = static_cast<uint32_t>(ptr), .layout = VK_IMAGE_LAYOUT_GENERAL });
+            return *this;
+        };
+
+        // 
         inline VsRenderPassCreateInfoHelper& addColorAttachment(const VkAttachmentDescription& attachment = {}) {
             uintptr_t ptr = attachments.size(); attachments.push_back(attachment); auto& layout = attachments.back().finalLayout;
             if (layout == VK_IMAGE_LAYOUT_UNDEFINED) { layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL; };

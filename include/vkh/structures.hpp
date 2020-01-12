@@ -942,14 +942,15 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
     #pragma pack(push, 1)
     struct VsGeometryInstance {
         glm::mat3x4 transform = {
-            glm::vec4(1.0f,0.0f,0.0f,0.0f),
-            glm::vec4(0.0f,1.0f,0.0f,0.0f),
-            glm::vec4(0.0f,0.0f,1.0f,0.0f)
+            glm::vec4(1.f,0.f,0.f,0.f),
+            glm::vec4(0.f,1.f,0.f,0.f),
+            glm::vec4(0.f,0.f,1.f,0.f)
         };
         uint32_t instanceId : 24;
         uint32_t mask : 8;
         uint32_t instanceOffset : 24;
-        union { uint32_t flags_8u : 8; VkGeometryInstanceFlagsNV flags = {}; };
+        uint32_t flags : 8;
+        //union { uint32_t flags_8u : 8; VkGeometryInstanceFlagsNV flags = {}; };
         uint64_t accelerationStructureHandle = 0ull;
 
         // Few Operators

@@ -19,6 +19,7 @@ namespace vkt {
         vk::Framebuffer frameBuffer = {};
         vk::CommandBuffer commandBuffer = {}; // terminal command (barrier)
         vk::Fence waitFence = {};
+        //vk::Image image = {};
         vk::Semaphore semaphore = {};
     };
 

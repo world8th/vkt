@@ -363,7 +363,7 @@ namespace vkt
                     .ppEnabledLayerNames = layers.data(),
                     .enabledExtensionCount = uint32_t(deviceExtensions.size()),
                     .ppEnabledExtensionNames = deviceExtensions.data(),
-                    .pEnabledFeatures = &(VkPhysicalDeviceFeatures&)(gFeatures.features)
+                    //.pEnabledFeatures = &(VkPhysicalDeviceFeatures&)(gFeatures.features)
                 });
                 this->pipelineCache = this->device.createPipelineCache(vk::PipelineCacheCreateInfo());
             };

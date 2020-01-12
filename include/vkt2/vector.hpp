@@ -200,6 +200,7 @@ namespace vkt {
         operator const VkImage&() const { return *allocation; };
         operator const VkSampler&() const { return (VkSampler&)imgInfo.sampler; };
         operator const VkDevice&() const { return *allocation; };
+        operator const vk::ImageSubresourceLayers() const { return vk::ImageSubresourceLayers{ (vk::ImageAspectFlags&)subresourceRange.aspectMask, subresourceRange.baseMipLevel, subresourceRange.baseArrayLayer, subresourceRange.layerCount }; };
 
         // 
         VmaImageAllocation* operator->() { return &(*allocation); };
