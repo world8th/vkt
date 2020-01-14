@@ -58,6 +58,7 @@
 #include <vector>
 #include <thread>
 #include <atomic>
+#include <future>
 
 // 
 #include <vkh/helpers.hpp>
@@ -280,32 +281,27 @@ namespace vkt {
     };
 
     // once submit command buffer
+    // TODO: return VkResult
     static inline auto submitOnce(const vk::Device& device, const vk::Queue& queue, const vk::CommandPool& cmdPool, const std::function<void(vk::CommandBuffer&)>& cmdFn = {}, const vk::SubmitInfo& smbi = {}) {
         auto cmdBuf = createCommandBuffer(device, cmdPool, false); cmdFn(cmdBuf); cmdBuf.end();
         submitCmd(device, queue, { cmdBuf }); device.freeCommandBuffers(cmdPool, 1, &cmdBuf); // free that command buffer
     };
 
     // submit command (with async wait)
-    static inline auto submitCmdAsync(const vk::Device& device, const vk::Queue& queue, const std::vector<vk::CommandBuffer>& cmds, const std::function<void()>& asyncCallback = {}, vk::SubmitInfo smbi = {}) {
-        // no commands 
-        if (cmds.size() <= 0) return;
-        smbi.commandBufferCount = cmds.size();
-        smbi.pCommandBuffers = (vk::CommandBuffer*)cmds.data();
-
-        vk::Fence fence = {}; vk::FenceCreateInfo fin = vk::FenceCreateInfo{};
-        device.createFence(&fin, nullptr, &fence);
-        queue.submit(1, (const vk::SubmitInfo*)& smbi, fence);
-        device.waitForFences(1, &fence, true, INT64_MAX);
-        device.destroyFence(fence, nullptr);
-        if (asyncCallback) asyncCallback();
+    // TODO: return VkResult
+    static inline auto submitCmdAsync(const vk::Device& device, const vk::Queue& queue, const std::vector<vk::CommandBuffer>& cmds, const vk::SubmitInfo& smbi = {}) {
+        return std::async(std::launch::async | std::launch::deferred, [=](){
+            return submitCmd(device, queue, cmds, smbi);
+        });
     };
 
     // once submit command buffer
-    static inline auto submitOnceAsync(const vk::Device& device, const vk::Queue& queue, const vk::CommandPool& cmdPool, const std::function<void(vk::CommandBuffer&)>& cmdFn = {}, const std::function<void(vk::CommandBuffer)>& asyncCallback = {}, const vk::SubmitInfo& smbi = {}) {
-        auto cmdBuf = createCommandBuffer(device, cmdPool, false); cmdFn(cmdBuf); cmdBuf.end();
-        submitCmdAsync(device, queue, { cmdBuf }, [&]() {
-            asyncCallback(cmdBuf); // call async callback
-            device.freeCommandBuffers(cmdPool, 1, &cmdBuf); // free that command buffer
+    // TODO: return VkResult
+    static inline auto submitOnceAsync(const vk::Device& device, const vk::Queue& queue, const vk::CommandPool& cmdPool, const std::function<void(vk::CommandBuffer&)>& cmdFn = {}, const vk::SubmitInfo& smbi = {}) {
+        vk::CommandBuffer cmdBuf = createCommandBuffer(device, cmdPool, false); cmdFn(cmdBuf); cmdBuf.end();
+        return std::async(std::launch::async | std::launch::deferred, [=]() {
+            submitCmdAsync(device, queue, { cmdBuf }, smbi).get();
+            device.freeCommandBuffers(cmdPool, 1, &cmdBuf);
         });
     };
 
