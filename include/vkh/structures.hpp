@@ -603,6 +603,29 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
     } VkGraphicsPipelineCreateInfo;
 
     // 
+    typedef struct VkPhysicalDeviceSubgroupSizeControlPropertiesEXT {
+        VkStructureType            sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_SIZE_CONTROL_PROPERTIES_EXT;
+        void*                      pNext = nullptr;
+        uint32_t                   minSubgroupSize = 0u;//16u;
+        uint32_t                   maxSubgroupSize = 0u;//64u;
+        uint32_t                   maxComputeWorkgroupSubgroups = 0u;
+        VkShaderStageFlags         requiredSubgroupSizeStages = {};
+
+        STRUCT_OPERATORS(VkPhysicalDeviceSubgroupSizeControlPropertiesEXT)
+        VK_HPP_STRUCT_OPERATORS(VkPhysicalDeviceSubgroupSizeControlPropertiesEXT,vk::PhysicalDeviceSubgroupSizeControlPropertiesEXT)
+    } VkPhysicalDeviceSubgroupSizeControlPropertiesEXT;
+
+    // 
+    typedef struct VkPipelineShaderStageRequiredSubgroupSizeCreateInfoEXT {
+        VkStructureType         sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_REQUIRED_SUBGROUP_SIZE_CREATE_INFO_EXT;
+        void*                   pNext = nullptr;
+        uint32_t                requiredSubgroupSize = 32u; // RDNA 2
+
+        STRUCT_OPERATORS(VkPipelineShaderStageRequiredSubgroupSizeCreateInfoEXT)
+        VK_HPP_STRUCT_OPERATORS(VkPipelineShaderStageRequiredSubgroupSizeCreateInfoEXT,vk::PipelineShaderStageRequiredSubgroupSizeCreateInfoEXT)
+    } VkPipelineShaderStageRequiredSubgroupSizeCreateInfoEXT;
+
+    // 
     typedef struct VkComputePipelineCreateInfo {
         VkStructureType                    sType                = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO;
         const void*                        pNext                = nullptr;

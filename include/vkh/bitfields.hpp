@@ -368,6 +368,32 @@ namespace vkh {
         OPERATORS(VkDependencyFlags,::VkDependencyFlagBits,::VkFlags)
         VK_HPP_OPERATORS(VkDependencyFlags,vk::DependencyFlagBits)
     };
+
+    // 
+    struct VkSubgroupFeatureFlags { ::VkFlags
+        eBasic: 1,
+        eVote: 1,
+        eArithmetic: 1,
+        eBallot: 1,
+        eShuffle: 1,
+        eShuffleRelative: 1,
+        eClustered: 1,
+        eQuad: 1,
+        ePartitioned: 1;
+
+        OPERATORS(VkSubgroupFeatureFlags,::VkSubgroupFeatureFlagBits,::VkFlags)
+        VK_HPP_OPERATORS(VkSubgroupFeatureFlags,vk::SubgroupFeatureFlagBits)
+    };
+
+    // 
+    struct VkPipelineShaderStageCreateFlags { ::VkFlags
+        eAllowVaryingSubgroupSize: 1,
+        eRequireFullSubgroups: 1;
+
+        OPERATORS(VkPipelineShaderStageCreateFlags,::VkPipelineShaderStageCreateFlagBits,::VkFlags)
+        VK_HPP_OPERATORS(VkPipelineShaderStageCreateFlags,vk::PipelineShaderStageCreateFlagBits)
+    };
+
 #pragma pack(pop)
     
     // Extras
