@@ -246,9 +246,11 @@ namespace vkh {
 
         // 
         inline std::vector<VkWriteDescriptorSet>& mapWriteDescriptorSet() {
+            entries.resize(handles.size());
             uint32_t I = 0; for (auto& hndl : handles) {
-                const uint32_t i = I++; auto& entry = hndl.entry_t;
-                const uintptr_t& pt0 = entry.offset;
+                const uint32_t i = I++;
+                const auto& entry = hndl.entry_t;
+                const auto& pt0 = entry.offset;
                 writes[i].dstSet = this->set;
                 if (entry.descriptorType == VK_DESCRIPTOR_TYPE_STORAGE_BUFFER || entry.descriptorType == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER) { // Map Buffers
                     writes[i].pBufferInfo = (VkDescriptorBufferInfo*)(heap.data()+pt0);
@@ -262,6 +264,7 @@ namespace vkh {
                 } else { // Map Images, Samplers, Combinations...
                     writes[i].pImageInfo = (VkDescriptorImageInfo*)(heap.data()+pt0);
                 };
+                entries[i] = entry;
             };
             return writes;
         };
@@ -272,13 +275,10 @@ namespace vkh {
 
 
     protected: template<class T = T> // 
-        inline VsDescriptorHandle<T>& _push_description( const VkDescriptorUpdateTemplateEntry& entry ) { // Un-Safe API again
-            const uintptr_t pt0 = heap.size();
+        inline VsDescriptorHandle<T>& _push_description( VkDescriptorUpdateTemplateEntry entry ) { // Un-Safe API again
+            const uintptr_t pt0 = heap.size(); entry.offset = pt0, entry.stride = sizeof(T);
             heap.resize(pt0+sizeof(T)*entry.descriptorCount, 0u);
-            entries.push_back(entry);
-            entries.back().offset = pt0;
-            entries.back().stride = sizeof(T);
-            handles.push_back(VsDescriptorHandle<T>{ entries.back(), pt0, &heap });
+            handles.push_back(VsDescriptorHandle<T>{ entry, pt0, &heap });
             writes.push_back({
                 .dstSet = this->set,
                 .dstBinding = entry.dstBinding,
@@ -299,7 +299,7 @@ namespace vkh {
 
         // 
         std::vector<uint8_t> heap = {};
-        std::vector<VkDescriptorUpdateTemplateEntry> entries = {}; // TODO: remove it
+        std::vector<VkDescriptorUpdateTemplateEntry> entries = {};
         std::vector<VsDescriptorHandle<>> handles = {};
 
         // regular version
