@@ -687,6 +687,16 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
     } VkDescriptorSetLayoutBinding;
 
     // 
+    typedef struct VkPushConstantRange {
+        VkShaderStageFlags    stageFlags = {};
+        uint32_t              offset     = 0u;
+        uint32_t              size       = 16u;
+
+        STRUCT_OPERATORS(VkPushConstantRange)
+        VK_HPP_STRUCT_OPERATORS(VkPushConstantRange, vk::PushConstantRange)
+    } VkPushConstantRange;
+
+    // 
     typedef struct VkPipelineLayoutCreateInfo {
         VkStructureType                 sType                   = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
         const void*                     pNext                   = nullptr;
