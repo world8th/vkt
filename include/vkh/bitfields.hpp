@@ -14,12 +14,12 @@ namespace vkh {
         NAME& operator=(const NAME& F) { (COMP&)(*this) = (COMP&)F; return *this; };\
         NAME& operator=(const BITS& F) { (COMP&)(*this) = (COMP&)F; return *this; };\
         NAME& operator=(const COMP& F) { (COMP&)(*this) = F; return *this; };\
-        NAME operator|(const NAME& F) { auto f = COMP(F) | COMP(*this); return reinterpret_cast<NAME&>(f); };\
-        NAME operator&(const NAME& F) { auto f = COMP(F) & COMP(*this); return reinterpret_cast<NAME&>(f); };\
-        NAME operator^(const NAME& F) { auto f = COMP(F) ^ COMP(*this); return reinterpret_cast<NAME&>(f); };\
-        NAME operator|(const BITS& F) { auto f = COMP(F) | COMP(*this); return reinterpret_cast<NAME&>(f); };\
-        NAME operator&(const BITS& F) { auto f = COMP(F) & COMP(*this); return reinterpret_cast<NAME&>(f); };\
-        NAME operator^(const BITS& F) { auto f = COMP(F) ^ COMP(*this); return reinterpret_cast<NAME&>(f); };\
+        NAME operator|(const NAME& F) { auto f = COMP(F) | COMP(*this); return std::move(reinterpret_cast<NAME&>(f)); };\
+        NAME operator&(const NAME& F) { auto f = COMP(F) & COMP(*this); return std::move(reinterpret_cast<NAME&>(f)); };\
+        NAME operator^(const NAME& F) { auto f = COMP(F) ^ COMP(*this); return std::move(reinterpret_cast<NAME&>(f)); };\
+        NAME operator|(const BITS& F) { auto f = COMP(F) | COMP(*this); return std::move(reinterpret_cast<NAME&>(f)); };\
+        NAME operator&(const BITS& F) { auto f = COMP(F) & COMP(*this); return std::move(reinterpret_cast<NAME&>(f)); };\
+        NAME operator^(const BITS& F) { auto f = COMP(F) ^ COMP(*this); return std::move(reinterpret_cast<NAME&>(f)); };\
         NAME operator~() { auto f = ~COMP(*this); return reinterpret_cast<NAME&>(f); };\
         operator BITS&() {return reinterpret_cast<BITS&>(*this);};\
         operator const BITS&() const {return reinterpret_cast<const BITS&>(*this);};\
@@ -29,9 +29,13 @@ namespace vkh {
     // 
     #define VK_HPP_OPERATORS(NAME,FTYP,BITS) \
         NAME& operator=(const BITS& F) { (BITS&)(*this) = (BITS&)F; return *this; };\
-        NAME operator|(const BITS& F) { auto f = BITS(F) | BITS(*this); return reinterpret_cast<NAME&>(f); };\
-        NAME operator&(const BITS& F) { auto f = BITS(F) & BITS(*this); return reinterpret_cast<NAME&>(f); };\
-        NAME operator^(const BITS& F) { auto f = BITS(F) ^ BITS(*this); return reinterpret_cast<NAME&>(f); };\
+        NAME operator|(const BITS& F) { auto f = BITS(F) | BITS(*this); return std::move(reinterpret_cast<NAME&>(f)); };\
+        NAME operator&(const BITS& F) { auto f = BITS(F) & BITS(*this); return std::move(reinterpret_cast<NAME&>(f)); };\
+        NAME operator^(const BITS& F) { auto f = BITS(F) ^ BITS(*this); return std::move(reinterpret_cast<NAME&>(f)); };\
+        NAME& operator=(const FTYP& F) { (FTYP&)(*this) = (FTYP&)F; return *this; };\
+        NAME operator|(const FTYP& F) { auto f = FTYP(F) | FTYP(*this); return std::move(reinterpret_cast<NAME&>(f)); };\
+        NAME operator&(const FTYP& F) { auto f = FTYP(F) & FTYP(*this); return std::move(reinterpret_cast<NAME&>(f)); };\
+        NAME operator^(const FTYP& F) { auto f = FTYP(F) ^ FTYP(*this); return std::move(reinterpret_cast<NAME&>(f)); };\
         operator BITS&() {return reinterpret_cast<BITS&>(*this);};\
         operator const BITS&() const {return reinterpret_cast<const BITS&>(*this);};\
         operator FTYP&() {return reinterpret_cast<FTYP&>(*this);};\
