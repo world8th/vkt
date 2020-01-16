@@ -28,6 +28,8 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         operator const VKNAME*() const { return reinterpret_cast<const VKNAME*>(this); };\
         VKNAME* operator->() { return reinterpret_cast<VKNAME*>(this); };\
         const VKNAME* operator->() const { return reinterpret_cast<const VKNAME*>(this); };\
+        VKNAME& hpp() { return reinterpret_cast<VKNAME&>(*this); };\
+        const VKNAME& hpp() const { return reinterpret_cast<const VKNAME&>(*this); };\
         NAME& operator =( const VKNAME& info ) { reinterpret_cast<VKNAME&>(*this) = info; return *this; };
 
     #define STRUCT_TYPE_COMPATIBLE(NAME,T)\

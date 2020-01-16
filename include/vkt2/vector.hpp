@@ -53,6 +53,10 @@ namespace vkt {
         operator const vk::Device& () const { return (vk::Device&)(allocator->m_hDevice); };
         operator const VkDevice& () const { return allocator->m_hDevice; };
 
+        //
+        vk::Device& getDevice() { return (vk::Device&)(allocator->m_hDevice); };
+        const vk::Device& getDevice() const { return allocator->m_hDevice; };
+
         // Allocation
         operator const VmaAllocation& () const { return allocation; };
         operator const VmaAllocationInfo& () const { return allocationInfo; };
@@ -111,6 +115,10 @@ namespace vkt {
         // 
         operator VkImage& () { return (VkImage&)image; };
         operator VkDevice& () { return allocator->m_hDevice; };
+
+        //
+        vk::Device& getDevice() { return (vk::Device&)(allocator->m_hDevice);};
+        const vk::Device& getDevice() const { return allocator->m_hDevice; };
 
         // Allocation
         operator const VmaAllocation& () const { return allocation; };
@@ -246,8 +254,8 @@ namespace vkt {
             info.buffer = bufInfo.buffer;
             info.offset = bufInfo.offset;
             info.range = bufInfo.range;
-            info.format = format; // TODO: AUTO-FORMAT
-            return (view = (vk::Device&)(bufInfo.buffer).createBufferView(info));
+            info.format = VkFormat(format); // TODO: AUTO-FORMAT
+            return (view = allocation->getDevice().createBufferView(info));
         };
 
         // at function 

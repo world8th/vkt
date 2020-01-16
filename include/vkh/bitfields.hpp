@@ -34,6 +34,8 @@ namespace vkh {
         NAME operator^(const BITS& F) { auto f = BITS(F) ^ BITS(*this); return reinterpret_cast<NAME&>(f); };\
         operator BITS&() {return reinterpret_cast<BITS&>(*this);};\
         operator const BITS&() const {return reinterpret_cast<const BITS&>(*this);};\
+        BITS& hpp() {return reinterpret_cast<BITS&>(*this);};\
+        const BITS& hpp() const {return reinterpret_cast<const BITS&>(*this);};\
 
 
     struct VkBufferCreateFlags { ::VkFlags

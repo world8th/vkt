@@ -257,7 +257,7 @@ namespace vkh {
                 } else 
                 if (entry.descriptorType == VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER || entry.descriptorType == VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER) { // Map Buffer Views
                     writes[i].pTexelBufferView = (VkBufferView*)(heap.data()+pt0);
-                } else 
+                } else
                 if (entry.descriptorType == VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_NV) { // Map Accelerator Structures (NV CUSTOM MAP)
                     writes_acs[i].pAccelerationStructures = (VkAccelerationStructureNV*)(heap.data()+pt0);
                     writes[i].pNext = &writes_acs[i];
