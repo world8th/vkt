@@ -4,6 +4,10 @@ Real-Time oriented Vulkan API rendering and computing library...
 Planned to beat world record as most perfect and most long-time development product... 
 Writing for C++20 prior...
 
+## In-Use
+
+*   [LancER](https://github.com/hyperearth/LancER) - (WIP) Ray Tracing Library and Demo
+
 ## Tech Spec
 
 ```MD
