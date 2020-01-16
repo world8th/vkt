@@ -315,18 +315,14 @@ namespace vkt
             auto gStorage16 = vk::PhysicalDevice16BitStorageFeatures{};
             auto gStorage8 = vk::PhysicalDevice8BitStorageFeaturesKHR{};
             auto gDescIndexing = vk::PhysicalDeviceDescriptorIndexingFeaturesEXT{};
-
-            // 
-            gStorage16.pNext = &gStorage8;
-            gDescIndexing.descriptorBindingPartiallyBound = true;
-            gDescIndexing.pNext = &gStorage16;
-
-            // 
+            auto gFloat16U8 = vk::PhysicalDeviceFloat16Int8FeaturesKHR{};
             auto gFeatures = vk::PhysicalDeviceFeatures2{};
+
+            // 
+            gStorage8.pNext = &gFloat16U8;
+            gStorage16.pNext = &gStorage8;
+            gDescIndexing.pNext = &gStorage16;
             gFeatures.pNext = &gDescIndexing;
-            gFeatures.features.shaderInt16 = true;
-            gFeatures.features.shaderInt64 = true;
-            gFeatures.features.shaderUniformBufferArrayDynamicIndexing = true;
 
             // 
             vkGetPhysicalDeviceFeatures2(physicalDevice, &(VkPhysicalDeviceFeatures2&)gFeatures);
