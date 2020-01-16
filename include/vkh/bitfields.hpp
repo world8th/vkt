@@ -27,15 +27,17 @@ namespace vkh {
         operator const COMP& () const { return reinterpret_cast<const COMP&>(*this); };
 
     // 
-    #define VK_HPP_OPERATORS(NAME,BITS) \
+    #define VK_HPP_OPERATORS(NAME,FTYP,BITS) \
         NAME& operator=(const BITS& F) { (BITS&)(*this) = (BITS&)F; return *this; };\
         NAME operator|(const BITS& F) { auto f = BITS(F) | BITS(*this); return reinterpret_cast<NAME&>(f); };\
         NAME operator&(const BITS& F) { auto f = BITS(F) & BITS(*this); return reinterpret_cast<NAME&>(f); };\
         NAME operator^(const BITS& F) { auto f = BITS(F) ^ BITS(*this); return reinterpret_cast<NAME&>(f); };\
         operator BITS&() {return reinterpret_cast<BITS&>(*this);};\
         operator const BITS&() const {return reinterpret_cast<const BITS&>(*this);};\
-        BITS& hpp() {return reinterpret_cast<BITS&>(*this);};\
-        const BITS& hpp() const {return reinterpret_cast<const BITS&>(*this);};\
+        operator FTYP&() {return reinterpret_cast<FTYP&>(*this);};\
+        operator const FTYP&() const {return reinterpret_cast<const FTYP&>(*this);};\
+        FTYP& hpp() {return reinterpret_cast<FTYP&>(*this);};\
+        const FTYP& hpp() const {return reinterpret_cast<const FTYP&>(*this);};\
 
 
     struct VkBufferCreateFlags { ::VkFlags
@@ -46,7 +48,7 @@ namespace vkh {
         eDeviceAddressCaptureReplay : 1;
 
         OPERATORS(VkBufferCreateFlags,::VkBufferCreateFlagBits,::VkFlags)
-        VK_HPP_OPERATORS(VkBufferCreateFlags,vk::BufferCreateFlagBits)
+        VK_HPP_OPERATORS(VkBufferCreateFlags,vk::BufferCreateFlags,vk::BufferCreateFlagBits)
     };
 
     // 
@@ -67,7 +69,7 @@ namespace vkh {
         eSharedDeviceAddress : 1;
 
         OPERATORS(VkBufferUsageFlags,::VkBufferUsageFlagBits,::VkFlags)
-        VK_HPP_OPERATORS(VkBufferUsageFlags,vk::BufferUsageFlagBits)
+        VK_HPP_OPERATORS(VkBufferUsageFlags,vk::BufferUsageFlags,vk::BufferUsageFlagBits)
     };
 
     // 
@@ -84,7 +86,7 @@ namespace vkh {
         eMemoryPlane2 : 1;
 
         OPERATORS(VkImageAspectFlags,::VkImageAspectFlagBits,::VkFlags)
-        VK_HPP_OPERATORS(VkImageAspectFlags,vk::ImageAspectFlagBits)
+        VK_HPP_OPERATORS(VkImageAspectFlags,vk::ImageAspectFlags,vk::ImageAspectFlagBits)
     };
 
     // 
@@ -99,7 +101,7 @@ namespace vkh {
             e64 : 1;
 
         OPERATORS(VkSampleCountFlags, ::VkSampleCountFlagBits, ::VkFlags)
-        VK_HPP_OPERATORS(VkSampleCountFlags,vk::SampleCountFlagBits)
+        VK_HPP_OPERATORS(VkSampleCountFlags,vk::SampleCountFlags,vk::SampleCountFlagBits)
     };
 
     // 
@@ -120,7 +122,7 @@ namespace vkh {
         eSubsampled:1;
         
         OPERATORS(VkImageCreateFlags,::VkImageCreateFlagBits,::VkFlags)
-        VK_HPP_OPERATORS(VkImageCreateFlags,vk::ImageCreateFlagBits)
+        VK_HPP_OPERATORS(VkImageCreateFlags,vk::ImageCreateFlags,vk::ImageCreateFlagBits)
     };
 
     // 
@@ -137,7 +139,7 @@ namespace vkh {
         eFragmentDensityMap:1;
 
         OPERATORS(VkImageUsageFlags,::VkImageUsageFlagBits,::VkFlags)
-        VK_HPP_OPERATORS(VkImageUsageFlags,vk::ImageUsageFlagBits)
+        VK_HPP_OPERATORS(VkImageUsageFlags,vk::ImageUsageFlags,vk::ImageUsageFlagBits)
     };
 
     // 
@@ -170,7 +172,7 @@ namespace vkh {
         eAccelerationStructureBuild:1;
 
         OPERATORS(VkPipelineStageFlags,::VkPipelineStageFlagBits,::VkFlags)
-        VK_HPP_OPERATORS(VkPipelineStageFlags,vk::PipelineStageFlagBits)
+        VK_HPP_OPERATORS(VkPipelineStageFlags,vk::PipelineStageFlags,vk::PipelineStageFlagBits)
     };
 
     // 
@@ -191,7 +193,7 @@ namespace vkh {
         eCallable:1;
 
         OPERATORS(VkShaderStageFlags,::VkShaderStageFlagBits,::VkFlags)
-        VK_HPP_OPERATORS(VkShaderStageFlags,vk::ShaderStageFlagBits)
+        VK_HPP_OPERATORS(VkShaderStageFlags,vk::ShaderStageFlags,vk::ShaderStageFlagBits)
     };
 
     // 
@@ -200,7 +202,7 @@ namespace vkh {
         eBack:1;
 
         OPERATORS(VkCullModeFlags,::VkCullModeFlagBits,::VkFlags)
-        VK_HPP_OPERATORS(VkCullModeFlags,vk::CullModeFlagBits)
+        VK_HPP_OPERATORS(VkCullModeFlags,vk::CullModeFlags,vk::CullModeFlagBits)
     };
 
     // 
@@ -235,7 +237,7 @@ namespace vkh {
         eTransformFeedbackCounterWrite:1;
 
         OPERATORS(VkAccessFlags,::VkAccessFlagBits,::VkFlags)
-        VK_HPP_OPERATORS(VkAccessFlags,vk::AccessFlagBits)
+        VK_HPP_OPERATORS(VkAccessFlags,vk::AccessFlags,vk::AccessFlagBits)
     };
 
     // 
@@ -267,7 +269,7 @@ namespace vkh {
         eFragmentDensityMap:1;
 
         OPERATORS(VkFormatFeatureFlags,::VkFormatFeatureFlagBits,::VkFlags)
-        VK_HPP_OPERATORS(VkFormatFeatureFlags,vk::FormatFeatureFlagBits)
+        VK_HPP_OPERATORS(VkFormatFeatureFlags,vk::FormatFeatureFlags,vk::FormatFeatureFlagBits)
     };
 
     // 
@@ -278,7 +280,7 @@ namespace vkh {
         eA:1;
         
         OPERATORS(VkColorComponentFlags,::VkColorComponentFlagBits,::VkFlags)
-        VK_HPP_OPERATORS(VkColorComponentFlags,vk::ColorComponentFlagBits)
+        VK_HPP_OPERATORS(VkColorComponentFlags,vk::ColorComponentFlags,vk::ColorComponentFlagBits)
     };
 
     // 
@@ -289,7 +291,7 @@ namespace vkh {
         eVariableDescriptorCount:1;
         
         OPERATORS(VkDescriptorBindingFlagsEXT,::VkDescriptorBindingFlagBitsEXT,::VkFlags)
-        VK_HPP_OPERATORS(VkDescriptorBindingFlagsEXT,vk::DescriptorBindingFlagBitsEXT)
+        VK_HPP_OPERATORS(VkDescriptorBindingFlagsEXT,vk::DescriptorBindingFlagsEXT,vk::DescriptorBindingFlagBitsEXT)
     };
 
     // 
@@ -301,7 +303,7 @@ namespace vkh {
         eLowMemory:1;
         
         OPERATORS(VkBuildAccelerationStructureFlagsNV,::VkBuildAccelerationStructureFlagBitsNV,::VkFlags)
-        VK_HPP_OPERATORS(VkBuildAccelerationStructureFlagsNV,vk::BuildAccelerationStructureFlagBitsNV)
+        VK_HPP_OPERATORS(VkBuildAccelerationStructureFlagsNV,vk::BuildAccelerationStructureFlagsNV,vk::BuildAccelerationStructureFlagBitsNV)
     };
 
     // 
@@ -310,7 +312,7 @@ namespace vkh {
         eNoDuplicateAnyHitInvocation:1;
         
         OPERATORS(VkGeometryFlagsNV,::VkGeometryFlagBitsNV,::VkFlags)
-        VK_HPP_OPERATORS(VkGeometryFlagsNV,vk::GeometryFlagBitsNV)
+        VK_HPP_OPERATORS(VkGeometryFlagsNV,vk::GeometryFlagsNV,vk::GeometryFlagBitsNV)
     };
 
     // 
@@ -322,7 +324,7 @@ namespace vkh {
         eProtected:1;
         
         OPERATORS(VkQueueFlags,::VkQueueFlagBits,::VkFlags)
-        VK_HPP_OPERATORS(VkQueueFlags,vk::QueueFlagBits)
+        VK_HPP_OPERATORS(VkQueueFlags,vk::QueueFlags,vk::QueueFlagBits)
     };
 
     // 
@@ -338,7 +340,7 @@ namespace vkh {
         eInherit:1;
 
         OPERATORS(VkSurfaceTransformFlagsKHR,::VkSurfaceTransformFlagBitsKHR,::VkFlags)
-        VK_HPP_OPERATORS(VkSurfaceTransformFlagsKHR,vk::SurfaceTransformFlagBitsKHR)
+        VK_HPP_OPERATORS(VkSurfaceTransformFlagsKHR,vk::SurfaceTransformFlagsKHR,vk::SurfaceTransformFlagBitsKHR)
     };
 
     // 
@@ -349,7 +351,7 @@ namespace vkh {
         eInherit:1;
 
         OPERATORS(VkCompositeAlphaFlagsKHR,::VkCompositeAlphaFlagBitsKHR,::VkFlags)
-        VK_HPP_OPERATORS(VkCompositeAlphaFlagsKHR,vk::CompositeAlphaFlagBitsKHR)
+        VK_HPP_OPERATORS(VkCompositeAlphaFlagsKHR,vk::CompositeAlphaFlagsKHR,vk::CompositeAlphaFlagBitsKHR)
     };
 
     // 
@@ -358,7 +360,7 @@ namespace vkh {
         eUpdateAfterBindPool:1;
         
         OPERATORS(VkDescriptorSetLayoutCreateFlags,::VkDescriptorSetLayoutCreateFlagBits,::VkFlags)
-        VK_HPP_OPERATORS(VkDescriptorSetLayoutCreateFlags,vk::DescriptorSetLayoutCreateFlagBits)
+        VK_HPP_OPERATORS(VkDescriptorSetLayoutCreateFlags,vk::DescriptorSetLayoutCreateFlags,vk::DescriptorSetLayoutCreateFlagBits)
     };
 
     // 
@@ -368,7 +370,7 @@ namespace vkh {
         eDeviceGroup:1;
 
         OPERATORS(VkDependencyFlags,::VkDependencyFlagBits,::VkFlags)
-        VK_HPP_OPERATORS(VkDependencyFlags,vk::DependencyFlagBits)
+        VK_HPP_OPERATORS(VkDependencyFlags,vk::DependencyFlags,vk::DependencyFlagBits)
     };
 
     // 
@@ -384,7 +386,7 @@ namespace vkh {
         ePartitioned: 1;
 
         OPERATORS(VkSubgroupFeatureFlags,::VkSubgroupFeatureFlagBits,::VkFlags)
-        VK_HPP_OPERATORS(VkSubgroupFeatureFlags,vk::SubgroupFeatureFlagBits)
+        VK_HPP_OPERATORS(VkSubgroupFeatureFlags,vk::SubgroupFeatureFlags,vk::SubgroupFeatureFlagBits)
     };
 
     // 
@@ -393,7 +395,7 @@ namespace vkh {
         eRequireFullSubgroups: 1;
 
         OPERATORS(VkPipelineShaderStageCreateFlags,::VkPipelineShaderStageCreateFlagBits,::VkFlags)
-        VK_HPP_OPERATORS(VkPipelineShaderStageCreateFlags,vk::PipelineShaderStageCreateFlagBits)
+        VK_HPP_OPERATORS(VkPipelineShaderStageCreateFlags,vk::PipelineShaderStageCreateFlags,vk::PipelineShaderStageCreateFlagBits)
     };
 
 #pragma pack(pop)
@@ -407,7 +409,7 @@ namespace vkh {
         eForceNoOpaque:1;
         
         OPERATORS(VkGeometryInstanceFlagsNV,::VkGeometryInstanceFlagBitsNV,::uint8_t)
-        VK_HPP_OPERATORS(VkGeometryInstanceFlagsNV,vk::GeometryInstanceFlagBitsNV)
+        VK_HPP_OPERATORS(VkGeometryInstanceFlagsNV,vk::GeometryInstanceFlagsNV,vk::GeometryInstanceFlagBitsNV)
     };
 #pragma pack(pop)
 
