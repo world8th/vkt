@@ -19,8 +19,11 @@
 #include "utils.hpp"
 #include "structs.hpp"
 #include "vector.hpp"
+
+#ifdef VKT_ENABLE_GLFW_SUPPORT
 #include <GLFW/glfw3.h>
 #include <GLFW/glfw3native.h>
+#endif
 
 // TODO: FULL REWRITE OF THAT "PROJECT"!!!
 namespace vkt
@@ -206,12 +209,14 @@ namespace vkt
             device.resetFences({ 1, &fence });
         }
 
+#ifdef VKT_ENABLE_GLFW_SUPPORT
         struct SurfaceWindow {
             SurfaceFormat surfaceFormat = {};
             vk::Extent2D surfaceSize = vk::Extent2D{ 0u, 0u };
             vk::SurfaceKHR surface = {};
             GLFWwindow* window = nullptr;
         } applicationWindow = {};
+#endif
 
     public:
         inline vk::Instance& createInstance() {
@@ -225,6 +230,7 @@ namespace vkt
             assert((instanceVersion = vk::enumerateInstanceVersion()) >= VK_MAKE_VERSION(1, 1, 0));
 
             // get required extensions
+#ifdef VKT_ENABLE_GLFW_SUPPORT
             uint32_t glfwExtensionCount = 0;
             const char** glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
 
@@ -232,6 +238,7 @@ namespace vkt
             for (uint32_t i = 0; i < glfwExtensionCount; i++) {
                 wantedExtensions.push_back(glfwExtensions[i]);
             };
+#endif
 
             // get our needed extensions
             auto installedExtensions = vk::enumerateInstanceExtensionProperties();
@@ -286,7 +293,7 @@ namespace vkt
         };
 
         // TODO: REMAKE MAKING
-        inline vk::Device createDevice(bool isComputePrior, std::string shaderPath, bool enableAdvancedAcceleration) {
+        inline vk::Device createDevice(bool isComputePrior = true, std::string shaderPath = "", bool enableAdvancedAcceleration = false) {
 
             // use extensions
             auto deviceExtensions = std::vector<const char*>();
@@ -338,7 +345,7 @@ namespace vkt
             uint32_t computeFamilyIndex = -1, graphicsFamilyIndex = -1;
             auto queueCreateInfos = std::vector<vk::DeviceQueueCreateInfo>();
 
-            // compute/graphics queue family
+#ifdef VKT_ENABLE_GLFW_SUPPORT
             for (auto queuefamily : gpuQueueProps) {
                 graphicsFamilyIndex++;
                 if (queuefamily.queueFlags & (vk::QueueFlagBits::eCompute) && queuefamily.queueFlags & (vk::QueueFlagBits::eGraphics) && physicalDevice.getSurfaceSupportKHR(graphicsFamilyIndex, surface())) {
@@ -346,7 +353,17 @@ namespace vkt
                     queueFamilyIndices.push_back(graphicsFamilyIndex);
                     break;
                 };
-            }; //VkPhysicalDeviceDescriptorIndexingFeaturesEXT
+            };
+#else
+            for (auto queuefamily : gpuQueueProps) {
+                computeFamilyIndex++;
+                if (queuefamily.queueFlags & (vk::QueueFlagBits::eCompute)) {
+                    queueCreateInfos.push_back(vk::DeviceQueueCreateInfo(vk::DeviceQueueCreateFlags()).setQueueFamilyIndex(computeFamilyIndex).setQueueCount(1).setPQueuePriorities(&priority));
+                    queueFamilyIndices.push_back(computeFamilyIndex);
+                    break;
+                };
+            };
+#endif
 
             // return device with queue pointer
             const uint32_t qptr = 0;
@@ -395,6 +412,7 @@ namespace vkt
             return device;
         };
 
+#ifdef VKT_ENABLE_GLFW_SUPPORT
         // create window and surface for this application (multi-window not supported)
         inline SurfaceWindow& createWindowSurface(GLFWwindow * window, uint32_t WIDTH, uint32_t HEIGHT, std::string title = "TestApp") {
             applicationWindow.window = window;
@@ -635,6 +653,7 @@ namespace vkt
             // create swapchain
             return device.createSwapchainKHR(swapchainCreateInfo, nullptr);
         }
+#endif
     };
 
 }; // namespace NSM
