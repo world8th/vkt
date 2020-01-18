@@ -52,6 +52,7 @@ namespace vkt
             "VK_EXT_sampler_filter_minmax",
             "VK_EXT_descriptor_indexing",
             "VK_EXT_scalar_block_layout",
+            "VK_EXT_subgroup_size_control",
 
             "VK_AMD_gpu_shader_int16",
             "VK_AMD_gpu_shader_half_float",
@@ -67,6 +68,7 @@ namespace vkt
             "VK_KHR_8bit_storage",
             "VK_KHR_incremental_present",
             "VK_KHR_push_descriptor",
+            "VK_KHR_surface",
             "VK_KHR_swapchain",
             "VK_KHR_sampler_ycbcr_conversion",
             "VK_KHR_image_format_list",
@@ -92,11 +94,13 @@ namespace vkt
             "VK_KHR_shader_clock",
             "VK_KHR_imageless_framebuffer",
             "VK_KHR_storage_buffer_storage_class",
+            "VK_KHR_shader_subgroup_extended_types",
 
             "VK_NV_compute_shader_derivatives",
             "VK_NV_corner_sampled_image",
             "VK_NV_shader_image_footprint",
             "VK_NV_shader_subgroup_partitioned",
+            "VK_NV_shader_sm_builtins",
 
             "VK_NV_ray_tracing",
         };
