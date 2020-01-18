@@ -152,17 +152,18 @@ namespace vkt {
     // 
     class ImageRegion : public std::enable_shared_from_this<ImageRegion> { public: 
         inline ImageRegion(){};
-        inline ImageRegion(const std::shared_ptr<VmaImageAllocation>& allocation, const vkh::VkImageViewCreateInfo& info = {}, const vk::ImageLayout& layout = vk::ImageLayout::eGeneral) {
-            this->allocation = allocation;
-            this->imgInfo.imageView = ((vk::Device&)(*allocation)).createImageView(vk::ImageViewCreateInfo(info).setImage(*allocation));
+
+        inline ImageRegion(const std::shared_ptr<VmaImageAllocation>& allocation, const vkh::VkImageViewCreateInfo& info = {}, const vk::ImageLayout& layout = vk::ImageLayout::eGeneral) : allocation(allocation), subresourceRange(info.subresourceRange) {
+            this->imgInfo.imageView = allocation->getDevice().createImageView(vk::ImageViewCreateInfo(info).setImage(*allocation));
             this->imgInfo.imageLayout = VkImageLayout(layout);
-            this->subresourceRange = info.subresourceRange;
         };
+
         inline ImageRegion(const ImageRegion& region) {
             this->allocation = region; 
             this->subresourceRange = (vk::ImageSubresourceRange&)region;
             this->imgInfo = (vk::DescriptorImageInfo&)(region); 
         };
+
         inline ImageRegion& operator=(const ImageRegion& region){
             this->allocation = region.allocation;
             this->subresourceRange = region.subresourceRange;
