@@ -7,6 +7,7 @@ Writing for C++20 prior...
 ## In-Use
 
 *   [LancER](https://github.com/hyperearth/LancER) - (WIP) Ray Tracing Library and Demo
+*   [RadX](https://github.com/world8th/RadX) - (WIP) Radix Sort for Newest GPU
 
 ## Tech Spec
 
