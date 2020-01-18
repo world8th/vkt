@@ -21,10 +21,12 @@ namespace vkh {
         NAME operator&(const BITS& F) { auto f = COMP(F) & COMP(*this); return std::move(reinterpret_cast<NAME&>(f)); };\
         NAME operator^(const BITS& F) { auto f = COMP(F) ^ COMP(*this); return std::move(reinterpret_cast<NAME&>(f)); };\
         NAME operator~() { auto f = ~COMP(*this); return reinterpret_cast<NAME&>(f); };\
+        BITS& c() { return reinterpret_cast<BITS&>(*this); }; \
+        const BITS& c() const { return reinterpret_cast<const BITS&>(*this); }; \
         operator BITS&() {return reinterpret_cast<BITS&>(*this);};\
         operator const BITS&() const {return reinterpret_cast<const BITS&>(*this);};\
-        operator COMP& () { return reinterpret_cast<COMP&>(*this); };\
-        operator const COMP& () const { return reinterpret_cast<const COMP&>(*this); };
+        explicit operator COMP& () { return reinterpret_cast<COMP&>(*this); };\
+        explicit operator const COMP& () const { return reinterpret_cast<const COMP&>(*this); };
 
     // 
     #define VK_HPP_OPERATORS(NAME,FTYP,BITS) \
@@ -41,7 +43,7 @@ namespace vkh {
         operator FTYP&() {return reinterpret_cast<FTYP&>(*this);};\
         operator const FTYP&() const {return reinterpret_cast<const FTYP&>(*this);};\
         FTYP& hpp() {return reinterpret_cast<FTYP&>(*this);};\
-        const FTYP& hpp() const {return reinterpret_cast<const FTYP&>(*this);};\
+        const FTYP& hpp() const {return reinterpret_cast<const FTYP&>(*this);};
 
 
     struct VkBufferCreateFlags { ::VkFlags
@@ -210,41 +212,6 @@ namespace vkh {
     };
 
     // 
-    struct VkAccessFlags { ::VkFlags
-        eIndirectCommandRead:1,
-        eIndexRead:1,
-        eVertexAttributeRead:1,
-        eUniformRead:1,
-        eInputAttachmentRead:1,
-        eShaderRead:1,
-        eShaderWrite:1,
-        eColorAttachmentRead:1,
-        eColorAttachmentWrite:1,
-        eDepthStencilAttachmentRead:1,
-        eDepthStencilAttachmentWrite:1,
-        eTransferSrc:1,
-        eTransferDst:1,
-        eHostRead:1,
-        eHostWrite:1,
-        eMemoryRead:1,
-        eMemoryWrite:1,
-        eCommandProcessRead:1,
-        eCommandProcessWrite:1,
-        eColorAttachmentReadNoncoherent:1,
-        eConditionalRenderingRead:1,
-        eAccelerationStructureRead:1,
-        aAccelerationStructureWrite:1,
-        eShadingRateImageRead:1,
-        eFragmentDensityMapRead:1,
-        eTransformFeedbackWrite:1,
-        eTransformFeedbackCounterRead:1,
-        eTransformFeedbackCounterWrite:1;
-
-        OPERATORS(VkAccessFlags,::VkAccessFlagBits,::VkFlags)
-        VK_HPP_OPERATORS(VkAccessFlags,vk::AccessFlags,vk::AccessFlagBits)
-    };
-
-    // 
     struct VkFormatFeatureFlags { ::VkFlags
         eSampledImage:1,
         eStorageImage:1,
@@ -400,6 +367,41 @@ namespace vkh {
 
         OPERATORS(VkPipelineShaderStageCreateFlags,::VkPipelineShaderStageCreateFlagBits,::VkFlags)
         VK_HPP_OPERATORS(VkPipelineShaderStageCreateFlags,vk::PipelineShaderStageCreateFlags,vk::PipelineShaderStageCreateFlagBits)
+    };
+
+    // 
+    struct VkAccessFlags { ::VkFlags
+        eIndirectCommandRead:1,
+        eIndexRead:1,
+        eVertexAttributeRead:1,
+        eUniformRead:1,
+        eInputAttachmentRead:1,
+        eShaderRead:1,
+        eShaderWrite:1,
+        eColorAttachmentRead:1,
+        eColorAttachmentWrite:1,
+        eDepthStencilAttachmentRead : 1,
+        eDepthStencilAttachmentWrite : 1,
+        eTransferRead:1,
+        eTransferWrite:1,
+        eHostRead:1,
+        eHostWrite:1,
+        eMemoryRead:1,
+        eMemoryWrite:1,
+        eCommandProcessRead:1,
+        eCommandProcessWrite:1,
+        eColorAttachmentReadNonCoherent:1,
+        eConditionalRenderingRead:1,
+        eAccelerationStructureRead:1,
+        eAccelerationStructureWrite:1,
+        eShadingRateImageRead:1,
+        eFragmentDensityMapRead:1,
+        eTransformFeedbackWrite:1,
+        eTransformFeedbackCounterRead:1,
+        eTransformFeedbackCounterWrite:1;
+
+        OPERATORS(VkAccessFlags, ::VkAccessFlagBits, ::VkFlags)
+        VK_HPP_OPERATORS(VkAccessFlags, vk::AccessFlags, vk::AccessFlagBits)
     };
 
 #pragma pack(pop)

@@ -972,6 +972,17 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         VK_HPP_STRUCT_OPERATORS(VkBindAccelerationStructureMemoryInfoNV,vk::BindAccelerationStructureMemoryInfoNV)
     } VkBindAccelerationStructureMemoryInfoNV;
 
+    // 
+    typedef struct VkMemoryBarrier {
+        VkStructureType     sType         = VK_STRUCTURE_TYPE_MEMORY_BARRIER;
+        const void*         pNext         = nullptr;
+        VkAccessFlags       srcAccessMask = {};
+        VkAccessFlags       dstAccessMask = {};
+
+        STRUCT_OPERATORS(VkMemoryBarrier)
+        VK_HPP_STRUCT_OPERATORS(VkMemoryBarrier, vk::MemoryBarrier)
+    } VkMemoryBarrier;
+
 
     #pragma pack(pop)
 

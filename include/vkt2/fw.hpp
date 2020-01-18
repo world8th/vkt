@@ -317,6 +317,7 @@ namespace vkt
             auto gDescIndexing = vk::PhysicalDeviceDescriptorIndexingFeaturesEXT{};
             auto gFloat16U8 = vk::PhysicalDeviceFloat16Int8FeaturesKHR{};
             auto gFeatures = vk::PhysicalDeviceFeatures2{};
+            //auto gConsertvative = vk::PhysicalDeviceConservativeRasterizationPropertiesEXT{};
 
             // 
             gStorage8.pNext = &gFloat16U8;
