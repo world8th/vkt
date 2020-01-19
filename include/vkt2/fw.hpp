@@ -231,7 +231,7 @@ namespace vkt
 #endif
 
             // 
-            assert((instanceVersion = vk::enumerateInstanceVersion()) >= VK_MAKE_VERSION(1, 1, 0));
+            assert((instanceVersion = vk::enumerateInstanceVersion()) >= VK_MAKE_VERSION(1, 1, 131));
 
             // get required extensions
 #ifdef VKT_ENABLE_GLFW_SUPPORT
@@ -276,7 +276,7 @@ namespace vkt
             auto appinfo = vk::ApplicationInfo{};
             appinfo.pNext = nullptr;
             appinfo.pApplicationName = "VKTest";
-            appinfo.apiVersion = VK_MAKE_VERSION(1, 1, 126);
+            appinfo.apiVersion = VK_MAKE_VERSION(1, 1, 131);
 
             // create instance info
             auto cinstanceinfo = vk::InstanceCreateInfo{};

@@ -295,7 +295,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         VkBool32                compareEnable           = false;
         VkCompareOp             compareOp               = VK_COMPARE_OP_ALWAYS;
         float                   minLod                  = 0.f;
-        float                   maxLod                  = 1.f;
+        float                   maxLod                  = 0.f;
         VkBorderColor           borderColor             = VK_BORDER_COLOR_FLOAT_TRANSPARENT_BLACK;
         VkBool32                unnormalizedCoordinates = false;
 
