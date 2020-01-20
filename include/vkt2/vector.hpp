@@ -22,7 +22,8 @@ namespace vkt {
         ) {
             VmaAllocationCreateInfo vmaInfo = {}; vmaInfo.usage = vmaUsage;
             if (vmaUsage == VMA_MEMORY_USAGE_CPU_TO_GPU || vmaUsage == VMA_MEMORY_USAGE_GPU_TO_CPU) { vmaInfo.flags = VMA_ALLOCATION_CREATE_MAPPED_BIT; };
-            assert(vmaCreateBuffer(this->allocator = allocator, createInfo, &vmaInfo, &(VkBuffer&)buffer, &allocation, &allocationInfo) == VK_SUCCESS);
+            auto result = vmaCreateBuffer(this->allocator = allocator, createInfo, &vmaInfo, &reinterpret_cast<VkBuffer&>(buffer), &allocation, &allocationInfo); 
+            assert(result == VK_SUCCESS);
             this->range = createInfo.size;
         };
          inline VmaBufferAllocation(const VmaBufferAllocation& allocation) : buffer(allocation.buffer), allocation(allocation.allocation), allocationInfo(allocation.allocationInfo), allocator(allocation.allocator), range(allocation.range) {};
@@ -83,7 +84,8 @@ namespace vkt {
         ) {
             VmaAllocationCreateInfo vmaInfo = {}; vmaInfo.usage = vmaUsage;
             if (vmaUsage == VMA_MEMORY_USAGE_CPU_TO_GPU || vmaUsage == VMA_MEMORY_USAGE_GPU_TO_CPU) { vmaInfo.flags = VMA_ALLOCATION_CREATE_MAPPED_BIT; };
-            assert(vmaCreateImage(this->allocator = allocator, createInfo, &vmaInfo, &reinterpret_cast<VkImage&>(image), &allocation, &allocationInfo) == VK_SUCCESS);
+            auto result = vmaCreateImage(this->allocator = allocator, createInfo, &vmaInfo, &reinterpret_cast<VkImage&>(image), &allocation, &allocationInfo);
+            assert(result == VK_SUCCESS);
         };
          inline VmaImageAllocation(const VmaImageAllocation& allocation) : image(allocation.image), allocation(allocation.allocation), allocationInfo(allocation.allocationInfo), allocator(allocation.allocator) {};
          inline VmaImageAllocation& operator=(const VmaImageAllocation& allocation) {

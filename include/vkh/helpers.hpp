@@ -133,7 +133,8 @@ namespace vkh {
 
         // 
         template<class C = T> inline VsDescriptorHandle<T>& operator=(const VsDescriptorHandle<C>& d) { this->stride_t = d.stride_t, this->entry_t = d.entry_t, this->field_t = d.field_t, this->V_t = d.V_t; return *this; };
-        template<class C = T> inline VsDescriptorHandle<T>& operator=(const C& d) { *reinterpret_cast<C*>(&(*V_t)[this->field_t]) = d; return *this; };
+        //template<class C = T> inline VsDescriptorHandle<T>& operator=(const C& d) { *reinterpret_cast<C*>(&(*V_t)[this->field_t]) = d; return *this; };
+        inline VsDescriptorHandle<T>& operator=(const T& d) { *reinterpret_cast<T*>(&(*V_t)[this->field_t]) = d; return *this; };
 
         //
         template<class C = T> operator VsDescriptorHandle<C>& () { return reinterpret_cast<VsDescriptorHandle<C>&>(*this); };
