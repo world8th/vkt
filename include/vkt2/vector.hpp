@@ -267,12 +267,12 @@ namespace vkt {
 
         // 
         inline void unmap() { allocation->unmap(); };
-        inline const T* map() const { return (T*)((uint8_t*)allocation->map()+offset()); };
-        inline T* const map() { return (T*)((uint8_t*)allocation->map()+offset()); };
+        inline const T* map(const uintptr_t& i = 0u) const { auto map = reinterpret_cast<const uint8_t*>(allocation->map()) + offset(); return &(reinterpret_cast<const T*>(map))[i]; };
+        inline T* const map(const uintptr_t& i = 0u) { auto map = reinterpret_cast<uint8_t*>(allocation->map()) + offset(); return &(reinterpret_cast<T*>(map))[i]; };
 
         // 
-        inline const T* mapped(const uintptr_t& i = 0u) const { return &((T*)((uint8_t*)allocation->mapped()+offset()))[i]; };
-        inline T* const mapped(const uintptr_t& i = 0u) { return &((T*)((uint8_t*)allocation->mapped()+offset()))[i]; };
+        inline const T* mapped(const uintptr_t& i = 0u) const { auto map = reinterpret_cast<const uint8_t*>(allocation->mapped()) + offset(); return &(reinterpret_cast<const T*>(map))[i]; };
+        inline T* const mapped(const uintptr_t& i = 0u) { auto map = reinterpret_cast<uint8_t*>(allocation->mapped()) + offset(); return &(reinterpret_cast<T*>(map))[i]; };
 
         // 
         inline T* const data() { return mapped(); };
@@ -306,13 +306,13 @@ namespace vkt {
 
         // 
         inline operator std::shared_ptr<VmaBufferAllocation>& () { return allocation; };
-        inline operator vkh::VkDescriptorBufferInfo& () { bufInfo.buffer = (vk::Buffer&)(*allocation); return reinterpret_cast<vkh::VkDescriptorBufferInfo&>(bufInfo); };
-        inline operator vk::DescriptorBufferInfo& () { bufInfo.buffer = (vk::Buffer&)(*allocation); return bufInfo; };
-        inline operator vk::Buffer& () { return reinterpret_cast<vk::Buffer&>(bufInfo.buffer = (vk::Buffer&)*allocation); };
+        inline operator vkh::VkDescriptorBufferInfo& () { bufInfo.buffer = allocation->buffer; return reinterpret_cast<vkh::VkDescriptorBufferInfo&>(bufInfo); };
+        inline operator vk::DescriptorBufferInfo& () { bufInfo.buffer = allocation->buffer; return bufInfo; };
+        inline operator vk::Buffer& () { return reinterpret_cast<vk::Buffer&>(bufInfo.buffer = allocation->buffer); };
         inline operator vk::Device& () { return *allocation; };
         inline operator vk::BufferView& () { return view; };
-        inline operator ::VkDescriptorBufferInfo& () { bufInfo.buffer = (vk::Buffer&)(*allocation); return reinterpret_cast<::VkDescriptorBufferInfo&>(bufInfo); };
-        inline operator VkBuffer& () { return reinterpret_cast<VkBuffer&>(bufInfo.buffer = (vk::Buffer&)*allocation); };
+        inline operator ::VkDescriptorBufferInfo& () { bufInfo.buffer = allocation->buffer; return reinterpret_cast<::VkDescriptorBufferInfo&>(bufInfo); };
+        inline operator VkBuffer& () { return reinterpret_cast<VkBuffer&>(bufInfo.buffer = allocation->buffer); };
         inline operator VkDevice& () { return *allocation; };
         inline operator VkBufferView& () { return view; };
 
