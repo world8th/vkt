@@ -162,8 +162,8 @@ namespace vkt {
 
         inline ImageRegion(const ImageRegion& region) {
             this->allocation = region; 
-            this->subresourceRange = (vk::ImageSubresourceRange&)region;
-            this->imgInfo = (vk::DescriptorImageInfo&)(region); 
+            this->subresourceRange = region.getImageSubresourceRange();
+            this->imgInfo = vk::DescriptorImageInfo(region);
         };
 
         inline ImageRegion& operator=(const ImageRegion& region){
