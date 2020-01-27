@@ -225,7 +225,6 @@ namespace vkt
     public:
         inline vk::Instance& createInstance() {
 
-
 #ifdef VOLK_H_
             volkInitialize();
 #endif
@@ -323,6 +322,7 @@ namespace vkt
             };
 
             // minimal features
+            auto gTexelBufferAligment = vk::PhysicalDeviceTexelBufferAlignmentFeaturesEXT{};
             auto gStorage16 = vk::PhysicalDevice16BitStorageFeatures{};
             auto gStorage8 = vk::PhysicalDevice8BitStorageFeaturesKHR{};
             auto gDescIndexing = vk::PhysicalDeviceDescriptorIndexingFeaturesEXT{};
@@ -331,6 +331,7 @@ namespace vkt
             //auto gConsertvative = vk::PhysicalDeviceConservativeRasterizationPropertiesEXT{};
 
             // 
+            gFloat16U8.pNext = &gTexelBufferAligment;
             gStorage8.pNext = &gFloat16U8;
             gStorage16.pNext = &gStorage8;
             gDescIndexing.pNext = &gStorage16;

@@ -89,6 +89,7 @@ namespace vkh {
             vkInfo.pStages = stages.data();
             vkInfo.stageCount = stages.size();
             vkInfo.groupCount = groups.size();
+            //vkInfo.maxRecursionDepth = 4u;
             return vkInfo;
         };
 
@@ -115,26 +116,28 @@ namespace vkh {
 
     // 
     template<class T = uint8_t>
-    struct VsDescriptorHandle { size_t stride_t = sizeof(T);
-        VkDescriptorUpdateTemplateEntry entry_t = nullptr;
-        std::shared_ptr<std::vector<uint8_t>> V_t = nullptr; uintptr_t field_t = 0u; // Byte Based
+    struct VsDescriptorHandle { //using T = T;
+        VkDescriptorUpdateTemplateEntry entry_t = {};
+        std::shared_ptr<std::vector<uint8_t>> V_t = {};
+        uintptr_t field_t = 0u; // Byte Based
+        size_t stride_t = sizeof(T);
 
         // 
-        ~VsDescriptorHandle() {};
-         VsDescriptorHandle() {};
-         VsDescriptorHandle(                 const VkDescriptorUpdateTemplateEntry& entry_t          , const uintptr_t& field_t = 0ull, std::shared_ptr<std::vector<uint8_t>> V_t = nullptr) : V_t(V_t), entry_t(entry_t), field_t(field_t), stride_t(sizeof(T)) {};
-         VsDescriptorHandle(size_t stride_t, const VkDescriptorUpdateTemplateEntry& entry_t = nullptr, const uintptr_t& field_t = 0ull, std::shared_ptr<std::vector<uint8_t>> V_t = nullptr) : V_t(V_t), entry_t(entry_t), field_t(field_t), stride_t(stride_t) {};
-         template<class C = T> VsDescriptorHandle(const VsDescriptorHandle<C>& handle = {}) : entry_t(handle.entry_t), field_t(handle.field_t), stride_t(handle.stride_t), V_t(handle.V_t) {};
+        template<class C = T>
+          VsDescriptorHandle(const VsDescriptorHandle<C>& handle) : entry_t(handle.entry_t), field_t(handle.field_t), stride_t(handle.stride_t), V_t(handle.V_t) {};
+          VsDescriptorHandle(const VkDescriptorUpdateTemplateEntry& entry_t, const uintptr_t& field_t = 0ull, const std::shared_ptr<std::vector<uint8_t>>& V_t = {}, const size_t stride_t = sizeof(T)) : V_t(V_t), entry_t(entry_t), field_t(field_t), stride_t(stride_t) {};
+         ~VsDescriptorHandle() {};
 
         // any buffers and images can `write` into types
-        template<class T = T> inline       VsDescriptorHandle<T> offset(const uint32_t& idx = 0u)       { return VsDescriptorHandle<T>{ sizeof(T), this->entry_t, this->stride_t * idx + this->field_t, V_t }; };
-        template<class T = T> inline const VsDescriptorHandle<T> offset(const uint32_t& idx = 0u) const { return VsDescriptorHandle<T>{ sizeof(T), this->entry_t, this->stride_t * idx + this->field_t, V_t }; };
+        template<class T = T> inline       VsDescriptorHandle<T> offset(const uint32_t& idx = 0u)       { return VsDescriptorHandle<T>(entry_t, stride_t*idx+field_t, V_t); };
+        template<class T = T> inline const VsDescriptorHandle<T> offset(const uint32_t& idx = 0u) const { return VsDescriptorHandle<T>(entry_t, stride_t*idx+field_t, V_t); };
         inline const uint32_t& size() const { return entry_t->descriptorCount; };
 
         // 
-        template<class C = T> inline VsDescriptorHandle<T>& operator=(const VsDescriptorHandle<C>& d) { this->stride_t = d.stride_t, this->entry_t = d.entry_t, this->field_t = d.field_t, this->V_t = d.V_t; return *this; };
+        template<class C = T> inline VsDescriptorHandle<T>& operator=(const VsDescriptorHandle<C>& d) { stride_t = d.stride_t, entry_t = d.entry_t, field_t = d.field_t, V_t = d.V_t; return *this; };
         //template<class C = T> inline VsDescriptorHandle<T>& operator=(const C& d) { *reinterpret_cast<C*>(&(*V_t)[this->field_t]) = d; return *this; };
-        inline VsDescriptorHandle<T>& operator=(const T& d) { *reinterpret_cast<T*>(&(*V_t)[this->field_t]) = d; return *this; };
+        //inline VsDescriptorHandle<T>& operator=(const T& d) { *reinterpret_cast<T*>(&(*V_t)[field_t]) = d; return *this; };
+        inline VsDescriptorHandle<T>& operator=(const T& d) { memcpy(&(*V_t)[field_t],&d,sizeof(T)); return *this; }; // Use MEMCPY method
 
         //
         template<class C = T> operator VsDescriptorHandle<C>& () { return reinterpret_cast<VsDescriptorHandle<C>&>(*this); };
@@ -253,19 +256,21 @@ namespace vkh {
                 const uint32_t i = I++;
                 const auto& entry = hndl.entry_t;
                 const auto& pt0 = entry.offset;
-                writes[i].dstSet = this->set;
+
                 if (entry.descriptorType == VK_DESCRIPTOR_TYPE_STORAGE_BUFFER || entry.descriptorType == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER) { // Map Buffers
-                    writes[i].pBufferInfo = (VkDescriptorBufferInfo*)(heap->data()+pt0);
-                } else 
+                    writes[i].pBufferInfo = reinterpret_cast<VkDescriptorBufferInfo*>(heap->data()+pt0);
+                } else
                 if (entry.descriptorType == VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER || entry.descriptorType == VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER) { // Map Buffer Views
-                    writes[i].pTexelBufferView = (VkBufferView*)(heap->data()+pt0);
+                    writes[i].pTexelBufferView = reinterpret_cast<VkBufferView*>(heap->data()+pt0);
                 } else
                 if (entry.descriptorType == VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_NV) { // Map Accelerator Structures (NV CUSTOM MAP)
-                    writes_acs[i].pAccelerationStructures = (VkAccelerationStructureNV*)(heap->data()+pt0);
+                    writes_acs[i].pAccelerationStructures = reinterpret_cast<VkAccelerationStructureNV*>(heap->data()+pt0);
                     writes[i].pNext = &writes_acs[i];
                 } else { // Map Images, Samplers, Combinations...
-                    writes[i].pImageInfo = (VkDescriptorImageInfo*)(heap->data()+pt0);
+                    writes[i].pImageInfo = reinterpret_cast<VkDescriptorImageInfo*>(heap->data()+pt0);
                 };
+
+                writes[i].dstSet = this->set;
                 entries[i] = entry;
             };
             return writes;
@@ -275,12 +280,11 @@ namespace vkh {
         inline operator std::vector<VkWriteDescriptorSet>&() { return mapWriteDescriptorSet(); };
         inline operator const std::vector<VkWriteDescriptorSet>&() const { return writes; };
 
-
     protected: template<class T = T> // 
         inline VsDescriptorHandle<T>& _push_description( VkDescriptorUpdateTemplateEntry entry ) { // Un-Safe API again
             const uintptr_t pt0 = heap->size(); entry.offset = pt0, entry.stride = sizeof(T);
             heap->resize(pt0+sizeof(T)*entry.descriptorCount, 0u);
-            handles.push_back(VsDescriptorHandle<T>{ entry, pt0, heap });
+            handles.push_back(VsDescriptorHandle<T>(entry, uintptr_t(pt0), heap));
             writes.push_back({
                 .dstSet = this->set,
                 .dstBinding = entry.dstBinding,
