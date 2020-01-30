@@ -1,4 +1,4 @@
-#pragma once
+#pragma once // #
 
 #include "./enums.hpp"
 #include "./bitfields.hpp"
@@ -1016,14 +1016,14 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
             glm::vec4(0.f,1.f,0.f,0.f),
             glm::vec4(0.f,0.f,1.f,0.f)
         };
-        //uint32_t instanceId : 24;
-        //uint32_t mask : 8;
-        //uint32_t instanceOffset : 24;
-        //uint32_t flags : 8;
-        uint24_t instanceId = 0u;
-        uint8_t mask = 0xFF;
-        uint24_t instanceOffset = 0u;
-        VkGeometryInstanceFlagsNV flags = {};
+        uint32_t instanceId : 24;
+        uint32_t mask : 8;
+        uint32_t instanceOffset : 24;
+        uint32_t flags : 8;
+        //uint24_t instanceId = 0u;
+        //uint8_t mask = 0xFF;
+        //uint24_t instanceOffset = 0u;
+        //VkGeometryInstanceFlagsNV flags = {};
         uint64_t accelerationStructureHandle = 0ull;
 
         // Few Operators

@@ -1,4 +1,4 @@
-#pragma once
+#pragma once // #
 
 //#ifdef OS_WIN
 #if (defined(_WIN32) || defined(__MINGW32__) || defined(_MSC_VER_) || defined(__MINGW64__)) 

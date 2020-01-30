@@ -1,4 +1,4 @@
-#pragma once
+#pragma once // #
 
 #ifdef VKT_FORCE_VMA_IMPLEMENTATION
 #ifndef VMA_IMPLEMENTATION
@@ -360,6 +360,10 @@ namespace vkt {
         inline VmaBufferAllocation& operator*() { return (*allocation); };
         inline const VmaBufferAllocation* operator->() const { return &(*allocation); };
         inline const VmaBufferAllocation& operator*() const { return (*allocation); };
+
+        // 
+        vk::DeviceSize& rangeInfo() { return bufInfo.range; };
+        const vk::DeviceSize& rangeInfo() const { return bufInfo.range; };
 
         //
         protected: friend Vector<T>; // 
