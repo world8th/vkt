@@ -324,9 +324,9 @@ namespace vkt
             // minimal features
             auto gTexelBufferAligment = vk::PhysicalDeviceTexelBufferAlignmentFeaturesEXT{};
             auto gStorage16 = vk::PhysicalDevice16BitStorageFeatures{};
-            auto gStorage8 = vk::PhysicalDevice8BitStorageFeaturesKHR{};
+            auto gStorage8 = vk::PhysicalDevice8BitStorageFeatures{};
             auto gDescIndexing = vk::PhysicalDeviceDescriptorIndexingFeaturesEXT{};
-            auto gFloat16U8 = vk::PhysicalDeviceFloat16Int8FeaturesKHR{};
+            auto gFloat16U8 = vk::PhysicalDeviceFloat16Int8FeaturesKHR{}; // Vulkan 1.3
             auto gFeatures = vk::PhysicalDeviceFeatures2{};
             //auto gConsertvative = vk::PhysicalDeviceConservativeRasterizationPropertiesEXT{};
 

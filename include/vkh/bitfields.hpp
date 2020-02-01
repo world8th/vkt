@@ -255,14 +255,14 @@ namespace vkh {
     };
 
     // 
-    struct VkDescriptorBindingFlagsEXT { ::VkFlags
+    struct VkDescriptorBindingFlags { ::VkFlags
         eUpdateAfterBind:1,
         eUpdateUnusedWhilePending:1,
         ePartiallyBound:1,
         eVariableDescriptorCount:1;
-        
-        OPERATORS(VkDescriptorBindingFlagsEXT,::VkDescriptorBindingFlagBitsEXT,::VkFlags)
-        VK_HPP_OPERATORS(VkDescriptorBindingFlagsEXT,vk::DescriptorBindingFlagsEXT,vk::DescriptorBindingFlagBitsEXT)
+
+        OPERATORS(VkDescriptorBindingFlags,::VkDescriptorBindingFlagBits,::VkFlags)
+        VK_HPP_OPERATORS(VkDescriptorBindingFlags,vk::DescriptorBindingFlags,vk::DescriptorBindingFlagBits)
     };
 
     // 

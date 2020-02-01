@@ -321,7 +321,7 @@ namespace vkh {
         };
 
         // 
-        inline VsDescriptorSetLayoutCreateInfoHelper& pushBinding(const VkDescriptorSetLayoutBinding& binding = {}, const VkDescriptorBindingFlagsEXT& flags = {}){
+        inline VsDescriptorSetLayoutCreateInfoHelper& pushBinding(const VkDescriptorSetLayoutBinding& binding = {}, const VkDescriptorBindingFlags& flags = {}){
             binding_flags.push_back(flags);
             bindings.push_back(binding);
             return *this;
@@ -358,9 +358,9 @@ namespace vkh {
 
     protected: // 
         VkDescriptorSetLayoutCreateInfo vk_info = {};
-        VkDescriptorSetLayoutBindingFlagsCreateInfoEXT flags_info = {};
+        VkDescriptorSetLayoutBindingFlagsCreateInfo flags_info = {};
         std::vector<VkDescriptorSetLayoutBinding> bindings = {};
-        std::vector<VkDescriptorBindingFlagsEXT> binding_flags = {};
+        std::vector<VkDescriptorBindingFlags> binding_flags = {};
     };
 
     // TODO: REMOVE CODE TAFTOLOGY

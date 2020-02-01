@@ -606,7 +606,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         VK_HPP_STRUCT_OPERATORS(VkGraphicsPipelineCreateInfo,vk::GraphicsPipelineCreateInfo)
     } VkGraphicsPipelineCreateInfo;
 
-    // 
+    // Vulkan 1.3
     typedef struct VkPhysicalDeviceSubgroupSizeControlPropertiesEXT {
         VkStructureType            sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_SIZE_CONTROL_PROPERTIES_EXT;
         void*                      pNext = nullptr;
@@ -619,7 +619,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         VK_HPP_STRUCT_OPERATORS(VkPhysicalDeviceSubgroupSizeControlPropertiesEXT,vk::PhysicalDeviceSubgroupSizeControlPropertiesEXT)
     } VkPhysicalDeviceSubgroupSizeControlPropertiesEXT;
 
-    // 
+    // Vulkan 1.3
     typedef struct VkPipelineShaderStageRequiredSubgroupSizeCreateInfoEXT {
         VkStructureType         sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_REQUIRED_SUBGROUP_SIZE_CREATE_INFO_EXT;
         void*                   pNext = nullptr;
@@ -717,17 +717,17 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
     } VkPipelineLayoutCreateInfo;
 
     // 
-    typedef struct VkDescriptorSetLayoutBindingFlagsCreateInfoEXT {
-        VkStructureType                       sType         = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_BINDING_FLAGS_CREATE_INFO_EXT;
+    typedef struct VkDescriptorSetLayoutBindingFlagsCreateInfo {
+        VkStructureType                       sType         = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_BINDING_FLAGS_CREATE_INFO;
         const void*                           pNext         = nullptr;
         uint32_t                              bindingCount  = 0u;
-        const VkDescriptorBindingFlagsEXT*    pBindingFlags = {};
+        const VkDescriptorBindingFlags*       pBindingFlags = {};
 
-        VkDescriptorSetLayoutBindingFlagsCreateInfoEXT& setBindingFlags(const std::vector<VkDescriptorBindingFlagsEXT>& V = {}) { pBindingFlags = V.data(); bindingCount = V.size(); return *this; };
+        VkDescriptorSetLayoutBindingFlagsCreateInfo& setBindingFlags(const std::vector<VkDescriptorBindingFlags>& V = {}) { pBindingFlags = V.data(); bindingCount = V.size(); return *this; };
 
-        STRUCT_OPERATORS(VkDescriptorSetLayoutBindingFlagsCreateInfoEXT)
-        VK_HPP_STRUCT_OPERATORS(VkDescriptorSetLayoutBindingFlagsCreateInfoEXT,vk::DescriptorSetLayoutBindingFlagsCreateInfoEXT)
-    } VkDescriptorSetLayoutBindingFlagsCreateInfoEXT;
+        STRUCT_OPERATORS(VkDescriptorSetLayoutBindingFlagsCreateInfo)
+        VK_HPP_STRUCT_OPERATORS(VkDescriptorSetLayoutBindingFlagsCreateInfo,vk::DescriptorSetLayoutBindingFlagsCreateInfo)
+    } VkDescriptorSetLayoutBindingFlagsCreateInfo;
 
     // 
     typedef struct VkDescriptorUpdateTemplateEntry {
