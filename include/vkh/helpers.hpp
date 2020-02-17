@@ -16,28 +16,28 @@ namespace vkh {
     // TODO: REMOVE CODE TAFTOLOGY
     class VsRayTracingPipelineCreateInfoHelper { 
     protected: 
-        VkRayTracingShaderGroupCreateInfoNV raygen_shader_group = {};
+        VkRayTracingShaderGroupCreateInfoNV raygenShaderGroup = {};
         std::vector<VkPipelineShaderStageCreateInfo> stages = {};
-        std::vector<VkRayTracingShaderGroupCreateInfoNV> miss_shader_groups = {};
-        std::vector<VkRayTracingShaderGroupCreateInfoNV> hit_shader_groups = {};
-        std::vector<VkRayTracingShaderGroupCreateInfoNV> compiled_shader_groups = {};
+        std::vector<VkRayTracingShaderGroupCreateInfoNV> missShaderGroups = {};
+        std::vector<VkRayTracingShaderGroupCreateInfoNV> hitShaderGroups = {};
+        std::vector<VkRayTracingShaderGroupCreateInfoNV> compiledShaderGroups = {};
 
     public: // get offsets of shader groups
         VkRayTracingPipelineCreateInfoNV vkInfo = {};
         uintptr_t raygenOffsetIndex() { return 0u; };
         uintptr_t missOffsetIndex() { return 1u; };
-        uintptr_t hitOffsetIndex() { return miss_shader_groups.size()+missOffsetIndex(); };
-        uintptr_t groupCount() { return miss_shader_groups.size() + hit_shader_groups.size() + 1u; };
+        uintptr_t hitOffsetIndex() { return missShaderGroups.size()+missOffsetIndex(); };
+        uintptr_t groupCount() { return missShaderGroups.size() + hitShaderGroups.size() + 1u; };
 
         // 
         VsRayTracingPipelineCreateInfoHelper(const VkRayTracingPipelineCreateInfoNV& info = {}) : vkInfo(info) {};
 
         // result groups
         inline std::vector<VkRayTracingShaderGroupCreateInfoNV>& compileGroups() {
-            compiled_shader_groups = { raygen_shader_group };
-            for (auto& group : miss_shader_groups) { compiled_shader_groups.push_back(group); };
-            for (auto& group : hit_shader_groups) { compiled_shader_groups.push_back(group); };
-            return compiled_shader_groups;
+            compiledShaderGroups = { raygenShaderGroup };
+            for (auto& group : missShaderGroups) { compiledShaderGroups.push_back(group); };
+            for (auto& group : hitShaderGroups) { compiledShaderGroups.push_back(group); };
+            return compiledShaderGroups;
         };
 
         // WARNING: Only One Hit Group Supported At Once
@@ -45,36 +45,36 @@ namespace vkh {
             for (auto& stage : stages_in) {
                 if (stage.stage == VK_SHADER_STAGE_RAYGEN_BIT_NV) {
                     const uintptr_t last_idx = stages.size(); stages.push_back(stage);
-                    raygen_shader_group.generalShader = last_idx;
+                    raygenShaderGroup.generalShader = last_idx;
                 };
             };
 
-            uintptr_t group_idx = -1U;
+            uintptr_t groupIdx = -1U;
             for (auto& stage : stages_in) {
                 if (stage.stage == VK_SHADER_STAGE_MISS_BIT_NV) {
                     const uintptr_t last_idx = stages.size(); stages.push_back(stage);
-                    group_idx = miss_shader_groups.size(); miss_shader_groups.push_back({});
+                    groupIdx = missShaderGroups.size(); missShaderGroups.push_back({});
                     //if (group_idx == -1U) { group_idx = miss_shader_groups.size(); miss_shader_groups.push_back({}); };
-                    miss_shader_groups[group_idx].generalShader = last_idx;//break;
+                    missShaderGroups[groupIdx].generalShader = last_idx;//break;
                 };
             };
 
-            group_idx = -1U; // Only One Hit Group Supported At Once
+            groupIdx = -1U; // Only One Hit Group Supported At Once
             for (auto& stage : stages_in) {
                 if (stage.stage == VK_SHADER_STAGE_CLOSEST_HIT_BIT_NV || stage.stage == VK_SHADER_STAGE_ANY_HIT_BIT_NV || stage.stage == VK_SHADER_STAGE_INTERSECTION_BIT_NV) {
                     const uintptr_t last_idx = stages.size(); stages.push_back(stage);
-                    if (group_idx == -1U) { group_idx = hit_shader_groups.size(); hit_shader_groups.push_back({}); };
+                    if (groupIdx == -1U) { groupIdx = hitShaderGroups.size(); hitShaderGroups.push_back({}); };
                     if (stage.stage == VK_SHADER_STAGE_CLOSEST_HIT_BIT_NV) {
-                        hit_shader_groups[group_idx].type = prior_group_type;
-                        hit_shader_groups[group_idx].closestHitShader = last_idx;
+                        hitShaderGroups[groupIdx].type = prior_group_type;
+                        hitShaderGroups[groupIdx].closestHitShader = last_idx;
                     };
                     if (stage.stage == VK_SHADER_STAGE_ANY_HIT_BIT_NV) {
-                        hit_shader_groups[group_idx].type = prior_group_type;
-                        hit_shader_groups[group_idx].anyHitShader = last_idx;
+                        hitShaderGroups[groupIdx].type = prior_group_type;
+                        hitShaderGroups[groupIdx].anyHitShader = last_idx;
                     };
                     if (stage.stage == VK_SHADER_STAGE_INTERSECTION_BIT_NV) {
-                        hit_shader_groups[group_idx].type = VK_RAY_TRACING_SHADER_GROUP_TYPE_PROCEDURAL_HIT_GROUP_NV, 
-                        hit_shader_groups[group_idx].intersectionShader = last_idx;
+                        hitShaderGroups[groupIdx].type = VK_RAY_TRACING_SHADER_GROUP_TYPE_PROCEDURAL_HIT_GROUP_NV,
+                        hitShaderGroups[groupIdx].intersectionShader = last_idx;
                     };
                 };
             };
