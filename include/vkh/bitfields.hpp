@@ -404,6 +404,30 @@ namespace vkh {
         VK_HPP_OPERATORS(VkAccessFlags, vk::AccessFlags, vk::AccessFlagBits)
     };
 
+    // 
+    struct VkMemoryPropertyFlags { ::VkFlags
+        eDeviceLocal:1,
+        eHostVisible:1,
+        eHostCoherent:1,
+        eHostCached:1,
+        eLazilyAllocated:1,
+        eProtected:1,
+        eDeviceCoherent:1,
+        eDeviceUncached:1;
+
+        OPERATORS(VkMemoryPropertyFlags, ::VkMemoryPropertyFlagBits, ::VkFlags)
+        VK_HPP_OPERATORS(VkMemoryPropertyFlags, vk::MemoryPropertyFlags, vk::MemoryPropertyFlagBits)
+    };
+
+    // 
+    struct VkMemoryHeapFlags { ::VkFlags
+        eDeviceLocal:1,
+        eMultiInstance:1;
+
+        OPERATORS(VkMemoryHeapFlags, ::VkMemoryHeapFlagBits, ::VkFlags)
+        VK_HPP_OPERATORS(VkMemoryHeapFlags, vk::MemoryHeapFlags, vk::MemoryHeapFlagBits)
+    };
+
 #pragma pack(pop)
     
     // Extras

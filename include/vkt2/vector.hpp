@@ -12,22 +12,64 @@
 
 namespace vkt {
 
+    struct MemoryAllocationInfo { // 
+        vk::Device device = {};
+        vk::DeviceMemory memory = {};
+        vk::DeviceSize range = 0ull;
+        vk::ImageLayout initialLayout = vk::ImageLayout::eUndefined;
+        HANDLE handle = {};
+        void* pMapped = nullptr;
+        vkh::VkPhysicalDeviceMemoryProperties memoryProperties = {};
+        VmaMemoryUsage vmaUsage = VMA_MEMORY_USAGE_GPU_ONLY;
+
+        // 
+        virtual int32_t getMemoryType(uint32_t memoryTypeBitsRequirement, vkh::VkMemoryPropertyFlags requiredProperties) const {
+            const uint32_t memoryCount = memoryProperties.memoryTypeCount;
+            for (uint32_t memoryIndex = 0; memoryIndex < memoryCount; ++memoryIndex) {
+                const uint32_t memoryTypeBits = (1 << memoryIndex);
+                const bool isRequiredMemoryType = memoryTypeBitsRequirement & memoryTypeBits;
+                const auto properties = VkMemoryPropertyFlags(memoryProperties.memoryTypes[memoryIndex].propertyFlags);
+                const bool hasRequiredProperties = (properties & VkMemoryPropertyFlags(requiredProperties)) == VkMemoryPropertyFlags(requiredProperties);
+                if (isRequiredMemoryType && hasRequiredProperties) return static_cast<int32_t>(memoryIndex);
+            }
+            return -1;
+        }
+    };
+
     // 
     class VmaBufferAllocation;
     class BufferAllocation : public std::enable_shared_from_this<BufferAllocation> { public:
         BufferAllocation() {};
-        BufferAllocation(const BufferAllocation& allocation) : buffer(allocation.buffer), range(allocation.range), device(allocation.device), pMapped(allocation.pMapped) { *this = allocation; };
+        BufferAllocation(
+            const MemoryAllocationInfo& allocationInfo,
+            const vkh::VkBufferCreateInfo& createInfo = {}
+        ) : info(allocationInfo) {
+            vk::MemoryRequirements memReqs = allocationInfo.device.getBufferMemoryRequirements(buffer);
+            vk::MemoryAllocateInfo memAllocInfo = {};
+            vk::ExportMemoryAllocateInfo exportAllocInfo{ vk::ExternalMemoryHandleTypeFlagBits::eOpaqueWin32 };
+            memAllocInfo.pNext = &exportAllocInfo;
+            memAllocInfo.allocationSize = memReqs.size;
+            memAllocInfo.memoryTypeIndex = uint32_t(allocationInfo.getMemoryType(memReqs.memoryTypeBits, { .eDeviceLocal = 1 }));
+
+            // 
+            this->info.device.bindBufferMemory(buffer, info.memory = info.device.allocateMemory(memAllocInfo), 0);
+            this->info.handle = info.device.getMemoryWin32HandleKHR({ info.memory, vk::ExternalMemoryHandleTypeFlagBits::eOpaqueWin32 });
+
+            // 
+            if (this->info.range == 0 || this->info.range == VK_WHOLE_SIZE) {
+                this->info.range = createInfo.size;
+            };
+        };
+        BufferAllocation(const BufferAllocation& allocation) : buffer(allocation.buffer), info(allocation.info) { *this = allocation; };
         BufferAllocation& operator=(const BufferAllocation& allocation) { 
             this->buffer = allocation.buffer;
-            this->device = allocation.device;
-            this->range = allocation.range;
-            this->pMapped = allocation.pMapped;
+            this->info = allocation.info;
             return *this;
         };
 
         // 
-        virtual void* map() { return pMapped; };
-        virtual void* mapped() { return pMapped; };
+        virtual void* map() { return info.pMapped; };
+        virtual void* mapped() { return info.pMapped; };
         virtual void  unmap() {};
 
         // 
@@ -39,23 +81,24 @@ namespace vkt {
         virtual operator const VkBuffer& () const { return reinterpret_cast<const VkBuffer&>(buffer); };
 
         // VMA HACK FOR EXTRACT DEVICE
-        virtual operator const vk::Device& () const { return device; };
-        virtual operator const VkDevice& () const { return reinterpret_cast<const VkDevice&>(device); };
+        virtual operator const vk::Device& () const { return info.device; };
+        virtual operator const VkDevice& () const { return reinterpret_cast<const VkDevice&>(info.device); };
 
         // 
-        virtual operator vk::Device& () { return device; };
-        virtual operator VkDevice& () { return reinterpret_cast<VkDevice&>(device); };
+        virtual operator vk::Device& () { return info.device; };
+        virtual operator VkDevice& () { return reinterpret_cast<VkDevice&>(info.device); };
 
         //
-        virtual vk::Device& getDevice() { return device; };
-        virtual const vk::Device& getDevice() const { return device; };
+        virtual vk::Device& getDevice() { return info.device; };
+        virtual const vk::Device& getDevice() const { return info.device; };
 
+        // 
+        virtual vk::DeviceSize& range() { return info.range; };
+        virtual const vk::DeviceSize& range() const { return info.range; };
 
     public: // in-variant 
         vk::Buffer buffer = {};
-        vk::Device device = {};
-        vk::DeviceSize range = 0ull;
-        void* pMapped = nullptr;
+        MemoryAllocationInfo info = {};
 
     protected: friend BufferAllocation; friend VmaBufferAllocation;
     };
@@ -73,8 +116,9 @@ namespace vkt {
             if (vmaUsage == VMA_MEMORY_USAGE_CPU_TO_GPU || vmaUsage == VMA_MEMORY_USAGE_GPU_TO_CPU) { vmaInfo.flags = VMA_ALLOCATION_CREATE_MAPPED_BIT; };
             auto result = vmaCreateBuffer(this->allocator = allocator, createInfo, &vmaInfo, &reinterpret_cast<VkBuffer&>(buffer), &allocation, &allocationInfo); 
             assert(result == VK_SUCCESS);
-            this->range = createInfo.size;
-            this->device = this->_getDevice();
+            this->info.range = createInfo.size;
+            this->info.device = this->_getDevice();
+            this->info.vmaUsage = vmaUsage;
         };
 
         // 
@@ -86,12 +130,11 @@ namespace vkt {
             if (allocation.allocation) {
                 vmaDestroyBuffer(allocator, *this, allocation); // don't assign into already allocated
             };
+            this->info = allocation.info;
             this->buffer = allocation.buffer;
             this->allocation = allocation.allocation;
             this->allocationInfo = allocation.allocationInfo;
             this->allocator = allocation.allocator;
-            this->range = allocation.range;
-            this->device = allocation.device;
             return *this;
         };
 
@@ -119,11 +162,27 @@ namespace vkt {
     class VmaImageAllocation;
     class ImageAllocation : public std::enable_shared_from_this<ImageAllocation> { public: 
         ImageAllocation() {};
-        ImageAllocation(const ImageAllocation& allocation) : image(allocation.image), device(allocation.device), pMapped(allocation.pMapped) { *this = allocation; };
+        ImageAllocation(
+            const MemoryAllocationInfo& allocationInfo,
+            const vkh::VkImageCreateInfo& createInfo = {}
+        ) : info(allocationInfo) {
+            vk::MemoryRequirements memReqs = allocationInfo.device.getImageMemoryRequirements(image);
+            vk::MemoryAllocateInfo memAllocInfo = {};
+            vk::ExportMemoryAllocateInfo exportAllocInfo{ vk::ExternalMemoryHandleTypeFlagBits::eOpaqueWin32 };
+            memAllocInfo.pNext = &exportAllocInfo;
+            memAllocInfo.allocationSize = memReqs.size;
+            memAllocInfo.memoryTypeIndex = uint32_t(allocationInfo.getMemoryType(memReqs.memoryTypeBits, {.eDeviceLocal = 1}));
+
+            // 
+            this->info.device.bindImageMemory(image, info.memory = info.device.allocateMemory(memAllocInfo), 0);
+            this->info.handle = info.device.getMemoryWin32HandleKHR({ info.memory, vk::ExternalMemoryHandleTypeFlagBits::eOpaqueWin32 });
+            this->info.range = memReqs.size;
+        }
+
+        ImageAllocation(const ImageAllocation& allocation) : image(allocation.image), info(allocation.info) { *this = allocation; };
         ImageAllocation& operator=(const ImageAllocation& allocation) {
             this->image = allocation.image;
-            this->device = allocation.device;
-            this->pMapped = allocation.pMapped;
+            this->info = allocation.info;
             return *this;
         };
 
@@ -136,30 +195,29 @@ namespace vkt {
         virtual operator VkImage& () { return reinterpret_cast<VkImage&>(this->image); };
 
         // 
-        virtual operator const vk::Device& () const { return device; };
-        virtual operator const VkDevice& () const { return reinterpret_cast<const VkDevice&>(device); };
+        virtual operator const vk::Device& () const { return info.device; };
+        virtual operator const VkDevice& () const { return reinterpret_cast<const VkDevice&>(info.device); };
 
         //
-        virtual vk::Device& getDevice() { return device; };
-        virtual const vk::Device& getDevice() const { return device; };
+        virtual vk::Device& getDevice() { return info.device; };
+        virtual const vk::Device& getDevice() const { return info.device; };
 
         // 
-        virtual const vk::Device& _getDevice() const { return device; };
+        virtual const vk::Device& _getDevice() const { return info.device; };
 
         // 
-        virtual operator vk::Device& () { return device; };
-        virtual operator VkDevice& () { return reinterpret_cast<VkDevice&>(device); };
+        virtual operator vk::Device& () { return info.device; };
+        virtual operator VkDevice& () { return reinterpret_cast<VkDevice&>(info.device); };
 
         // Get mapped memory
-        virtual void* map() { return pMapped; };
-        virtual void* mapped() { return pMapped; };
-        virtual void  unmap() {};
+        virtual void* map() { return (info.pMapped = info.device.mapMemory(info.memory, 0u, info.range, {})); };
+        virtual void* mapped() { return info.pMapped; };
+        virtual void  unmap() { info.device.unmapMemory(info.memory); };
 
     // 
     protected: friend VmaImageAllocation; friend ImageAllocation;
         vk::Image image = {};
-        vk::Device device = {};
-        void* pMapped = nullptr;
+        MemoryAllocationInfo info = {};
     };
 
     // 
@@ -175,7 +233,10 @@ namespace vkt {
             if (vmaUsage == VMA_MEMORY_USAGE_CPU_TO_GPU || vmaUsage == VMA_MEMORY_USAGE_GPU_TO_CPU) { vmaInfo.flags = VMA_ALLOCATION_CREATE_MAPPED_BIT; };
             auto result = vmaCreateImage(this->allocator = allocator, createInfo, &vmaInfo, &reinterpret_cast<VkImage&>(image), &allocation, &allocationInfo);
             assert(result == VK_SUCCESS);
-            this->device = this->_getDevice();
+            this->info.device = this->_getDevice();
+            this->info.initialLayout = vk::ImageLayout(createInfo.initialLayout);
+            this->info.range = allocationInfo.size;
+            this->info.vmaUsage = vmaUsage;
         };
 
         // 
@@ -187,14 +248,15 @@ namespace vkt {
             this->allocation = allocation.allocation;
             this->allocationInfo = allocation.allocationInfo;
             this->allocator = allocation.allocator;
-            this->device = allocation.device;
+            this->info = allocation.info;
+            //this->info.device = this->_getDevice();
             return *this;
         };
 
         // Get mapped memory
         virtual void* map() override { void* ptr = nullptr; vmaMapMemory(allocator, allocation, &ptr); return ptr; };
         virtual void* mapped() override { if (!allocationInfo.pMappedData) { vmaMapMemory(allocator, allocation, &allocationInfo.pMappedData); }; return allocationInfo.pMappedData; };
-        virtual void unmap() override { vmaUnmapMemory(allocator, allocation); allocationInfo.pMappedData = nullptr; };
+        virtual void  unmap() override { vmaUnmapMemory(allocator, allocation); allocationInfo.pMappedData = nullptr; };
 
         // Allocation
         virtual operator const VmaAllocation& () const { return allocation; };
@@ -405,7 +467,7 @@ namespace vkt {
         //virtual const vk::DeviceSize& stride() const { return this->stride; };
 
         // 
-        virtual vk::DeviceSize range() const { return (this->bufInfo.range != VK_WHOLE_SIZE ? std::min(this->bufInfo.range, this->allocation->range - this->bufInfo.offset) : (this->allocation->range - this->bufInfo.offset)); };
+        virtual vk::DeviceSize range() const { return (this->bufInfo.range != VK_WHOLE_SIZE ? std::min(this->bufInfo.range, this->allocation->range() - this->bufInfo.offset) : (this->allocation->range() - this->bufInfo.offset)); };
         virtual vk::DeviceSize size() const { return this->range() / this->stride; };
 
         // 

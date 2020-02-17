@@ -983,9 +983,28 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         VK_HPP_STRUCT_OPERATORS(VkMemoryBarrier, vk::MemoryBarrier)
     } VkMemoryBarrier;
 
+    //
+    typedef struct VkMemoryType {
+        VkMemoryPropertyFlags    propertyFlags = {};
+        uint32_t                 heapIndex = 0u;
+    } VkMemoryType;
 
-    #pragma pack(pop)
+    // 
+    typedef struct VkMemoryHeap {
+        VkDeviceSize      size  = 0u;
+        VkMemoryHeapFlags flags = {};
+    } VkMemoryHeap;
 
+    // 
+    typedef struct VkPhysicalDeviceMemoryProperties {
+        uint32_t     memoryTypeCount                  = 0u;
+        VkMemoryType memoryTypes[VK_MAX_MEMORY_TYPES] = {};
+        uint32_t     memoryHeapCount                  = 0u;
+        VkMemoryHeap memoryHeaps[VK_MAX_MEMORY_HEAPS] = {};
+    } VkPhysicalDeviceMemoryProperties;
+
+
+#pragma pack(pop)
 
 #pragma pack(push, 1)
     struct uint24__ { // for compatibility only
