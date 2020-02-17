@@ -61,7 +61,7 @@ namespace vkt {
             };
         };
         BufferAllocation(const BufferAllocation& allocation) : buffer(allocation.buffer), info(allocation.info) { *this = allocation; };
-        BufferAllocation& operator=(const BufferAllocation& allocation) { 
+        virtual BufferAllocation& operator=(const BufferAllocation& allocation) {
             this->buffer = allocation.buffer;
             this->info = allocation.info;
             return *this;
@@ -126,7 +126,7 @@ namespace vkt {
         VmaBufferAllocation(const BufferAllocation& allocation) { *this = dynamic_cast<const VmaBufferAllocation&>(allocation); };
 
         // 
-        VmaBufferAllocation& operator=(const VmaBufferAllocation& allocation) {
+        virtual VmaBufferAllocation& operator=(const VmaBufferAllocation& allocation) {
             if (allocation.allocation) {
                 vmaDestroyBuffer(allocator, *this, allocation); // don't assign into already allocated
             };
@@ -182,7 +182,7 @@ namespace vkt {
         }
 
         ImageAllocation(const ImageAllocation& allocation) : image(allocation.image), info(allocation.info) { *this = allocation; };
-        ImageAllocation& operator=(const ImageAllocation& allocation) {
+        virtual ImageAllocation& operator=(const ImageAllocation& allocation) {
             this->image = allocation.image;
             this->info = allocation.info;
             return *this;
@@ -242,7 +242,7 @@ namespace vkt {
         };
 
         // 
-        VmaImageAllocation& operator=(const VmaImageAllocation& allocation) {
+        virtual VmaImageAllocation& operator=(const VmaImageAllocation& allocation) {
             if (allocation.allocation) {
                 vmaDestroyImage(allocator, *this, allocation); // don't assign into already allocated
             };
@@ -368,18 +368,18 @@ namespace vkt {
         virtual operator const vk::ImageSubresourceLayers() const { return vk::ImageSubresourceLayers{ reinterpret_cast<const vk::ImageAspectFlags&>(subresourceRange.aspectMask), subresourceRange.baseMipLevel, subresourceRange.baseArrayLayer, subresourceRange.layerCount }; };
 
         // 
-        vk::Image& getImage() { return *this->allocation; };
-        vk::ImageView& getImageView() { return reinterpret_cast<vk::ImageView&>(this->imgInfo.imageView); };
-        vk::ImageLayout& getImageLayout() { return reinterpret_cast<vk::ImageLayout&>(this->imgInfo.imageLayout); };
-        vk::Sampler& getSampler() { return reinterpret_cast<vk::Sampler&>(this->imgInfo.sampler); };
-        vk::ImageSubresourceRange& getImageSubresourceRange() { return this->subresourceRange; };
+        virtual vk::Image& getImage() { return *this->allocation; };
+        virtual vk::ImageView& getImageView() { return reinterpret_cast<vk::ImageView&>(this->imgInfo.imageView); };
+        virtual vk::ImageLayout& getImageLayout() { return reinterpret_cast<vk::ImageLayout&>(this->imgInfo.imageLayout); };
+        virtual vk::Sampler& getSampler() { return reinterpret_cast<vk::Sampler&>(this->imgInfo.sampler); };
+        virtual vk::ImageSubresourceRange& getImageSubresourceRange() { return this->subresourceRange; };
 
         // 
-        const vk::Image& getImage() const { return *this->allocation; };
-        const vk::ImageView& getImageView() const { return reinterpret_cast<const vk::ImageView&>(this->imgInfo.imageView); };
-        const vk::ImageLayout& getImageLayout() const { return reinterpret_cast<const vk::ImageLayout&>(this->imgInfo.imageLayout); };
-        const vk::Sampler& getSampler() const { return reinterpret_cast<const vk::Sampler&>(this->imgInfo.sampler); };
-        const vk::ImageSubresourceRange& getImageSubresourceRange() const { return this->subresourceRange; };
+        virtual const vk::Image& getImage() const { return *this->allocation; };
+        virtual const vk::ImageView& getImageView() const { return reinterpret_cast<const vk::ImageView&>(this->imgInfo.imageView); };
+        virtual const vk::ImageLayout& getImageLayout() const { return reinterpret_cast<const vk::ImageLayout&>(this->imgInfo.imageLayout); };
+        virtual const vk::Sampler& getSampler() const { return reinterpret_cast<const vk::Sampler&>(this->imgInfo.sampler); };
+        virtual const vk::ImageSubresourceRange& getImageSubresourceRange() const { return this->subresourceRange; };
 
         // 
         virtual ImageAllocation* operator->() { return &(*allocation); };
