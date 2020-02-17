@@ -100,6 +100,10 @@ namespace vkt {
         virtual vk::DeviceSize& range() { return info.range; };
         virtual const vk::DeviceSize& range() const { return info.range; };
 
+        // 
+        virtual MemoryAllocationInfo& getAllocationInfo() { return info; };
+        virtual const MemoryAllocationInfo& getAllocationInfo() const { return info; };
+
     public: // in-variant 
         vk::Buffer buffer = {};
         MemoryAllocationInfo info = {};
@@ -337,6 +341,7 @@ namespace vkt {
         // 
         virtual operator std::shared_ptr<ImageAllocation>&() { return this->allocation; };
         virtual operator vkh::VkImageSubresourceRange&() { return this->subresourceRange; };
+        virtual operator vkt::MemoryAllocationInfo&() { return this->allocation->info; };
         virtual operator vkh::VkDescriptorImageInfo&() { return this->imgInfo; };
         virtual operator vk::DescriptorImageInfo&() { return this->imgInfo; };
         virtual operator vk::ImageSubresourceRange&() { return this->subresourceRange; };
@@ -356,6 +361,7 @@ namespace vkt {
         // 
         virtual operator const std::shared_ptr<ImageAllocation>&() const { return this->allocation; };
         virtual operator const vkh::VkImageSubresourceRange&() const { return this->subresourceRange; };
+        virtual operator const vkt::MemoryAllocationInfo&() const { return this->allocation->info; };
         virtual operator const vkh::VkDescriptorImageInfo&() const { return this->imgInfo; };
         virtual operator const vk::DescriptorImageInfo&() const { return this->imgInfo; };
         virtual operator const vk::ImageSubresourceRange&() const { return this->subresourceRange; };
