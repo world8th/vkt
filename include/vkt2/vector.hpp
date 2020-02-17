@@ -159,6 +159,7 @@ namespace vkt {
 
 
     // 
+    class ImageRegion;
     class VmaImageAllocation;
     class ImageAllocation : public std::enable_shared_from_this<ImageAllocation> { public: 
         ImageAllocation() {};
@@ -175,6 +176,7 @@ namespace vkt {
 
             // 
             this->info.device.bindImageMemory(image, info.memory = info.device.allocateMemory(memAllocInfo), 0);
+            this->info.initialLayout = vk::ImageLayout(createInfo.initialLayout);
             this->info.handle = info.device.getMemoryWin32HandleKHR({ info.memory, vk::ExternalMemoryHandleTypeFlagBits::eOpaqueWin32 });
             this->info.range = memReqs.size;
         }
@@ -215,7 +217,7 @@ namespace vkt {
         virtual void  unmap() { info.device.unmapMemory(info.memory); };
 
     // 
-    protected: friend VmaImageAllocation; friend ImageAllocation;
+    protected: friend VmaImageAllocation; friend ImageAllocation; friend ImageRegion;
         vk::Image image = {};
         MemoryAllocationInfo info = {};
     };
@@ -316,6 +318,15 @@ namespace vkt {
         virtual ImageRegion& setSampler(const VkSampler& sampler = {}) { this->imgInfo.sampler = sampler; return *this; };
         virtual ImageRegion& setImageLayout(const vk::ImageLayout layout = {}) { this->imgInfo.imageLayout = reinterpret_cast<const VkImageLayout&>(layout); return *this; };
         virtual ImageRegion& setSampler(const vk::Sampler& sampler = {}) { this->imgInfo.sampler = reinterpret_cast<const VkSampler&>(sampler); return *this; };
+        virtual ImageRegion& transfer(vk::CommandBuffer& cmdBuf) {
+            vkt::imageBarrier(cmdBuf, { 
+                .image = *this->allocation, 
+                .targetLayout = vk::ImageLayout(this->imgInfo.imageLayout), 
+                .originLayout = vk::ImageLayout(this->allocation->info.initialLayout), 
+                .subresourceRange = *this 
+            });
+            return *this;
+        };
 
         // 
         virtual operator std::shared_ptr<ImageAllocation>&() { return this->allocation; };
