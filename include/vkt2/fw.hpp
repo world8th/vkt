@@ -102,6 +102,10 @@ namespace vkt
             "VK_NV_shader_subgroup_partitioned",
             "VK_NV_shader_sm_builtins",
 
+            "VK_KHR_external_memory",
+            "VK_KHR_external_memory_capabilities",
+            "VK_KHR_external_memory_win32",
+
             "VK_NV_ray_tracing",
         };
 
@@ -139,6 +143,7 @@ namespace vkt
         vk::ImageView depthImageView = {};
         vk::PipelineCache pipelineCache = {};
         vk::DispatchLoaderDynamic dispatch = {};
+        vk::PhysicalDeviceMemoryProperties2 memoryProperties = {};
         VmaAllocator allocator = {};
         uint32_t queueFamilyIndex = 0;
         uint32_t instanceVersion = 0;
@@ -162,6 +167,7 @@ namespace vkt
         inline vk::CommandPool& getCommandPool() { return commandPool; };
         inline vk::PipelineCache& getPipelineCache() { return pipelineCache; };
         inline vk::DescriptorPool& getDescriptorPool() { return descriptorPool; };
+        inline vk::PhysicalDeviceMemoryProperties2& getMemoryProperties() { return memoryProperties; };
         inline VmaAllocator& getAllocator() { return allocator; };
 
         // 
@@ -174,6 +180,7 @@ namespace vkt
         inline const vk::CommandPool& getCommandPool() const { return commandPool; };
         inline const vk::PipelineCache& getPipelineCache() const { return pipelineCache; };
         inline const vk::DescriptorPool& getDescriptorPool() const { return descriptorPool; };
+        inline const vk::PhysicalDeviceMemoryProperties2& getMemoryProperties() const { return memoryProperties; };
         inline const VmaAllocator& getAllocator() const { return allocator; };
 
         //
@@ -185,6 +192,7 @@ namespace vkt
         inline operator vk::CommandPool&() { return commandPool; };
         inline operator vk::PipelineCache&() { return pipelineCache; };
         inline operator vk::DescriptorPool&() { return descriptorPool; };
+        inline operator vk::PhysicalDeviceMemoryProperties2& () { return memoryProperties; };
         inline operator VmaAllocator&() { return allocator; };
 
         //
@@ -196,6 +204,7 @@ namespace vkt
         inline operator const vk::CommandPool&() const { return commandPool; };
         inline operator const vk::PipelineCache&() const { return pipelineCache; };
         inline operator const vk::DescriptorPool&() const { return descriptorPool; };
+        inline operator const vk::PhysicalDeviceMemoryProperties2& () const { return memoryProperties; };
         inline operator const VmaAllocator&() const { return allocator; };
 
         // 
@@ -339,7 +348,7 @@ namespace vkt
 
             // 
             vkGetPhysicalDeviceFeatures2(physicalDevice, &(VkPhysicalDeviceFeatures2&)gFeatures);
-            //physicalDevice.getFeatures2(&gFeatures);
+            this->memoryProperties = physicalDevice.getMemoryProperties2();
 
             // get features and queue family properties
             //auto gpuFeatures = gpu.getFeatures();

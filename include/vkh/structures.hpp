@@ -987,12 +987,18 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
     typedef struct VkMemoryType {
         VkMemoryPropertyFlags    propertyFlags = {};
         uint32_t                 heapIndex = 0u;
+
+        STRUCT_OPERATORS(VkMemoryType)
+        VK_HPP_STRUCT_OPERATORS(VkMemoryType, vk::MemoryType)
     } VkMemoryType;
 
     // 
     typedef struct VkMemoryHeap {
         VkDeviceSize      size  = 0u;
         VkMemoryHeapFlags flags = {};
+
+        STRUCT_OPERATORS(VkMemoryHeap)
+        VK_HPP_STRUCT_OPERATORS(VkMemoryHeap, vk::MemoryHeap)
     } VkMemoryHeap;
 
     // 
@@ -1001,6 +1007,9 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         VkMemoryType memoryTypes[VK_MAX_MEMORY_TYPES] = {};
         uint32_t     memoryHeapCount                  = 0u;
         VkMemoryHeap memoryHeaps[VK_MAX_MEMORY_HEAPS] = {};
+
+        STRUCT_OPERATORS(VkPhysicalDeviceMemoryProperties)
+        VK_HPP_STRUCT_OPERATORS(VkPhysicalDeviceMemoryProperties, vk::PhysicalDeviceMemoryProperties)
     } VkPhysicalDeviceMemoryProperties;
 
 
