@@ -16,6 +16,7 @@ namespace vkt {
         vk::Device device = {};
         vk::DeviceMemory memory = {};
         vk::DeviceSize range = 0ull;
+        vk::DeviceSize reqSize = 0ull;
         vk::ImageLayout initialLayout = vk::ImageLayout::eUndefined;
         vk::DispatchLoaderDynamic dispatch = {};
 
@@ -60,6 +61,7 @@ namespace vkt {
             this->info.handle = info.device.getMemoryWin32HandleKHR({ info.memory, vk::ExternalMemoryHandleTypeFlagBits::eOpaqueWin32 }, this->info.dispatch);
 
             // 
+            this->info.reqSize = memReqs.size;
             if (this->info.range == 0 || this->info.range == VK_WHOLE_SIZE) {
                 this->info.range = createInfo.size;
             };
@@ -175,8 +177,15 @@ namespace vkt {
             const MemoryAllocationInfo& allocationInfo,
             const vkh::VkImageCreateInfo& createInfo = {}
         ) : info(allocationInfo) {
-            this->image = this->info.device.createImage(createInfo);
+            vkh::VkImageUsageFlags usage = createInfo.usage;
+            if (allocationInfo.vmaUsage == VMA_MEMORY_USAGE_CPU_TO_GPU) { usage.eTransferSrc = 1; };
+            if (allocationInfo.vmaUsage == VMA_MEMORY_USAGE_GPU_TO_CPU) { usage.eTransferDst = 1; };
+            if (allocationInfo.vmaUsage == VMA_MEMORY_USAGE_GPU_ONLY) { usage.eTransferDst = 1, usage.eTransferSrc = 1; };
 
+            // 
+            this->image = this->info.device.createImage(vk::ImageCreateInfo(createInfo).setUsage(usage));
+
+            // 
             vk::MemoryRequirements memReqs = allocationInfo.device.getImageMemoryRequirements(image);
             vk::MemoryAllocateInfo memAllocInfo = {};
             vk::ExportMemoryAllocateInfo exportAllocInfo{ vk::ExternalMemoryHandleTypeFlagBits::eOpaqueWin32 };
@@ -184,11 +193,14 @@ namespace vkt {
             memAllocInfo.allocationSize = memReqs.size;
             memAllocInfo.memoryTypeIndex = uint32_t(allocationInfo.getMemoryType(memReqs.memoryTypeBits, {.eDeviceLocal = 1}));
 
+
+
             // 
             this->info.device.bindImageMemory(image, info.memory = info.device.allocateMemory(memAllocInfo), 0);
             this->info.initialLayout = vk::ImageLayout(createInfo.initialLayout);
             this->info.handle = info.device.getMemoryWin32HandleKHR({ info.memory, vk::ExternalMemoryHandleTypeFlagBits::eOpaqueWin32 }, this->info.dispatch);
             this->info.range = memReqs.size;
+            this->info.reqSize = memReqs.size;
         }
 
         ImageAllocation(const ImageAllocation& allocation) : image(allocation.image), info(allocation.info) { *this = allocation; };
@@ -225,6 +237,10 @@ namespace vkt {
         virtual void* map() { return (info.pMapped = info.device.mapMemory(info.memory, 0u, info.range, {})); };
         virtual void* mapped() { return info.pMapped; };
         virtual void  unmap() { info.device.unmapMemory(info.memory); };
+
+        // 
+        virtual MemoryAllocationInfo& getAllocationInfo() { return info; };
+        virtual const MemoryAllocationInfo& getAllocationInfo() const { return info; };
 
     // 
     protected: friend VmaImageAllocation; friend ImageAllocation; friend ImageRegion;

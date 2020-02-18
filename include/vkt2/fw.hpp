@@ -106,6 +106,10 @@ namespace vkt
             "VK_KHR_external_memory_capabilities",
             "VK_KHR_external_memory_win32",
 
+            "VK_KHR_external_semaphore",
+            "VK_KHR_external_semaphore_capabilities",
+            "VK_KHR_external_semaphore_win32",
+
             "VK_NV_ray_tracing",
         };
 
