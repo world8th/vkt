@@ -111,6 +111,7 @@ namespace vkt
             "VK_KHR_external_semaphore_win32",
 
             "VK_NV_ray_tracing",
+            "VK_NVX_image_view_handle"
         };
 
         // instance layers
