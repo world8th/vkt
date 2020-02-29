@@ -26,7 +26,7 @@ namespace vkt {
         VmaMemoryUsage vmaUsage = VMA_MEMORY_USAGE_GPU_ONLY;
 
         // 
-        int32_t getMemoryType(uint32_t memoryTypeBitsRequirement, vkh::VkMemoryPropertyFlags requiredProperties) const {
+        int32_t getMemoryType(const uint32_t& memoryTypeBitsRequirement, const vkh::VkMemoryPropertyFlags& requiredProperties = { .eDeviceLocal = 1 }) const {
             const uint32_t memoryCount = memoryProperties.memoryTypeCount;
             for (uint32_t memoryIndex = 0; memoryIndex < memoryCount; ++memoryIndex) {
                 const uint32_t memoryTypeBits = (1 << memoryIndex);
