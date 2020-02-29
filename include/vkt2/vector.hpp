@@ -255,7 +255,7 @@ namespace vkt {
         VmaImageAllocation(
             const VmaAllocator& allocator,
             const vkh::VkImageCreateInfo& createInfo = {},
-            VmaMemoryUsage vmaUsage = VMA_MEMORY_USAGE_GPU_ONLY
+            const VmaMemoryUsage& vmaUsage = VMA_MEMORY_USAGE_GPU_ONLY
         ) {
             VmaAllocationCreateInfo vmaInfo = {}; vmaInfo.usage = vmaUsage;
             if (vmaUsage == VMA_MEMORY_USAGE_CPU_TO_GPU || vmaUsage == VMA_MEMORY_USAGE_GPU_TO_CPU) { vmaInfo.flags = VMA_ALLOCATION_CREATE_MAPPED_BIT; };
@@ -310,19 +310,56 @@ namespace vkt {
 #endif
 
     // 
+    struct ImageRegionCreateInfoAllocated {
+        const MemoryAllocationInfo& allocationInfo = {};
+        const vkh::VkImageCreateInfo& createInfo = {};
+        const vkh::VkImageViewCreateInfo& info = {};
+        const vk::ImageLayout& layout = vk::ImageLayout::eGeneral;
+    };
+
+    // 
+    struct ImageRegionCreateInfoVMA {
+        const VmaAllocator& allocator = {};
+        const vkh::VkImageCreateInfo& createInfo = {};
+        const VmaMemoryUsage& vmaUsage = VMA_MEMORY_USAGE_GPU_ONLY;
+        const vkh::VkImageViewCreateInfo& info = {};
+        const vk::ImageLayout& layout = vk::ImageLayout::eGeneral;
+    };
+
+    // 
     class ImageRegion : public std::enable_shared_from_this<ImageRegion> { public: 
         ImageRegion(){};
-
         ImageRegion(const std::shared_ptr<ImageAllocation>& allocation, const vkh::VkImageViewCreateInfo& info = {}, const vk::ImageLayout& layout = vk::ImageLayout::eGeneral) : allocation(allocation), subresourceRange(info.subresourceRange) {
             this->imgInfo.imageView = allocation->getDevice().createImageView(vk::ImageViewCreateInfo(info).setImage(*allocation));
             this->imgInfo.imageLayout = VkImageLayout(layout);
         };
-
         ImageRegion(const ImageRegion& region) {
             this->allocation = region; 
             this->subresourceRange = region.getImageSubresourceRange();
             this->imgInfo = vk::DescriptorImageInfo(region);
         };
+        ImageRegion(
+            const MemoryAllocationInfo& allocationInfo,
+            const vkh::VkImageCreateInfo& createInfo = {},
+            const vkh::VkImageViewCreateInfo& info = {}, 
+            const vk::ImageLayout& layout = vk::ImageLayout::eGeneral
+        ) {
+            this->allocation = std::make_shared<ImageAllocation>(allocationInfo, createInfo);
+            this->imgInfo.imageView = this->allocation->getDevice().createImageView(vk::ImageViewCreateInfo(info).setImage(*this->allocation));
+            this->imgInfo.imageLayout = VkImageLayout(layout);
+        };
+        ImageRegion(
+            const VmaAllocator& allocator,
+            const vkh::VkImageCreateInfo& createInfo = {},
+            const VmaMemoryUsage& vmaUsage = VMA_MEMORY_USAGE_GPU_ONLY,
+            const vkh::VkImageViewCreateInfo& info = {},
+            const vk::ImageLayout& layout = vk::ImageLayout::eGeneral
+        ) {
+            this->allocation = std::make_shared<VmaImageAllocation>(allocator, createInfo, vmaUsage);
+            this->imgInfo.imageView = this->allocation->getDevice().createImageView(vk::ImageViewCreateInfo(info).setImage(*this->allocation));
+            this->imgInfo.imageLayout = VkImageLayout(layout);
+        };
+
 
         virtual ImageRegion& operator=(const ImageRegion& region) {
             this->allocation = region.allocation;
@@ -429,6 +466,19 @@ namespace vkt {
     public:
         Vector() {};
         Vector(const std::shared_ptr<BufferAllocation>& allocation, vk::DeviceSize offset = 0u, vk::DeviceSize size = VK_WHOLE_SIZE) : allocation(allocation), bufInfo({ allocation->buffer,offset,size }), stride(sizeof(T)) {};
+        Vector(
+            const MemoryAllocationInfo& allocationInfo,
+            const vkh::VkBufferCreateInfo& createInfo = {}
+        ) {
+            this->bufInfo.buffer = (this->allocation = std::make_shared<BufferAllocation>(allocationInfo, createInfo))->buffer;
+        };
+        Vector(
+            const VmaAllocator& allocator,
+            const vkh::VkBufferCreateInfo& createInfo = {},
+            VmaMemoryUsage vmaUsage = VMA_MEMORY_USAGE_GPU_ONLY
+        ) {
+            this->bufInfo.buffer = (this->allocation = std::make_shared<VmaBufferAllocation>(allocator, createInfo, vmaUsage))->buffer;
+        };
 
         //  
         template<class Tm = T> Vector(const Vector<Tm>& V) : allocation(V), bufInfo({ V.buffer(), V.offset(), V.range() }), stride(sizeof(T)) {};
@@ -536,7 +586,7 @@ namespace vkt {
 
         //
         protected: friend Vector<T>; // 
-        protected: vk::DescriptorBufferInfo bufInfo = {};
+        protected: vk::DescriptorBufferInfo bufInfo = { {}, 0u, VK_WHOLE_SIZE };
         public   : vk::DeviceSize stride = sizeof(T);
         protected: vk::BufferView view = {};
         protected: std::shared_ptr<BufferAllocation> allocation = {};
