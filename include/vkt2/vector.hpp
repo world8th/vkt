@@ -477,11 +477,7 @@ namespace vkt {
         };
 
         ImageRegion(){};
-        ImageRegion(const ImageRegion& region) {
-            this->allocation = region;
-            this->subresourceRange = region.getImageSubresourceRange();
-            this->imgInfo = vk::DescriptorImageInfo(region);
-        };
+        ImageRegion(const ImageRegion& region) { *this = region; };
 
         ImageRegion(
             const std::shared_ptr<ImageAllocation>& allocation, 
@@ -649,7 +645,7 @@ namespace vkt {
         };
 
         //  
-        template<class Tm = T> Vector(const Vector<Tm>& V) : allocation(V), bufInfo({ V.buffer(), V.offset(), V.range() }), stride(sizeof(T)) {};
+        template<class Tm = T> Vector(const Vector<Tm>& V) : allocation(V), bufInfo({ V.buffer(), V.offset(), V.range() }), stride(sizeof(T)) { *this = V; };
         template<class Tm = T> inline Vector<T>& operator=(const Vector<Tm>& V) { this->allocation = V, this->bufInfo = vk::DescriptorBufferInfo(V.buffer(), V.offset(), V.range()), this->stride = sizeof(T); return *this; };
 
         // 
