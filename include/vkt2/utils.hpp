@@ -1,5 +1,9 @@
 #pragma once // #
 
+#ifdef ENABLE_OPENGL_INTEROP
+#include <glad/glad.h>
+#endif
+
 // 
 #ifdef USE_CIMG
 #include "tinyexr.h"

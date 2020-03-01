@@ -13,6 +13,8 @@
 namespace vkt {
 
     struct MemoryAllocationInfo { // 
+        uint32_t glMemory = 0u, glID = 0u;
+
         vk::Device device = {};
         vk::DeviceMemory memory = {};
         vk::DeviceSize range = 0ull;
@@ -65,6 +67,14 @@ namespace vkt {
             if (this->info.range == 0 || this->info.range == VK_WHOLE_SIZE) {
                 this->info.range = createInfo.size;
             };
+
+            // 
+#ifdef ENABLE_OPENGL_INTEROP
+            glCreateBuffers(1u, &this->info.glID);
+            glCreateMemoryObjectsEXT(1u, &this->info.glMemory);
+            glImportMemoryWin32HandleEXT(this->info.glMemory, this->info.reqSize, GL_HANDLE_TYPE_OPAQUE_WIN32_EXT, this->info.handle);
+            glNamedBufferStorageMemEXT(this->info.glID, this->info.range, this->info.glMemory, 0u);
+#endif
         };
         BufferAllocation(const BufferAllocation& allocation) : buffer(allocation.buffer), info(allocation.info) { *this = allocation; };
         virtual BufferAllocation& operator=(const BufferAllocation& allocation) {
@@ -193,14 +203,40 @@ namespace vkt {
             memAllocInfo.allocationSize = memReqs.size;
             memAllocInfo.memoryTypeIndex = uint32_t(allocationInfo.getMemoryType(memReqs.memoryTypeBits, {.eDeviceLocal = 1}));
 
-
-
             // 
             this->info.device.bindImageMemory(image, info.memory = info.device.allocateMemory(memAllocInfo), 0);
             this->info.initialLayout = vk::ImageLayout(createInfo.initialLayout);
             this->info.handle = info.device.getMemoryWin32HandleKHR({ info.memory, vk::ExternalMemoryHandleTypeFlagBits::eOpaqueWin32 }, this->info.dispatch);
             this->info.range = memReqs.size;
             this->info.reqSize = memReqs.size;
+
+            // 
+#ifdef ENABLE_OPENGL_INTEROP
+            GLuint format = GL_RGBA8;
+            if (createInfo.format == VK_FORMAT_R16G16B16A16_UNORM) { format = GL_RGBA16; };
+            if (createInfo.format == VK_FORMAT_R32G32B32A32_SFLOAT) { format = GL_RGBA32F; };
+            if (createInfo.format == VK_FORMAT_R16G16B16A16_SFLOAT) { format = GL_RGBA16F; };
+            if (createInfo.format == VK_FORMAT_R32G32B32_SFLOAT) { format = GL_RGB32F; };
+            if (createInfo.format == VK_FORMAT_R16G16B16_SFLOAT) { format = GL_RGB16F; };
+            if (createInfo.format == VK_FORMAT_R32G32_SFLOAT) { format = GL_RG32F; };
+            if (createInfo.format == VK_FORMAT_R16G16_SFLOAT) { format = GL_RG16F; };
+
+            // Import Memory
+            glCreateTextures(GL_TEXTURE_2D, 1, &this->info.glID);
+            glCreateMemoryObjectsEXT(1, &this->info.glMemory);
+            glImportMemoryWin32HandleEXT(this->info.glMemory, this->info.reqSize, GL_HANDLE_TYPE_OPAQUE_WIN32_EXT, this->info.handle);
+
+            // Create GL Image
+            if (createInfo.imageType == VK_IMAGE_TYPE_1D) {
+                glTextureStorageMem1DEXT(this->info.glID, createInfo.mipLevels, format, createInfo.extent.width, this->info.glMemory, 0);
+            } else 
+            if (createInfo.imageType == VK_IMAGE_TYPE_2D) {
+                glTextureStorageMem2DEXT(this->info.glID, createInfo.mipLevels, format, createInfo.extent.width, createInfo.extent.height, this->info.glMemory, 0);
+            } else
+            if (createInfo.imageType == VK_IMAGE_TYPE_3D) {
+                glTextureStorageMem3DEXT(this->info.glID, createInfo.mipLevels, format, createInfo.extent.width, createInfo.extent.height, createInfo.extent.depth, this->info.glMemory, 0);
+            }
+#endif
         }
 
         ImageAllocation(const ImageAllocation& allocation) : image(allocation.image), info(allocation.info) { *this = allocation; };
@@ -439,6 +475,11 @@ namespace vkt {
         virtual vk::Sampler& getSampler() { return reinterpret_cast<vk::Sampler&>(this->imgInfo.sampler); };
         virtual vk::ImageSubresourceRange& getImageSubresourceRange() { return this->subresourceRange; };
 
+#ifdef ENABLE_OPENGL_INTEROP
+        virtual GLuint& getGL() { return this->allocation->info.glID; };
+        virtual const GLuint& getGL() const { return this->allocation->info.glID; };
+#endif
+
         // 
         virtual const vk::Image& getImage() const { return *this->allocation; };
         virtual const vk::ImageView& getImageView() const { return reinterpret_cast<const vk::ImageView&>(this->imgInfo.imageView); };
@@ -482,7 +523,7 @@ namespace vkt {
 
         //  
         template<class Tm = T> Vector(const Vector<Tm>& V) : allocation(V), bufInfo({ V.buffer(), V.offset(), V.range() }), stride(sizeof(T)) {};
-        template<class Tm = T> Vector<T>& operator=(const Vector<Tm>& V) { this->allocation = V, this->bufInfo = vk::DescriptorBufferInfo(V.buffer(), V.offset(), V.range()), this->stride = sizeof(T); return *this; };
+        template<class Tm = T> inline Vector<T>& operator=(const Vector<Tm>& V) { this->allocation = V, this->bufInfo = vk::DescriptorBufferInfo(V.buffer(), V.offset(), V.range()), this->stride = sizeof(T); return *this; };
 
         // 
         virtual void unmap() { allocation->unmap(); };
@@ -568,8 +609,13 @@ namespace vkt {
         //virtual const VkBuffer& buffer() const { return reinterpret_cast<VkBuffer&>(allocation->buffer); };
 
         // typed casting 
-        template<class Tm = T> Vector<Tm>& cast() { return reinterpret_cast<Vector<Tm>&>(*this); };
-        template<class Tm = T> const Vector<Tm>& cast() const { return reinterpret_cast<const Vector<Tm>&>(*this); };
+        template<class Tm = T> inline Vector<Tm>& cast() { return reinterpret_cast<Vector<Tm>&>(*this); };
+        template<class Tm = T> inline const Vector<Tm>& cast() const { return reinterpret_cast<const Vector<Tm>&>(*this); };
+
+#ifdef ENABLE_OPENGL_INTEROP
+        virtual GLuint& getGL() { return this->allocation->info.glID; };
+        virtual const GLuint& getGL() const { return this->allocation->info.glID; };
+#endif
 
         // 
         virtual bool has() const { return allocation ? true : false; };
