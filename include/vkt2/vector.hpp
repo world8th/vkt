@@ -393,6 +393,7 @@ namespace vkt {
         ImageRegion(const std::shared_ptr<ImageAllocation>& allocation, const vkh::VkImageViewCreateInfo& info = {}, const vk::ImageLayout& layout = vk::ImageLayout::eGeneral) : allocation(allocation), subresourceRange(info.subresourceRange) { this->construct(allocation, info, layout); };
         ImageRegion(const MemoryAllocationInfo& allocationInfo, const vkh::VkImageCreateInfo& createInfo = {}, const vkh::VkImageViewCreateInfo& info = {}, const vk::ImageLayout& layout = vk::ImageLayout::eGeneral) { this->construct(std::make_shared<ImageAllocation>(allocationInfo, createInfo), info, layout); };
         ImageRegion(const VmaAllocator& allocator, const vkh::VkImageCreateInfo& createInfo = {}, const VmaMemoryUsage& vmaUsage = VMA_MEMORY_USAGE_GPU_ONLY, const vkh::VkImageViewCreateInfo& info = {}, const vk::ImageLayout& layout = vk::ImageLayout::eGeneral) { this->construct(std::make_shared<VmaImageAllocation>(allocator, createInfo, vmaUsage), info, layout); };
+        ~ImageRegion() {};
 
         // 
         virtual ImageRegion* construct(
@@ -518,6 +519,7 @@ namespace vkt {
         Vector(const std::shared_ptr<BufferAllocation>& allocation, vk::DeviceSize offset = 0u, vk::DeviceSize size = VK_WHOLE_SIZE) : allocation(allocation), bufInfo({ allocation->buffer,offset,size }), stride(sizeof(T)) {  this->construct(allocation, offset, size); };
         Vector(const MemoryAllocationInfo& allocationInfo, const vkh::VkBufferCreateInfo& createInfo = {}) { this->construct(std::make_shared<BufferAllocation>(allocationInfo, createInfo)); };
         Vector(const VmaAllocator& allocator, const vkh::VkBufferCreateInfo& createInfo = {}, const VmaMemoryUsage& vmaUsage = VMA_MEMORY_USAGE_GPU_ONLY) { this->construct(std::make_shared<VmaBufferAllocation>(allocator, createInfo, vmaUsage)); };
+        ~Vector() {};
 
         //
         virtual Vector<T>* construct(const std::shared_ptr<BufferAllocation>& allocation, vk::DeviceSize offset = 0u, vk::DeviceSize size = VK_WHOLE_SIZE, vk::DeviceSize stride = sizeof(T)) {
