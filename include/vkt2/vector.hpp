@@ -46,23 +46,21 @@ namespace vkt {
     class VmaBufferAllocation;
     class BufferAllocation : public std::enable_shared_from_this<BufferAllocation> { public:
         BufferAllocation() {};
-        BufferAllocation(const MemoryAllocationInfo& allocationInfo, const vkh::VkBufferCreateInfo& createInfo = {}) : info( allocationInfo) { this->construct( allocationInfo,  createInfo); };
-        BufferAllocation(const MemoryAllocationInfo* allocationInfo, const vkh::VkBufferCreateInfo* createInfo = {}) : info(*allocationInfo) { this->construct(*allocationInfo, *createInfo); };
-        BufferAllocation(const void* allocationInfo, const void* createInfo = {}) : info(*(MemoryAllocationInfo*)allocationInfo) { this->construct(*(const MemoryAllocationInfo*)allocationInfo, *(const vkh::VkBufferCreateInfo*)createInfo); };
-        BufferAllocation(const BufferAllocation& allocation) : buffer(allocation.buffer), info(allocation.info) { *this = allocation; };
+        BufferAllocation(const vkt::uni_arg<MemoryAllocationInfo>& allocationInfo, const vkt::uni_arg<vkh::VkBufferCreateInfo>& createInfo = {}) : info( allocationInfo) { this->construct( allocationInfo,  createInfo); };
+        BufferAllocation(const vkt::uni_arg    <BufferAllocation>& allocation) : buffer(allocation->buffer), info(allocation->info) { *this = allocation; };
 
         virtual BufferAllocation* construct(
-            const MemoryAllocationInfo& allocationInfo,
-            const vkh::VkBufferCreateInfo& createInfo = {}
+            const vkt::uni_arg<MemoryAllocationInfo>& allocationInfo,
+            const vkt::uni_arg<vkh::VkBufferCreateInfo>& createInfo = {}
         ) {
-            this->buffer = this->info.device.createBuffer(createInfo);
+            this->buffer = this->info.device.createBuffer(*createInfo);
 
-            vk::MemoryRequirements memReqs = allocationInfo.device.getBufferMemoryRequirements(buffer);
+            vk::MemoryRequirements memReqs = allocationInfo->device.getBufferMemoryRequirements(buffer);
             vk::MemoryAllocateInfo memAllocInfo = {};
             vk::ExportMemoryAllocateInfo exportAllocInfo{ vk::ExternalMemoryHandleTypeFlagBits::eOpaqueWin32 };
             memAllocInfo.pNext = &exportAllocInfo;
             memAllocInfo.allocationSize = memReqs.size;
-            memAllocInfo.memoryTypeIndex = uint32_t(allocationInfo.getMemoryType(memReqs.memoryTypeBits, { .eDeviceLocal = 1 }));
+            memAllocInfo.memoryTypeIndex = uint32_t(allocationInfo->getMemoryType(memReqs.memoryTypeBits, { .eDeviceLocal = 1 }));
 
             // 
             this->info.device.bindBufferMemory(buffer, info.memory = info.device.allocateMemory(memAllocInfo), 0);
@@ -71,7 +69,7 @@ namespace vkt {
             // 
             this->info.reqSize = memReqs.size;
             if (this->info.range == 0 || this->info.range == VK_WHOLE_SIZE) {
-                this->info.range = createInfo.size;
+                this->info.range = createInfo->size;
             };
 
             // 
@@ -85,9 +83,9 @@ namespace vkt {
             return this;
         };
 
-        virtual BufferAllocation& operator=(const BufferAllocation& allocation) {
-            this->buffer = allocation.buffer;
-            this->info = allocation.info;
+        virtual BufferAllocation& operator=(const vkt::uni_arg<BufferAllocation>& allocation) {
+            this->buffer = allocation->buffer;
+            this->info = allocation->info;
             return *this;
         };
 
@@ -136,38 +134,36 @@ namespace vkt {
     // 
     class VmaBufferAllocation : public BufferAllocation { public: 
         VmaBufferAllocation() {};
-        VmaBufferAllocation(const VmaAllocator& allocator, const vkh::VkBufferCreateInfo& createInfo = {}, VmaMemoryUsage vmaUsage = VMA_MEMORY_USAGE_GPU_ONLY) { this->construct( allocator,  createInfo, vmaUsage); };
-        VmaBufferAllocation(const VmaAllocator* allocator, const vkh::VkBufferCreateInfo* createInfo = {}, VmaMemoryUsage vmaUsage = VMA_MEMORY_USAGE_GPU_ONLY) { this->construct(*allocator, *createInfo, vmaUsage); };
-        VmaBufferAllocation(const void* allocator, const void* createInfo = {}, VmaMemoryUsage vmaUsage = VMA_MEMORY_USAGE_GPU_ONLY) { this->construct(*(const VmaAllocator*)allocator, *(const vkh::VkBufferCreateInfo*)createInfo, vmaUsage); };
-        VmaBufferAllocation(const VmaBufferAllocation& allocation) : allocation(allocation.allocation), allocationInfo(allocation.allocationInfo), allocator(allocation.allocator) { *this = allocation; };
-        VmaBufferAllocation(const BufferAllocation& allocation) { *this = dynamic_cast<const VmaBufferAllocation&>(allocation); };
+        VmaBufferAllocation(const vkt::uni_arg<VmaAllocator>& allocator, const vkt::uni_arg<vkh::VkBufferCreateInfo>& createInfo = {}, VmaMemoryUsage vmaUsage = VMA_MEMORY_USAGE_GPU_ONLY) { this->construct( allocator,  createInfo, vmaUsage); };
+        VmaBufferAllocation(const vkt::uni_arg<VmaBufferAllocation>& allocation) : allocation(allocation->allocation), allocationInfo(allocation->allocationInfo), allocator(allocation->allocator) { *this = allocation; };
+        VmaBufferAllocation(const vkt::uni_arg<BufferAllocation>& allocation) { *this = dynamic_cast<const VmaBufferAllocation&>(allocation); };
 
         //
         virtual VmaBufferAllocation* construct(
-            const VmaAllocator& allocator,
-            const vkh::VkBufferCreateInfo& createInfo = {},
-            VmaMemoryUsage vmaUsage = VMA_MEMORY_USAGE_GPU_ONLY
+            const vkt::uni_arg<VmaAllocator>& allocator,
+            const vkt::uni_arg<vkh::VkBufferCreateInfo>& createInfo = {},
+            const vkt::uni_arg<VmaMemoryUsage>& vmaUsage = VMA_MEMORY_USAGE_GPU_ONLY
         ) {
             VmaAllocationCreateInfo vmaInfo = {}; vmaInfo.usage = vmaUsage;
             if (vmaUsage == VMA_MEMORY_USAGE_CPU_TO_GPU || vmaUsage == VMA_MEMORY_USAGE_GPU_TO_CPU) { vmaInfo.flags = VMA_ALLOCATION_CREATE_MAPPED_BIT; };
-            auto result = vmaCreateBuffer(this->allocator = allocator, createInfo, &vmaInfo, &reinterpret_cast<VkBuffer&>(buffer), &allocation, &allocationInfo);
+            auto result = vmaCreateBuffer(this->allocator = allocator, *createInfo, &vmaInfo, &reinterpret_cast<VkBuffer&>(buffer), &allocation, &allocationInfo);
             assert(result == VK_SUCCESS);
-            this->info.range = createInfo.size;
+            this->info.range = createInfo->size;
             this->info.device = this->_getDevice();
             this->info.vmaUsage = vmaUsage;
             return this;
         };
 
         // 
-        virtual VmaBufferAllocation& operator=(const VmaBufferAllocation& allocation) {
-            if (allocation.allocation) {
-                vmaDestroyBuffer(allocator, *this, allocation); // don't assign into already allocated
+        virtual VmaBufferAllocation& operator=(const vkt::uni_arg<VmaBufferAllocation>& allocation) {
+            if (allocation->allocation) {
+                vmaDestroyBuffer(allocator, *this, *allocation); // don't assign into already allocated
             };
-            this->info = allocation.info;
-            this->buffer = allocation.buffer;
-            this->allocation = allocation.allocation;
-            this->allocationInfo = allocation.allocationInfo;
-            this->allocator = allocation.allocator;
+            this->info = allocation->info;
+            this->buffer = allocation->buffer;
+            this->allocation = allocation->allocation;
+            this->allocationInfo = allocation->allocationInfo;
+            this->allocator = allocation->allocator;
             return *this;
         };
 
@@ -196,35 +192,33 @@ namespace vkt {
     class VmaImageAllocation;
     class ImageAllocation : public std::enable_shared_from_this<ImageAllocation> { public: 
         ImageAllocation() {};
-        ImageAllocation(const MemoryAllocationInfo& allocationInfo, const vkh::VkImageCreateInfo& createInfo = {}) : info( allocationInfo) { this->construct( allocationInfo,  createInfo); }
-        ImageAllocation(const MemoryAllocationInfo* allocationInfo, const vkh::VkImageCreateInfo* createInfo = {}) : info(*allocationInfo) { this->construct(*allocationInfo, *createInfo); };
-        ImageAllocation(const void* allocationInfo, const void* createInfo = {}) : info(*(const MemoryAllocationInfo*)allocationInfo) { this->construct(*(const MemoryAllocationInfo*)allocationInfo, *(const vkh::VkImageCreateInfo*)createInfo); };
-        ImageAllocation(const ImageAllocation& allocation) : image(allocation.image), info(allocation.info) { *this = allocation; };
+        ImageAllocation(const vkt::uni_arg<MemoryAllocationInfo>& allocationInfo, const vkt::uni_arg<vkh::VkImageCreateInfo>& createInfo = {}) : info( allocationInfo) { this->construct( allocationInfo,  createInfo); }
+        ImageAllocation(const vkt::uni_arg<ImageAllocation>& allocation) : image(allocation->image), info(allocation->info) { *this = allocation; };
 
 
         virtual ImageAllocation* construct(
-            const MemoryAllocationInfo& allocationInfo,
-            const vkh::VkImageCreateInfo& createInfo = {}
+            const vkt::uni_arg<MemoryAllocationInfo>& allocationInfo,
+            const vkt::uni_arg < vkh::VkImageCreateInfo>& createInfo = {}
         ) {
-            vkh::VkImageUsageFlags usage = createInfo.usage;
-            if (allocationInfo.vmaUsage == VMA_MEMORY_USAGE_CPU_TO_GPU) { usage.eTransferSrc = 1; };
-            if (allocationInfo.vmaUsage == VMA_MEMORY_USAGE_GPU_TO_CPU) { usage.eTransferDst = 1; };
-            if (allocationInfo.vmaUsage == VMA_MEMORY_USAGE_GPU_ONLY) { usage.eTransferDst = 1, usage.eTransferSrc = 1; };
+            vkh::VkImageUsageFlags usage = createInfo->usage;
+            if (allocationInfo->vmaUsage == VMA_MEMORY_USAGE_CPU_TO_GPU) { usage.eTransferSrc = 1; };
+            if (allocationInfo->vmaUsage == VMA_MEMORY_USAGE_GPU_TO_CPU) { usage.eTransferDst = 1; };
+            if (allocationInfo->vmaUsage == VMA_MEMORY_USAGE_GPU_ONLY) { usage.eTransferDst = 1, usage.eTransferSrc = 1; };
 
             // 
-            this->image = this->info.device.createImage(vk::ImageCreateInfo(createInfo).setUsage(usage));
+            this->image = this->info.device.createImage(vk::ImageCreateInfo(*createInfo).setUsage(usage));
 
             // 
-            vk::MemoryRequirements memReqs = allocationInfo.device.getImageMemoryRequirements(image);
+            vk::MemoryRequirements memReqs = allocationInfo->device.getImageMemoryRequirements(image);
             vk::MemoryAllocateInfo memAllocInfo = {};
             vk::ExportMemoryAllocateInfo exportAllocInfo{ vk::ExternalMemoryHandleTypeFlagBits::eOpaqueWin32 };
             memAllocInfo.pNext = &exportAllocInfo;
             memAllocInfo.allocationSize = memReqs.size;
-            memAllocInfo.memoryTypeIndex = uint32_t(allocationInfo.getMemoryType(memReqs.memoryTypeBits, { .eDeviceLocal = 1 }));
+            memAllocInfo.memoryTypeIndex = uint32_t(allocationInfo->getMemoryType(memReqs.memoryTypeBits, { .eDeviceLocal = 1 }));
 
             // 
             this->info.device.bindImageMemory(image, info.memory = info.device.allocateMemory(memAllocInfo), 0);
-            this->info.initialLayout = vk::ImageLayout(createInfo.initialLayout);
+            this->info.initialLayout = vk::ImageLayout(createInfo->initialLayout);
             this->info.handle = info.device.getMemoryWin32HandleKHR({ info.memory, vk::ExternalMemoryHandleTypeFlagBits::eOpaqueWin32 }, this->info.dispatch);
             this->info.range = memReqs.size;
             this->info.reqSize = memReqs.size;
@@ -261,9 +255,9 @@ namespace vkt {
             return this;
         };
 
-        virtual ImageAllocation& operator=(const ImageAllocation& allocation) {
-            this->image = allocation.image;
-            this->info = allocation.info;
+        virtual ImageAllocation& operator=(const vkt::uni_arg<ImageAllocation>& allocation) {
+            this->image = allocation->image;
+            this->info = allocation->info;
             return *this;
         };
 
@@ -308,10 +302,8 @@ namespace vkt {
     // 
     class VmaImageAllocation : public ImageAllocation { public: 
         VmaImageAllocation() {};
-        VmaImageAllocation(const VmaImageAllocation& allocation) : allocation(allocation.allocation), allocationInfo(allocation.allocationInfo), allocator(allocation.allocator) { *this = allocation; };
-        VmaImageAllocation(const VmaAllocator& allocator, const vkh::VkImageCreateInfo& createInfo = {}, const VmaMemoryUsage& vmaUsage = VMA_MEMORY_USAGE_GPU_ONLY) { this->construct( allocator,  createInfo, vmaUsage); };
-        VmaImageAllocation(const VmaAllocator* allocator, const vkh::VkImageCreateInfo* createInfo = {}, const VmaMemoryUsage& vmaUsage = VMA_MEMORY_USAGE_GPU_ONLY) { this->construct(*allocator, *createInfo, vmaUsage); };
-        VmaImageAllocation(const void* allocator, const void* createInfo = {}, const VmaMemoryUsage& vmaUsage = VMA_MEMORY_USAGE_GPU_ONLY) { this->construct(*(const VmaAllocator*)allocator, *(const vkh::VkImageCreateInfo*)createInfo, vmaUsage); };
+        VmaImageAllocation(const vkt::uni_arg<VmaImageAllocation>& allocation) : allocation(allocation->allocation), allocationInfo(allocation->allocationInfo), allocator(allocation->allocator) { *this = allocation; };
+        VmaImageAllocation(const vkt::uni_arg<VmaAllocator>& allocator, const vkt::uni_arg<vkh::VkImageCreateInfo>& createInfo = {}, const VmaMemoryUsage& vmaUsage = VMA_MEMORY_USAGE_GPU_ONLY) { this->construct( allocator,  createInfo, vmaUsage); };
 
         // 
         virtual VmaImageAllocation* construct(
@@ -392,29 +384,29 @@ namespace vkt {
     // 
     class ImageRegion : public std::enable_shared_from_this<ImageRegion> { public: 
         ImageRegion() {};
-        ImageRegion(const ImageRegion& region) { *this = region; };
-        ImageRegion(const std::shared_ptr<ImageAllocation>& allocation, const vkh::VkImageViewCreateInfo& info = {}, const vk::ImageLayout& layout = vk::ImageLayout::eGeneral) : allocation(allocation), subresourceRange(info.subresourceRange) { this->construct(allocation, info, layout); };
-        ImageRegion(const MemoryAllocationInfo& allocationInfo, const vkh::VkImageCreateInfo& createInfo = {}, const vkh::VkImageViewCreateInfo& info = {}, const vk::ImageLayout& layout = vk::ImageLayout::eGeneral) { this->construct(std::make_shared<ImageAllocation>(allocationInfo, createInfo), info, layout); };
-        ImageRegion(const VmaAllocator& allocator, const vkh::VkImageCreateInfo& createInfo = {}, const VmaMemoryUsage& vmaUsage = VMA_MEMORY_USAGE_GPU_ONLY, const vkh::VkImageViewCreateInfo& info = {}, const vk::ImageLayout& layout = vk::ImageLayout::eGeneral) { this->construct(vkt::uni_ptr<ImageAllocation>(std::make_shared<VmaImageAllocation>(allocator, createInfo, vmaUsage)), info, layout); };
+        ImageRegion(const vkt::uni_arg<ImageRegion>& region) { *this = region; };
+        ImageRegion(const std::shared_ptr<ImageAllocation>& allocation, const vkt::uni_arg<vkh::VkImageViewCreateInfo>& info = {}, const vkt::uni_arg<vk::ImageLayout>& layout = vk::ImageLayout::eGeneral) : allocation(allocation), subresourceRange(info->subresourceRange) { this->construct(allocation, info, layout); };
+        ImageRegion(const vkt::uni_arg<MemoryAllocationInfo>& allocationInfo, const vkt::uni_arg<vkh::VkImageCreateInfo>& createInfo = {}, const vkt::uni_arg<vkh::VkImageViewCreateInfo>& info = {}, const vkt::uni_arg<vk::ImageLayout>& layout = vk::ImageLayout::eGeneral) { this->construct(std::make_shared<ImageAllocation>(allocationInfo, createInfo), info, layout); };
+        ImageRegion(const vkt::uni_arg<VmaAllocator>& allocator, const vkt::uni_arg<vkh::VkImageCreateInfo>& createInfo = {}, const vkt::uni_arg<VmaMemoryUsage>& vmaUsage = VMA_MEMORY_USAGE_GPU_ONLY, const vkt::uni_arg<vkh::VkImageViewCreateInfo>& info = {}, const vkt::uni_arg<vk::ImageLayout>& layout = vk::ImageLayout::eGeneral) { this->construct(vkt::uni_ptr<ImageAllocation>(std::make_shared<VmaImageAllocation>(allocator, createInfo, vmaUsage)), info, layout); };
         ~ImageRegion() {};
 
         // 
         virtual ImageRegion* construct(
             const vkt::uni_ptr<ImageAllocation>& allocation,
-            const vkh::VkImageViewCreateInfo& info = {},
-            const vk::ImageLayout& layout = vk::ImageLayout::eGeneral
+            const vkt::uni_arg<vkh::VkImageViewCreateInfo>& info = {},
+            const vkt::uni_arg<vk::ImageLayout>& layout = vk::ImageLayout::eGeneral
         ) {
             this->allocation = allocation;
-            this->imgInfo.imageView = this->allocation->getDevice().createImageView(vk::ImageViewCreateInfo(info).setImage(*this->allocation));
-            this->imgInfo.imageLayout = VkImageLayout(layout);
+            this->imgInfo.imageView = this->allocation->getDevice().createImageView(vk::ImageViewCreateInfo(*info).setImage(*this->allocation));
+            this->imgInfo.imageLayout = VkImageLayout(*layout);
             return this;
         };
 
         // 
-        virtual ImageRegion& operator=(const ImageRegion& region) {
-            this->allocation = region.uniPtr();
-            this->subresourceRange = region.subresourceRange;
-            this->imgInfo = region.imgInfo;
+        virtual ImageRegion& operator=(const vkt::uni_arg<ImageRegion>& region) {
+            this->allocation = region->uniPtr();
+            this->subresourceRange = region->subresourceRange;
+            this->imgInfo = region->imgInfo;
             return *this;
         };
 
@@ -527,22 +519,26 @@ namespace vkt {
     template<class T = uint8_t>
     class Vector { public: //
         Vector() {};
-        Vector(const std::shared_ptr<BufferAllocation>& allocation, vk::DeviceSize offset = 0u, vk::DeviceSize size = VK_WHOLE_SIZE) : allocation(allocation), bufInfo({ allocation->buffer,offset,size }), stride(sizeof(T)) {  this->construct(allocation, offset, size); };
-        Vector(const MemoryAllocationInfo& allocationInfo, const vkh::VkBufferCreateInfo& createInfo = {}) { this->construct(std::make_shared<BufferAllocation>(allocationInfo, createInfo)); };
-        Vector(const VmaAllocator& allocator, const vkh::VkBufferCreateInfo& createInfo = {}, const VmaMemoryUsage& vmaUsage = VMA_MEMORY_USAGE_GPU_ONLY) { this->construct(vkt::uni_ptr<BufferAllocation>(std::make_shared<VmaBufferAllocation>(allocator, createInfo, vmaUsage))); };
+        Vector(const std::shared_ptr<BufferAllocation>& allocation, const vkt::uni_arg<vk::DeviceSize>& offset = 0ull, const vkt::uni_arg<vk::DeviceSize>& size = VK_WHOLE_SIZE) : allocation(allocation), bufInfo({ allocation->buffer,offset,size }), stride(sizeof(T)) {  this->construct(allocation, offset, size); };
+        Vector(const vkt::uni_arg<MemoryAllocationInfo>& allocationInfo, const vkt::uni_arg<vkh::VkBufferCreateInfo>& createInfo = {}) { this->construct(std::make_shared<BufferAllocation>(allocationInfo, createInfo)); };
+        Vector(const vkt::uni_arg<VmaAllocator>& allocator, const vkt::uni_arg<vkh::VkBufferCreateInfo>& createInfo = {}, const vkt::uni_arg<VmaMemoryUsage>& vmaUsage = VMA_MEMORY_USAGE_GPU_ONLY) { this->construct(vkt::uni_ptr<BufferAllocation>(std::make_shared<VmaBufferAllocation>(allocator, createInfo, vmaUsage))); };
         ~Vector() {};
 
         //
-        virtual Vector<T>* construct(const vkt::uni_ptr<BufferAllocation>& allocation, vk::DeviceSize offset = 0u, vk::DeviceSize size = VK_WHOLE_SIZE, vk::DeviceSize stride = sizeof(T)) {
+        virtual Vector<T>* construct(const vkt::uni_ptr<BufferAllocation>& allocation, const vkt::uni_arg<vk::DeviceSize>& offset = 0ull, const vkt::uni_arg<vk::DeviceSize>& size = VK_WHOLE_SIZE, const vkt::uni_arg<vk::DeviceSize>& stride = sizeof(T)) {
             this->allocation = allocation;
             this->bufInfo = { allocation->buffer,offset,size };
             this->stride = stride;
             return this;
         };
 
-        //  
+        // 
         template<class Tm = T> Vector(const Vector<Tm>& V) : allocation(V), bufInfo({ V.buffer(), V.offset(), V.range() }), stride(sizeof(T)) { *this = V; };
         template<class Tm = T> inline Vector<T>& operator=(const Vector<Tm>& V) { this->allocation = V.uniPtr(), this->bufInfo = vk::DescriptorBufferInfo(V.buffer(), V.offset(), V.range()), this->stride = sizeof(T); return *this; };
+
+        // But it doesn't working...(currently)
+        template<class Tm = T> Vector(const vkt::uni_arg<Vector<Tm>>& V) : allocation(V), bufInfo({ V->buffer(), V->offset(), V->range() }), stride(sizeof(T)) { *this = V; };
+        template<class Tm = T> inline Vector<T>& operator=(const vkt::uni_arg<Vector<Tm>>& V) { this->allocation = V->uniPtr(), this->bufInfo = vk::DescriptorBufferInfo(V->buffer(), V->offset(), V->range()), this->stride = sizeof(T); return *this; };
 
         // 
         virtual void unmap() { allocation->unmap(); };
