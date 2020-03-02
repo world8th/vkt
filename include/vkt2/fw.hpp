@@ -18,6 +18,7 @@
 //#define GLFW_INCLUDE_VULKAN
 #include "utils.hpp"
 #include "structs.hpp"
+#include "core.hpp"
 #include "vector.hpp"
 
 #ifdef VKT_ENABLE_GLFW_SUPPORT
