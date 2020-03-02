@@ -12,6 +12,47 @@
 
 namespace vkt {
 
+    template<class T = uint8_t>
+    class uni_ptr {
+    protected: //using T = uint8_t;
+        std::shared_ptr<T> shared = {};
+        T* regular = nullptr;
+
+    public: // 
+        uni_ptr<T>() {};
+        uni_ptr<T>(const std::shared_ptr<T>& shared) : shared(shared) {};
+        uni_ptr<T>(T* regular) : regular(regular) {  };
+
+        // 
+        virtual std::shared_ptr<T>& get_shared() { return (this->shared = (this->shared ? this->shared : std::shared_ptr<T>(this->regular))); };
+        virtual const std::shared_ptr<T>& get_shared() const { return (this->shared ? this->shared : std::shared_ptr<T>(this->regular)); };
+
+        // 
+        virtual T* get_ptr() { return (regular ? regular : &(*shared)); };
+        virtual const T* get_ptr() const { return (regular ? regular : &(*shared)); };
+
+        // 
+        virtual operator T* () { return get_ptr(); };
+        virtual operator const T* () const { return get_ptr(); };
+
+        // 
+        virtual operator std::shared_ptr<T>& () { return get_shared(); };
+        virtual operator const std::shared_ptr<T>& () const { return get_shared(); };
+
+        // 
+        virtual uni_ptr* operator= (T* ptr) { regular = ptr; return this; }
+        virtual uni_ptr* operator= (const std::shared_ptr<T>& ptr) { shared = ptr; return this; }
+
+        // 
+        virtual T* operator->() { return get_ptr(); };
+        virtual const T* operator->() const { return get_ptr(); };
+
+        //
+        virtual T& operator*() { return *get_ptr(); };
+        virtual const T& operator*() const { return *get_ptr(); };
+    };
+
+
     struct MemoryAllocationInfo { // 
         uint32_t glMemory = 0u, glID = 0u;
 
@@ -93,6 +134,8 @@ namespace vkt {
         // 
         virtual void* map() { return info.pMapped; };
         virtual void* mapped() { return info.pMapped; };
+        virtual const void* map() const { return info.pMapped; };
+        virtual const void* mapped() const { return info.pMapped; };
         virtual void  unmap() {};
 
         // 
@@ -392,12 +435,12 @@ namespace vkt {
         ImageRegion(const ImageRegion& region) { *this = region; };
         ImageRegion(const std::shared_ptr<ImageAllocation>& allocation, const vkh::VkImageViewCreateInfo& info = {}, const vk::ImageLayout& layout = vk::ImageLayout::eGeneral) : allocation(allocation), subresourceRange(info.subresourceRange) { this->construct(allocation, info, layout); };
         ImageRegion(const MemoryAllocationInfo& allocationInfo, const vkh::VkImageCreateInfo& createInfo = {}, const vkh::VkImageViewCreateInfo& info = {}, const vk::ImageLayout& layout = vk::ImageLayout::eGeneral) { this->construct(std::make_shared<ImageAllocation>(allocationInfo, createInfo), info, layout); };
-        ImageRegion(const VmaAllocator& allocator, const vkh::VkImageCreateInfo& createInfo = {}, const VmaMemoryUsage& vmaUsage = VMA_MEMORY_USAGE_GPU_ONLY, const vkh::VkImageViewCreateInfo& info = {}, const vk::ImageLayout& layout = vk::ImageLayout::eGeneral) { this->construct(std::make_shared<VmaImageAllocation>(allocator, createInfo, vmaUsage), info, layout); };
+        ImageRegion(const VmaAllocator& allocator, const vkh::VkImageCreateInfo& createInfo = {}, const VmaMemoryUsage& vmaUsage = VMA_MEMORY_USAGE_GPU_ONLY, const vkh::VkImageViewCreateInfo& info = {}, const vk::ImageLayout& layout = vk::ImageLayout::eGeneral) { this->construct(vkt::uni_ptr<ImageAllocation>(std::make_shared<VmaImageAllocation>(allocator, createInfo, vmaUsage)), info, layout); };
         ~ImageRegion() {};
 
         // 
         virtual ImageRegion* construct(
-            const std::shared_ptr<ImageAllocation>& allocation,
+            const vkt::uni_ptr<ImageAllocation>& allocation,
             const vkh::VkImageViewCreateInfo& info = {},
             const vk::ImageLayout& layout = vk::ImageLayout::eGeneral
         ) {
@@ -409,11 +452,15 @@ namespace vkt {
 
         // 
         virtual ImageRegion& operator=(const ImageRegion& region) {
-            this->allocation = region.allocation;
+            this->allocation = region.uniPtr();
             this->subresourceRange = region.subresourceRange;
             this->imgInfo = region.imgInfo;
             return *this;
         };
+
+        // 
+        virtual vkt::uni_ptr<ImageAllocation>& uniPtr() { return this->allocation; };
+        virtual const vkt::uni_ptr<ImageAllocation>& uniPtr() const { return this->allocation; };
 
         //virtual vkh::VkImageSubresourceRange& subresourceRange() { return this->subresourceRange; };
         virtual vkh::VkImageSubresourceLayers subresourceLayers(const uint32_t mipLevel =  0u) const { return {
@@ -439,7 +486,9 @@ namespace vkt {
         };
 
         // 
-        virtual operator std::shared_ptr<ImageAllocation>&() { return this->allocation; };
+        virtual operator ImageAllocation*() { return this->allocation; };
+        virtual operator vkt::uni_ptr<ImageAllocation>&() { return this->allocation; };
+        virtual operator std::shared_ptr<ImageAllocation>& () { return this->allocation; };
         virtual operator vkh::VkImageSubresourceRange&() { return this->subresourceRange; };
         virtual operator vkt::MemoryAllocationInfo&() { return this->allocation->info; };
         virtual operator vkh::VkDescriptorImageInfo&() { return this->imgInfo; };
@@ -459,7 +508,9 @@ namespace vkt {
         virtual operator VkDevice&() { return reinterpret_cast<VkDevice&>(this->allocation->getDevice()); };
 
         // 
-        virtual operator const std::shared_ptr<ImageAllocation>&() const { return this->allocation; };
+        virtual operator const ImageAllocation*() const { return this->allocation; };
+        virtual operator const vkt::uni_ptr<ImageAllocation>&() const { return this->allocation; };
+        virtual operator const std::shared_ptr<ImageAllocation>& () const { return this->allocation; };
         virtual operator const vkh::VkImageSubresourceRange&() const { return this->subresourceRange; };
         virtual operator const vkt::MemoryAllocationInfo&() const { return this->allocation->info; };
         virtual operator const vkh::VkDescriptorImageInfo&() const { return this->imgInfo; };
@@ -476,7 +527,7 @@ namespace vkt {
         virtual operator const VkImageLayout&() const { return this->imgInfo.imageLayout; };
         virtual operator const VkImage&() const { return *this->allocation; };
         virtual operator const VkSampler&() const { return this->imgInfo.sampler; };
-        virtual operator const VkDevice& () const { return reinterpret_cast<VkDevice&>(this->allocation->getDevice()); };
+        virtual operator const VkDevice& () const { return reinterpret_cast<const VkDevice&>(this->allocation->getDevice()); };
         virtual operator const vk::ImageSubresourceLayers() const { return vk::ImageSubresourceLayers{ reinterpret_cast<const vk::ImageAspectFlags&>(subresourceRange.aspectMask), subresourceRange.baseMipLevel, subresourceRange.baseArrayLayer, subresourceRange.layerCount }; };
 
         // 
@@ -506,7 +557,7 @@ namespace vkt {
 
     protected: friend VmaImageAllocation; friend ImageAllocation; // 
         vkh::VkDescriptorImageInfo imgInfo = {};
-        std::shared_ptr<ImageAllocation> allocation = {};
+        vkt::uni_ptr<ImageAllocation> allocation = {};
 
     public: // irrevalent sources
         vkh::VkImageSubresourceRange subresourceRange = {};
@@ -518,11 +569,11 @@ namespace vkt {
         Vector() {};
         Vector(const std::shared_ptr<BufferAllocation>& allocation, vk::DeviceSize offset = 0u, vk::DeviceSize size = VK_WHOLE_SIZE) : allocation(allocation), bufInfo({ allocation->buffer,offset,size }), stride(sizeof(T)) {  this->construct(allocation, offset, size); };
         Vector(const MemoryAllocationInfo& allocationInfo, const vkh::VkBufferCreateInfo& createInfo = {}) { this->construct(std::make_shared<BufferAllocation>(allocationInfo, createInfo)); };
-        Vector(const VmaAllocator& allocator, const vkh::VkBufferCreateInfo& createInfo = {}, const VmaMemoryUsage& vmaUsage = VMA_MEMORY_USAGE_GPU_ONLY) { this->construct(std::make_shared<VmaBufferAllocation>(allocator, createInfo, vmaUsage)); };
+        Vector(const VmaAllocator& allocator, const vkh::VkBufferCreateInfo& createInfo = {}, const VmaMemoryUsage& vmaUsage = VMA_MEMORY_USAGE_GPU_ONLY) { this->construct(vkt::uni_ptr<BufferAllocation>(std::make_shared<VmaBufferAllocation>(allocator, createInfo, vmaUsage))); };
         ~Vector() {};
 
         //
-        virtual Vector<T>* construct(const std::shared_ptr<BufferAllocation>& allocation, vk::DeviceSize offset = 0u, vk::DeviceSize size = VK_WHOLE_SIZE, vk::DeviceSize stride = sizeof(T)) {
+        virtual Vector<T>* construct(const vkt::uni_ptr<BufferAllocation>& allocation, vk::DeviceSize offset = 0u, vk::DeviceSize size = VK_WHOLE_SIZE, vk::DeviceSize stride = sizeof(T)) {
             this->allocation = allocation;
             this->bufInfo = { allocation->buffer,offset,size };
             this->stride = stride;
@@ -531,16 +582,16 @@ namespace vkt {
 
         //  
         template<class Tm = T> Vector(const Vector<Tm>& V) : allocation(V), bufInfo({ V.buffer(), V.offset(), V.range() }), stride(sizeof(T)) { *this = V; };
-        template<class Tm = T> inline Vector<T>& operator=(const Vector<Tm>& V) { this->allocation = V, this->bufInfo = vk::DescriptorBufferInfo(V.buffer(), V.offset(), V.range()), this->stride = sizeof(T); return *this; };
+        template<class Tm = T> inline Vector<T>& operator=(const Vector<Tm>& V) { this->allocation = V.uniPtr(), this->bufInfo = vk::DescriptorBufferInfo(V.buffer(), V.offset(), V.range()), this->stride = sizeof(T); return *this; };
 
         // 
         virtual void unmap() { allocation->unmap(); };
-        virtual const T* map(const uintptr_t& i = 0u) const { auto map = reinterpret_cast<const uint8_t*>(allocation->map()) + offset(); return &(reinterpret_cast<const T*>(map))[i]; };
-        virtual T* const map(const uintptr_t& i = 0u) { auto map = reinterpret_cast<uint8_t*>(allocation->map()) + offset(); return &(reinterpret_cast<T*>(map))[i]; };
+        virtual const T* map(const uintptr_t& i = 0u) const { auto mapc = reinterpret_cast<const uint8_t*>(allocation->map()) + offset(); return &(reinterpret_cast<const T*>(mapc))[i]; };
+        virtual T* const map(const uintptr_t& i = 0u) { auto mapc = reinterpret_cast<uint8_t*>(allocation->map()) + offset(); return &(reinterpret_cast<T*>(mapc))[i]; };
 
         // 
-        virtual const T* mapped(const uintptr_t& i = 0u) const { auto map = reinterpret_cast<const uint8_t*>(allocation->mapped()) + offset(); return &(reinterpret_cast<const T*>(map))[i]; };
-        virtual T* const mapped(const uintptr_t& i = 0u) { auto map = reinterpret_cast<uint8_t*>(allocation->mapped()) + offset(); return &(reinterpret_cast<T*>(map))[i]; };
+        virtual const T* mapped(const uintptr_t& i = 0u) const { auto mapc = reinterpret_cast<const uint8_t*>(allocation->mapped()) + offset(); return &(reinterpret_cast<const T*>(mapc))[i]; };
+        virtual T* const mapped(const uintptr_t& i = 0u) { auto mapc = reinterpret_cast<uint8_t*>(allocation->mapped()) + offset(); return &(reinterpret_cast<T*>(mapc))[i]; };
 
         // 
         virtual T* const data() { return mapped(); };
@@ -555,6 +606,10 @@ namespace vkt {
             info.format = VkFormat(format); // TODO: AUTO-FORMAT
             return (view = allocation->getDevice().createBufferView(info));
         };
+
+        // 
+        virtual vkt::uni_ptr<BufferAllocation>& uniPtr() { return allocation; };
+        virtual const vkt::uni_ptr<BufferAllocation>& uniPtr() const { return allocation; };
 
         // at function 
         virtual const T& at(const uintptr_t& i = 0u) const { return *mapped(i); };
@@ -573,6 +628,8 @@ namespace vkt {
         virtual T* const end() { return &at(size() - 1ul); };
 
         // 
+        virtual operator BufferAllocation*() { return allocation; };
+        virtual operator vkt::uni_ptr<BufferAllocation>& () { return allocation; };
         virtual operator std::shared_ptr<BufferAllocation>& () { return allocation; };
         virtual operator vkh::VkDescriptorBufferInfo& () { bufInfo.buffer = allocation->buffer; return reinterpret_cast<vkh::VkDescriptorBufferInfo&>(bufInfo); };
         virtual operator vk::DescriptorBufferInfo& () { bufInfo.buffer = allocation->buffer; return bufInfo; };
@@ -585,6 +642,8 @@ namespace vkt {
         virtual operator VkBufferView& () { return reinterpret_cast<VkBufferView&>(view); };
 
         //
+        virtual operator const BufferAllocation*() const { return allocation; };
+        virtual operator const vkt::uni_ptr<BufferAllocation>& () const { return allocation; };
         virtual operator const std::shared_ptr<BufferAllocation>& () const { return allocation; };
         virtual operator const vkh::VkDescriptorBufferInfo& () const { return reinterpret_cast<const vkh::VkDescriptorBufferInfo&>(bufInfo); };
         virtual operator const vk::DescriptorBufferInfo& () const { return bufInfo; };
@@ -613,7 +672,7 @@ namespace vkt {
         //virtual VkBuffer& buffer() { return reinterpret_cast<VkBuffer&>(allocation->buffer); };
 
         // 
-        virtual const vk::Buffer& buffer() const { return reinterpret_cast<vk::Buffer&>(allocation->buffer); };
+        virtual const vk::Buffer& buffer() const { return reinterpret_cast<const vk::Buffer&>(allocation->buffer); };
         //virtual const VkBuffer& buffer() const { return reinterpret_cast<VkBuffer&>(allocation->buffer); };
 
         // typed casting 
@@ -643,6 +702,6 @@ namespace vkt {
         protected: vk::DescriptorBufferInfo bufInfo = { {}, 0u, VK_WHOLE_SIZE };
         public   : vk::DeviceSize stride = sizeof(T);
         protected: vk::BufferView view = {};
-        protected: std::shared_ptr<BufferAllocation> allocation = {};
+        protected: vkt::uni_ptr<BufferAllocation> allocation = {};
     };
 };
