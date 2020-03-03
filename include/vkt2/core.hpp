@@ -74,6 +74,7 @@ namespace vkt {
 
         // 
         virtual bool has_value() const { return storage.has_value(); };
+        virtual bool has() const { return this->has_value(); };
 
         // 
         //virtual operator bool() { return storage; };
