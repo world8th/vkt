@@ -226,13 +226,13 @@ namespace vkt {
             // 
 #ifdef ENABLE_OPENGL_INTEROP
             GLuint format = GL_RGBA8;
-            if (createInfo.format == VK_FORMAT_R16G16B16A16_UNORM) { format = GL_RGBA16; };
-            if (createInfo.format == VK_FORMAT_R32G32B32A32_SFLOAT) { format = GL_RGBA32F; };
-            if (createInfo.format == VK_FORMAT_R16G16B16A16_SFLOAT) { format = GL_RGBA16F; };
-            if (createInfo.format == VK_FORMAT_R32G32B32_SFLOAT) { format = GL_RGB32F; };
-            if (createInfo.format == VK_FORMAT_R16G16B16_SFLOAT) { format = GL_RGB16F; };
-            if (createInfo.format == VK_FORMAT_R32G32_SFLOAT) { format = GL_RG32F; };
-            if (createInfo.format == VK_FORMAT_R16G16_SFLOAT) { format = GL_RG16F; };
+            if (createInfo->format == VK_FORMAT_R16G16B16A16_UNORM) { format = GL_RGBA16; };
+            if (createInfo->format == VK_FORMAT_R32G32B32A32_SFLOAT) { format = GL_RGBA32F; };
+            if (createInfo->format == VK_FORMAT_R16G16B16A16_SFLOAT) { format = GL_RGBA16F; };
+            if (createInfo->format == VK_FORMAT_R32G32B32_SFLOAT) { format = GL_RGB32F; };
+            if (createInfo->format == VK_FORMAT_R16G16B16_SFLOAT) { format = GL_RGB16F; };
+            if (createInfo->format == VK_FORMAT_R32G32_SFLOAT) { format = GL_RG32F; };
+            if (createInfo->format == VK_FORMAT_R16G16_SFLOAT) { format = GL_RG16F; };
 
             // Import Memory
             glCreateTextures(GL_TEXTURE_2D, 1, &this->info.glID);
@@ -240,17 +240,17 @@ namespace vkt {
             glImportMemoryWin32HandleEXT(this->info.glMemory, this->info.reqSize, GL_HANDLE_TYPE_OPAQUE_WIN32_EXT, this->info.handle);
 
             // Create GL Image
-            if (createInfo.imageType == VK_IMAGE_TYPE_1D) {
-                glTextureStorageMem1DEXT(this->info.glID, createInfo.mipLevels, format, createInfo.extent.width, this->info.glMemory, 0);
+            if (createInfo->imageType == VK_IMAGE_TYPE_1D) {
+                glTextureStorageMem1DEXT(this->info.glID, createInfo->mipLevels, format, createInfo->extent.width, this->info.glMemory, 0);
             }
             else
-                if (createInfo.imageType == VK_IMAGE_TYPE_2D) {
-                    glTextureStorageMem2DEXT(this->info.glID, createInfo.mipLevels, format, createInfo.extent.width, createInfo.extent.height, this->info.glMemory, 0);
-                }
-                else
-                    if (createInfo.imageType == VK_IMAGE_TYPE_3D) {
-                        glTextureStorageMem3DEXT(this->info.glID, createInfo.mipLevels, format, createInfo.extent.width, createInfo.extent.height, createInfo.extent.depth, this->info.glMemory, 0);
-                    }
+            if (createInfo->imageType == VK_IMAGE_TYPE_2D) {
+                glTextureStorageMem2DEXT(this->info.glID, createInfo->mipLevels, format, createInfo->extent.width, createInfo->extent.height, this->info.glMemory, 0);
+            }
+            else
+            if (createInfo->imageType == VK_IMAGE_TYPE_3D) {
+                glTextureStorageMem3DEXT(this->info.glID, createInfo->mipLevels, format, createInfo->extent.width, createInfo->extent.height, createInfo->extent.depth, this->info.glMemory, 0);
+            }
 #endif
             return this;
         };
