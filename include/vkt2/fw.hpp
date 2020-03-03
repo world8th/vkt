@@ -238,6 +238,14 @@ namespace vkt
 #endif
 
     public:
+        inline vk::ImageView getDepthImageView() const {
+            return depthImageView;
+        };
+
+        inline vk::Image getDepthImage() const {
+            return depthImage;
+        };
+
         inline vk::Instance& createInstance() {
 
 #ifdef VOLK_H_

@@ -366,19 +366,19 @@ namespace vkt {
 
     // 
     struct ImageRegionCreateInfoAllocated {
-        const MemoryAllocationInfo& allocationInfo = {};
-        const vkh::VkImageCreateInfo& createInfo = {};
-        const vkh::VkImageViewCreateInfo& info = {};
-        const vk::ImageLayout& layout = vk::ImageLayout::eGeneral;
+        const vkt::uni_arg<MemoryAllocationInfo>& allocationInfo = {};
+        const vkt::uni_arg<vkh::VkImageCreateInfo>& createInfo = {};
+        const vkt::uni_arg<vkh::VkImageViewCreateInfo>& info = {};
+        const vkt::uni_arg<vk::ImageLayout>& layout = vk::ImageLayout::eGeneral;
     };
 
     // 
     struct ImageRegionCreateInfoVMA {
-        const VmaAllocator& allocator = {};
-        const vkh::VkImageCreateInfo& createInfo = {};
-        const VmaMemoryUsage& vmaUsage = VMA_MEMORY_USAGE_GPU_ONLY;
-        const vkh::VkImageViewCreateInfo& info = {};
-        const vk::ImageLayout& layout = vk::ImageLayout::eGeneral;
+        const vkt::uni_arg<VmaAllocator>& allocator = {};
+        const vkt::uni_arg<vkh::VkImageCreateInfo>& createInfo = {};
+        const vkt::uni_arg<VmaMemoryUsage>& vmaUsage = VMA_MEMORY_USAGE_GPU_ONLY;
+        const vkt::uni_arg<vkh::VkImageViewCreateInfo>& info = {};
+        const vkt::uni_arg<vk::ImageLayout>& layout = vk::ImageLayout::eGeneral;
     };
 
     // 
@@ -397,6 +397,7 @@ namespace vkt {
             const vkt::uni_arg<vk::ImageLayout>& layout = vk::ImageLayout::eGeneral
         ) {
             this->allocation = allocation;
+            this->subresourceRange = info->subresourceRange;
             this->imgInfo.imageView = this->allocation->getDevice().createImageView(vk::ImageViewCreateInfo(*info).setImage(*this->allocation));
             this->imgInfo.imageLayout = VkImageLayout(*layout);
             return this;
@@ -429,10 +430,10 @@ namespace vkt {
         virtual ImageRegion& setSampler(const vk::Sampler& sampler = {}) { this->imgInfo.sampler = reinterpret_cast<const VkSampler&>(sampler); return *this; };
         virtual ImageRegion& transfer(vk::CommandBuffer& cmdBuf) {
             vkt::imageBarrier(cmdBuf, { 
-                .image = *this->allocation, 
+                .image = vk::Image(*this->allocation), 
                 .targetLayout = vk::ImageLayout(this->imgInfo.imageLayout), 
                 .originLayout = vk::ImageLayout(this->allocation->info.initialLayout), 
-                .subresourceRange = *this 
+                .subresourceRange = vk::ImageSubresourceRange(*this) 
             });
             return *this;
         };
