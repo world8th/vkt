@@ -136,14 +136,14 @@ namespace vkt {
     };
 
     struct FixConstruction {
-        vk::PipelineShaderStageCreateInfo spi = {};
-        vk::PipelineShaderStageRequiredSubgroupSizeCreateInfoEXT sgmp = {};
+        vkh::VkPipelineShaderStageCreateInfo spi = {};
+        vkh::VkPipelineShaderStageRequiredSubgroupSizeCreateInfoEXT sgmp = {};
 
         // 
-        operator vk::PipelineShaderStageCreateInfo& () { return spi; };
-        operator vk::PipelineShaderStageRequiredSubgroupSizeCreateInfoEXT& () { return sgmp; };
-        operator const vk::PipelineShaderStageCreateInfo& () const { return spi; };
-        operator const vk::PipelineShaderStageRequiredSubgroupSizeCreateInfoEXT& () const { return sgmp; };
+        operator vkh::VkPipelineShaderStageCreateInfo& () { return spi; };
+        operator vkh::VkPipelineShaderStageRequiredSubgroupSizeCreateInfoEXT& () { return sgmp; };
+        operator const vkh::VkPipelineShaderStageCreateInfo& () const { return spi; };
+        operator const vkh::VkPipelineShaderStageRequiredSubgroupSizeCreateInfoEXT& () const { return sgmp; };
     };
 
     // create shader module
@@ -161,8 +161,8 @@ namespace vkt {
         auto f = FixConstruction{};
         f.spi = makePipelineStageInfo(device,code,vk::ShaderStageFlagBits::eCompute,entry);
         f.spi.flags = vk::PipelineShaderStageCreateFlagBits::eRequireFullSubgroupsEXT;
-        createShaderModuleIntrusive(device, code, f.spi.module);
-        f.sgmp = vk::PipelineShaderStageRequiredSubgroupSizeCreateInfoEXT{};
+        createShaderModuleIntrusive(device, code, (vk::ShaderModule&)(f.spi.module));
+        f.sgmp = vkh::VkPipelineShaderStageRequiredSubgroupSizeCreateInfoEXT{};
         f.sgmp.requiredSubgroupSize = subgroupSize;
         if (subgroupSize) f.spi.pNext = &f.sgmp;
         return std::move(f);
@@ -170,9 +170,9 @@ namespace vkt {
 
     // create compute pipelines
     static inline auto createCompute(const vkt::uni_arg<vk::Device>& device, const vkt::uni_arg<FixConstruction>& spi, const vkt::uni_arg<vk::PipelineLayout>& layout, const vkt::uni_arg<vk::PipelineCache>& cache = vk::PipelineCache{}, const vkt::uni_arg<uint32_t>& subgroupSize = 0u) {
-        auto cmpi = vk::ComputePipelineCreateInfo{};
+        auto cmpi = vkh::VkComputePipelineCreateInfo{};
         cmpi.flags = {};
-        cmpi.layout = layout;
+        cmpi.layout = *layout;
         cmpi.stage = *spi;
         cmpi.basePipelineIndex = -1;
         return device->createComputePipeline(cache, cmpi);
@@ -213,7 +213,7 @@ namespace vkt {
         //vk::CommandBufferInheritanceInfo inhi = vk::CommandBufferInheritanceInfo{};
         //inhi.pipelineStatistics = vk::QueryPipelineStatisticFlagBits::eComputeShaderInvocations;
 
-        vk::CommandBufferBeginInfo bgi = vk::CommandBufferBeginInfo{};
+        vk::CommandBufferBeginInfo bgi = {};
         bgi.flags = {};
         bgi.flags = once ? vk::CommandBufferUsageFlagBits::eOneTimeSubmit : vk::CommandBufferUsageFlagBits::eSimultaneousUse;
         //bgi.pInheritanceInfo = secondary ? &inhi : nullptr;
@@ -324,33 +324,33 @@ namespace vkt {
         vkt::uni_arg<vk::Image> image = {};
         vkt::uni_arg<vk::ImageLayout> targetLayout = vk::ImageLayout::eGeneral;
         vkt::uni_arg<vk::ImageLayout> originLayout = vk::ImageLayout::eUndefined;
-        vkt::uni_arg<vk::ImageSubresourceRange> subresourceRange = vk::ImageSubresourceRange{ {}, 0u, 1u, 0u, 1u };
+        vkt::uni_arg<vkh::VkImageSubresourceRange> subresourceRange = vkh::VkImageSubresourceRange{ {}, 0u, 1u, 0u, 1u };
     };
 
     // 
-    static inline auto imageBarrier(const vkt::uni_arg<vk::CommandBuffer>& cmd = vk::CommandBuffer{}, const ImageBarrierInfo& info = ImageBarrierInfo{}) {
+    static inline auto imageBarrier(const vkt::uni_arg<vk::CommandBuffer>& cmd = vk::CommandBuffer{}, const vkt::uni_arg<ImageBarrierInfo>& info = ImageBarrierInfo{}) {
         vk::Result result = vk::Result::eSuccess; // planned to complete
-        if (*info.originLayout == *info.targetLayout) return result; // no need transfering more
+        if (*info->originLayout == *info->targetLayout) return result; // no need transfering more
 
         vk::ImageMemoryBarrier imageMemoryBarriers = {};
         imageMemoryBarriers.srcQueueFamilyIndex = ~0U;
         imageMemoryBarriers.dstQueueFamilyIndex = ~0U;
-        imageMemoryBarriers.oldLayout = info.originLayout;
-        imageMemoryBarriers.newLayout = info.targetLayout;
-        imageMemoryBarriers.subresourceRange = info.subresourceRange;
-        imageMemoryBarriers.image = info.image;
+        imageMemoryBarriers.oldLayout = info->originLayout;
+        imageMemoryBarriers.newLayout = info->targetLayout;
+        imageMemoryBarriers.subresourceRange = reinterpret_cast<const vk::ImageSubresourceRange&>(*info->subresourceRange);
+        imageMemoryBarriers.image = info->image;
 
         // Put barrier on top
-        const auto  srcStageMask = vk::PipelineStageFlags{ vk::PipelineStageFlagBits::eBottomOfPipe };
-        const auto  dstStageMask = vk::PipelineStageFlags{ vk::PipelineStageFlagBits::eTopOfPipe };
-        const auto  dependencyFlags = vk::DependencyFlags{};
+        const auto  srcStageMask = vkh::VkPipelineStageFlags{ .eBottomOfPipe = 1 };
+        const auto  dstStageMask = vkh::VkPipelineStageFlags{ .eTopOfPipe = 1 };
+        const auto  dependencyFlags = vkh::VkDependencyFlags{};
               auto  srcMask = vk::AccessFlags{}, dstMask = vk::AccessFlags{};
 
         typedef vk::ImageLayout il;
         typedef vk::AccessFlagBits afb;
 
         // Is it me, or are these the same?
-        switch (info.originLayout) {
+        switch (info->originLayout) {
             case il::eUndefined: break;
             case il::eGeneral: srcMask = afb::eTransferWrite; break;
             case il::eColorAttachmentOptimal: srcMask = afb::eColorAttachmentWrite; break;
@@ -363,7 +363,7 @@ namespace vkt {
             case il::ePresentSrcKHR: srcMask = afb::eMemoryRead; break;
         };
 
-        switch (info.targetLayout) {
+        switch (info->targetLayout) {
             case il::eUndefined: break;
             case il::eGeneral: dstMask = afb::eTransferWrite; break;
             case il::eColorAttachmentOptimal: dstMask = afb::eColorAttachmentWrite; break;

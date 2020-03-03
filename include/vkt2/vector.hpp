@@ -429,11 +429,11 @@ namespace vkt {
         virtual ImageRegion& setImageLayout(const vk::ImageLayout layout = {}) { this->imgInfo.imageLayout = reinterpret_cast<const VkImageLayout&>(layout); return *this; };
         virtual ImageRegion& setSampler(const vk::Sampler& sampler = {}) { this->imgInfo.sampler = reinterpret_cast<const VkSampler&>(sampler); return *this; };
         virtual ImageRegion& transfer(vk::CommandBuffer& cmdBuf) {
-            vkt::imageBarrier(cmdBuf, { 
+            vkt::imageBarrier(cmdBuf, vkt::ImageBarrierInfo{ 
                 .image = vk::Image(*this->allocation), 
-                .targetLayout = vk::ImageLayout(this->imgInfo.imageLayout), 
-                .originLayout = vk::ImageLayout(this->allocation->info.initialLayout), 
-                .subresourceRange = vk::ImageSubresourceRange(*this) 
+                .targetLayout = reinterpret_cast<vk::ImageLayout&>(this->imgInfo.imageLayout),
+                .originLayout = this->allocation->info.initialLayout,
+                .subresourceRange = this->subresourceRange
             });
             return *this;
         };
