@@ -3,6 +3,7 @@
 //#include "utils.hpp"
 //#include "structs.hpp"
 #include <memory>
+#include <optional>
 
 namespace vkt {
 
@@ -53,7 +54,7 @@ namespace vkt {
     template<class T = uint8_t>
     class uni_arg {
     protected:
-        T storage = {};
+        std::optional<T> storage = std::nullopt;
     public:
         uni_arg<T>() {};
         uni_arg<T>(const T& t) : storage(t) {};
@@ -64,20 +65,20 @@ namespace vkt {
         virtual uni_arg* operator= (const T* ptr) { storage = *ptr; return this; };
 
         // experimental
-        virtual operator T& () { return storage; };
-        virtual operator const T& () const { return storage; };
+        virtual operator T& () { return *storage; };
+        virtual operator const T& () const { return *storage; };
 
         // 
-        virtual operator T* () { return &storage; };
-        virtual operator const T* () const { return &storage; };
+        virtual operator T* () { return &(*storage); };
+        virtual operator const T* () const { return &(*storage); };
 
         // 
-        virtual T* operator->() { return &storage; };
-        virtual const T* operator->() const { return &storage; };
+        virtual T* operator->() { return &(*storage); };
+        virtual const T* operator->() const { return &(*storage); };
 
         //
-        virtual T& operator*() { return storage; };
-        virtual const T& operator*() const { return storage; };
+        virtual T& operator*() { return *storage; };
+        virtual const T& operator*() const { return *storage; };
     };
 
 
@@ -85,7 +86,7 @@ namespace vkt {
     class uni_ptr {
     protected: //using T = uint8_t;
         std::shared_ptr<T> shared = {};
-        T* regular = nullptr;
+        std::optional<T*> regular = std::nullopt;
         //T storage = {};
 
     public: // 
@@ -99,12 +100,12 @@ namespace vkt {
         //uni_ptr<T>(T p) : storage(p), regular(&storage) {};
 
         // 
-        virtual std::shared_ptr<T>& get_shared() { return (this->shared = (this->shared ? this->shared : std::shared_ptr<T>(this->regular))); };
-        virtual const std::shared_ptr<T>& get_shared() const { return (this->shared ? this->shared : std::shared_ptr<T>(this->regular)); };
+        virtual std::shared_ptr<T>& get_shared() { return (this->shared = (this->shared ? this->shared : std::shared_ptr<T>(*this->regular))); };
+        virtual const std::shared_ptr<T>& get_shared() const { return (this->shared ? this->shared : std::shared_ptr<T>(*this->regular)); };
 
         // 
-        virtual T* get_ptr() { return (regular ? regular : &(*shared)); };
-        virtual const T* get_ptr() const { return (regular ? regular : &(*shared)); };
+        virtual T* get_ptr() { return (regular ? *regular : &(*shared)); };
+        virtual const T* get_ptr() const { return (regular ? *regular : &(*shared)); };
 
         // experimental
         virtual operator T& () { return *get_ptr(); };
