@@ -1,7 +1,7 @@
 #pragma once // #
 
-#include "utils.hpp"
-#include "structs.hpp"
+//#include "utils.hpp"
+//#include "structs.hpp"
 #include <memory>
 
 namespace vkt {
