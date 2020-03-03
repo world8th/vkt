@@ -73,6 +73,13 @@ namespace vkt {
         virtual operator const T* () const { return &(*storage); };
 
         // 
+        virtual bool has_value() const { return storage.has_value(); };
+
+        // 
+        //virtual operator bool() { return storage; };
+        //virtual operator bool() const { return storage; };
+
+        // 
         virtual T* operator->() { return &(*storage); };
         virtual const T* operator->() const { return &(*storage); };
 

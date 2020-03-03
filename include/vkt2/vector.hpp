@@ -507,6 +507,10 @@ namespace vkt {
         virtual const ImageAllocation* operator->() const { return &(*allocation); };
         virtual const ImageAllocation& operator*() const { return (*allocation); };
 
+        // 
+        virtual bool has() const { return allocation ? true : false; };
+        virtual bool has_value() const { return this->has(); };
+
     protected: friend VmaImageAllocation; friend ImageAllocation; // 
         vkh::VkDescriptorImageInfo imgInfo = {};
         vkt::uni_ptr<ImageAllocation> allocation = {};
@@ -642,6 +646,7 @@ namespace vkt {
 
         // 
         virtual bool has() const { return allocation ? true : false; };
+        virtual bool has_value() const { return this->has(); };
 
         // 
         virtual BufferAllocation* operator->() { return &(*allocation); };
