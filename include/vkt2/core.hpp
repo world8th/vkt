@@ -54,9 +54,9 @@ namespace vkt {
     template<class T = uint8_t>
     class uni_arg {
     protected:
-        std::optional<T> storage = std::nullopt;
+        std::optional<T> storage = { T{} };//std::nullopt;
     public:
-        uni_arg<T>() {};
+        uni_arg<T>() : storage(T{}) {};
         uni_arg<T>(const T& t) : storage(t) {};
         uni_arg<T>(const T* t) : storage(*t) {};
 

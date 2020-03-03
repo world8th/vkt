@@ -169,7 +169,7 @@ namespace vkt {
     };
 
     // create compute pipelines
-    static inline auto createCompute(const vkt::uni_arg<vk::Device>& device, const vkt::uni_arg<FixConstruction>& spi, const vkt::uni_arg<vk::PipelineLayout>& layout, const vkt::uni_arg < vk::PipelineCache>& cache = {}, const vkt::uni_arg<uint32_t>& subgroupSize = 0u) {
+    static inline auto createCompute(const vkt::uni_arg<vk::Device>& device, const vkt::uni_arg<FixConstruction>& spi, const vkt::uni_arg<vk::PipelineLayout>& layout, const vkt::uni_arg<vk::PipelineCache>& cache = vk::PipelineCache{}, const vkt::uni_arg<uint32_t>& subgroupSize = 0u) {
         auto cmpi = vk::ComputePipelineCreateInfo{};
         cmpi.flags = {};
         cmpi.layout = layout;
@@ -179,14 +179,14 @@ namespace vkt {
     };
 
     // create compute pipelines
-    static inline auto createCompute(const vkt::uni_arg<vk::Device>& device, const std::vector<uint32_t>& code, const vkt::uni_arg<vk::PipelineLayout>& layout, const vkt::uni_arg<vk::PipelineCache>& cache = {}, const vkt::uni_arg<uint32_t>& subgroupSize = 0u) {
+    static inline auto createCompute(const vkt::uni_arg<vk::Device>& device, const std::vector<uint32_t>& code, const vkt::uni_arg<vk::PipelineLayout>& layout, const vkt::uni_arg<vk::PipelineCache>& cache = vk::PipelineCache{}, const vkt::uni_arg<uint32_t>& subgroupSize = 0u) {
         auto f = makeComputePipelineStageInfo(device, code, "main", subgroupSize);
         if (subgroupSize) f.spi.pNext = &f.sgmp; // fix link
         return createCompute(device, f, layout, cache, subgroupSize);
     };
 
     // create compute pipelines
-    static inline auto createCompute(const vkt::uni_arg<vk::Device>& device, const vkt::uni_arg<std::string>& path, const vkt::uni_arg<vk::PipelineLayout>& layout, const vkt::uni_arg<vk::PipelineCache>& cache = {}, const vkt::uni_arg<uint32_t>& subgroupSize = 0u) {
+    static inline auto createCompute(const vkt::uni_arg<vk::Device>& device, const vkt::uni_arg<std::string>& path, const vkt::uni_arg<vk::PipelineLayout>& layout, const vkt::uni_arg<vk::PipelineCache>& cache = vk::PipelineCache{}, const vkt::uni_arg<uint32_t>& subgroupSize = 0u) {
         return createCompute(device, readBinary(path), layout, cache, subgroupSize);
     };
 
@@ -223,7 +223,7 @@ namespace vkt {
     };
 
     // add dispatch in command buffer (with default pipeline barrier)
-    static inline auto cmdDispatch(const vkt::uni_arg<vk::CommandBuffer>& cmd, const vkt::uni_arg<vk::Pipeline>& pipeline, const vkt::uni_arg<uint32_t>& x = 1, const vkt::uni_arg<uint32_t>& y = 1, const vkt::uni_arg<uint32_t>& z = 1, const vkt::uni_arg<bool>& barrier = true) {
+    static inline auto cmdDispatch(const vkt::uni_arg<vk::CommandBuffer>& cmd, const vkt::uni_arg<vk::Pipeline>& pipeline, const vkt::uni_arg<uint32_t>& x = 1u, const vkt::uni_arg<uint32_t>& y = 1u, const vkt::uni_arg<uint32_t>& z = 1u, const vkt::uni_arg<bool>& barrier = true) {
         cmd->bindPipeline(vk::PipelineBindPoint::eCompute, pipeline);
         cmd->dispatch(x, y, z);
         if (barrier) {
@@ -261,7 +261,7 @@ namespace vkt {
     // template function for fill buffer by constant value
     // use for create repeat variant
     template<uint32_t Rv>
-    static inline auto cmdFillBuffer(const vkt::uni_arg<vk::CommandBuffer>& cmd, const vkt::uni_arg<vk::Buffer>& dstBuffer, const vkt::uni_arg<vk::DeviceSize>& size = 0xFFFFFFFF, const vkt::uni_arg<vk::DeviceSize>& offset = 0) {
+    static inline auto cmdFillBuffer(const vkt::uni_arg<vk::CommandBuffer>& cmd, const vkt::uni_arg<vk::Buffer>& dstBuffer, const vkt::uni_arg<vk::DeviceSize>& size = 0xFFFFFFFFull, const vkt::uni_arg<vk::DeviceSize>& offset = 0ull) {
         vk::CommandBuffer(cmd).fillBuffer(vk::Buffer(dstBuffer), offset, size, Rv);
         //updateCommandBarrier(cmd);
         return vk::Result::eSuccess;
@@ -270,7 +270,7 @@ namespace vkt {
 
     // submit command (with async wait)
     // TODO: return vk::Result 
-    static inline auto submitCmd(const vkt::uni_arg<vk::Device>& device, const vkt::uni_arg<vk::Queue>& queue, const std::vector<vk::CommandBuffer>& cmds, vkt::uni_arg<vk::SubmitInfo> smbi = {}) {
+    static inline auto submitCmd(const vkt::uni_arg<vk::Device>& device, const vkt::uni_arg<vk::Queue>& queue, const std::vector<vk::CommandBuffer>& cmds, vkt::uni_arg<vk::SubmitInfo> smbi = vk::SubmitInfo{}) {
         // no commands 
         if (cmds.size() <= 0) return;
         smbi->commandBufferCount = cmds.size();
@@ -287,14 +287,14 @@ namespace vkt {
 
     // once submit command buffer
     // TODO: return VkResult
-    static inline auto submitOnce(const vkt::uni_arg<vk::Device>& device, const vkt::uni_arg<vk::Queue>& queue, const vkt::uni_arg<vk::CommandPool>& cmdPool, const std::function<void(vk::CommandBuffer&)>& cmdFn = {}, const vkt::uni_arg<vk::SubmitInfo>& smbi = {}) {
+    static inline auto submitOnce(const vkt::uni_arg<vk::Device>& device, const vkt::uni_arg<vk::Queue>& queue, const vkt::uni_arg<vk::CommandPool>& cmdPool, const std::function<void(vk::CommandBuffer&)>& cmdFn = {}, const vkt::uni_arg<vk::SubmitInfo>& smbi = vk::SubmitInfo{}) {
         auto cmdBuf = createCommandBuffer(device, cmdPool, false); cmdFn(cmdBuf); cmdBuf.end();
         submitCmd(device, queue, { cmdBuf }); device->freeCommandBuffers(cmdPool, 1, &cmdBuf); // free that command buffer
     };
 
     // submit command (with async wait)
     // TODO: return VkResult
-    static inline auto submitCmdAsync(const vkt::uni_arg<vk::Device>& device, const vkt::uni_arg<vk::Queue>& queue, const std::vector<vk::CommandBuffer>& cmds, const vkt::uni_arg<vk::SubmitInfo>& smbi = {}) {
+    static inline auto submitCmdAsync(const vkt::uni_arg<vk::Device>& device, const vkt::uni_arg<vk::Queue>& queue, const std::vector<vk::CommandBuffer>& cmds, const vkt::uni_arg<vk::SubmitInfo>& smbi = vk::SubmitInfo{}) {
         return std::async(std::launch::async | std::launch::deferred, [=](){
             return submitCmd(device, queue, cmds, smbi);
         });
@@ -302,7 +302,7 @@ namespace vkt {
 
     // once submit command buffer
     // TODO: return VkResult
-    static inline auto submitOnceAsync(const vkt::uni_arg<vk::Device>& device, const vkt::uni_arg<vk::Queue>& queue, const vkt::uni_arg<vk::CommandPool>& cmdPool, const std::function<void(vk::CommandBuffer&)>& cmdFn = {}, const vkt::uni_arg<vk::SubmitInfo>& smbi = {}) {
+    static inline auto submitOnceAsync(const vkt::uni_arg<vk::Device>& device, const vkt::uni_arg<vk::Queue>& queue, const vkt::uni_arg<vk::CommandPool>& cmdPool, const std::function<void(vk::CommandBuffer&)>& cmdFn = {}, const vkt::uni_arg<vk::SubmitInfo>& smbi = vk::SubmitInfo{}) {
         vk::CommandBuffer cmdBuf = createCommandBuffer(device, cmdPool, false); cmdFn(cmdBuf); cmdBuf.end();
         return std::async(std::launch::async | std::launch::deferred, [=]() {
             submitCmdAsync(device, queue, { cmdBuf }, smbi).get();
@@ -328,7 +328,7 @@ namespace vkt {
     };
 
     // 
-    static inline auto imageBarrier(const vkt::uni_arg<vk::CommandBuffer>& cmd = {}, const ImageBarrierInfo& info = {}) {
+    static inline auto imageBarrier(const vkt::uni_arg<vk::CommandBuffer>& cmd = vk::CommandBuffer{}, const ImageBarrierInfo& info = ImageBarrierInfo{}) {
         vk::Result result = vk::Result::eSuccess; // planned to complete
         if (*info.originLayout == *info.targetLayout) return result; // no need transfering more
 
