@@ -128,6 +128,11 @@ namespace vkt {
         virtual MemoryAllocationInfo& getAllocationInfo() { return info; };
         virtual const MemoryAllocationInfo& getAllocationInfo() const { return info; };
 
+        // 
+        virtual BufferAllocation* address() { return this; };
+        virtual const BufferAllocation* address() const { return this; };
+
+
     public: // in-variant 
         vk::Buffer buffer = {};
         MemoryAllocationInfo info = {};
@@ -190,6 +195,10 @@ namespace vkt {
         // Allocation
         virtual operator const VmaAllocation& () const { return allocation; };
         virtual operator const VmaAllocationInfo& () const { return allocationInfo; };
+
+        // 
+        virtual VmaBufferAllocation* address() { return this; };
+        virtual const VmaBufferAllocation* address() const { return this; };
 
     // 
     protected: friend VmaBufferAllocation; friend BufferAllocation; // 
@@ -312,6 +321,10 @@ namespace vkt {
         virtual MemoryAllocationInfo& getAllocationInfo() { return info; };
         virtual const MemoryAllocationInfo& getAllocationInfo() const { return info; };
 
+        // 
+        virtual ImageAllocation* address() { return this; };
+        virtual const ImageAllocation* address() const { return this; };
+
     // 
     protected: friend VmaImageAllocation; friend ImageAllocation; friend ImageRegion;
         vk::Image image = {};
@@ -381,6 +394,10 @@ namespace vkt {
         // 
         virtual operator VmaAllocation& () { return allocation; };
         virtual operator VmaAllocationInfo& () { return allocationInfo; };
+
+        // 
+        virtual VmaImageAllocation* address() { return this; };
+        virtual const VmaImageAllocation* address() const { return this; };
 
     // 
     protected: friend VmaImageAllocation; friend ImageAllocation; // 
@@ -543,6 +560,11 @@ namespace vkt {
         virtual bool has() const { return allocation ? true : false; };
         virtual bool has_value() const { return this->has(); };
 
+        // 
+        virtual ImageRegion* address() { return this; };
+        virtual const ImageRegion* address() const { return this; };
+
+
     protected: friend VmaImageAllocation; friend ImageAllocation; // 
         vkh::VkDescriptorImageInfo imgInfo = {};
         vkt::uni_ptr<ImageAllocation> allocation = {};
@@ -690,6 +712,10 @@ namespace vkt {
         // 
         virtual vk::DeviceSize& rangeInfo() { return bufInfo.range; };
         virtual const vk::DeviceSize& rangeInfo() const { return bufInfo.range; };
+
+        // 
+        virtual Vector<T>* address() { return this; };
+        virtual const Vector<T>* address() const { return this; };
 
         //
         protected: friend Vector<T>; // 
