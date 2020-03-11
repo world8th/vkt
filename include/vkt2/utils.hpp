@@ -136,6 +136,10 @@ namespace vkt {
     };
 
     struct FixConstruction {
+        FixConstruction(vkh::VkPipelineShaderStageCreateInfo spi = {}, vkh::VkPipelineShaderStageRequiredSubgroupSizeCreateInfoEXT sgmp = {}) : spi(spi), sgmp(sgmp) {
+
+        }
+
         vkh::VkPipelineShaderStageCreateInfo spi = {};
         vkh::VkPipelineShaderStageRequiredSubgroupSizeCreateInfoEXT sgmp = {};
 
@@ -172,7 +176,7 @@ namespace vkt {
     static inline auto createCompute(const vkt::uni_arg<vk::Device>& device, const vkt::uni_arg<FixConstruction>& spi, const vkt::uni_arg<vk::PipelineLayout>& layout, const vkt::uni_arg<vk::PipelineCache>& cache = vk::PipelineCache{}, const vkt::uni_arg<uint32_t>& subgroupSize = 0u) {
         auto cmpi = vkh::VkComputePipelineCreateInfo{};
         cmpi.flags = {};
-        cmpi.layout = *layout;
+        cmpi.layout = vk::PipelineLayout(*layout);
         cmpi.stage = *spi;
         cmpi.basePipelineIndex = -1;
         return device->createComputePipeline(cache, cmpi);
