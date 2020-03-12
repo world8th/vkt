@@ -565,6 +565,10 @@ namespace vkt {
         virtual const ImageRegion* address() const { return this; };
 
         // 
+        virtual vkt::uni_ptr<ImageAllocation>& getAllocation() { return allocation; };
+        virtual const vkt::uni_ptr<ImageAllocation>& getAllocation() const { return allocation; };
+
+        // 
         virtual vkh::VkDescriptorImageInfo& getDescriptor() { return imgInfo; };
         virtual const vkh::VkDescriptorImageInfo& getDescriptor() const { return imgInfo; };
 
@@ -649,12 +653,12 @@ namespace vkt {
         virtual operator BufferAllocation*() { return allocation; };
         virtual operator vkt::uni_ptr<BufferAllocation>& () { return allocation; };
         virtual operator std::shared_ptr<BufferAllocation>& () { return allocation; };
-        virtual operator vkh::VkDescriptorBufferInfo& () { bufInfo.buffer = allocation->buffer; return reinterpret_cast<vkh::VkDescriptorBufferInfo&>(bufInfo); };
+        virtual operator vkh::VkDescriptorBufferInfo& () { bufInfo.buffer = allocation->buffer; return bufInfo; };
         virtual operator vk::DescriptorBufferInfo& () { bufInfo.buffer = allocation->buffer; return bufInfo; };
         virtual operator vk::Buffer& () { return reinterpret_cast<vk::Buffer&>(bufInfo.buffer = allocation->buffer); };
         virtual operator vk::Device& () { return *allocation; };
         virtual operator vk::BufferView& () { return view; };
-        virtual operator ::VkDescriptorBufferInfo& () { bufInfo.buffer = allocation->buffer; return reinterpret_cast<::VkDescriptorBufferInfo&>(bufInfo); };
+        virtual operator ::VkDescriptorBufferInfo& () { bufInfo.buffer = allocation->buffer; return bufInfo; };
         virtual operator VkBuffer& () { return reinterpret_cast<VkBuffer&>(bufInfo.buffer = allocation->buffer); };
         virtual operator VkDevice& () { return *allocation; };
         virtual operator VkBufferView& () { return reinterpret_cast<VkBufferView&>(view); };
@@ -663,15 +667,15 @@ namespace vkt {
         virtual operator const BufferAllocation*() const { return allocation; };
         virtual operator const vkt::uni_ptr<BufferAllocation>& () const { return allocation; };
         virtual operator const std::shared_ptr<BufferAllocation>& () const { return allocation; };
-        virtual operator const vkh::VkDescriptorBufferInfo& () const { return reinterpret_cast<const vkh::VkDescriptorBufferInfo&>(bufInfo); };
+        virtual operator const vkh::VkDescriptorBufferInfo& () const { return bufInfo; };
         virtual operator const vk::DescriptorBufferInfo& () const { return bufInfo; };
         virtual operator const vk::Buffer& () const { return *allocation; };
         virtual operator const vk::Device& () const { return *allocation; };
         virtual operator const vk::BufferView& () const { return view; };
-        virtual operator const ::VkDescriptorBufferInfo& () const { return reinterpret_cast<const ::VkDescriptorBufferInfo&>(bufInfo); };
+        virtual operator const ::VkDescriptorBufferInfo& () const { return bufInfo; };
         virtual operator const VkBuffer&() const { return *allocation; };
         virtual operator const VkDevice&() const { return *allocation; };
-        virtual operator const VkBufferView& () const { return reinterpret_cast<const VkBufferView&>(view); };
+        virtual operator const VkBufferView& () const { return reinterpret_cast<const VkBufferView&>(view);; };
 
         // 
         virtual vk::DeviceSize& offset() { return this->bufInfo.offset; };
@@ -723,6 +727,10 @@ namespace vkt {
         // 
         virtual vkh::VkDescriptorBufferInfo& getDescriptor() { return bufInfo; };
         virtual const vkh::VkDescriptorBufferInfo& getDescriptor() const { return bufInfo; };
+
+        // 
+        virtual vkt::uni_ptr<BufferAllocation>& getAllocation() { return allocation; };
+        virtual const vkt::uni_ptr<BufferAllocation>& getAllocation() const { return allocation; };
 
         //
         protected: friend Vector<T>; // 
