@@ -18,6 +18,8 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         operator const ::NAME&() const { return reinterpret_cast<const ::NAME&>(*this); };\
         operator ::NAME*() { return reinterpret_cast<::NAME*>(this); };\
         operator const ::NAME*() const { return reinterpret_cast<const ::NAME*>(this); };\
+        ::NAME& vk() { return reinterpret_cast<::NAME&>(*this); };\
+        const ::NAME& vk() const { return reinterpret_cast<const ::NAME&>(*this); };\
         NAME& operator =( const ::NAME& info ) { reinterpret_cast<::NAME&>(*this) = info; return *this; };\
         NAME& operator =( const NAME& info ) { reinterpret_cast<::NAME&>(*this) = reinterpret_cast<const ::NAME&>(info); return *this; }; 
 
