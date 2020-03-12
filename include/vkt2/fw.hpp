@@ -37,24 +37,29 @@ namespace vkt
         std::vector<const char*> wantedExtensions = {
             "VK_KHR_get_physical_device_properties2",
             "VK_KHR_get_surface_capabilities2",
-            "VK_KHR_display",
+
             "VK_EXT_direct_mode_display",
-            "VK_EXT_swapchain_colorspace"
+            "VK_EXT_swapchain_colorspace",
+
+            "VK_KHR_swapchain",
+            "VK_KHR_surface",
+            "VK_KHR_display",
         };
 
         // default device extensions
         std::vector<const char*> wantedDeviceExtensions = {
             "VK_EXT_swapchain_colorspace",
             "VK_EXT_external_memory_host",
+            "VK_EXT_queue_family_foreign",
+            "VK_EXT_swapchain_colorspace",
             "VK_EXT_sample_locations",
             "VK_EXT_conservative_rasterization",
             "VK_EXT_hdr_metadata",
-            "VK_EXT_queue_family_foreign",
+            "VK_EXT_subgroup_size_control",
             "VK_EXT_sampler_filter_minmax",
             "VK_EXT_descriptor_indexing",
             "VK_EXT_scalar_block_layout",
-            "VK_EXT_subgroup_size_control",
-
+            
             "VK_AMD_gpu_shader_int16",
             "VK_AMD_gpu_shader_half_float",
             "VK_AMD_gcn_shader",
@@ -69,8 +74,9 @@ namespace vkt
             "VK_KHR_8bit_storage",
             "VK_KHR_incremental_present",
             "VK_KHR_push_descriptor",
-            "VK_KHR_surface",
             "VK_KHR_swapchain",
+            "VK_KHR_surface",
+            "VK_KHR_display",
             "VK_KHR_sampler_ycbcr_conversion",
             "VK_KHR_image_format_list",
             "VK_KHR_shader_draw_parameters",
@@ -482,7 +488,7 @@ namespace vkt
         {
             auto surfaceFormats = gpu.getSurfaceFormatsKHR(applicationWindow.surface);
 
-            const std::vector<vk::Format> preferredFormats = { vk::Format::eR8G8B8A8Unorm, vk::Format::eB8G8R8A8Unorm };
+            const std::vector<vk::Format> preferredFormats = { vk::Format::eA2B10G10R10UnormPack32, vk::Format::eA2R10G10B10UintPack32, vk::Format::eR8G8B8A8Srgb, vk::Format::eB8G8R8A8Srgb, vk::Format::eA8B8G8R8SrgbPack32, vk::Format::eR8G8B8A8Unorm, vk::Format::eB8G8R8A8Unorm, vk::Format::eA8B8G8R8UnormPack32 };
 
             vk::Format surfaceColorFormat =
                 surfaceFormats.size() == 1 &&
@@ -535,6 +541,7 @@ namespace vkt
             sfd.colorFormat = surfaceColorFormat;
             sfd.depthFormat = surfaceDepthFormat;
             sfd.colorFormatProperties = formatProperties; // get properties about format
+
             return sfd;
         }
 
