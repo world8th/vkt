@@ -132,20 +132,19 @@ namespace vkt {
 
     template<class T = uint8_t>
     class uni_arg {
-    protected:
-        std::optional<T> storage = { T{} };//std::nullopt;
-    public:
+    protected: std::optional<T> storage = { T{} };//std::nullopt;
+    public: // 
         uni_arg<T>() : storage(T{}) {};
         uni_arg<T>(const T& t) : storage(t) {};
         uni_arg<T>(const T* t) : storage(*t) {};
-        uni_arg<T>(const uni_ptr<T>& ptr) : storage(ptr.ref()) {}; // UnUsual and Vain
-
-        //template<class... A>
-        //uni_arg<T>(A... args) : storage(args) {};
+        uni_arg<T>(const uni_arg<T>& t) : storage(*t) {};
+        uni_arg<T>(const uni_ptr<T>& p) : storage(*p) {}; // UnUsual and Vain
 
         // 
-        virtual uni_arg* operator= (const T& ptr) { storage = ptr; return this; };
-        virtual uni_arg* operator= (const T* ptr) { storage = *ptr; return this; };
+        virtual uni_ptr<T> operator= (const T& ptr) { storage =  ptr; return uni_ptr<T>(*storage); };
+        virtual uni_ptr<T> operator= (const T* ptr) { storage = *ptr; return uni_ptr<T>(*storage); };
+        virtual uni_ptr<T> operator= (const uni_arg<T>& t) { storage = *t; return uni_ptr<T>(*storage); };
+        virtual uni_ptr<T> operator= (const uni_ptr<T>& p) { storage = *p; return uni_ptr<T>(*storage); };
 
         // experimental
         virtual operator T& () { return *storage; };
@@ -154,6 +153,10 @@ namespace vkt {
         // 
         virtual operator T* () { return &(*storage); };
         virtual operator const T* () const { return &(*storage); };
+
+        // 
+        virtual operator uni_ptr<T>() { return *storage; };
+        virtual operator uni_ptr<const T>() const { return *storage; };
 
         // 
         virtual bool has_value() const { return storage.has_value(); };
