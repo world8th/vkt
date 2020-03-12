@@ -488,12 +488,12 @@ namespace vkt
         {
             auto surfaceFormats = gpu.getSurfaceFormatsKHR(applicationWindow.surface);
 
-            const std::vector<vk::Format> preferredFormats = { vk::Format::eA2B10G10R10UnormPack32, vk::Format::eA2R10G10B10UintPack32, vk::Format::eR8G8B8A8Srgb, vk::Format::eB8G8R8A8Srgb, vk::Format::eA8B8G8R8SrgbPack32, vk::Format::eR8G8B8A8Unorm, vk::Format::eB8G8R8A8Unorm, vk::Format::eA8B8G8R8UnormPack32 };
+            const std::vector<vk::Format> preferredFormats = { vk::Format::eR16G16B16A16Unorm, vk::Format::eB16G16R16G16422Unorm, vk::Format::eA2B10G10R10UnormPack32, vk::Format::eA2R10G10B10UintPack32, vk::Format::eR8G8B8A8Srgb, vk::Format::eB8G8R8A8Srgb, vk::Format::eA8B8G8R8SrgbPack32, vk::Format::eR8G8B8A8Unorm, vk::Format::eB8G8R8A8Unorm, vk::Format::eA8B8G8R8UnormPack32 };
 
             vk::Format surfaceColorFormat =
                 surfaceFormats.size() == 1 &&
                 surfaceFormats[0].format == vk::Format::eUndefined
-                ? vk::Format::eR8G8B8A8Unorm
+                ? vk::Format::eR8G8B8A8Srgb
                 : surfaceFormats[0].format;
 
             // search preferred surface format support
