@@ -564,6 +564,9 @@ namespace vkt {
         virtual ImageRegion* address() { return this; };
         virtual const ImageRegion* address() const { return this; };
 
+        // 
+        virtual vkh::VkDescriptorImageInfo& getDescriptor() { return imgInfo; };
+        virtual const vkh::VkDescriptorImageInfo& getDescriptor() const { return imgInfo; };
 
     protected: friend VmaImageAllocation; friend ImageAllocation; // 
         vkh::VkDescriptorImageInfo imgInfo = {};
@@ -586,7 +589,7 @@ namespace vkt {
         //
         virtual Vector<T>* construct(const vkt::uni_ptr<BufferAllocation>& allocation, const vkt::uni_arg<vk::DeviceSize>& offset = 0ull, const vkt::uni_arg<vk::DeviceSize>& size = VK_WHOLE_SIZE, const vkt::uni_arg<vk::DeviceSize>& stride = sizeof(T)) {
             this->allocation = allocation;
-            this->bufInfo = { allocation->buffer,offset,size };
+            this->bufInfo = vk::DescriptorBufferInfo{ allocation->buffer,offset,size };
             this->stride = stride;
             return this;
         };
@@ -717,9 +720,13 @@ namespace vkt {
         virtual Vector<T>* address() { return this; };
         virtual const Vector<T>* address() const { return this; };
 
+        // 
+        virtual vkh::VkDescriptorBufferInfo& getDescriptor() { return bufInfo; };
+        virtual const vkh::VkDescriptorBufferInfo& getDescriptor() const { return bufInfo; };
+
         //
         protected: friend Vector<T>; // 
-        protected: vk::DescriptorBufferInfo bufInfo = { {}, 0u, VK_WHOLE_SIZE };
+        protected: vkh::VkDescriptorBufferInfo bufInfo = { {}, 0u, VK_WHOLE_SIZE };
         public   : vk::DeviceSize stride = sizeof(T);
         protected: vk::BufferView view = {};
         protected: vkt::uni_ptr<BufferAllocation> allocation = {};
