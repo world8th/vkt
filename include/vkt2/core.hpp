@@ -163,6 +163,14 @@ namespace vkt {
         virtual bool has() const { return this->has_value(); };
 
         // 
+        virtual T* ptr() { return &(*storage); };
+        virtual const T* ptr() const { return &(*storage); };
+
+        // 
+        virtual T& ref() { return *storage; };
+        virtual const T& ref() const { return *storage; };
+
+        // 
         //virtual operator bool() { return storage; };
         //virtual operator bool() const { return storage; };
 
