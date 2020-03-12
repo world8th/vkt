@@ -83,7 +83,7 @@ namespace vkt {
             return this;
         };
 
-        virtual BufferAllocation& operator=(const vkt::uni_arg<BufferAllocation>& allocation) {
+        virtual BufferAllocation& operator=(const vkt::uni_ptr<BufferAllocation>& allocation) {
             this->buffer = allocation->buffer;
             this->info = allocation->info;
             return *this;
@@ -168,7 +168,7 @@ namespace vkt {
         };
 
         // 
-        virtual VmaBufferAllocation& operator=(const vkt::uni_arg<VmaBufferAllocation>& allocation) {
+        virtual VmaBufferAllocation& operator=(const vkt::uni_ptr<VmaBufferAllocation>& allocation) {
             if (allocation->allocation) {
                 vmaDestroyBuffer(allocator, *this, *allocation); // don't assign into already allocated
             };
