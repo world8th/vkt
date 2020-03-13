@@ -1,7 +1,7 @@
 #pragma once // #
 
 #ifdef ENABLE_OPENGL_INTEROP
-#include <glad/glad.h>
+#include "glad/glad.h"
 #endif
 
 // 

@@ -20,8 +20,8 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         operator const ::NAME*() const { return reinterpret_cast<const ::NAME*>(this); };\
         ::NAME& vk() { return reinterpret_cast<::NAME&>(*this); };\
         const ::NAME& vk() const { return reinterpret_cast<const ::NAME&>(*this); };\
-        NAME& operator =( const ::NAME& info ) { reinterpret_cast<::NAME&>(*this) = info; return *this; };\
-        NAME& operator =( const NAME& info ) { reinterpret_cast<::NAME&>(*this) = reinterpret_cast<const ::NAME&>(info); return *this; }; 
+        NAME& operator =( const ::NAME& info ) { memcpy(this, &info, sizeof(NAME)); return *this; };\
+        NAME& operator =( const NAME& info ) { memcpy(this, &info, sizeof(NAME)); return *this; }; 
 
     #define VK_HPP_STRUCT_OPERATORS(NAME,VKNAME)\
         operator VKNAME&() { return reinterpret_cast<VKNAME&>(*this); };\
@@ -32,7 +32,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         const VKNAME* operator->() const { return reinterpret_cast<const VKNAME*>(this); };\
         VKNAME& hpp() { return reinterpret_cast<VKNAME&>(*this); };\
         const VKNAME& hpp() const { return reinterpret_cast<const VKNAME&>(*this); };\
-        NAME& operator =( const VKNAME& info ) { reinterpret_cast<VKNAME&>(*this) = info; return *this; };
+        NAME& operator =( const VKNAME& info ) { memcpy(this, &info, sizeof(NAME)); return *this; };
 
     #define STRUCT_TYPE_COMPATIBLE(NAME,T)\
         NAME& operator=(const T& V) { memcpy(this, &V, sizeof(T)); return *this; };\

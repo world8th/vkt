@@ -222,7 +222,7 @@ namespace vkt {
         // 
         virtual ImageAllocation* construct(
             const vkt::uni_arg<MemoryAllocationInfo>& allocationInfo,
-            const vkt::uni_arg<vkh::VkImageCreateInfo>& createInfo = vkh::VkImageCreateInfo{}
+                  vkt::uni_arg<vkh::VkImageCreateInfo> createInfo = vkh::VkImageCreateInfo{}
         ) {
             vkh::VkImageUsageFlags usage = createInfo->usage;
             if (allocationInfo->vmaUsage == VMA_MEMORY_USAGE_CPU_TO_GPU) { usage.eTransferSrc = 1; };
@@ -230,7 +230,7 @@ namespace vkt {
             if (allocationInfo->vmaUsage == VMA_MEMORY_USAGE_GPU_ONLY) { usage.eTransferDst = 1, usage.eTransferSrc = 1; };
 
             // 
-            this->image = this->info.device.createImage(vk::ImageCreateInfo(*createInfo).setUsage(usage));
+            this->image = this->info.device.createImage(createInfo->hpp().setUsage(usage));
 
             // 
             vk::MemoryRequirements memReqs = allocationInfo->device.getImageMemoryRequirements(image);
@@ -441,12 +441,12 @@ namespace vkt {
         // 
         virtual ImageRegion* construct(
             const vkt::uni_ptr<ImageAllocation>& allocation,
-            const vkt::uni_arg<vkh::VkImageViewCreateInfo>& info = vkh::VkImageViewCreateInfo{},
+                  vkt::uni_arg<vkh::VkImageViewCreateInfo> info = vkh::VkImageViewCreateInfo{},
             const vkt::uni_arg<vk::ImageLayout>& layout = vk::ImageLayout::eGeneral
         ) {
             this->allocation = allocation;
             this->subresourceRange = info->subresourceRange;
-            this->imgInfo.imageView = this->allocation->getDevice().createImageView(vk::ImageViewCreateInfo(*info).setImage(this->allocation->getImage()));
+            this->imgInfo.imageView = this->allocation->getDevice().createImageView(info->hpp().setImage(this->allocation->getImage()));
             this->imgInfo.imageLayout = VkImageLayout(*layout);
             return this;
         };
@@ -478,7 +478,7 @@ namespace vkt {
         virtual ImageRegion& setSampler(const vk::Sampler& sampler = {}) { this->imgInfo.sampler = reinterpret_cast<const VkSampler&>(sampler); return *this; };
         virtual ImageRegion& transfer(vk::CommandBuffer& cmdBuf) {
             vkt::imageBarrier(cmdBuf, vkt::ImageBarrierInfo{ 
-                .image = vk::Image(*this->allocation), 
+                .image = this->allocation->getImage(),
                 .targetLayout = reinterpret_cast<vk::ImageLayout&>(this->imgInfo.imageLayout),
                 .originLayout = this->allocation->info.initialLayout,
                 .subresourceRange = this->subresourceRange
