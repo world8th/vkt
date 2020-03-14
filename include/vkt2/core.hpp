@@ -54,8 +54,8 @@ namespace vkt {
     template<class T = uint8_t>
     class uni_ptr {
     protected: //using T = uint8_t;
-        std::shared_ptr<T> shared = {};
         std::optional<T*> regular = std::nullopt;
+        std::shared_ptr<T> shared = {};
         //T storage = {};
 
     public: // 

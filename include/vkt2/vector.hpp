@@ -568,6 +568,10 @@ namespace vkt {
         virtual vkt::uni_ptr<ImageAllocation>& getAllocation() { return allocation; };
         virtual const vkt::uni_ptr<ImageAllocation>& getAllocation() const { return allocation; };
 
+        // for JavaCPP
+        virtual ImageAllocation* getAllocationPtr() { return allocation.ptr(); };
+        virtual const ImageAllocation* getAllocationPtr() const { return allocation.ptr(); };
+
         // 
         virtual vkh::VkDescriptorImageInfo& getDescriptor() { return imgInfo; };
         virtual const vkh::VkDescriptorImageInfo& getDescriptor() const { return imgInfo; };
@@ -731,6 +735,10 @@ namespace vkt {
         // 
         virtual vkt::uni_ptr<BufferAllocation>& getAllocation() { return allocation; };
         virtual const vkt::uni_ptr<BufferAllocation>& getAllocation() const { return allocation; };
+
+        // for JavaCPP
+        virtual BufferAllocation* getAllocationPtr() { return allocation.ptr(); };
+        virtual const BufferAllocation* getAllocationPtr() const { return allocation.ptr(); };
 
         //
         protected: friend Vector<T>; // 
