@@ -459,7 +459,7 @@ namespace vkt {
             return *this;
         };
 
-        // 
+        // Alias Of getAllocation
         virtual vkt::uni_ptr<ImageAllocation>& uniPtr() { return this->allocation; };
         virtual const vkt::uni_ptr<ImageAllocation>& uniPtr() const { return this->allocation; };
 
@@ -633,7 +633,7 @@ namespace vkt {
             return (view = allocation->getDevice().createBufferView(info));
         };
 
-        // 
+        // Alias Of getAllocation
         virtual vkt::uni_ptr<BufferAllocation>& uniPtr() { return allocation; };
         virtual const vkt::uni_ptr<BufferAllocation>& uniPtr() const { return allocation; };
 
