@@ -459,7 +459,7 @@ namespace vkt {
             return *this;
         };
 
-        // Alias Of getAllocation
+        // alias Of getAllocation
         virtual vkt::uni_ptr<ImageAllocation>& uniPtr() { return this->allocation; };
         virtual const vkt::uni_ptr<ImageAllocation>& uniPtr() const { return this->allocation; };
 
@@ -564,7 +564,7 @@ namespace vkt {
         virtual ImageRegion* address() { return this; };
         virtual const ImageRegion* address() const { return this; };
 
-        // 
+        // alias of uniPtr
         virtual vkt::uni_ptr<ImageAllocation>& getAllocation() { return allocation; };
         virtual const vkt::uni_ptr<ImageAllocation>& getAllocation() const { return allocation; };
 
@@ -633,7 +633,7 @@ namespace vkt {
             return (view = allocation->getDevice().createBufferView(info));
         };
 
-        // Alias Of getAllocation
+        // alias Of getAllocation
         virtual vkt::uni_ptr<BufferAllocation>& uniPtr() { return allocation; };
         virtual const vkt::uni_ptr<BufferAllocation>& uniPtr() const { return allocation; };
 
@@ -732,7 +732,7 @@ namespace vkt {
         virtual vkh::VkDescriptorBufferInfo& getDescriptor() { return bufInfo; };
         virtual const vkh::VkDescriptorBufferInfo& getDescriptor() const { return bufInfo; };
 
-        // 
+        // alias of uniPtr
         virtual vkt::uni_ptr<BufferAllocation>& getAllocation() { return allocation; };
         virtual const vkt::uni_ptr<BufferAllocation>& getAllocation() const { return allocation; };
 
