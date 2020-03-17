@@ -143,6 +143,14 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         VK_HPP_STRUCT_OPERATORS(VkDescriptorBufferInfo,vk::DescriptorBufferInfo)
     } VkDescriptorBufferInfo;
 
+    // TODO: inherit ops
+    typedef struct VkStridedBufferRegionKHR {
+        VkBuffer        buffer  = VK_NULL_HANDLE;
+        VkDeviceSize    offset  = 0u;
+        VkDeviceSize    stride  = 16u;
+        VkDeviceSize    size    = 1u;
+    } VkStridedBufferRegionKHR;
+
     // 
     typedef struct VkDescriptorImageInfo {
         VkSampler        sampler     = VK_NULL_HANDLE;
