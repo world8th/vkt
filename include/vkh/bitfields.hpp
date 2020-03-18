@@ -428,6 +428,9 @@ namespace vkh {
         VK_HPP_OPERATORS(VkMemoryHeapFlags, vk::MemoryHeapFlags, vk::MemoryHeapFlagBits)
     };
 
+    // Vulkan 1.2
+    // TODO: VkPipelineCreateFlagBits and VkPipelineCreateFlags
+
 #pragma pack(pop)
     
     // Extras
