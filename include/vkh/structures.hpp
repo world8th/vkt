@@ -1094,9 +1094,6 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
 #endif
     } VkDeviceOrHostAddressConstKHR;
 
-    // VK_KHR_pipeline_library missed
-    //VkStructureType VK_STRUCTURE_TYPE_PIPELINE_LIBRARY_CREATE_INFO_KHR = static_cast<VkStructureType>(1000290000u);
-
     // VK_KHR_pipeline_library
     typedef struct VkPipelineLibraryCreateInfoKHR {
         VkStructureType      sType          = VK_STRUCTURE_TYPE_PIPELINE_LIBRARY_CREATE_INFO_KHR;
@@ -1117,6 +1114,76 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
 #endif
     } VkPipelineLibraryCreateInfoKHR;
 
+    // 
+    typedef struct VkAccelerationStructureGeometryTrianglesDataKHR {
+        VkStructureType                  sType          = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_TRIANGLES_DATA_KHR;
+        const void*                      pNext          = nullptr;
+        VkFormat                         vertexFormat   = VK_FORMAT_R32G32B32_SFLOAT;
+        VkDeviceOrHostAddressConstKHR    vertexData     = {};
+        VkDeviceSize                     vertexStride   = 16u;
+        VkIndexType                      indexType      = VK_INDEX_TYPE_NONE_NV;
+        VkDeviceOrHostAddressConstKHR    indexData      = {};
+        VkDeviceOrHostAddressConstKHR    transformData  = {};
+
+#ifdef VK_ENABLE_BETA_EXTENSIONS
+        STRUCT_OPERATORS(VkAccelerationStructureGeometryTrianglesDataKHR)
+        VK_HPP_STRUCT_OPERATORS(VkAccelerationStructureGeometryTrianglesDataKHR, vk::AccelerationStructureGeometryTrianglesDataKHR)
+#endif
+    } VkAccelerationStructureGeometryTrianglesDataKHR;
+
+    // 
+    typedef struct VkAccelerationStructureGeometryInstancesDataKHR {
+        VkStructureType                  sType            = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_INSTANCES_DATA_KHR;
+        const void*                      pNext            = nullptr;
+        VkBool32                         arrayOfPointers  = false;
+        VkDeviceOrHostAddressConstKHR    data             = {};
+
+#ifdef VK_ENABLE_BETA_EXTENSIONS
+        STRUCT_OPERATORS(VkAccelerationStructureGeometryInstancesDataKHR)
+        VK_HPP_STRUCT_OPERATORS(VkAccelerationStructureGeometryInstancesDataKHR, vk::AccelerationStructureGeometryInstancesDataKHR)
+#endif
+    } VkAccelerationStructureGeometryInstancesDataKHR;
+
+    // 
+    typedef struct VkAccelerationStructureGeometryAabbsDataKHR {
+        VkStructureType                  sType   = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_AABBS_DATA_KHR;
+        const void*                      pNext   = nullptr;
+        VkDeviceOrHostAddressConstKHR    data    = {};
+        VkDeviceSize                     stride  = 32u;
+
+#ifdef VK_ENABLE_BETA_EXTENSIONS
+        STRUCT_OPERATORS(VkAccelerationStructureGeometryAabbsDataKHR)
+        VK_HPP_STRUCT_OPERATORS(VkAccelerationStructureGeometryAabbsDataKHR, vk::AccelerationStructureGeometryAabbsDataKHR)
+#endif
+    } VkAccelerationStructureGeometryAabbsDataKHR;
+
+    // Use Vulkan-HPP for avoid ambigous
+    typedef union VkAccelerationStructureGeometryDataKHR {
+#ifdef VK_ENABLE_BETA_EXTENSIONS
+        VkAccelerationStructureGeometryTrianglesDataKHR  triangles;
+        VkAccelerationStructureGeometryAabbsDataKHR      aabbs    ;
+        VkAccelerationStructureGeometryInstancesDataKHR  instances;
+#else
+        uint32_t data[8]; // Reserved for future
+#endif
+#ifdef VK_ENABLE_BETA_EXTENSIONS
+        STRUCT_OPERATORS(VkAccelerationStructureGeometryDataKHR)
+        VK_HPP_STRUCT_OPERATORS(VkAccelerationStructureGeometryDataKHR, vk::AccelerationStructureGeometryDataKHR)
+#endif
+    } VkAccelerationStructureGeometryDataKHR;
+
+    // 
+    typedef struct VkAccelerationStructureGeometryKHR {
+        VkStructureType                           sType         = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR;
+        const void*                               pNext         = nullptr;
+        VkGeometryTypeKHR                         geometryType  = {};
+        VkAccelerationStructureGeometryDataKHR    geometry      = VkAccelerationStructureGeometryDataKHR{ .triangles = {} };
+        VkGeometryFlagsKHR                        flags         = {};
+#ifdef VK_ENABLE_BETA_EXTENSIONS
+        STRUCT_OPERATORS(VkAccelerationStructureGeometryKHR)
+        VK_HPP_STRUCT_OPERATORS(VkAccelerationStructureGeometryKHR, vk::AccelerationStructureGeometryKHR)
+#endif
+    } VkAccelerationStructureGeometryKHR;
 
 #pragma pack(pop)
 

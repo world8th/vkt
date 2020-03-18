@@ -289,6 +289,15 @@ namespace vkh {
     };
 
     // 
+    struct VkGeometryFlagsKHR { ::VkFlags
+        eOpaque:1,
+        eNoDuplicateAnyHitInvocation:1;
+        
+        OPERATORS(VkGeometryFlagsKHR,::VkGeometryFlagBitsKHR,::VkFlags)
+        VK_HPP_OPERATORS(VkGeometryFlagsKHR,vk::GeometryFlagsKHR,vk::GeometryFlagBitsKHR)
+    };
+
+    // 
     struct VkQueueFlags { ::VkFlags
         eGraphics:1,
         eCompute:1,
