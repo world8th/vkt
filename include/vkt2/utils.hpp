@@ -186,6 +186,7 @@ namespace vkt {
     // create compute pipelines
     static inline auto createCompute(const vkt::uni_arg<vk::Device>& device, const vkt::uni_arg<FixConstruction>& spi, const vkt::uni_arg<vk::PipelineLayout>& layout, const vkt::uni_arg<vk::PipelineCache>& cache = vk::PipelineCache{}, const vkt::uni_arg<uint32_t>& subgroupSize = 0u) {
         auto cmpi = vkh::VkComputePipelineCreateInfo{};
+        cmpi.flags = {};
         cmpi.layout = vk::PipelineLayout(*layout);
         cmpi.stage = *spi;
         cmpi.basePipelineIndex = -1;

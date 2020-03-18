@@ -5,6 +5,7 @@
 #define VK_ENABLE_BETA_EXTENSIONS
 #include <glm/glm.hpp>
 #include <vulkan/vulkan.hpp>
+#include <vkt2/core.hpp>
 
 namespace vkh {
 
@@ -12,9 +13,9 @@ namespace vkh {
 
     // 
     #define OPERATORS(NAME,BITS,COMP) \
-        NAME& operator=(const NAME& F) { (COMP&)(*this) = (COMP&)F; return *this; };\
-        NAME& operator=(const BITS& F) { (COMP&)(*this) = (COMP&)F; return *this; };\
-        NAME& operator=(const COMP& F) { (COMP&)(*this) = F; return *this; };\
+        NAME& operator=(const vkt::uni_arg<NAME>& F) { memcpy(this, F, sizeof(NAME)); return *this; };\
+        NAME& operator=(const vkt::uni_arg<BITS>& F) { memcpy(this, F, sizeof(NAME)); return *this; };\
+        NAME& operator=(const vkt::uni_arg<COMP>& F) { memcpy(this, F, sizeof(NAME)); return *this; };\
         NAME operator|(const NAME& F) { auto f = COMP(F) | COMP(*this); return std::move(reinterpret_cast<NAME&>(f)); };\
         NAME operator&(const NAME& F) { auto f = COMP(F) & COMP(*this); return std::move(reinterpret_cast<NAME&>(f)); };\
         NAME operator^(const NAME& F) { auto f = COMP(F) ^ COMP(*this); return std::move(reinterpret_cast<NAME&>(f)); };\
@@ -31,11 +32,11 @@ namespace vkh {
 
     // 
     #define VK_HPP_OPERATORS(NAME,FTYP,BITS) \
-        NAME& operator=(const BITS& F) { reinterpret_cast<BITS&>(*this) = F; return *this; };\
+        NAME& operator=(const vkt::uni_arg<BITS>& F) { memcpy(this, F, sizeof(NAME)); return *this; };\
         NAME operator|(const BITS& F) { auto f = F | reinterpret_cast<BITS&>(*this); return std::move(reinterpret_cast<NAME&>(f)); };\
         NAME operator&(const BITS& F) { auto f = F & reinterpret_cast<BITS&>(*this); return std::move(reinterpret_cast<NAME&>(f)); };\
         NAME operator^(const BITS& F) { auto f = F ^ reinterpret_cast<BITS&>(*this); return std::move(reinterpret_cast<NAME&>(f)); };\
-        NAME& operator=(const FTYP& F) { reinterpret_cast<FTYP&>(*this) = F; return *this; };\
+        NAME& operator=(const vkt::uni_arg<FTYP>& F) { memcpy(this, F, sizeof(NAME)); return *this; };\
         NAME operator|(const FTYP& F) { auto f = F | reinterpret_cast<FTYP&>(*this); return std::move(reinterpret_cast<NAME&>(f)); };\
         NAME operator&(const FTYP& F) { auto f = F & reinterpret_cast<FTYP&>(*this); return std::move(reinterpret_cast<NAME&>(f)); };\
         NAME operator^(const FTYP& F) { auto f = F ^ reinterpret_cast<FTYP&>(*this); return std::move(reinterpret_cast<NAME&>(f)); };\
