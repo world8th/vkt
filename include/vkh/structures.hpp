@@ -1026,6 +1026,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         VK_HPP_STRUCT_OPERATORS(VkPhysicalDeviceMemoryProperties, vk::PhysicalDeviceMemoryProperties)
     } VkPhysicalDeviceMemoryProperties;
 
+    // 
     typedef struct VkBufferDeviceAddressInfo {
         VkStructureType    sType  = VK_STRUCTURE_TYPE_BUFFER_DEVICE_ADDRESS_INFO;
         const void*        pNext  = nullptr;
