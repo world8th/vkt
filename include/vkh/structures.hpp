@@ -1022,6 +1022,59 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         VK_HPP_STRUCT_OPERATORS(VkPhysicalDeviceMemoryProperties, vk::PhysicalDeviceMemoryProperties)
     } VkPhysicalDeviceMemoryProperties;
 
+    typedef struct VkBufferDeviceAddressInfo {
+        VkStructureType    sType  = VK_STRUCTURE_TYPE_BUFFER_DEVICE_ADDRESS_INFO;
+        const void*        pNext  = nullptr;
+        VkBuffer           buffer = {};
+
+        // 
+        operator VkBuffer&() { return buffer; };
+        operator const VkBuffer&() const { return buffer; };
+
+        // 
+        void operator=(const VkBuffer& buffer) { this->buffer = buffer; };
+
+        // 
+        STRUCT_OPERATORS(VkBufferDeviceAddressInfo)
+        VK_HPP_STRUCT_OPERATORS(VkBufferDeviceAddressInfo, vk::BufferDeviceAddressInfo)
+    } VkBufferDeviceAddressInfo;
+
+    // 
+    typedef union VkDeviceOrHostAddressKHR {
+        VkDeviceAddress    deviceAddress;
+        void*              hostAddress;
+
+        // 
+        void operator=(const VkDeviceAddress& deviceAddress) { this->deviceAddress = deviceAddress; };
+        void operator=(void* const& hostAddress) { this->hostAddress = hostAddress; };
+
+        // 
+        operator VkDeviceAddress&() { return deviceAddress; };
+        operator const VkDeviceAddress&() const { return deviceAddress; };
+
+        // 
+        operator void*&() { return hostAddress; };
+        operator void* const&() const { return hostAddress; };
+    } VkDeviceOrHostAddressKHR;
+
+    // 
+    typedef union VkDeviceOrHostAddressConstKHR  {
+        VkDeviceAddress    deviceAddress;
+        const void*        hostAddress;
+
+        // 
+        void operator=(const VkDeviceAddress& deviceAddress) { this->deviceAddress = deviceAddress; };
+        void operator=(const void* const& hostAddress) { this->hostAddress = hostAddress; };
+
+        // 
+        operator VkDeviceAddress&() { return deviceAddress; };
+        operator const VkDeviceAddress&() const { return deviceAddress; };
+
+        // 
+        operator void const*& () { return hostAddress; };
+        operator const void* const&() const { return hostAddress; };
+    } VkDeviceOrHostAddressConstKHR;
+
 
 #pragma pack(pop)
 

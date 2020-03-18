@@ -132,9 +132,19 @@ namespace vkt {
         virtual BufferAllocation* address() { return this; };
         virtual const BufferAllocation* address() const { return this; };
 
+        // 
+        virtual vkh::VkDeviceOrHostAddressKHR deviceAddress() {
+            return vkh::VkDeviceOrHostAddressKHR{ .deviceAddress = getDevice().getBufferAddress(vkh::VkBufferDeviceAddressInfo{.buffer = this->buffer }.hpp()) };
+        };
+
+        // 
+        virtual vkh::VkDeviceOrHostAddressConstKHR deviceAddress() const {
+            return vkh::VkDeviceOrHostAddressConstKHR{ .deviceAddress = getDevice().getBufferAddress(vkh::VkBufferDeviceAddressInfo{.buffer = this->buffer }.hpp()) };
+        };
 
     public: // in-variant 
         vk::Buffer buffer = {};
+        vk::DeviceAddress cached = {};
         MemoryAllocationInfo info = {};
 
     protected: friend BufferAllocation; friend VmaBufferAllocation;
