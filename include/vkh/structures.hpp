@@ -1287,6 +1287,63 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
 #endif
     } VkAccelerationStructureCreateInfoKHR;
 
+    // 
+    typedef struct VkRayTracingPipelineInterfaceCreateInfoKHR {
+        VkStructureType    sType = VK_STRUCTURE_TYPE_RAY_TRACING_PIPELINE_INTERFACE_CREATE_INFO_KHR;
+        const void*        pNext = nullptr;
+        uint32_t           maxPayloadSize = 128u;
+        uint32_t           maxAttributeSize = 128u;
+        uint32_t           maxCallableSize = 128u;
+
+#ifdef VK_ENABLE_BETA_EXTENSIONS
+        STRUCT_OPERATORS(VkRayTracingPipelineInterfaceCreateInfoKHR)
+        VK_HPP_STRUCT_OPERATORS(VkRayTracingPipelineInterfaceCreateInfoKHR, vk::RayTracingPipelineInterfaceCreateInfoKHR)
+#endif
+    } VkRayTracingPipelineInterfaceCreateInfoKHR;
+
+    // 
+    typedef struct VkRayTracingShaderGroupCreateInfoKHR {
+        VkStructureType                   sType                             = VK_STRUCTURE_TYPE_RAY_TRACING_SHADER_GROUP_CREATE_INFO_KHR;
+        const void*                       pNext                             = nullptr;
+        VkRayTracingShaderGroupTypeKHR    type                              = VK_RAY_TRACING_SHADER_GROUP_TYPE_TRIANGLES_HIT_GROUP_KHR ;
+        uint32_t                          generalShader                     = VK_SHADER_UNUSED_KHR;
+        uint32_t                          closestHitShader                  = VK_SHADER_UNUSED_KHR;
+        uint32_t                          anyHitShader                      = VK_SHADER_UNUSED_KHR;
+        uint32_t                          intersectionShader                = VK_SHADER_UNUSED_KHR;
+        const void*                       pShaderGroupCaptureReplayHandle   = nullptr;
+#ifdef VK_ENABLE_BETA_EXTENSIONS
+        STRUCT_OPERATORS(VkRayTracingShaderGroupCreateInfoKHR)
+        VK_HPP_STRUCT_OPERATORS(VkRayTracingShaderGroupCreateInfoKHR, vk::RayTracingShaderGroupCreateInfoKHR)
+#endif
+    } VkRayTracingShaderGroupCreateInfoKHR;
+
+    // 
+    typedef struct VkRayTracingPipelineCreateInfoKHR {
+        VkStructureType                                      sType              = VK_STRUCTURE_TYPE_RAY_TRACING_PIPELINE_CREATE_INFO_KHR;
+        const void*                                          pNext              = nullptr;
+        VkPipelineCreateFlags                                flags              = {};
+        uint32_t                                             stageCount         = 0u;
+        const VkPipelineShaderStageCreateInfo*               pStages            = nullptr;
+        uint32_t                                             groupCount         = 0u;
+        const VkRayTracingShaderGroupCreateInfoKHR*          pGroups            = nullptr;
+        uint32_t                                             maxRecursionDepth  = 1u;
+        VkPipelineLibraryCreateInfoKHR                       libraries          = {};
+        const VkRayTracingPipelineInterfaceCreateInfoKHR*    pLibraryInterface  = nullptr;
+        VkPipelineLayout                                     layout             = {};
+        VkPipeline                                           basePipelineHandle = {};
+        int32_t                                              basePipelineIndex  = 0;
+
+        // 
+        VkRayTracingPipelineCreateInfoKHR& setStages(const std::vector<VkPipelineShaderStageCreateInfo>& V = {}) { pStages = V.data(); stageCount = static_cast<uint32_t>(V.size()); return *this; };
+        VkRayTracingPipelineCreateInfoKHR& setGroups(const std::vector<VkRayTracingShaderGroupCreateInfoKHR>& V = {}) { pGroups = V.data(); groupCount = static_cast<uint32_t>(V.size()); return *this; };
+
+#ifdef VK_ENABLE_BETA_EXTENSIONS
+        STRUCT_OPERATORS(VkRayTracingPipelineCreateInfoKHR)
+        VK_HPP_STRUCT_OPERATORS(VkRayTracingPipelineCreateInfoKHR, vk::RayTracingPipelineCreateInfoKHR)
+#endif
+    } VkRayTracingPipelineCreateInfoKHR;
+
+
 #pragma pack(pop)
 
 #pragma pack(push, 1)
