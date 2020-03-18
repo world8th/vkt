@@ -268,25 +268,19 @@ namespace vkh {
     };
 
     // 
-    struct VkBuildAccelerationStructureFlagsNV { ::VkFlags
+    struct VkBuildAccelerationStructureFlagsKHR { ::VkFlags
         eAllowUpdate:1,
         eAllowCompaction:1,
         ePreferFastTrace:1,
         ePreferFastBuild:1,
         eLowMemory:1;
         
-        OPERATORS(VkBuildAccelerationStructureFlagsNV,::VkBuildAccelerationStructureFlagBitsNV,::VkFlags)
-        VK_HPP_OPERATORS(VkBuildAccelerationStructureFlagsNV,vk::BuildAccelerationStructureFlagsNV,vk::BuildAccelerationStructureFlagBitsNV)
+        OPERATORS(VkBuildAccelerationStructureFlagsKHR,::VkBuildAccelerationStructureFlagBitsKHR,::VkFlags)
+        VK_HPP_OPERATORS(VkBuildAccelerationStructureFlagsKHR,vk::BuildAccelerationStructureFlagsKHR,vk::BuildAccelerationStructureFlagBitsKHR)
     };
 
     // 
-    struct VkGeometryFlagsNV { ::VkFlags
-        eOpaque:1,
-        eNoDuplicateAnyHitInvocation:1;
-        
-        OPERATORS(VkGeometryFlagsNV,::VkGeometryFlagBitsNV,::VkFlags)
-        VK_HPP_OPERATORS(VkGeometryFlagsNV,vk::GeometryFlagsNV,vk::GeometryFlagBitsNV)
-    };
+    using VkBuildAccelerationStructureFlagsNV = VkBuildAccelerationStructureFlagsKHR;
 
     // 
     struct VkGeometryFlagsKHR { ::VkFlags
@@ -296,6 +290,9 @@ namespace vkh {
         OPERATORS(VkGeometryFlagsKHR,::VkGeometryFlagBitsKHR,::VkFlags)
         VK_HPP_OPERATORS(VkGeometryFlagsKHR,vk::GeometryFlagsKHR,vk::GeometryFlagBitsKHR)
     };
+
+    // 
+    using VkGeometryFlagsNV = VkGeometryFlagsKHR;
 
     // 
     struct VkQueueFlags { ::VkFlags

@@ -321,7 +321,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
 
     // 
     typedef struct VkImageSubresourceRange {
-        VkImageAspectFlags    aspectMask     = { .eColor = 1 };
+        VkImageAspectFlags    aspectMask     = VkImageAspectFlags{ .eColor = 1 };
         uint32_t              baseMipLevel   = 0u;
         uint32_t              levelCount     = 1u;
         uint32_t              baseArrayLayer = 0u;
@@ -333,7 +333,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
 
     // 
     typedef struct VkImageSubresourceLayers {
-        VkImageAspectFlags    aspectMask     = { .eColor = 1 };
+        VkImageAspectFlags    aspectMask     = VkImageAspectFlags{ .eColor = 1 };
         uint32_t              mipLevel       = 0u;
         uint32_t              baseArrayLayer = 0u;
         uint32_t              layerCount     = 1u;
@@ -542,7 +542,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         VkBlendFactor            srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
         VkBlendFactor            dstAlphaBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
         VkBlendOp                alphaBlendOp        = VK_BLEND_OP_ADD;
-        VkColorComponentFlags    colorWriteMask      = {.eR = 1, .eG = 1, .eB = 1, .eA = 1};
+        VkColorComponentFlags    colorWriteMask      = VkColorComponentFlags{.eR = 1, .eG = 1, .eB = 1, .eA = 1};
 
         STRUCT_OPERATORS(VkPipelineColorBlendAttachmentState)
         VK_HPP_STRUCT_OPERATORS(VkPipelineColorBlendAttachmentState,vk::PipelineColorBlendAttachmentState)
@@ -558,7 +558,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         uint32_t                                      attachmentCount  = 0u;
         const VkPipelineColorBlendAttachmentState*    pAttachments     = nullptr;
         glm::vec4                                     blendConstants   = {1.f,1.f,1.f,1.f};
-        //float                                         blendConstants[4];
+        //float                                       blendConstants[4];
 
         VkPipelineColorBlendStateCreateInfo& setAttachments(const std::vector<VkPipelineColorBlendAttachmentState>& V = {}) { pAttachments = V.data(); attachmentCount = static_cast<uint32_t>(V.size()); return *this; };
 
@@ -699,7 +699,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         uint32_t              binding               = 0u;
         VkDescriptorType      descriptorType        = VK_DESCRIPTOR_TYPE_SAMPLER;
         uint32_t              descriptorCount       = 1u;
-        VkShaderStageFlags    stageFlags            = { .eCompute = 1 };
+        VkShaderStageFlags    stageFlags            = VkShaderStageFlags{ .eCompute = 1 };
         const VkSampler*      pImmutableSamplers    = nullptr;
 
         STRUCT_OPERATORS(VkDescriptorSetLayoutBinding)
@@ -1047,6 +1047,26 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
     } VkBufferDeviceAddressInfo;
 
     // 
+    typedef struct VkAccelerationStructureDeviceAddressInfoKHR {
+        VkStructureType               sType                 = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_DEVICE_ADDRESS_INFO_KHR;
+        const void*                   pNext                 = nullptr;
+        VkAccelerationStructureKHR    accelerationStructure = {};
+
+        // 
+        operator VkAccelerationStructureKHR&() { return accelerationStructure; };
+        operator const VkAccelerationStructureKHR&() const { return accelerationStructure; };
+
+        // 
+        void operator=(const VkAccelerationStructureKHR& accelerationStructure) { this->accelerationStructure = accelerationStructure; };
+
+        // 
+#ifdef VK_ENABLE_BETA_EXTENSIONS
+        STRUCT_OPERATORS(VkAccelerationStructureDeviceAddressInfoKHR)
+        VK_HPP_STRUCT_OPERATORS(VkAccelerationStructureDeviceAddressInfoKHR, vk::AccelerationStructureDeviceAddressInfoKHR)
+#endif
+    } VkAccelerationStructureDeviceAddressInfoKHR;
+
+    // 
     typedef union VkDeviceOrHostAddressKHR {
         VkDeviceAddress    deviceAddress;
         void*              hostAddress;
@@ -1149,7 +1169,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         VkStructureType                  sType   = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_AABBS_DATA_KHR;
         const void*                      pNext   = nullptr;
         VkDeviceOrHostAddressConstKHR    data    = {};
-        VkDeviceSize                     stride  = 32u;
+        VkDeviceSize                     stride  = 24u;
 
 #ifdef VK_ENABLE_BETA_EXTENSIONS
         STRUCT_OPERATORS(VkAccelerationStructureGeometryAabbsDataKHR)
@@ -1164,7 +1184,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         VkAccelerationStructureGeometryAabbsDataKHR      aabbs    ;
         VkAccelerationStructureGeometryInstancesDataKHR  instances;
 #else
-        uint32_t data[8]; // Reserved for future
+        uint32_t data[12]; // Reserved for future
 #endif
 #ifdef VK_ENABLE_BETA_EXTENSIONS
         STRUCT_OPERATORS(VkAccelerationStructureGeometryDataKHR)
@@ -1184,6 +1204,88 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         VK_HPP_STRUCT_OPERATORS(VkAccelerationStructureGeometryKHR, vk::AccelerationStructureGeometryKHR)
 #endif
     } VkAccelerationStructureGeometryKHR;
+
+    // 
+    typedef struct VkAccelerationStructureBuildOffsetInfoKHR {
+        uint32_t    primitiveCount  = 1u;
+        uint32_t    primitiveOffset = 0u;
+        uint32_t    firstVertex     = 0u;
+        uint32_t    transformOffset = 0u;
+#ifdef VK_ENABLE_BETA_EXTENSIONS
+        STRUCT_OPERATORS(VkAccelerationStructureBuildOffsetInfoKHR)
+        VK_HPP_STRUCT_OPERATORS(VkAccelerationStructureBuildOffsetInfoKHR, vk::AccelerationStructureBuildOffsetInfoKHR)
+#endif
+    } VkAccelerationStructureBuildOffsetInfoKHR;
+
+    // UN-Planned, we wants custom version
+    //VkAabbPositionsKHR {};
+    //VkTransformMatrixKHR = {};
+
+    // 
+    typedef struct VkAccelerationStructureBuildGeometryInfoKHR {
+        VkStructureType                                     sType                    = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_GEOMETRY_INFO_KHR;
+        const void*                                         pNext                    = nullptr;
+        VkAccelerationStructureTypeKHR                      type                     = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR;
+        VkBuildAccelerationStructureFlagsKHR                flags                    = {};
+        VkBool32                                            update                   = false;
+        VkAccelerationStructureKHR                          srcAccelerationStructure = {};
+        VkAccelerationStructureKHR                          dstAccelerationStructure = {};
+        VkBool32                                            geometryArrayOfPointers  = false;
+        uint32_t                                            geometryCount            = 1u;
+        const VkAccelerationStructureGeometryKHR* const*    ppGeometries             = nullptr;
+        VkDeviceOrHostAddressKHR                            scratchData              = {};
+
+        // Vector of Pointers into VkAccelerationStructureGeometryKHR
+        VkAccelerationStructureCreateGeometryTypeInfoKHR& setGeometryInfos(const std::vector<const VkAccelerationStructureGeometryKHR*>& geometries = {}){
+            this->ppGeometries = geometries.data();
+            this->geometryCount = static_cast<uint32_t>(geometries.size());
+        };
+
+#ifdef VK_ENABLE_BETA_EXTENSIONS
+        STRUCT_OPERATORS(VkAccelerationStructureBuildGeometryInfoKHR)
+        VK_HPP_STRUCT_OPERATORS(VkAccelerationStructureBuildGeometryInfoKHR, vk::AccelerationStructureBuildGeometryInfoKHR)
+#endif
+    } VkAccelerationStructureBuildGeometryInfoKHR;
+
+    // 
+    typedef struct VkAccelerationStructureCreateGeometryTypeInfoKHR {
+        VkStructureType      sType              = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_CREATE_GEOMETRY_TYPE_INFO_KHR;
+        const void*          pNext              = nullptr;
+        VkGeometryTypeKHR    geometryType       = VK_GEOMETRY_TYPE_TRIANGLES_KHR;
+        uint32_t             maxPrimitiveCount  = 1u;
+        VkIndexType          indexType          = VK_INDEX_TYPE_NONE_KHR;
+        uint32_t             maxVertexCount     = 3u;
+        VkFormat             vertexFormat       = VK_FORMAT_UNDEFINED;
+        VkBool32             allowsTransforms   = false;
+
+#ifdef VK_ENABLE_BETA_EXTENSIONS
+        STRUCT_OPERATORS(VkAccelerationStructureCreateGeometryTypeInfoKHR)
+        VK_HPP_STRUCT_OPERATORS(VkAccelerationStructureCreateGeometryTypeInfoKHR, vk::AccelerationStructureCreateGeometryTypeInfoKHR)
+#endif
+    } VkAccelerationStructureCreateGeometryTypeInfoKHR;
+
+    // 
+    typedef struct VkAccelerationStructureCreateInfoKHR {
+        VkStructureType                                            sType             = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_CREATE_INFO_KHR;
+        const void*                                                pNext             = nullptr;
+        VkDeviceSize                                               compactedSize     = 0u;
+        VkAccelerationStructureTypeKHR                             type              = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR ;
+        VkBuildAccelerationStructureFlagsKHR                       flags             = {};
+        uint32_t                                                   maxGeometryCount  = 0u;
+        const VkAccelerationStructureCreateGeometryTypeInfoKHR*    pGeometryInfos    = nullptr;
+        VkDeviceAddress                                            deviceAddress     = VK_NULL_HANDLE;
+
+        // 
+        VkAccelerationStructureCreateInfoKHR& setGeometryInfos(const std::vector<VkAccelerationStructureCreateGeometryTypeInfoKHR>& geometryInfos = {}){
+            this->pGeometryInfos = geometryInfos.data();
+            this->maxGeometryCount = static_cast<uint32_t>(geometryInfos.size());
+        };
+        
+#ifdef VK_ENABLE_BETA_EXTENSIONS
+        STRUCT_OPERATORS(VkAccelerationStructureCreateInfoKHR)
+        VK_HPP_STRUCT_OPERATORS(VkAccelerationStructureCreateInfoKHR, vk::AccelerationStructureCreateInfoKHR)
+#endif
+    } VkAccelerationStructureCreateInfoKHR;
 
 #pragma pack(pop)
 
@@ -1209,21 +1311,20 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
     };
 
     // CODING EXTRAS...
-    #pragma pack(push, 1)
     struct VsGeometryInstance {
         glm::mat3x4 transform = {
             glm::vec4(1.f,0.f,0.f,0.f),
             glm::vec4(0.f,1.f,0.f,0.f),
             glm::vec4(0.f,0.f,1.f,0.f)
         };
-        uint32_t instanceId : 24;
-        uint32_t mask : 8;
-        uint32_t instanceOffset : 24;
-        uint32_t flags : 8;
-        //uint24_t instanceId = 0u;
-        //uint8_t mask = 0xFF;
-        //uint24_t instanceOffset = 0u;
-        //VkGeometryInstanceFlagsNV flags = {};
+        //uint32_t instanceId : 24;
+        //uint32_t mask : 8;
+        //uint32_t instanceOffset : 24;
+        //uint32_t flags : 8;
+        uint24_t instanceId = 0u;
+        uint8_t mask = 0xFF;
+        uint24_t instanceOffset = 0u;
+        VkGeometryInstanceFlagsNV flags = {};
         uint64_t accelerationStructureHandle = 0ull;
 
         // Few Operators
@@ -1233,6 +1334,5 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         operator const VsGeometryInstance& () const { return *this; };
         VsGeometryInstance& operator =(const VsGeometryInstance& info) { memcpy(this,&info,sizeof(VsGeometryInstance)); return *this; };
     };
-    #pragma pack(pop)
 
 };
