@@ -159,7 +159,17 @@
 #define GLAPIENTRY APIENTRY
 #endif
 
+// Fix for... 
 #include <stdint.h>
+#define khronos_int8_t int8_t
+#define khronos_uint8_t uint8_t
+#define khronos_int16_t int16_t
+#define khronos_uint16_t uint16_t
+#define khronos_int32_t int32_t
+#define khronos_uint32_t uint32_t
+#define khronos_float_t float
+#define khronos_int64_t int64_t
+#define khronos_uint64_t uint64_t
 
 #ifdef __cplusplus
 extern "C" {
