@@ -1335,10 +1335,12 @@ namespace VULKAN_HPP_NAMESPACE
       return ::vkCmdWaitEvents( commandBuffer, eventCount, pEvents, srcStageMask, dstStageMask, memoryBarrierCount, pMemoryBarriers, bufferMemoryBarrierCount, pBufferMemoryBarriers, imageMemoryBarrierCount, pImageMemoryBarriers );
     }
 
+#ifdef VK_ENABLE_BETA_EXTENSIONS
     void vkCmdWriteAccelerationStructuresPropertiesKHR( VkCommandBuffer commandBuffer, uint32_t accelerationStructureCount, const VkAccelerationStructureKHR* pAccelerationStructures, VkQueryType queryType, VkQueryPool queryPool, uint32_t firstQuery ) const VULKAN_HPP_NOEXCEPT
     {
       return ::vkCmdWriteAccelerationStructuresPropertiesKHR( commandBuffer, accelerationStructureCount, pAccelerationStructures, queryType, queryPool, firstQuery );
     }
+#endif
 
     void vkCmdWriteAccelerationStructuresPropertiesNV( VkCommandBuffer commandBuffer, uint32_t accelerationStructureCount, const VkAccelerationStructureKHR* pAccelerationStructures, VkQueryType queryType, VkQueryPool queryPool, uint32_t firstQuery ) const VULKAN_HPP_NOEXCEPT
     {
@@ -1407,10 +1409,12 @@ namespace VULKAN_HPP_NAMESPACE
       return ::vkAllocateMemory( device, pAllocateInfo, pAllocator, pMemory );
     }
 
+#ifdef VK_ENABLE_BETA_EXTENSIONS
     VkResult vkBindAccelerationStructureMemoryKHR( VkDevice device, uint32_t bindInfoCount, const VkBindAccelerationStructureMemoryInfoKHR* pBindInfos ) const VULKAN_HPP_NOEXCEPT
     {
       return ::vkBindAccelerationStructureMemoryKHR( device, bindInfoCount, pBindInfos );
     }
+#endif
 
     VkResult vkBindAccelerationStructureMemoryNV( VkDevice device, uint32_t bindInfoCount, const VkBindAccelerationStructureMemoryInfoKHR* pBindInfos ) const VULKAN_HPP_NOEXCEPT
     {

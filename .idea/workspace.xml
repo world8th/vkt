@@ -2,7 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="4d2a495b-8033-4094-8f05-9d8023f436de" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/include/.vscode/settings.json" beforeDir="false" afterPath="$PROJECT_DIR$/include/.vscode/settings.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/glad/glad.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/glad/glad.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/include/vkt2/fw.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/vkt2/fw.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/vkt2/utils.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/vkt2/utils.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/vulkan/vulkan.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/vulkan/vulkan.hpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -47,9 +51,9 @@
     <servers />
   </component>
   <component name="WindowStateProjectService">
-    <state x="656" y="346" key="com.intellij.ide.util.TipDialog" timestamp="1582878281192">
+    <state x="656" y="346" key="com.intellij.ide.util.TipDialog" timestamp="1584510921076">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="656" y="346" key="com.intellij.ide.util.TipDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1582878281192" />
+    <state x="656" y="346" key="com.intellij.ide.util.TipDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1584510921076" />
   </component>
 </project>

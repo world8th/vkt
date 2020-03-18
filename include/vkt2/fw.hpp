@@ -325,6 +325,10 @@ namespace vkt
             // 
             instance = vk::createInstance(cinstanceinfo);
 
+#ifdef VOLK_H_
+            volkLoadInstance(instance);
+#endif
+
             // get physical device for application
             physicalDevices = instance.enumeratePhysicalDevices();
 
@@ -421,14 +425,25 @@ namespace vkt
                     .ppEnabledExtensionNames = deviceExtensions.data(),
                     //.pEnabledFeatures = &(VkPhysicalDeviceFeatures&)(gFeatures.features)
                 });
+#ifdef VOLK_H_
+                volkLoadDevice(this->device);
+#endif
                 this->pipelineCache = this->device.createPipelineCache(vk::PipelineCacheCreateInfo());
             };
-            
+
+            // 
             this->queue = this->device.getQueue(queueFamilyIndex, 0); // 
             this->fence = this->device.createFence(vk::FenceCreateInfo().setFlags({}));
             this->commandPool = this->device.createCommandPool(vk::CommandPoolCreateInfo(vk::CommandPoolCreateFlags(vk::CommandPoolCreateFlagBits::eResetCommandBuffer), queueFamilyIndex));
-            this->dispatch = vk::DispatchLoaderDynamic(this->instance, this->device); // 
+            this->dispatch = vk::DispatchLoaderDynamic(this->instance, vkGetInstanceProcAddr, this->device, vkGetDeviceProcAddr); // 
 
+            // 
+#ifdef VOLK_H_
+            VolkDeviceTable table = {};
+            volkLoadDeviceTable(&table, this->device);
+#endif
+
+            // 
             VmaAllocatorCreateInfo vma_info = {};
             vma_info.device = this->device;
             vma_info.instance = this->instance;
