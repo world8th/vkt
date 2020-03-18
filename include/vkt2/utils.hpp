@@ -405,5 +405,35 @@ namespace vkt {
         std::vector<T> V{}; for (auto& v : Vy) {V.push_back(reinterpret_cast<const T&>(v));}; return std::move(V);
     };
 
+    // 
+    struct MemoryAllocationInfo { // 
+        uint32_t glMemory = 0u, glID = 0u;
+
+        vk::Device device = {};
+        vk::DeviceMemory memory = {};
+        vk::DeviceSize range = 0ull;
+        vk::DeviceSize reqSize = 0ull;
+        vk::ImageLayout initialLayout = vk::ImageLayout::eUndefined;
+        vk::DispatchLoaderDynamic dispatch = {};
+
+        HANDLE handle = {};
+        void* pMapped = nullptr;
+        vkh::VkPhysicalDeviceMemoryProperties memoryProperties = {};
+        VmaMemoryUsage vmaUsage = VMA_MEMORY_USAGE_GPU_ONLY;
+
+        // 
+        int32_t getMemoryType(const uint32_t& memoryTypeBitsRequirement, const vkh::VkMemoryPropertyFlags& requiredProperties = { .eDeviceLocal = 1 }) const {
+            const uint32_t memoryCount = memoryProperties.memoryTypeCount;
+            for (uint32_t memoryIndex = 0; memoryIndex < memoryCount; ++memoryIndex) {
+                const uint32_t memoryTypeBits = (1 << memoryIndex);
+                const bool isRequiredMemoryType = memoryTypeBitsRequirement & memoryTypeBits;
+                const auto properties = VkMemoryPropertyFlags(memoryProperties.memoryTypes[memoryIndex].propertyFlags);
+                const bool hasRequiredProperties = (properties & VkMemoryPropertyFlags(requiredProperties)) == VkMemoryPropertyFlags(requiredProperties);
+                if (isRequiredMemoryType && hasRequiredProperties) return static_cast<int32_t>(memoryIndex);
+            }
+            return -1;
+        }
+    };
+
 //#endif
 };
