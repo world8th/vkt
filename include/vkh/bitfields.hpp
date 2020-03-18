@@ -2,7 +2,7 @@
 
 #include <memory>
 #include <vector>
-#define VK_ENABLE_BETA_EXTENSIONS
+//#define VK_ENABLE_BETA_EXTENSIONS
 #include <glm/glm.hpp>
 #include <vulkan/vulkan.hpp>
 #include <vkt2/core.hpp>

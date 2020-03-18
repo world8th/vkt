@@ -151,8 +151,10 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         VkDeviceSize    size    = 1u;
 
         // Beta
+#ifdef VK_ENABLE_BETA_EXTENSIONS
         STRUCT_OPERATORS(VkStridedBufferRegionKHR)
         VK_HPP_STRUCT_OPERATORS(VkStridedBufferRegionKHR, vk::StridedBufferRegionKHR)
+#endif
     } VkStridedBufferRegionKHR;
 
     // 
@@ -1062,8 +1064,10 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         operator void* const&() const { return hostAddress; };
 
         // 
+#ifdef VK_ENABLE_BETA_EXTENSIONS
         STRUCT_OPERATORS(VkDeviceOrHostAddressKHR)
         VK_HPP_STRUCT_OPERATORS(VkDeviceOrHostAddressKHR, vk::DeviceOrHostAddressKHR)
+#endif
     } VkDeviceOrHostAddressKHR;
 
     // 
@@ -1084,8 +1088,10 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         operator const void* const&() const { return hostAddress; };
 
         // Beta
+#ifdef VK_ENABLE_BETA_EXTENSIONS
         STRUCT_OPERATORS(VkDeviceOrHostAddressConstKHR)
         VK_HPP_STRUCT_OPERATORS(VkDeviceOrHostAddressConstKHR, vk::DeviceOrHostAddressConstKHR)
+#endif
     } VkDeviceOrHostAddressConstKHR;
 
     // VK_KHR_pipeline_library missed
@@ -1105,8 +1111,10 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         };
 
         // Beta
+#ifdef VK_ENABLE_BETA_EXTENSIONS
         STRUCT_OPERATORS(VkPipelineLibraryCreateInfoKHR)
         VK_HPP_STRUCT_OPERATORS(VkPipelineLibraryCreateInfoKHR, vk::PipelineLibraryCreateInfoKHR)
+#endif
     } VkPipelineLibraryCreateInfoKHR;
 
 
