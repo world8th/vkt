@@ -430,7 +430,31 @@ namespace vkh {
     };
 
     // Vulkan 1.2
-    // TODO: VkPipelineCreateFlagBits and VkPipelineCreateFlags
+    // Beta: VkPipelineCreateFlagBits and VkPipelineCreateFlags
+    struct VkPipelineCreateFlags { ::VkFlags
+        eDisableOptimization:1,
+        eAllowDirevatives:1,
+        eDirevative:1,
+        eViewIndexFromDevice:1,
+        eDispatchBase:1,
+        eDeferCompile:1,
+        eCaptureStatistics:1,
+        eCaptureInternalRepresentations:1,
+        eFailOnPipelineCompileRequired:1,
+        eEarlyReturnOnFailure:1,
+        eUnknown:1,
+        eLibrary:1,
+        eRayTracingSkipTriangles:1,
+        eRayTracingSkipAABBs:1,
+        eRayTracingNoNullAnyHitShaders:1,
+        eRayTracingNoNullClosestHitShaders:1,
+        eRayTracingNoNullMissHitShaders:1,
+        eRayTracingNoNullIntersectionShaders:1,
+        eIndirectBindable:1;
+
+        OPERATORS(VkPipelineCreateFlags, ::VkPipelineCreateFlagBits, ::VkFlags)
+        VK_HPP_OPERATORS(VkPipelineCreateFlags, vk::PipelineCreateFlags, vk::PipelineCreateFlagBits)
+    };
 
 #pragma pack(pop)
     
