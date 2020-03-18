@@ -102,6 +102,7 @@ namespace vkt
             "VK_KHR_imageless_framebuffer",
             "VK_KHR_storage_buffer_storage_class",
             "VK_KHR_shader_subgroup_extended_types",
+            "VK_KHR_ray_tracing",
 
             "VK_NV_compute_shader_derivatives",
             "VK_NV_corner_sampled_image",
@@ -380,6 +381,7 @@ namespace vkt
 
             // 
             vkGetPhysicalDeviceFeatures2(physicalDevice, &(VkPhysicalDeviceFeatures2&)gFeatures);
+            //physicalDevice.getFeatures2(&(VkPhysicalDeviceFeatures2&)gFeatures);
             this->memoryProperties = physicalDevice.getMemoryProperties2();
 
             // get features and queue family properties
@@ -435,6 +437,7 @@ namespace vkt
             this->queue = this->device.getQueue(queueFamilyIndex, 0); // 
             this->fence = this->device.createFence(vk::FenceCreateInfo().setFlags({}));
             this->commandPool = this->device.createCommandPool(vk::CommandPoolCreateInfo(vk::CommandPoolCreateFlags(vk::CommandPoolCreateFlagBits::eResetCommandBuffer), queueFamilyIndex));
+            //this->dispatch = vk::DispatchLoaderDynamic(this->instance, this->device); // 
             this->dispatch = vk::DispatchLoaderDynamic(this->instance, vkGetInstanceProcAddr, this->device, vkGetDeviceProcAddr); // 
 
             // 
