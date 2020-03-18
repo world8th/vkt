@@ -142,6 +142,10 @@ namespace vkt {
             return vkh::VkDeviceOrHostAddressConstKHR{ .deviceAddress = getDevice().getBufferAddress(vkh::VkBufferDeviceAddressInfo{.buffer = this->buffer }.hpp()) };
         };
 
+        // getter by operator (for direct pass)
+        virtual operator vkh::VkDeviceOrHostAddressKHR() { return this->deviceAddress(); };
+        virtual operator vkh::VkDeviceOrHostAddressConstKHR() const { return this->deviceAddress(); };
+
     public: // in-variant 
         vk::Buffer buffer = {};
         vk::DeviceAddress cached = {};
@@ -744,13 +748,17 @@ namespace vkt {
 
         // get deviceAddress with offset
         virtual vkh::VkDeviceOrHostAddressKHR deviceAddress() {
-            return vkh::VkDeviceOrHostAddressKHR{ .deviceAddress = getDevice().getBufferAddress(vkh::VkBufferDeviceAddressInfo{ .buffer = this->buffer() }.hpp()) + bufRegion.offset };
+            return vkh::VkDeviceOrHostAddressKHR{ .deviceAddress = getDevice().getBufferAddress(vkh::VkBufferDeviceAddressInfo{ .buffer = this->buffer() }.hpp()) + this->offset() };
         };
 
         // get deviceAddress with offset
         virtual vkh::VkDeviceOrHostAddressConstKHR deviceAddress() const {
-            return vkh::VkDeviceOrHostAddressConstKHR{ .deviceAddress = getDevice().getBufferAddress(vkh::VkBufferDeviceAddressInfo{ .buffer = this->buffer() }.hpp()) + bufRegion.offset };
+            return vkh::VkDeviceOrHostAddressConstKHR{ .deviceAddress = getDevice().getBufferAddress(vkh::VkBufferDeviceAddressInfo{ .buffer = this->buffer() }.hpp()) + this->offset() };
         };
+
+        // getter by operator (for direct pass)
+        virtual operator vkh::VkDeviceOrHostAddressKHR() { return this->deviceAddress(); };
+        virtual operator vkh::VkDeviceOrHostAddressConstKHR() const { return this->deviceAddress(); };
 
         // 
         virtual void unmap() { allocation->unmap(); };
