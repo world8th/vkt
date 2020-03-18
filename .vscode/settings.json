@@ -77,5 +77,7 @@
         "xutility": "cpp",
         "compare": "cpp",
         "cstdarg": "cpp"
-    }
+    },
+    "C_Cpp.default.cppStandard": "c++20",
+    "C_Cpp.default.cStandard": "c11"
 }

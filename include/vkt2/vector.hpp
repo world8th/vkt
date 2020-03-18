@@ -609,30 +609,27 @@ namespace vkt {
         template<class Tm = T> Vector(const Vector<Tm>& V) : allocation(V), bufInfo({ V.buffer(), V.offset(), V.range() }), stride(sizeof(T)) { *this = V; };
         template<class Tm = T> inline Vector<T>& operator=(const Vector<Tm>& V) { 
             this->allocation = V.uniPtr();
-            this->bufInfo = vk::DescriptorBufferInfo(V.buffer(), V.offset(), V.range());
-            this->bufRegion = vkh::VkStridedBufferRegionKHR{ V.buffer(), V.offset(), sizeof(T), V.range() / sizeof(T) };
+            this->bufInfo = vkh::VkDescriptorBufferInfo{ static_cast<VkBuffer>(V.buffer()), V.offset(), V.range() };
+            this->bufRegion = vkh::VkStridedBufferRegionKHR{ static_cast<VkBuffer>(V.buffer()), V.offset(), sizeof(T), V.range() / sizeof(T) };
             return *this;
         };
 
         //
         virtual Vector<T>* construct(const vkt::uni_ptr<BufferAllocation>& allocation, const vkt::uni_arg<vk::DeviceSize>& offset = 0ull, const vkt::uni_arg<vk::DeviceSize>& size = VK_WHOLE_SIZE, const vkt::uni_arg<vk::DeviceSize>& stride = sizeof(T)) {
             this->allocation = allocation;
-            this->bufInfo = vk::DescriptorBufferInfo{ allocation->buffer,offset,size };
-            this->bufRegion.buffer = allocation->buffer;
-            this->bufRegion.stride = stride;
-            this->bufRegion.offset = offset;
-            this->bufRegion.size = this->ranged() / stride;
+            this->bufInfo = vkh::VkDescriptorBufferInfo{ static_cast<VkBuffer>(allocation->buffer),offset,size };
+            this->bufRegion = vkh::VkStridedBufferRegionKHR{ static_cast<VkBuffer>(allocation->buffer),offset,stride,this->ranged()/stride };
             return this;
         };
 
         // 
         virtual vk::BufferView& createBufferView(const vk::Format& format = vk::Format::eUndefined) {
-            vkh::VkBufferViewCreateInfo info = {};
-            info.buffer = bufInfo.buffer;
-            info.offset = bufInfo.offset;
-            info.range = bufInfo.range;
-            info.format = VkFormat(format); // TODO: AUTO-FORMAT
-            return (view = allocation->getDevice().createBufferView(info));
+            return (view = allocation->getDevice().createBufferView(vkh::VkBufferViewCreateInfo{
+                .buffer = static_cast<VkBuffer>(this->bufRegion.buffer),
+                .format = static_cast<VkFormat>(format),
+                .offset = this->bufRegion.offset,
+                .range = this->bufRegion.stride * this->bufRegion.size
+            }));
         };
 
         // alias Of getAllocation
@@ -640,13 +637,13 @@ namespace vkt {
         virtual const vkt::uni_ptr<BufferAllocation>& uniPtr() const { return allocation; };
 
         // 
-        virtual operator    ::VkDescriptorBufferInfo& () { bufInfo.buffer = allocation->buffer; return bufInfo; };
-        virtual operator vkh::VkDescriptorBufferInfo& () { bufInfo.buffer = allocation->buffer; return bufInfo; };
+        virtual operator    ::VkDescriptorBufferInfo& () { this->bufInfo.buffer = this->bufRegion.buffer = allocation->buffer; return bufInfo; };
+        virtual operator vkh::VkDescriptorBufferInfo& () { this->bufInfo.buffer = this->bufRegion.buffer = allocation->buffer; return bufInfo; };
         virtual operator vkt::uni_ptr<BufferAllocation>& () { return allocation; };
         virtual operator std::shared_ptr<BufferAllocation>& () { return allocation; };
 
-        virtual operator vk::DescriptorBufferInfo& () { bufInfo.buffer = allocation->buffer; return bufInfo; };
-        virtual operator vk::Buffer& () { return reinterpret_cast<vk::Buffer&>(bufInfo.buffer = allocation->buffer); };
+        virtual operator vk::DescriptorBufferInfo& () { this->bufInfo.buffer = this->bufRegion.buffer = allocation->buffer; return bufInfo; };
+        virtual operator vk::Buffer& () { return reinterpret_cast<vk::Buffer&>(this->bufInfo.buffer = this->bufRegion.buffer = allocation->buffer); };
         virtual operator vk::Device& () { return *allocation; };
         virtual operator vk::BufferView& () { return view; };
         
@@ -672,11 +669,11 @@ namespace vkt {
         virtual operator const VkBufferView& () const { return reinterpret_cast<const VkBufferView&>(view);; };
 
         // 
-        virtual vk::DeviceSize& offset() { return this->bufInfo.offset; };
+        virtual vk::DeviceSize& offset() { return this->bufRegion.offset; };
         //virtual vk::DeviceSize& stride() { return this->stride; };
 
         // 
-        virtual const vk::DeviceSize& offset() const { return this->bufInfo.offset; };
+        virtual const vk::DeviceSize& offset() const { return this->bufRegion.offset; };
         //virtual const vk::DeviceSize& stride() const { return this->stride; };
 
         // LEGACY, used for constructor only
@@ -741,6 +738,19 @@ namespace vkt {
         virtual BufferAllocation* getAllocationPtr() { return allocation.ptr(); };
         virtual const BufferAllocation* getAllocationPtr() const { return allocation.ptr(); };
 
+        //
+        virtual vk::Device& getDevice() { return allocation->getDevice(); };
+        virtual const vk::Device& getDevice() const { return allocation->getDevice(); };
+
+        // get deviceAddress with offset
+        virtual vkh::VkDeviceOrHostAddressKHR deviceAddress() {
+            return vkh::VkDeviceOrHostAddressKHR{ .deviceAddress = getDevice().getBufferAddress(vkh::VkBufferDeviceAddressInfo{ .buffer = this->buffer() }.hpp()) + bufRegion.offset };
+        };
+
+        // get deviceAddress with offset
+        virtual vkh::VkDeviceOrHostAddressConstKHR deviceAddress() const {
+            return vkh::VkDeviceOrHostAddressConstKHR{ .deviceAddress = getDevice().getBufferAddress(vkh::VkBufferDeviceAddressInfo{ .buffer = this->buffer() }.hpp()) + bufRegion.offset };
+        };
 
         // 
         virtual void unmap() { allocation->unmap(); };
