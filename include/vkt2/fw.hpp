@@ -336,9 +336,9 @@ namespace vkt
             // create instance info
             auto cinstanceinfo = vk::InstanceCreateInfo{};
             cinstanceinfo.pApplicationInfo = &appinfo;
-            cinstanceinfo.enabledExtensionCount = extensions.size();
+            cinstanceinfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
             cinstanceinfo.ppEnabledExtensionNames = extensions.data();
-            cinstanceinfo.enabledLayerCount = layers.size();
+            cinstanceinfo.enabledLayerCount = static_cast<uint32_t>(layers.size());
             cinstanceinfo.ppEnabledLayerNames = layers.data();
 
             // 

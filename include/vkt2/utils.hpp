@@ -288,7 +288,7 @@ namespace vkt {
     static inline auto submitCmd(const vkt::uni_arg<vk::Device>& device, const vkt::uni_arg<vk::Queue>& queue, const std::vector<vk::CommandBuffer>& cmds, vkt::uni_arg<vk::SubmitInfo> smbi = vk::SubmitInfo{}) {
         // no commands 
         if (cmds.size() <= 0) return;
-        smbi->commandBufferCount = cmds.size();
+        smbi->commandBufferCount = static_cast<uint32_t>(cmds.size());
         smbi->pCommandBuffers = (vk::CommandBuffer*)cmds.data();
 
         vk::Fence fence = {}; vk::FenceCreateInfo fin = vk::FenceCreateInfo{};

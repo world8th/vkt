@@ -45,7 +45,7 @@ namespace vkh {
             for (auto& stage : stages_in) {
                 if (stage.stage == VK_SHADER_STAGE_RAYGEN_BIT_NV) {
                     const uintptr_t last_idx = stages.size(); stages.push_back(stage);
-                    raygenShaderGroup.generalShader = last_idx;
+                    raygenShaderGroup.generalShader = static_cast<uint32_t>(last_idx);
                 };
             };
 
@@ -55,7 +55,7 @@ namespace vkh {
                     const uintptr_t lastIdx = stages.size(); stages.push_back(stage);
                     groupIdx = missShaderGroups.size(); missShaderGroups.push_back({});
                     //if (group_idx == -1U) { group_idx = miss_shader_groups.size(); miss_shader_groups.push_back({}); };
-                    missShaderGroups[groupIdx].generalShader = lastIdx;//break;
+                    missShaderGroups[groupIdx].generalShader = static_cast<uint32_t>(lastIdx);//break;
                 };
             };
 
@@ -63,19 +63,19 @@ namespace vkh {
             for (auto& stage : stages_in) {
                 if (stage.stage == VK_SHADER_STAGE_CLOSEST_HIT_BIT_NV || stage.stage == VK_SHADER_STAGE_ANY_HIT_BIT_NV || stage.stage == VK_SHADER_STAGE_INTERSECTION_BIT_NV) {
                     const uintptr_t lastIdx = stages.size(); stages.push_back(stage);
-                    if (groupIdx == -1U) { groupIdx = hitShaderGroups.size(); hitShaderGroups.push_back({}); };
+                    if (groupIdx == -1U) { groupIdx = static_cast<uint32_t>(hitShaderGroups.size()); hitShaderGroups.push_back({}); };
                     auto& group = hitShaderGroups[groupIdx];
                     if (stage.stage == VK_SHADER_STAGE_CLOSEST_HIT_BIT_NV) {
                         group.type = prior_group_type;
-                        group.closestHitShader = lastIdx;
+                        group.closestHitShader = static_cast<uint32_t>(lastIdx);
                     };
                     if (stage.stage == VK_SHADER_STAGE_ANY_HIT_BIT_NV) {
                         group.type = prior_group_type;
-                        group.anyHitShader = lastIdx;
+                        group.anyHitShader = static_cast<uint32_t>(lastIdx);
                     };
                     if (stage.stage == VK_SHADER_STAGE_INTERSECTION_BIT_NV) {
                         group.type = VK_RAY_TRACING_SHADER_GROUP_TYPE_PROCEDURAL_HIT_GROUP_NV,
-                        group.intersectionShader = lastIdx;
+                        group.intersectionShader = static_cast<uint32_t>(lastIdx);
                     };
                 };
             };
@@ -88,8 +88,8 @@ namespace vkh {
             auto& groups = compileGroups();
             vkInfo.pGroups = groups.data();
             vkInfo.pStages = stages.data();
-            vkInfo.stageCount = stages.size();
-            vkInfo.groupCount = groups.size();
+            vkInfo.stageCount = static_cast<uint32_t>(stages.size());
+            vkInfo.groupCount = static_cast<uint32_t>(groups.size());
             //vkInfo.maxRecursionDepth = 4u;
             return vkInfo;
         };
@@ -202,7 +202,7 @@ namespace vkh {
         // 
         inline VkDescriptorUpdateTemplateCreateInfo& format() {
             template_info.pDescriptorUpdateEntries = entries.data();
-            template_info.descriptorUpdateEntryCount = entries.size();
+            template_info.descriptorUpdateEntryCount = static_cast<uint32_t>(entries.size());
             return template_info;
         };
 
@@ -331,9 +331,9 @@ namespace vkh {
         // 
         inline VkDescriptorSetLayoutCreateInfo& format() {
             vk_info.pBindings = bindings.data();
-            vk_info.bindingCount = bindings.size();
+            vk_info.bindingCount = static_cast<uint32_t>(bindings.size());
             flags_info.pBindingFlags = binding_flags.data();
-            flags_info.bindingCount = binding_flags.size();
+            flags_info.bindingCount = static_cast<uint32_t>(binding_flags.size());
             return vk_info;
         };
 
@@ -374,10 +374,10 @@ namespace vkh {
         inline std::vector<VkSubpassDescription>& subpassFormat() {
             for (uint32_t i = 0; i < color_attachments.size(); i++) {
                 subpasses[i].pColorAttachments = color_attachments[i].data();
-                subpasses[i].colorAttachmentCount = color_attachments[i].size();
+                subpasses[i].colorAttachmentCount = static_cast<uint32_t>(color_attachments[i].size());
                 subpasses[i].pDepthStencilAttachment = &depth_stencil_attachment[i];
                 subpasses[i].pInputAttachments = input_attachments[i].data();
-                subpasses[i].inputAttachmentCount = input_attachments[i].size();
+                subpasses[i].inputAttachmentCount = static_cast<uint32_t>(input_attachments[i].size());
             };
             return subpasses;
         };
@@ -385,9 +385,9 @@ namespace vkh {
         // 
         inline VkRenderPassCreateInfo& format() {
             vk_info.pAttachments = attachments.data();
-            vk_info.attachmentCount = attachments.size();
+            vk_info.attachmentCount = static_cast<uint32_t>(attachments.size());
             vk_info.pDependencies = dependencies.data();
-            vk_info.dependencyCount = dependencies.size();
+            vk_info.dependencyCount = static_cast<uint32_t>(dependencies.size());
             vk_info.setSubpasses(subpassFormat());
             return vk_info;
         };
