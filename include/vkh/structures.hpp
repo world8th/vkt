@@ -149,6 +149,10 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         VkDeviceSize    offset  = 0u;
         VkDeviceSize    stride  = 16u;
         VkDeviceSize    size    = 1u;
+
+        // Beta
+        STRUCT_OPERATORS(VkStridedBufferRegionKHR)
+        VK_HPP_STRUCT_OPERATORS(VkStridedBufferRegionKHR, vk::StridedBufferRegionKHR)
     } VkStridedBufferRegionKHR;
 
     // 
@@ -1055,6 +1059,10 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         // 
         operator void*&() { return hostAddress; };
         operator void* const&() const { return hostAddress; };
+
+        // 
+        STRUCT_OPERATORS(VkDeviceOrHostAddressKHR)
+        VK_HPP_STRUCT_OPERATORS(VkDeviceOrHostAddressKHR, vk::DeviceOrHostAddressKHR)
     } VkDeviceOrHostAddressKHR;
 
     // 
@@ -1073,10 +1081,14 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         // 
         operator void const*& () { return hostAddress; };
         operator const void* const&() const { return hostAddress; };
+
+        // Beta
+        STRUCT_OPERATORS(VkDeviceOrHostAddressConstKHR)
+        VK_HPP_STRUCT_OPERATORS(VkDeviceOrHostAddressConstKHR, vk::DeviceOrHostAddressConstKHR)
     } VkDeviceOrHostAddressConstKHR;
 
-    // VK_KHR_pipeline_library Missed
-    VkStructureType VK_STRUCTURE_TYPE_PIPELINE_LIBRARY_CREATE_INFO_KHR = static_cast<VkStructureType>(1000290000u);
+    // VK_KHR_pipeline_library missed
+    //VkStructureType VK_STRUCTURE_TYPE_PIPELINE_LIBRARY_CREATE_INFO_KHR = static_cast<VkStructureType>(1000290000u);
 
     // VK_KHR_pipeline_library
     typedef struct VkPipelineLibraryCreateInfoKHR {
@@ -1090,6 +1102,10 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
             this->libraryCount = static_cast<uint32_t>(libraries.size());
             this->pLibraries = libraries.data();
         };
+
+        // Beta
+        STRUCT_OPERATORS(VkPipelineLibraryCreateInfoKHR)
+        VK_HPP_STRUCT_OPERATORS(VkPipelineLibraryCreateInfoKHR, vk::PipelineLibraryCreateInfoKHR)
     } VkPipelineLibraryCreateInfoKHR;
 
 
