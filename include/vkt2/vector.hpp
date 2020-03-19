@@ -205,7 +205,7 @@ namespace vkt {
     class Vector { public: //
         ~Vector() {};
         Vector() {};
-        Vector(const vkt::uni_ptr<BufferAllocation>& allocation, const vkt::uni_arg<vk::DeviceSize>& offset = 0ull, const vkt::uni_arg<vk::DeviceSize>& size = VK_WHOLE_SIZE) : allocation(allocation), bufInfo({ allocation->buffer,offset,size }) { this->construct(allocation, offset, size, sizeof(T)); };
+        Vector(const vkt::uni_ptr<BufferAllocation>& allocation, const vkt::uni_arg<vk::DeviceSize>& offset = 0ull, const vkt::uni_arg<vk::DeviceSize>& size = VK_WHOLE_SIZE) : allocation(allocation), bufInfo({ allocation->buffer, offset, size }) { this->construct(allocation, offset, size, sizeof(T)); };
         Vector(const vkt::uni_arg<MemoryAllocationInfo>& allocationInfo, const vkt::uni_arg<vkh::VkBufferCreateInfo>& createInfo = {}) { this->construct(std::make_shared<BufferAllocation>(allocationInfo, createInfo)); };
         Vector(const vkt::uni_arg<VmaAllocator>& allocator, const vkt::uni_arg<vkh::VkBufferCreateInfo>& createInfo = {}, const vkt::uni_arg<VmaMemoryUsage>& vmaUsage = VMA_MEMORY_USAGE_GPU_ONLY) { this->construct(vkt::uni_ptr<BufferAllocation>(std::dynamic_pointer_cast<BufferAllocation>(std::make_shared<VmaBufferAllocation>(allocator, createInfo, vmaUsage)))); };
 
@@ -214,7 +214,7 @@ namespace vkt {
         template<class Tm = T> inline Vector<T>& operator=(const Vector<Tm>& V) { 
             this->allocation = V.uniPtr();
             this->bufInfo = vkh::VkDescriptorBufferInfo{ static_cast<VkBuffer>(V.buffer()), V.offset(), V.range() };
-            this->bufRegion = vkh::VkStridedBufferRegionKHR{ static_cast<VkBuffer>(V.buffer()), V.offset(), sizeof(T), V.range() / sizeof(T) };
+            this->bufRegion = vkh::VkStridedBufferRegionKHR{ static_cast<VkBuffer>(V.buffer()), V.offset(), sizeof(T), V.ranged() / sizeof(T) };
             return *this;
         };
 
@@ -281,12 +281,13 @@ namespace vkt {
         //virtual const vk::DeviceSize& stride() const { return this->stride; };
 
         // LEGACY, used for constructor only
-        virtual vk::DeviceSize ranged() const { return (this->bufInfo.range != VK_WHOLE_SIZE ? std::min(this->bufInfo.range, this->allocation->range() - this->bufInfo.offset) : (this->allocation->range() - this->bufInfo.offset)); };
+        //virtual vk::DeviceSize ranged() const { return (this->bufInfo.range != VK_WHOLE_SIZE ? std::min(this->bufInfo.range, this->allocation->range() - this->bufInfo.offset) : (this->allocation->range() - this->bufInfo.offset)); };
+        virtual vk::DeviceSize ranged() const { return (this->bufInfo.range != VK_WHOLE_SIZE ? std::min(vk::DeviceSize(this->bufInfo.range), vk::DeviceSize(this->allocation->range())) : vk::DeviceSize(this->allocation->range())); };
 
         // Get static and cached value
-        virtual vk::DeviceSize& range() { return (this->bufInfo.range = (this->bufRegion.size * this->bufRegion.stride)); };
-        virtual const vk::DeviceSize& range() const { return (this->bufRegion.size * this->bufRegion.stride); };
-        
+        virtual vk::DeviceSize& range() { return (this->bufInfo.range = (this->bufRegion.size * this->bufRegion.stride - 0u)); };
+        virtual const vk::DeviceSize& range() const { return (this->bufRegion.size * this->bufRegion.stride - 0u); };
+
         //virtual vk::DeviceSize size() const { return this->range() / this->stride; };
         virtual const vk::DeviceSize& size() const { return this->bufRegion.size; };
         virtual vk::DeviceSize& size() { return this->bufRegion.size; };
