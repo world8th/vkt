@@ -349,6 +349,10 @@ namespace vkt {
             return vkh::VkDeviceOrHostAddressConstKHR{ .deviceAddress = getDevice().getBufferAddress(vkh::VkBufferDeviceAddressInfo{ .buffer = this->buffer() }.hpp()) + this->offset() };
         };
 
+        // 
+        virtual vkh::VkStridedBufferRegionKHR& getRegion() { return bufRegion; };
+        virtual const vkh::VkStridedBufferRegionKHR& getRegion() const { return bufRegion; };
+
         // getter by operator (for direct pass)
         virtual operator vkh::VkDeviceOrHostAddressKHR() { return this->deviceAddress(); };
         virtual operator vkh::VkDeviceOrHostAddressConstKHR() const { return this->deviceAddress(); };

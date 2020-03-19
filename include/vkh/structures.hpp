@@ -1343,6 +1343,49 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
 #endif
     } VkRayTracingPipelineCreateInfoKHR;
 
+    // 
+    typedef struct VkAccelerationStructureMemoryRequirementsInfoKHR {
+        VkStructureType                                     sType                 = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_MEMORY_REQUIREMENTS_INFO_KHR;
+        const void*                                         pNext                 = nullptr;
+        VkAccelerationStructureMemoryRequirementsTypeKHR    type                  = VK_ACCELERATION_STRUCTURE_MEMORY_REQUIREMENTS_TYPE_OBJECT_KHR;
+        VkAccelerationStructureBuildTypeKHR                 buildType             = VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR;
+        VkAccelerationStructureKHR                          accelerationStructure = {};
+
+        // 
+        operator VkAccelerationStructureKHR& () { return accelerationStructure; };
+        operator const VkAccelerationStructureKHR& () const { return accelerationStructure; };
+        VkAccelerationStructureMemoryRequirementsInfoKHR& operator=(const VkAccelerationStructureKHR& accelerationStructure) { this->accelerationStructure = accelerationStructure; return *this; };
+
+#ifdef VK_ENABLE_BETA_EXTENSIONS
+        STRUCT_OPERATORS(VkAccelerationStructureMemoryRequirementsInfoKHR)
+        VK_HPP_STRUCT_OPERATORS(VkAccelerationStructureMemoryRequirementsInfoKHR, vk::AccelerationStructureMemoryRequirementsInfoKHR)
+#endif
+    } VkAccelerationStructureMemoryRequirementsInfoKHR;
+
+    // 
+    typedef struct VkBindAccelerationStructureMemoryInfoKHR {
+        VkStructureType               sType                 = VK_STRUCTURE_TYPE_BIND_ACCELERATION_STRUCTURE_MEMORY_INFO_KHR;
+        const void*                   pNext                 = nullptr;
+        VkAccelerationStructureKHR    accelerationStructure = {};
+        VkDeviceMemory                memory                = {};
+        VkDeviceSize                  memoryOffset          = 0u;
+        uint32_t                      deviceIndexCount      = 0u;
+        const uint32_t*               pDeviceIndices        = nullptr;
+
+        // 
+        operator VkAccelerationStructureKHR& () { return accelerationStructure; };
+        operator const VkAccelerationStructureKHR& () const { return accelerationStructure; };
+
+        // 
+        VkBindAccelerationStructureMemoryInfoKHR& setDeviceIndices(const std::vector<uint32_t>& V = {}) { pDeviceIndices = V.data(); deviceIndexCount = static_cast<uint32_t>(V.size()); return *this; };
+        VkBindAccelerationStructureMemoryInfoKHR& operator=(const VkAccelerationStructureKHR& accelerationStructure) { this->accelerationStructure = accelerationStructure; return *this; };
+
+#ifdef VK_ENABLE_BETA_EXTENSIONS
+        STRUCT_OPERATORS(VkBindAccelerationStructureMemoryInfoKHR)
+        VK_HPP_STRUCT_OPERATORS(VkBindAccelerationStructureMemoryInfoKHR, vk::BindAccelerationStructureMemoryInfoKHR)
+#endif
+    } VkBindAccelerationStructureMemoryInfoKHR;
+
 
 #pragma pack(pop)
 

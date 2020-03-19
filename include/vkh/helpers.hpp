@@ -16,24 +16,24 @@ namespace vkh {
     // TODO: REMOVE CODE TAFTOLOGY
     class VsRayTracingPipelineCreateInfoHelper { 
     protected: 
-        VkRayTracingShaderGroupCreateInfoNV raygenShaderGroup = {};
+        VkRayTracingShaderGroupCreateInfoKHR raygenShaderGroup = {};
         std::vector<VkPipelineShaderStageCreateInfo> stages = {};
-        std::vector<VkRayTracingShaderGroupCreateInfoNV> missShaderGroups = {};
-        std::vector<VkRayTracingShaderGroupCreateInfoNV> hitShaderGroups = {};
-        std::vector<VkRayTracingShaderGroupCreateInfoNV> compiledShaderGroups = {};
+        std::vector<VkRayTracingShaderGroupCreateInfoKHR> missShaderGroups = {};
+        std::vector<VkRayTracingShaderGroupCreateInfoKHR> hitShaderGroups = {};
+        std::vector<VkRayTracingShaderGroupCreateInfoKHR> compiledShaderGroups = {};
 
     public: // get offsets of shader groups
-        VkRayTracingPipelineCreateInfoNV vkInfo = {};
+        VkRayTracingPipelineCreateInfoKHR vkInfo = {};
         uintptr_t raygenOffsetIndex() { return 0u; };
         uintptr_t missOffsetIndex() { return 1u; };
         uintptr_t hitOffsetIndex() { return missShaderGroups.size()+missOffsetIndex(); };
         uintptr_t groupCount() { return missShaderGroups.size() + hitShaderGroups.size() + 1u; };
 
         // 
-        VsRayTracingPipelineCreateInfoHelper(const VkRayTracingPipelineCreateInfoNV& info = {}) : vkInfo(info) {};
+        VsRayTracingPipelineCreateInfoHelper(const VkRayTracingPipelineCreateInfoKHR& info = {}) : vkInfo(info) {};
 
         // result groups
-        inline std::vector<VkRayTracingShaderGroupCreateInfoNV>& compileGroups() {
+        inline std::vector<VkRayTracingShaderGroupCreateInfoKHR>& compileGroups() {
             compiledShaderGroups = { raygenShaderGroup };
             for (auto& group : missShaderGroups) { compiledShaderGroups.push_back(group); };
             for (auto& group : hitShaderGroups) { compiledShaderGroups.push_back(group); };
@@ -41,9 +41,9 @@ namespace vkh {
         };
 
         // WARNING: Only One Hit Group Supported At Once
-        inline VsRayTracingPipelineCreateInfoHelper& addShaderStages(const std::vector<VkPipelineShaderStageCreateInfo>& stages_in = {}, const VkRayTracingShaderGroupTypeNV& prior_group_type = VK_RAY_TRACING_SHADER_GROUP_TYPE_TRIANGLES_HIT_GROUP_NV) {
+        inline VsRayTracingPipelineCreateInfoHelper& addShaderStages(const std::vector<VkPipelineShaderStageCreateInfo>& stages_in = {}, const VkRayTracingShaderGroupTypeKHR& prior_group_type = VK_RAY_TRACING_SHADER_GROUP_TYPE_TRIANGLES_HIT_GROUP_KHR) {
             for (auto& stage : stages_in) {
-                if (stage.stage == VK_SHADER_STAGE_RAYGEN_BIT_NV) {
+                if (stage.stage == VK_SHADER_STAGE_RAYGEN_BIT_KHR) {
                     const uintptr_t last_idx = stages.size(); stages.push_back(stage);
                     raygenShaderGroup.generalShader = static_cast<uint32_t>(last_idx);
                 };
@@ -51,7 +51,7 @@ namespace vkh {
 
             uintptr_t groupIdx = -1U;
             for (auto& stage : stages_in) {
-                if (stage.stage == VK_SHADER_STAGE_MISS_BIT_NV) {
+                if (stage.stage == VK_SHADER_STAGE_MISS_BIT_KHR) {
                     const uintptr_t lastIdx = stages.size(); stages.push_back(stage);
                     groupIdx = missShaderGroups.size(); missShaderGroups.push_back({});
                     //if (group_idx == -1U) { group_idx = miss_shader_groups.size(); miss_shader_groups.push_back({}); };
@@ -61,20 +61,20 @@ namespace vkh {
 
             groupIdx = -1U; // Only One Hit Group Supported At Once
             for (auto& stage : stages_in) {
-                if (stage.stage == VK_SHADER_STAGE_CLOSEST_HIT_BIT_NV || stage.stage == VK_SHADER_STAGE_ANY_HIT_BIT_NV || stage.stage == VK_SHADER_STAGE_INTERSECTION_BIT_NV) {
+                if (stage.stage == VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR || stage.stage == VK_SHADER_STAGE_ANY_HIT_BIT_KHR || stage.stage == VK_SHADER_STAGE_INTERSECTION_BIT_KHR) {
                     const uintptr_t lastIdx = stages.size(); stages.push_back(stage);
                     if (groupIdx == -1U) { groupIdx = static_cast<uint32_t>(hitShaderGroups.size()); hitShaderGroups.push_back({}); };
                     auto& group = hitShaderGroups[groupIdx];
-                    if (stage.stage == VK_SHADER_STAGE_CLOSEST_HIT_BIT_NV) {
+                    if (stage.stage == VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR) {
                         group.type = prior_group_type;
                         group.closestHitShader = static_cast<uint32_t>(lastIdx);
                     };
-                    if (stage.stage == VK_SHADER_STAGE_ANY_HIT_BIT_NV) {
+                    if (stage.stage == VK_SHADER_STAGE_ANY_HIT_BIT_KHR) {
                         group.type = prior_group_type;
                         group.anyHitShader = static_cast<uint32_t>(lastIdx);
                     };
-                    if (stage.stage == VK_SHADER_STAGE_INTERSECTION_BIT_NV) {
-                        group.type = VK_RAY_TRACING_SHADER_GROUP_TYPE_PROCEDURAL_HIT_GROUP_NV,
+                    if (stage.stage == VK_SHADER_STAGE_INTERSECTION_BIT_KHR) {
+                        group.type = VK_RAY_TRACING_SHADER_GROUP_TYPE_PROCEDURAL_HIT_GROUP_KHR,
                         group.intersectionShader = static_cast<uint32_t>(lastIdx);
                     };
                 };
@@ -84,7 +84,7 @@ namespace vkh {
         };
 
         // 
-        inline VkRayTracingPipelineCreateInfoNV& format() {
+        inline VkRayTracingPipelineCreateInfoKHR& format() {
             auto& groups = compileGroups();
             vkInfo.pGroups = groups.data();
             vkInfo.pStages = stages.data();
@@ -95,24 +95,24 @@ namespace vkh {
         };
 
         // 
-        inline operator const ::VkRayTracingPipelineCreateInfoNV* () const { return vkInfo; };
-        inline operator const VkRayTracingPipelineCreateInfoNV* () { return &vkInfo; };
+        inline operator const ::VkRayTracingPipelineCreateInfoKHR* () const { return vkInfo; };
+        inline operator const VkRayTracingPipelineCreateInfoKHR* () { return &vkInfo; };
 
         // 
-        inline operator ::VkRayTracingPipelineCreateInfoNV* () { return format(); };
-        inline operator VkRayTracingPipelineCreateInfoNV* () { return &format(); };
+        inline operator ::VkRayTracingPipelineCreateInfoKHR* () { return format(); };
+        inline operator VkRayTracingPipelineCreateInfoKHR* () { return &format(); };
 
         // 
-        inline operator const ::VkRayTracingPipelineCreateInfoNV&() const { return vkInfo; };
-        inline operator const VkRayTracingPipelineCreateInfoNV&() { return vkInfo; };
+        inline operator const ::VkRayTracingPipelineCreateInfoKHR&() const { return vkInfo; };
+        inline operator const VkRayTracingPipelineCreateInfoKHR&() { return vkInfo; };
 
         // 
-        inline operator ::VkRayTracingPipelineCreateInfoNV&() { return format(); };
-        inline operator VkRayTracingPipelineCreateInfoNV&() { return format(); };
+        inline operator ::VkRayTracingPipelineCreateInfoKHR&() { return format(); };
+        inline operator VkRayTracingPipelineCreateInfoKHR&() { return format(); };
 
         // Vulkan-HPP
-        inline operator const vk::RayTracingPipelineCreateInfoNV& () const { return vkInfo; };
-        inline operator vk::RayTracingPipelineCreateInfoNV& () { return format(); };
+        inline operator const vk::RayTracingPipelineCreateInfoKHR& () const { return vkInfo; };
+        inline operator vk::RayTracingPipelineCreateInfoKHR& () { return format(); };
     };
 
     // 
