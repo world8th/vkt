@@ -27,10 +27,16 @@ namespace vkt {
         ) {
             this->buffer = this->info.device.createBuffer(*createInfo);
 
+            vk::MemoryAllocateFlagsInfo allocFlags = {};
+            allocFlags.flags = vk::MemoryAllocateFlagBits::eDeviceAddress;
+
+            // 
             vk::MemoryRequirements memReqs = allocationInfo->device.getBufferMemoryRequirements(buffer);
-            vk::MemoryAllocateInfo memAllocInfo = {};
             vk::ExportMemoryAllocateInfo exportAllocInfo{ vk::ExternalMemoryHandleTypeFlagBits::eOpaqueWin32 };
-            memAllocInfo.pNext = &exportAllocInfo;
+
+            // 
+            vk::MemoryAllocateInfo memAllocInfo = {};
+            memAllocInfo.pNext = &exportAllocInfo.setPNext(&allocFlags);
             memAllocInfo.allocationSize = memReqs.size;
             memAllocInfo.memoryTypeIndex = uint32_t(allocationInfo->getMemoryType(memReqs.memoryTypeBits, { .eDeviceLocal = 1 }));
 
@@ -145,6 +151,7 @@ namespace vkt {
         ) {
             VmaAllocationCreateInfo vmaInfo = {}; vmaInfo.usage = vmaUsage;
             if (vmaUsage == VMA_MEMORY_USAGE_CPU_TO_GPU || vmaUsage == VMA_MEMORY_USAGE_GPU_TO_CPU) { vmaInfo.flags = VMA_ALLOCATION_CREATE_MAPPED_BIT; };
+
             auto result = vmaCreateBuffer(this->allocator = allocator, *createInfo, &vmaInfo, &reinterpret_cast<VkBuffer&>(buffer), &allocation, &allocationInfo);
             assert(result == VK_SUCCESS);
             this->info.range = createInfo->size;

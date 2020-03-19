@@ -145,7 +145,11 @@ namespace vkt
             "VK_EXT_validation_flags", 
             "VK_EXT_debug_marker",
             "VK_EXT_debug_report",
-            "VK_EXT_debug_utils"
+            "VK_EXT_debug_utils",
+
+            // 
+            "VK_KHR_buffer_device_address",
+            "VK_EXT_buffer_device_address"
         };
 
         // instance layers
@@ -184,6 +188,7 @@ namespace vkt
         vk::PipelineCache pipelineCache = {};
         vk::DispatchLoaderDynamic dispatch = {};
         vk::PhysicalDeviceMemoryProperties2 memoryProperties = {};
+
         VmaAllocator allocator = {};
         uint32_t queueFamilyIndex = 0;
         uint32_t instanceVersion = 0;
@@ -389,9 +394,11 @@ namespace vkt
             auto gDescIndexing = vk::PhysicalDeviceDescriptorIndexingFeaturesEXT{};
             auto gFloat16U8 = vk::PhysicalDeviceFloat16Int8FeaturesKHR{}; // Vulkan 1.3
             auto gFeatures = vk::PhysicalDeviceFeatures2{};
+            auto gDeviceAddress = vk::PhysicalDeviceBufferDeviceAddressFeaturesEXT{};
             //auto gConsertvative = vk::PhysicalDeviceConservativeRasterizationPropertiesEXT{};
 
             // 
+            gTexelBufferAligment.pNext = &gDeviceAddress;
             gFloat16U8.pNext = &gTexelBufferAligment;
             gStorage8.pNext = &gFloat16U8;
             gStorage16.pNext = &gStorage8;
@@ -399,7 +406,7 @@ namespace vkt
             gFeatures.pNext = &gDescIndexing;
 
             // 
-            vkGetPhysicalDeviceFeatures2(physicalDevice, &(VkPhysicalDeviceFeatures2&)gFeatures);
+            vkGetPhysicalDeviceFeatures2(physicalDevice, &reinterpret_cast<VkPhysicalDeviceFeatures2&>(gFeatures));
             //physicalDevice.getFeatures2(&(VkPhysicalDeviceFeatures2&)gFeatures);
             this->memoryProperties = physicalDevice.getMemoryProperties2();
 

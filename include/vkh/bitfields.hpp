@@ -74,6 +74,7 @@ namespace vkh {
         eRayTracing : 1,
         eTransformFeedbackBuffer : 1,
         eTransformFeedbackCounterBuffer : 1,
+        eUnknown:4,
         eSharedDeviceAddress : 1;
 
         OPERATORS(VkBufferUsageFlags,::VkBufferUsageFlagBits,::VkFlags)
