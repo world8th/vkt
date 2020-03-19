@@ -394,7 +394,7 @@ namespace vkt
             auto gDescIndexing = vk::PhysicalDeviceDescriptorIndexingFeaturesEXT{};
             auto gFloat16U8 = vk::PhysicalDeviceFloat16Int8FeaturesKHR{}; // Vulkan 1.3
             auto gFeatures = vk::PhysicalDeviceFeatures2{};
-            auto gDeviceAddress = vk::PhysicalDeviceBufferDeviceAddressFeaturesEXT{};
+            auto gDeviceAddress = vk::PhysicalDeviceBufferDeviceAddressFeatures{};
             //auto gConsertvative = vk::PhysicalDeviceConservativeRasterizationPropertiesEXT{};
 
             // 
