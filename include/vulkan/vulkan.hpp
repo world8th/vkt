@@ -1335,12 +1335,10 @@ namespace VULKAN_HPP_NAMESPACE
       return ::vkCmdWaitEvents( commandBuffer, eventCount, pEvents, srcStageMask, dstStageMask, memoryBarrierCount, pMemoryBarriers, bufferMemoryBarrierCount, pBufferMemoryBarriers, imageMemoryBarrierCount, pImageMemoryBarriers );
     }
 
-#ifdef VK_ENABLE_BETA_EXTENSIONS
     void vkCmdWriteAccelerationStructuresPropertiesKHR( VkCommandBuffer commandBuffer, uint32_t accelerationStructureCount, const VkAccelerationStructureKHR* pAccelerationStructures, VkQueryType queryType, VkQueryPool queryPool, uint32_t firstQuery ) const VULKAN_HPP_NOEXCEPT
     {
       return ::vkCmdWriteAccelerationStructuresPropertiesKHR( commandBuffer, accelerationStructureCount, pAccelerationStructures, queryType, queryPool, firstQuery );
     }
-#endif
 
     void vkCmdWriteAccelerationStructuresPropertiesNV( VkCommandBuffer commandBuffer, uint32_t accelerationStructureCount, const VkAccelerationStructureKHR* pAccelerationStructures, VkQueryType queryType, VkQueryPool queryPool, uint32_t firstQuery ) const VULKAN_HPP_NOEXCEPT
     {
@@ -1409,12 +1407,10 @@ namespace VULKAN_HPP_NAMESPACE
       return ::vkAllocateMemory( device, pAllocateInfo, pAllocator, pMemory );
     }
 
-#ifdef VK_ENABLE_BETA_EXTENSIONS
     VkResult vkBindAccelerationStructureMemoryKHR( VkDevice device, uint32_t bindInfoCount, const VkBindAccelerationStructureMemoryInfoKHR* pBindInfos ) const VULKAN_HPP_NOEXCEPT
     {
       return ::vkBindAccelerationStructureMemoryKHR( device, bindInfoCount, pBindInfos );
     }
-#endif
 
     VkResult vkBindAccelerationStructureMemoryNV( VkDevice device, uint32_t bindInfoCount, const VkBindAccelerationStructureMemoryInfoKHR* pBindInfos ) const VULKAN_HPP_NOEXCEPT
     {
@@ -73744,7 +73740,7 @@ namespace VULKAN_HPP_NAMESPACE
   template<typename Dispatch>
   VULKAN_HPP_INLINE typename ResultValueType<void>::type Device::bindAccelerationStructureMemoryNV( ArrayProxy<const VULKAN_HPP_NAMESPACE::BindAccelerationStructureMemoryInfoKHR> bindInfos, Dispatch const &d ) const
   {
-    Result result = static_cast<Result>( d.vkBindAccelerationStructureMemoryNV( m_device, bindInfos.size() , reinterpret_cast<const VkBindAccelerationStructureMemoryInfoKHR*>( bindInfos.data() ) ) );
+    Result result = static_cast<Result>( d.vkBindAccelerationStructureMemoryKHR( m_device, bindInfos.size() , reinterpret_cast<const VkBindAccelerationStructureMemoryInfoKHR*>( bindInfos.data() ) ) );
     return createResultValue( result, VULKAN_HPP_NAMESPACE_STRING"::Device::bindAccelerationStructureMemoryNV" );
   }
 #endif /*VULKAN_HPP_DISABLE_ENHANCED_MODE*/
@@ -77159,13 +77155,13 @@ namespace VULKAN_HPP_NAMESPACE
   template<typename Dispatch>
   VULKAN_HPP_INLINE Result Device::getRayTracingShaderGroupHandlesNV( VULKAN_HPP_NAMESPACE::Pipeline pipeline, uint32_t firstGroup, uint32_t groupCount, size_t dataSize, void* pData, Dispatch const &d) const VULKAN_HPP_NOEXCEPT
   {
-    return static_cast<Result>( d.vkGetRayTracingShaderGroupHandlesNV( m_device, static_cast<VkPipeline>( pipeline ), firstGroup, groupCount, dataSize, pData ) );
+    return static_cast<Result>( d.vkGetRayTracingShaderGroupHandlesKHR( m_device, static_cast<VkPipeline>( pipeline ), firstGroup, groupCount, dataSize, pData ) );
   }
 #ifndef VULKAN_HPP_DISABLE_ENHANCED_MODE
   template<typename T, typename Dispatch>
   VULKAN_HPP_INLINE typename ResultValueType<void>::type Device::getRayTracingShaderGroupHandlesNV( VULKAN_HPP_NAMESPACE::Pipeline pipeline, uint32_t firstGroup, uint32_t groupCount, ArrayProxy<T> data, Dispatch const &d ) const
   {
-    Result result = static_cast<Result>( d.vkGetRayTracingShaderGroupHandlesNV( m_device, static_cast<VkPipeline>( pipeline ), firstGroup, groupCount, data.size() * sizeof( T ) , reinterpret_cast<void*>( data.data() ) ) );
+    Result result = static_cast<Result>( d.vkGetRayTracingShaderGroupHandlesKHR( m_device, static_cast<VkPipeline>( pipeline ), firstGroup, groupCount, data.size() * sizeof( T ) , reinterpret_cast<void*>( data.data() ) ) );
     return createResultValue( result, VULKAN_HPP_NAMESPACE_STRING"::Device::getRayTracingShaderGroupHandlesNV" );
   }
 #endif /*VULKAN_HPP_DISABLE_ENHANCED_MODE*/
