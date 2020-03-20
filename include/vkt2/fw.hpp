@@ -27,6 +27,8 @@
 #include <GLFW/glfw3native.h>
 #endif
 
+//#define VKT_ENABLE_DEBUG
+
 // TODO: FULL REWRITE OF THAT "PROJECT"!!!
 namespace vkt
 { 
@@ -411,7 +413,11 @@ namespace vkt
             debugCreateInfo.pUserData = nullptr;
 
             // 
+#ifdef VKT_ENABLE_DEBUG
             instance = vk::createInstance(cinstanceinfo.setPNext(&debugCreateInfo));
+#else
+            instance = vk::createInstance(cinstanceinfo);
+#endif
 
 #ifdef VOLK_H_
             volkLoadInstance(instance);
@@ -421,9 +427,11 @@ namespace vkt
             physicalDevices = instance.enumeratePhysicalDevices();
 
             // 
+#ifdef VKT_ENABLE_DEBUG
             if (CreateDebugUtilsMessengerEXT(instance, &debugCreateInfo, nullptr, &reinterpret_cast<VkDebugUtilsMessengerEXT&>(messenger)) != VK_SUCCESS) {
                 throw std::runtime_error("failed to set up debug callback");
             }
+#endif
 
             // 
             return instance;
