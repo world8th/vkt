@@ -1183,8 +1183,20 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
     typedef union VkAccelerationStructureGeometryDataKHR {
 #ifdef VK_ENABLE_BETA_EXTENSIONS
         VkAccelerationStructureGeometryTrianglesDataKHR  triangles;
-        VkAccelerationStructureGeometryAabbsDataKHR      aabbs    ;
         VkAccelerationStructureGeometryInstancesDataKHR  instances;
+        VkAccelerationStructureGeometryAabbsDataKHR      aabbs    ;
+
+        VkAccelerationStructureGeometryDataKHR& operator=(const VkAccelerationStructureGeometryTrianglesDataKHR& triangles) { this->triangles = triangles; return *this; };
+        VkAccelerationStructureGeometryDataKHR& operator=(const VkAccelerationStructureGeometryInstancesDataKHR& instances) { this->instances = instances; return *this; };
+        VkAccelerationStructureGeometryDataKHR& operator=(const VkAccelerationStructureGeometryAabbsDataKHR& aabbs) { this->aabbs = aabbs; return *this; };
+
+        operator VkAccelerationStructureGeometryTrianglesDataKHR& () { return triangles; };
+        operator VkAccelerationStructureGeometryInstancesDataKHR& () { return instances; };
+        operator VkAccelerationStructureGeometryAabbsDataKHR& () { return aabbs; };
+        
+        operator const VkAccelerationStructureGeometryTrianglesDataKHR& () const { return triangles; };
+        operator const VkAccelerationStructureGeometryInstancesDataKHR& () const { return instances; };
+        operator const VkAccelerationStructureGeometryAabbsDataKHR& () const { return aabbs; };
 #else
         uint32_t data[12]; // Reserved for future
 #endif
