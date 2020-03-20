@@ -29,7 +29,46 @@
 
 // TODO: FULL REWRITE OF THAT "PROJECT"!!!
 namespace vkt
-{
+{ 
+
+    VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(
+        VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
+        VkDebugUtilsMessageTypeFlagsEXT messageType,
+        const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
+        void* pUserData) {
+
+        std::cerr << "validation layer: " << pCallbackData->pMessage << std::endl;
+        return VK_FALSE;
+    }
+
+    VkResult CreateDebugUtilsMessengerEXT(
+        VkInstance instance,
+        const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo,
+        const VkAllocationCallbacks* pAllocator,
+        VkDebugUtilsMessengerEXT* pCallback) {
+
+        // Note: It seems that static_cast<...> doesn't work. Use the C-style forced cast.
+        auto func = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");
+        if (func != nullptr) {
+            return func(instance, pCreateInfo, pAllocator, pCallback);
+        }
+        else {
+            return VK_ERROR_EXTENSION_NOT_PRESENT;
+        }
+    }
+
+    std::vector<const char*> GetRequiredExtensions() {
+        uint32_t glfwExtensionCount = 0;
+        const char** glfwExtensions;
+        glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
+        std::vector<const char*> extensions(glfwExtensions, glfwExtensions + glfwExtensionCount);
+
+        // also want the "debug utils"
+        extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+        return extensions;
+    }
+
+
 
     class GPUFramework {
     protected:
@@ -45,6 +84,10 @@ namespace vkt
             "VK_KHR_swapchain",
             "VK_KHR_surface",
             "VK_KHR_display",
+
+            "VK_EXT_debug_marker",
+            "VK_EXT_debug_report",
+            "VK_EXT_debug_utils",
         };
 
         // default device extensions
@@ -188,6 +231,7 @@ namespace vkt
         vk::PipelineCache pipelineCache = {};
         vk::DispatchLoaderDynamic dispatch = {};
         vk::PhysicalDeviceMemoryProperties2 memoryProperties = {};
+        vk::DebugUtilsMessengerEXT messenger = {};
 
         VmaAllocator allocator = {};
         uint32_t queueFamilyIndex = 0;
@@ -347,8 +391,23 @@ namespace vkt
             cinstanceinfo.enabledLayerCount = static_cast<uint32_t>(layers.size());
             cinstanceinfo.ppEnabledLayerNames = layers.data();
 
+            // create the "debug utils EXT" callback object
+            VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo{};
+            debugCreateInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
+            debugCreateInfo.messageSeverity =
+                VkDebugUtilsMessageSeverityFlagBitsEXT::VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT |
+                //VkDebugUtilsMessageSeverityFlagBitsEXT::VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT |
+                VkDebugUtilsMessageSeverityFlagBitsEXT::VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
+                VkDebugUtilsMessageSeverityFlagBitsEXT::VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
+            debugCreateInfo.messageType =
+                VkDebugUtilsMessageTypeFlagBitsEXT::VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
+                VkDebugUtilsMessageTypeFlagBitsEXT::VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
+                VkDebugUtilsMessageTypeFlagBitsEXT::VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
+            debugCreateInfo.pfnUserCallback = DebugCallback;    // global function
+            debugCreateInfo.pUserData = nullptr;
+
             // 
-            instance = vk::createInstance(cinstanceinfo);
+            instance = vk::createInstance(cinstanceinfo.setPNext(&debugCreateInfo));
 
 #ifdef VOLK_H_
             volkLoadInstance(instance);
@@ -356,6 +415,11 @@ namespace vkt
 
             // get physical device for application
             physicalDevices = instance.enumeratePhysicalDevices();
+
+            // 
+            if (CreateDebugUtilsMessengerEXT(instance, &debugCreateInfo, nullptr, &reinterpret_cast<VkDebugUtilsMessengerEXT&>(messenger)) != VK_SUCCESS) {
+                throw std::runtime_error("failed to set up debug callback");
+            }
 
             // 
             return instance;
