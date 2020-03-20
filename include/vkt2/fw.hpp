@@ -58,10 +58,14 @@ namespace vkt
     }
 
     std::vector<const char*> GetRequiredExtensions() {
+#ifdef VKT_ENABLE_GLFW_SUPPORT
         uint32_t glfwExtensionCount = 0;
         const char** glfwExtensions;
         glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
         std::vector<const char*> extensions(glfwExtensions, glfwExtensions + glfwExtensionCount);
+#else
+        std::vector<const char*> extensions{};
+#endif
 
         // also want the "debug utils"
         extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
