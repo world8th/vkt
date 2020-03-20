@@ -187,8 +187,8 @@ namespace vkh {
             if (entry.descriptorType == VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER || entry.descriptorType == VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER) {
                 return _push_description<VkBufferView>(entry);
             } else 
-            if (entry.descriptorType == VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_NV) {
-                return _push_description<VkAccelerationStructureNV>(entry);
+            if (entry.descriptorType == VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR) {
+                return _push_description<VkAccelerationStructureKHR>(entry);
             } else {
                 return _push_description<VkDescriptorImageInfo>(entry);
             };
@@ -264,8 +264,8 @@ namespace vkh {
                 if (entry.descriptorType == VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER || entry.descriptorType == VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER) { // Map Buffer Views
                     writes[i].pTexelBufferView = reinterpret_cast<VkBufferView*>(heap->data()+pt0);
                 } else
-                if (entry.descriptorType == VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_NV) { // Map Accelerator Structures (NV CUSTOM MAP)
-                    writes_acs[i].pAccelerationStructures = reinterpret_cast<VkAccelerationStructureNV*>(heap->data()+pt0);
+                if (entry.descriptorType == VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR) { // Map Accelerator Structures (KHR CUSTOM MAP)
+                    writes_acs[i].pAccelerationStructures = reinterpret_cast<VkAccelerationStructureKHR*>(heap->data()+pt0);
                     writes[i].pNext = &writes_acs[i];
                 } else { // Map Images, Samplers, Combinations...
                     writes[i].pImageInfo = reinterpret_cast<VkDescriptorImageInfo*>(heap->data()+pt0);
@@ -293,8 +293,8 @@ namespace vkh {
                 .descriptorCount = entry.descriptorCount,
                 .descriptorType = entry.descriptorType,
             });
-            writes_acs.push_back(VkWriteDescriptorSetAccelerationStructureNV{
-                .accelerationStructureCount = entry.descriptorType == VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_NV ? entry.descriptorCount : 0u
+            writes_acs.push_back(VkWriteDescriptorSetAccelerationStructureKHR{
+                .accelerationStructureCount = entry.descriptorType == VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR ? entry.descriptorCount : 0u
             });
             return handles.back();
         };
@@ -310,7 +310,7 @@ namespace vkh {
         std::vector<VsDescriptorHandle<>> handles = {};
 
         // regular version
-        std::vector<VkWriteDescriptorSetAccelerationStructureNV> writes_acs = {};
+        std::vector<VkWriteDescriptorSetAccelerationStructureKHR> writes_acs = {};
         std::vector<VkWriteDescriptorSet> writes = {};
     };
  

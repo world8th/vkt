@@ -12661,7 +12661,7 @@ VkResult VmaBlockVector::CreateBlock(VkDeviceSize blockSize, size_t* pNewBlockIn
     exportAllocInfo.pNext = &allocFlags;
 
     VkMemoryAllocateInfo allocInfo = { VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO };
-    allocInfo.pNext = &exportAllocInfo;
+    //allocInfo.pNext = &exportAllocInfo;
     allocInfo.memoryTypeIndex = m_MemoryTypeIndex;
     allocInfo.allocationSize = blockSize;
     VkDeviceMemory mem = VK_NULL_HANDLE;
