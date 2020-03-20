@@ -195,15 +195,17 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
     } VkWriteDescriptorSet;
 
     // 
-    typedef struct VkWriteDescriptorSetAccelerationStructureNV {
-        VkStructureType                     sType                       = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET_ACCELERATION_STRUCTURE_NV;
-        const void*                         pNext                       = nullptr;
-        uint32_t                            accelerationStructureCount  = 1u;
-        const VkAccelerationStructureNV*    pAccelerationStructures     = nullptr;
-        
-        STRUCT_OPERATORS(VkWriteDescriptorSetAccelerationStructureNV)
-        VK_HPP_STRUCT_OPERATORS(VkWriteDescriptorSetAccelerationStructureNV,vk::WriteDescriptorSetAccelerationStructureNV)
-    } VkWriteDescriptorSetAccelerationStructureNV;
+    typedef struct VkWriteDescriptorSetAccelerationStructureKHR {
+        VkStructureType                  sType                      = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET_ACCELERATION_STRUCTURE_NV;
+        const void*                      pNext                      = nullptr;
+        uint32_t                         accelerationStructureCount = 1u;
+        const VkAccelerationStructureNV* pAccelerationStructures    = nullptr;
+
+        STRUCT_OPERATORS(VkWriteDescriptorSetAccelerationStructureKHR)
+        VK_HPP_STRUCT_OPERATORS(VkWriteDescriptorSetAccelerationStructureKHR, vk::WriteDescriptorSetAccelerationStructureKHR)
+    } VkWriteDescriptorSetAccelerationStructureKHR;
+
+    using VkWriteDescriptorSetAccelerationStructureNV = VkWriteDescriptorSetAccelerationStructureKHR;
 
     // 
     typedef struct VkDescriptorPoolCreateInfo {
@@ -1322,15 +1324,15 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         VkStructureType                                      sType              = VK_STRUCTURE_TYPE_RAY_TRACING_PIPELINE_CREATE_INFO_KHR;
         const void*                                          pNext              = nullptr;
         VkPipelineCreateFlags                                flags              = {};
-        uint32_t                                             stageCount         = 0u;
+        uint32_t                                             stageCount         = 1u;
         const VkPipelineShaderStageCreateInfo*               pStages            = nullptr;
-        uint32_t                                             groupCount         = 0u;
+        uint32_t                                             groupCount         = 1u;
         const VkRayTracingShaderGroupCreateInfoKHR*          pGroups            = nullptr;
         uint32_t                                             maxRecursionDepth  = 1u;
         VkPipelineLibraryCreateInfoKHR                       libraries          = {};
         const VkRayTracingPipelineInterfaceCreateInfoKHR*    pLibraryInterface  = nullptr;
-        VkPipelineLayout                                     layout             = {};
-        VkPipeline                                           basePipelineHandle = {};
+        VkPipelineLayout                                     layout             = VK_NULL_HANDLE;
+        VkPipeline                                           basePipelineHandle = VK_NULL_HANDLE;
         int32_t                                              basePipelineIndex  = 0;
 
         // 
