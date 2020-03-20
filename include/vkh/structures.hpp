@@ -1305,7 +1305,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
     typedef struct VkRayTracingShaderGroupCreateInfoKHR {
         VkStructureType                   sType                             = VK_STRUCTURE_TYPE_RAY_TRACING_SHADER_GROUP_CREATE_INFO_KHR;
         const void*                       pNext                             = nullptr;
-        VkRayTracingShaderGroupTypeKHR    type                              = VK_RAY_TRACING_SHADER_GROUP_TYPE_TRIANGLES_HIT_GROUP_KHR ;
+        VkRayTracingShaderGroupTypeKHR    type                              = VK_RAY_TRACING_SHADER_GROUP_TYPE_TRIANGLES_HIT_GROUP_KHR;
         uint32_t                          generalShader                     = VK_SHADER_UNUSED_KHR;
         uint32_t                          closestHitShader                  = VK_SHADER_UNUSED_KHR;
         uint32_t                          anyHitShader                      = VK_SHADER_UNUSED_KHR;
