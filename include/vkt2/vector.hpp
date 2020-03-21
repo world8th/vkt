@@ -157,6 +157,9 @@ namespace vkt {
             this->info.range = createInfo->size;
             this->info.device = this->_getDevice();
             this->info.vmaUsage = vmaUsage;
+            this->info.memory = allocationInfo.deviceMemory;
+            this->info.offset = allocationInfo.offset;
+
             return this;
         };
 

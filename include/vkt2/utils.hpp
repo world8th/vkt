@@ -411,6 +411,7 @@ namespace vkt {
 
         vk::Device device = {};
         vk::DeviceMemory memory = {};
+        vk::DeviceSize offset = 0ull;
         vk::DeviceSize range = 0ull;
         vk::DeviceSize reqSize = 0ull;
         vk::ImageLayout initialLayout = vk::ImageLayout::eUndefined;
