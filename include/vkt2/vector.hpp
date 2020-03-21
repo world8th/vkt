@@ -281,8 +281,7 @@ namespace vkt {
         //virtual const vk::DeviceSize& stride() const { return this->stride; };
 
         // LEGACY, used for constructor only
-        //virtual vk::DeviceSize ranged() const { return (this->bufInfo.range != VK_WHOLE_SIZE ? std::min(this->bufInfo.range, this->allocation->range() - this->bufInfo.offset) : (this->allocation->range() - this->bufInfo.offset)); };
-        virtual vk::DeviceSize ranged() const { return (this->bufInfo.range != VK_WHOLE_SIZE ? std::min(vk::DeviceSize(this->bufInfo.range), vk::DeviceSize(this->allocation->range())) : vk::DeviceSize(this->allocation->range())); };
+        virtual vk::DeviceSize ranged() const { return (this->bufInfo.range != VK_WHOLE_SIZE ? std::min(vk::DeviceSize(this->bufInfo.range), vk::DeviceSize(this->allocation->range() - this->offset())) : vk::DeviceSize(this->allocation->range() - this->offset())); };
 
         // Get static and cached value
         virtual vk::DeviceSize& range() { return (this->bufInfo.range = (this->bufRegion.size * this->bufRegion.stride - 0u)); };
