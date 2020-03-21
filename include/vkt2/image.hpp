@@ -130,6 +130,17 @@ namespace vkt {
         virtual ImageAllocation* address() { return this; };
         virtual const ImageAllocation* address() const { return this; };
 
+        // Bindless Textures Directly
+#ifdef ENABLE_OPENGL_INTEROP
+        virtual GLuint& getGL() { return this->info.glID; };
+        virtual const GLuint& getGL() const { return this->info.glID; };
+
+        virtual uint64_t deviceAddress() { return glGetTextureHandleARB(this->info.glID); };
+        virtual const uint64_t deviceAddress() const { return glGetTextureHandleARB(this->info.glID); };
+        virtual uint64_t deviceAddress(GLuint sampler) { return glGetTextureSamplerHandleARB(this->info.glID, sampler); };
+        virtual const uint64_t deviceAddress(GLuint sampler) const { return glGetTextureSamplerHandleARB(this->info.glID, sampler); };
+#endif
+
     // 
     protected: friend VmaImageAllocation; friend ImageAllocation; friend ImageRegion;
         vk::Image image = {};
@@ -348,6 +359,12 @@ namespace vkt {
 #ifdef ENABLE_OPENGL_INTEROP
         virtual GLuint& getGL() { return this->allocation->info.glID; };
         virtual const GLuint& getGL() const { return this->allocation->info.glID; };
+
+        // Bindless Textures Directly
+        virtual uint64_t deviceAddress () { return glGetTextureHandleARB(this->allocation->info.glID); };
+        virtual const uint64_t deviceAddress() const { return glGetTextureHandleARB(this->allocation->info.glID); };
+        virtual uint64_t deviceAddress(GLuint sampler) { return glGetTextureSamplerHandleARB(this->allocation->info.glID, sampler); };
+        virtual const uint64_t deviceAddress(GLuint sampler) const { return glGetTextureSamplerHandleARB(this->allocation->info.glID, sampler); };
 #endif
 
         // 
