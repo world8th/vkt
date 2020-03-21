@@ -84,6 +84,16 @@ namespace vkt {
             return this;
         };
 
+        // UNIMPLEMENTED!
+        virtual vk::DispatchLoaderDynamic dispatchLoaderDynamic() {
+            return {};
+        }
+
+        // UNIMPLEMENTED!
+        virtual vk::DispatchLoaderDynamic dispatchLoaderDynamic() const {
+            return {};
+        }
+
         virtual ImageAllocation& operator=(const vkt::uni_arg<ImageAllocation>& allocation) {
             this->image = allocation->image;
             this->info = allocation->info;
@@ -215,6 +225,17 @@ namespace vkt {
         virtual VmaImageAllocation* address() { return this; };
         virtual const VmaImageAllocation* address() const { return this; };
 
+        //vk::DispatchLoaderDynamic(this->instance, vkGetInstanceProcAddr, this->device, vkGetDeviceProcAddr);
+        virtual vk::DispatchLoaderDynamic dispatchLoaderDynamic() override {
+            VmaAllocatorInfo info = {}; vmaGetAllocatorInfo(this->allocator, &info);
+            return vk::DispatchLoaderDynamic(info.instance, vkGetInstanceProcAddr, info.device, vkGetDeviceProcAddr);
+        };
+
+        virtual vk::DispatchLoaderDynamic dispatchLoaderDynamic() const override {
+            VmaAllocatorInfo info = {}; vmaGetAllocatorInfo(this->allocator, &info);
+            return vk::DispatchLoaderDynamic(info.instance, vkGetInstanceProcAddr, info.device, vkGetDeviceProcAddr);
+        };
+
     // 
     protected: friend VmaImageAllocation; friend ImageAllocation; // 
         VmaAllocation allocation = {};
@@ -264,6 +285,19 @@ namespace vkt {
             this->subresourceRange = info->subresourceRange;
             this->imgInfo.imageView = this->allocation->getDevice().createImageView(info->hpp().setImage(this->allocation->getImage()));
             this->imgInfo.imageLayout = VkImageLayout(*layout);
+
+            // 
+#ifdef ENABLE_OPENGL_INTEROP
+            if (!this->allocation->info.glID) {
+                vk::ImageViewHandleInfoNVX handleInfo = {};
+                handleInfo.imageView = this->imgInfo.imageView;
+                handleInfo.sampler = this->imgInfo.sampler;
+                handleInfo.descriptorType = this->imgInfo.sampler ? vk::DescriptorType::eCombinedImageSampler : vk::DescriptorType::eSampledImage;
+                this->allocation->info.glID = this->allocation->getDevice().getImageViewHandleNVX(&handleInfo, this->allocation->dispatchLoaderDynamic());
+            };
+#endif
+
+            // 
             return this;
         };
 
@@ -357,14 +391,33 @@ namespace vkt {
         virtual vk::ImageSubresourceRange& getImageSubresourceRange() { return this->subresourceRange; };
 
 #ifdef ENABLE_OPENGL_INTEROP
-        virtual GLuint& getGL() { return this->allocation->info.glID; };
-        virtual const GLuint& getGL() const { return this->allocation->info.glID; };
+        virtual GLuint& getGL() { 
+            vk::ImageViewHandleInfoNVX handleInfo = {};
+            handleInfo.imageView = this->imgInfo.imageView;
+            handleInfo.sampler = this->imgInfo.sampler;
+            handleInfo.descriptorType = this->imgInfo.sampler ? vk::DescriptorType::eCombinedImageSampler : vk::DescriptorType::eSampledImage;
+            if (!this->allocation->info.glID) {
+                this->allocation->info.glID = this->allocation->getDevice().getImageViewHandleNVX(&handleInfo, this->allocation->dispatchLoaderDynamic());
+            };
+            return this->allocation->info.glID; 
+        };
+
+        virtual const GLuint& getGL() const { 
+            vk::ImageViewHandleInfoNVX handleInfo = {};
+            handleInfo.imageView = this->imgInfo.imageView;
+            handleInfo.sampler = this->imgInfo.sampler;
+            handleInfo.descriptorType = this->imgInfo.sampler ? vk::DescriptorType::eCombinedImageSampler : vk::DescriptorType::eSampledImage;
+            if (!this->allocation->info.glID) {
+                return this->allocation->getDevice().getImageViewHandleNVX(&handleInfo, this->allocation->dispatchLoaderDynamic());
+            };
+            return this->allocation->info.glID; 
+        };
 
         // Bindless Textures Directly
-        virtual uint64_t deviceAddress () { return glGetTextureHandleARB(this->allocation->info.glID); };
-        virtual const uint64_t deviceAddress() const { return glGetTextureHandleARB(this->allocation->info.glID); };
-        virtual uint64_t deviceAddress(GLuint sampler) { return glGetTextureSamplerHandleARB(this->allocation->info.glID, sampler); };
-        virtual const uint64_t deviceAddress(GLuint sampler) const { return glGetTextureSamplerHandleARB(this->allocation->info.glID, sampler); };
+        virtual uint64_t deviceAddress () { return glGetTextureHandleARB(this->getGL()); };
+        virtual const uint64_t deviceAddress() const { return glGetTextureHandleARB(this->getGL()); };
+        virtual uint64_t deviceAddress(GLuint sampler) { return glGetTextureSamplerHandleARB(this->getGL(), sampler); };
+        virtual const uint64_t deviceAddress(GLuint sampler) const { return glGetTextureSamplerHandleARB(this->getGL(), sampler); };
 #endif
 
         // 
