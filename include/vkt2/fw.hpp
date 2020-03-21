@@ -553,6 +553,7 @@ namespace vkt
             vma_info.device = this->device;
             vma_info.instance = this->instance;
             vma_info.physicalDevice = this->physicalDevice;
+            vma_info.flags = VMA_ALLOCATOR_CREATE_BUFFER_DEVICE_ADDRESS_BIT;
             vmaCreateAllocator(&vma_info, &this->allocator);
 
             // Manually Create Descriptor Pool
