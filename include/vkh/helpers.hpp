@@ -401,6 +401,14 @@ namespace vkh {
             writes_acs.push_back(VkWriteDescriptorSetAccelerationStructureKHR{
                 .accelerationStructureCount = entry.descriptorType == VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR ? entry.descriptorCount : 0u
             });
+            entries.push_back(vkh::VkDescriptorUpdateTemplateEntry{ // TODO: Direct Contact With Descriptor and Heap
+                .dstBinding = entry.dstBinding,
+                .dstArrayElement = entry.dstArrayElement,
+                .descriptorCount = entry.descriptorCount,
+                .descriptorType = entry.descriptorType,
+                .offset = pt0,
+                .stride = sizeof(T)
+            });
             return handles.back();
         };
 
