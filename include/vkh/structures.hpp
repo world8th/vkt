@@ -1213,6 +1213,26 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         VkGeometryTypeKHR                         geometryType  = {};
         VkAccelerationStructureGeometryDataKHR    geometry      = VkAccelerationStructureGeometryDataKHR{ .triangles = {} };
         VkGeometryFlagsKHR                        flags         = {};
+
+        // 
+        VkAccelerationStructureGeometryKHR& operator=(const VkAccelerationStructureGeometryTrianglesDataKHR& triangles) { this->geometryType = VK_GEOMETRY_TYPE_TRIANGLES_KHR; this->geometry.triangles = triangles; return *this; };
+        VkAccelerationStructureGeometryKHR& operator=(const VkAccelerationStructureGeometryInstancesDataKHR& instances) { this->geometryType = VK_GEOMETRY_TYPE_INSTANCES_KHR; this->geometry.instances = instances; return *this; };
+        VkAccelerationStructureGeometryKHR& operator=(const VkAccelerationStructureGeometryAabbsDataKHR& aabbs) { this->geometryType = VK_GEOMETRY_TYPE_AABBS_KHR; this->geometry.aabbs = aabbs; return *this; };
+
+        // TODO: typing resolve
+        operator VkAccelerationStructureGeometryTrianglesDataKHR& () { return geometry.triangles; };
+        operator VkAccelerationStructureGeometryInstancesDataKHR& () { return geometry.instances; };
+        operator VkAccelerationStructureGeometryAabbsDataKHR& () { return geometry.aabbs; };
+
+        // TODO: typing resolve
+        operator const VkAccelerationStructureGeometryTrianglesDataKHR& () const { return geometry.triangles; };
+        operator const VkAccelerationStructureGeometryInstancesDataKHR& () const { return geometry.instances; };
+        operator const VkAccelerationStructureGeometryAabbsDataKHR& () const { return geometry.aabbs; };
+
+        // 
+        operator VkAccelerationStructureGeometryDataKHR& () { return geometry; };
+        operator const VkAccelerationStructureGeometryDataKHR& () const { return geometry; };
+
 #ifdef VK_ENABLE_BETA_EXTENSIONS
         STRUCT_OPERATORS(VkAccelerationStructureGeometryKHR)
         VK_HPP_STRUCT_OPERATORS(VkAccelerationStructureGeometryKHR, vk::AccelerationStructureGeometryKHR)
