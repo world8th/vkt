@@ -8,6 +8,7 @@ Writing for C++20 prior...
 
 *   [LancER](https://github.com/hyperearth/LancER) - (WIP) Ray Tracing Library and Demo
 *   [RadX](https://github.com/world8th/RadX) - (WIP) Radix Sort for Newest GPU
+*   Hello triangle example, based on [VK_KHR_ray_tracing](https://github.com/helixd-2k18/VK_KHR_ray_tracing) extension, modified
 
 ## Tech Spec
 
