@@ -406,8 +406,10 @@ namespace vkt {
     };
 
     void debugLabel(const vk::CommandBuffer& buildCommand, const std::string& labelName = "", const vk::DispatchLoaderDynamic& dispatch = {}) {
+#ifdef VKT_ENABLE_DEBUG_MARK
         buildCommand.insertDebugUtilsLabelEXT(vk::DebugUtilsLabelEXT().setColor({ 1.f,0.75,0.25f }).setPLabelName(labelName.c_str()), dispatch);
         buildCommand.setCheckpointNV(labelName.c_str(), dispatch);
+#endif
     };
 
     // 
