@@ -405,6 +405,11 @@ namespace vkt {
         std::vector<T> V{}; for (auto& v : Vy) {V.push_back(reinterpret_cast<const T&>(v));}; return std::move(V);
     };
 
+    void debugLabel(const vk::CommandBuffer& buildCommand, const std::string& labelName = "", const vk::DispatchLoaderDynamic& dispatch = {}) {
+        buildCommand.insertDebugUtilsLabelEXT(vk::DebugUtilsLabelEXT().setColor({ 1.f,0.75,0.25f }).setPLabelName(labelName.c_str()), dispatch);
+        buildCommand.setCheckpointNV(labelName.c_str(), dispatch);
+    };
+
     // 
     struct MemoryAllocationInfo { // 
         uint32_t glMemory = 0u, glID = 0u;

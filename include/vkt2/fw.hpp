@@ -94,6 +94,8 @@ namespace vkt
             "VK_EXT_debug_marker",
             "VK_EXT_debug_report",
             "VK_EXT_debug_utils",
+
+            "VK_NV_device_diagnostic_checkpoints"
         };
 
         // default device extensions
@@ -105,7 +107,8 @@ namespace vkt
             "VK_EXT_sample_locations",
             "VK_EXT_conservative_rasterization",
             "VK_EXT_hdr_metadata",
-            
+            "VK_EXT_transform_feedback",
+
             // 
             "VK_EXT_descriptor_indexing",
             "VK_KHR_descriptor_update_template",
@@ -171,6 +174,7 @@ namespace vkt
             "VK_KHR_display",
 
             // 
+            "VK_NV_device_diagnostic_checkpoints",
             "VK_NV_compute_shader_derivatives",
             "VK_NV_corner_sampled_image",
             "VK_NV_shader_image_footprint",
@@ -199,13 +203,13 @@ namespace vkt
 
             // 
             "VK_KHR_buffer_device_address",
-            "VK_EXT_buffer_device_address"
+            //"VK_EXT_buffer_device_address"
         };
 
         // instance layers
         std::vector<const char*> wantedLayers = {
             //"VK_LAYER_KHRONOS_validation",
-            
+
             //"VK_LAYER_LUNARG_assistant_layer",
             //"VK_LAYER_LUNARG_standard_validation",
             //"VK_LAYER_LUNARG_parameter_validation",
@@ -466,6 +470,8 @@ namespace vkt
             };
 
             // minimal features
+            auto gTrasformFeedback = vk::PhysicalDeviceTransformFeedbackFeaturesEXT{};
+            auto gRayTracing = vk::PhysicalDeviceRayTracingFeaturesKHR{};
             auto gTexelBufferAligment = vk::PhysicalDeviceTexelBufferAlignmentFeaturesEXT{};
             auto gStorage16 = vk::PhysicalDevice16BitStorageFeatures{};
             auto gStorage8 = vk::PhysicalDevice8BitStorageFeatures{};
@@ -473,11 +479,12 @@ namespace vkt
             auto gFloat16U8 = vk::PhysicalDeviceFloat16Int8FeaturesKHR{}; // Vulkan 1.3
             auto gFeatures = vk::PhysicalDeviceFeatures2{};
             auto gDeviceAddress = vk::PhysicalDeviceBufferDeviceAddressFeatures{};
-            auto transformFeedback = vk::PhysicalDeviceTransformFeedbackFeaturesEXT{};
+
             //auto gConsertvative = vk::PhysicalDeviceConservativeRasterizationPropertiesEXT{};
 
             // 
-            gDeviceAddress.pNext = &transformFeedback;
+            gTrasformFeedback.pNext = &gRayTracing;
+            gDeviceAddress.pNext = &gTrasformFeedback;
             gTexelBufferAligment.pNext = &gDeviceAddress;
             gFloat16U8.pNext = &gTexelBufferAligment;
             gStorage8.pNext = &gFloat16U8;
