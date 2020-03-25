@@ -123,6 +123,7 @@ namespace vkt
             "VK_EXT_sampler_filter_minmax",
             "VK_KHR_sampler_ycbcr_conversion",
             "VK_KHR_sampler_mirror_clamp_to_edge",
+            "VK_KHR_imageless_framebuffer",
 
             // 
             "VK_KHR_bind_memory2",
@@ -472,9 +473,11 @@ namespace vkt
             auto gFloat16U8 = vk::PhysicalDeviceFloat16Int8FeaturesKHR{}; // Vulkan 1.3
             auto gFeatures = vk::PhysicalDeviceFeatures2{};
             auto gDeviceAddress = vk::PhysicalDeviceBufferDeviceAddressFeatures{};
+            auto transformFeedback = vk::PhysicalDeviceTransformFeedbackFeaturesEXT{};
             //auto gConsertvative = vk::PhysicalDeviceConservativeRasterizationPropertiesEXT{};
 
             // 
+            gDeviceAddress.pNext = &transformFeedback;
             gTexelBufferAligment.pNext = &gDeviceAddress;
             gFloat16U8.pNext = &gTexelBufferAligment;
             gStorage8.pNext = &gFloat16U8;
