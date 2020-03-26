@@ -1,0 +1,3 @@
+[submodule "xvk"]
+	path = include/xvk
+	url = https://github.com/Vulkan4D/xvk.git
