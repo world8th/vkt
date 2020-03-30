@@ -208,7 +208,7 @@ namespace vkt
 
         // instance layers
         std::vector<const char*> wantedLayers = {
-            "VK_LAYER_KHRONOS_validation",
+            //"VK_LAYER_KHRONOS_validation",
 
             //"VK_LAYER_LUNARG_assistant_layer",
             //"VK_LAYER_LUNARG_standard_validation",
@@ -783,8 +783,19 @@ namespace vkt
             updateSwapchainFramebuffer(swapchainBuffers, swapchain, renderpass);
             for (int i = 0; i < swapchainBuffers.size(); i++)
             { // create semaphore
-                swapchainBuffers[i].semaphore = device.createSemaphore(vk::SemaphoreCreateInfo());
+                vk::SemaphoreTypeCreateInfo timeline = {};
+                timeline.semaphoreType = vk::SemaphoreType::eTimeline;
+                timeline.initialValue = i;
+
+                // 
+                //swapchainBuffers[i].semaphore = device.createSemaphore(vk::SemaphoreCreateInfo());
+                swapchainBuffers[i].drawSemaphore = device.createSemaphore(vk::SemaphoreCreateInfo());
+                swapchainBuffers[i].presentSemaphore = device.createSemaphore(vk::SemaphoreCreateInfo());
                 swapchainBuffers[i].waitFence = device.createFence(vk::FenceCreateInfo().setFlags(vk::FenceCreateFlagBits::eSignaled));
+                ///swapchainBuffers[i].timeline = device.createSemaphore(vk::SemaphoreCreateInfo().setPNext(&timeline));
+
+                // 
+                //device.signalSemaphore(vk::SemaphoreSignalInfo().setSemaphore(swapchainBuffers[i].timeline).setValue(i));
             };
             return swapchainBuffers;
         }

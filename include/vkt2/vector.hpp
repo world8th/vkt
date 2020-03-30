@@ -26,6 +26,7 @@ namespace vkt {
             const vkt::uni_arg<vkh::VkBufferCreateInfo>& createInfo = vkh::VkBufferCreateInfo{}
         ) {
             this->buffer = this->info.device.createBuffer(*createInfo);
+            this->usage = createInfo->usage;
 
             vk::MemoryAllocateFlagsInfo allocFlags = {};
             allocFlags.flags = vk::MemoryAllocateFlagBits::eDeviceAddress;
@@ -112,7 +113,7 @@ namespace vkt {
 
         // 
         virtual vkh::VkDeviceOrHostAddressKHR deviceAddress() {
-            return vkh::VkDeviceOrHostAddressKHR{ .deviceAddress = getDevice().getBufferAddress(vkh::VkBufferDeviceAddressInfo{.buffer = this->buffer }.hpp()) };
+            return vkh::VkDeviceOrHostAddressKHR{ .deviceAddress = this->usage.eSharedDeviceAddress ? getDevice().getBufferAddress(vkh::VkBufferDeviceAddressInfo{.buffer = this->buffer }.hpp()) : 0ull };
         };
 
         // 
@@ -126,6 +127,7 @@ namespace vkt {
 
     public: // in-variant 
         vk::Buffer buffer = {};
+        vkh::VkBufferUsageFlags usage = {};
         vk::DeviceAddress cached = {};
         MemoryAllocationInfo info = {};
 
@@ -159,6 +161,7 @@ namespace vkt {
             this->info.vmaUsage = vmaUsage;
             this->info.memory = allocationInfo.deviceMemory;
             this->info.offset = allocationInfo.offset;
+            this->usage = createInfo->usage;
 
             return this;
         };

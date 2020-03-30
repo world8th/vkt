@@ -20,7 +20,10 @@ namespace vkt {
         vk::CommandBuffer commandBuffer = {}; // terminal command (barrier)
         vk::Fence waitFence = {};
         //vk::Image image = {};
-        vk::Semaphore semaphore = {};
+
+        vk::Semaphore drawSemaphore = {}, presentSemaphore = {};
+
+        //vk::Semaphore timeline = {};
     };
 
 #pragma pack(push, 1)
