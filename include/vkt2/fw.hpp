@@ -208,7 +208,7 @@ namespace vkt
 
         // instance layers
         std::vector<const char*> wantedLayers = {
-            //"VK_LAYER_KHRONOS_validation",
+            "VK_LAYER_KHRONOS_validation",
 
             //"VK_LAYER_LUNARG_assistant_layer",
             //"VK_LAYER_LUNARG_standard_validation",
@@ -525,6 +525,9 @@ namespace vkt
                 };
             };
 #endif
+            // TRYING
+            //gRayTracing.rayTracingIndirectAccelerationStructureBuild = true;
+            //gRayTracing.rayQuery = true;
 
             // return device with queue pointer
             const uint32_t qptr = 0;

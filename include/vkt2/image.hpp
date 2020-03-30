@@ -329,7 +329,16 @@ namespace vkt {
         virtual ImageRegion& transfer(vk::CommandBuffer& cmdBuf) {
             vkt::imageBarrier(cmdBuf, vkt::ImageBarrierInfo{ 
                 .image = this->allocation->getImage(),
-                .targetLayout = reinterpret_cast<vk::ImageLayout&>(this->imgInfo.imageLayout),
+                .targetLayout = reinterpret_cast<const vk::ImageLayout&>(this->imgInfo.imageLayout),
+                .originLayout = this->allocation->info.initialLayout,
+                .subresourceRange = this->subresourceRange
+            });
+            return *this;
+        };
+        virtual const ImageRegion& transfer(vk::CommandBuffer& cmdBuf) const {
+            vkt::imageBarrier(cmdBuf, vkt::ImageBarrierInfo{
+                .image = this->allocation->getImage(),
+                .targetLayout = reinterpret_cast<const vk::ImageLayout&>(this->imgInfo.imageLayout),
                 .originLayout = this->allocation->info.initialLayout,
                 .subresourceRange = this->subresourceRange
             });
