@@ -118,7 +118,7 @@ namespace vkt {
 
         // 
         virtual vkh::VkDeviceOrHostAddressConstKHR deviceAddress() const {
-            return vkh::VkDeviceOrHostAddressConstKHR{ .deviceAddress = getDevice().getBufferAddress(vkh::VkBufferDeviceAddressInfo{.buffer = this->buffer }.hpp()) };
+            return vkh::VkDeviceOrHostAddressConstKHR{ .deviceAddress = this->usage.eSharedDeviceAddress ? getDevice().getBufferAddress(vkh::VkBufferDeviceAddressInfo{.buffer = this->buffer }.hpp()) : 0ull };
         };
 
         // getter by operator (for direct pass)
@@ -242,8 +242,18 @@ namespace vkt {
                 .buffer = static_cast<VkBuffer>(this->bufRegion.buffer),
                 .format = static_cast<VkFormat>(format),
                 .offset = this->bufRegion.offset,
-                .range = this->bufRegion.stride * this->bufRegion.size
+                .range = this->bufInfo.range
             }));
+        };
+
+        // 
+        virtual vk::BufferView createBufferView(const vk::Format& format = vk::Format::eUndefined) const {
+            return allocation->getDevice().createBufferView(vkh::VkBufferViewCreateInfo{
+                .buffer = static_cast<VkBuffer>(this->bufRegion.buffer),
+                .format = static_cast<VkFormat>(format),
+                .offset = this->bufRegion.offset,
+                .range = this->bufInfo.range
+            });
         };
 
         // alias Of getAllocation
