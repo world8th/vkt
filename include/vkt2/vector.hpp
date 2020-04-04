@@ -369,13 +369,13 @@ namespace vkt {
         // get deviceAddress with offset (currently, prefer unshifted)
         virtual vkh::VkDeviceOrHostAddressKHR deviceAddress() {
             //return vkh::VkDeviceOrHostAddressKHR{ .deviceAddress = getDevice().getBufferAddress(vkh::VkBufferDeviceAddressInfo{ .buffer = this->buffer() }.hpp()) + this->offset() };
-            return vkh::VkDeviceOrHostAddressKHR{ .deviceAddress = getDevice().getBufferAddress(vkh::VkBufferDeviceAddressInfo{.buffer = this->buffer() }.hpp()) };
+            return this->allocation->deviceAddress();
         };
 
         // get deviceAddress with offset (currently, prefer unshifted)
         virtual vkh::VkDeviceOrHostAddressConstKHR deviceAddress() const {
             //return vkh::VkDeviceOrHostAddressConstKHR{ .deviceAddress = getDevice().getBufferAddress(vkh::VkBufferDeviceAddressInfo{ .buffer = this->buffer() }.hpp()) + this->offset() };
-            return vkh::VkDeviceOrHostAddressConstKHR{ .deviceAddress = getDevice().getBufferAddress(vkh::VkBufferDeviceAddressInfo{.buffer = this->buffer() }.hpp()) };
+            return this->allocation->deviceAddress();
         };
 
         // 
