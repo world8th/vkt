@@ -60,13 +60,13 @@ namespace vkt {
 
     public: // 
         uni_ptr<T>() {};
-        uni_ptr<T>(const std::shared_ptr<T>& shared) { *this = shared; };
+        uni_ptr<T>(std::shared_ptr<T> shared) { *this = shared; };
         uni_ptr<T>(T* regular) { *this = regular; };
         uni_ptr<T>(T& regular) { *this = regular; }; // for argument passing
-        
+
         virtual uni_ptr* operator= (T* ptr) { regular = ptr; return this; };
         virtual uni_ptr* operator= (T& ptr) { regular = &ptr; return this; }; // for argument passing
-        virtual uni_ptr* operator= (const std::shared_ptr<T>& ptr) { shared = ptr; return this; };
+        virtual uni_ptr* operator= (std::shared_ptr<T> ptr) { shared = ptr; return this; };
 
         // 
         template<class M = T>
@@ -141,14 +141,14 @@ namespace vkt {
         uni_arg<T>() : storage(T{}) {};
         uni_arg<T>(const T& t) : storage(t) {};
         uni_arg<T>(const T* t) : storage(*t) {};
-        uni_arg<T>(const uni_arg<T>& t) : storage(*t) {};
-        uni_arg<T>(const uni_ptr<T>& p) : storage(*p) {}; // UnUsual and Vain
+        //uni_arg<T>(uni_arg<T> t) : storage(*t) {};
+        uni_arg<T>(uni_ptr<T> p) : storage(*p) {}; // UnUsual and Vain
 
         // 
         virtual uni_ptr<T> operator= (const T& ptr) { storage =  ptr; return uni_ptr<T>(*storage); };
         virtual uni_ptr<T> operator= (const T* ptr) { storage = *ptr; return uni_ptr<T>(*storage); };
-        virtual uni_ptr<T> operator= (const uni_arg<T>& t) { storage = *t; return uni_ptr<T>(*storage); };
-        virtual uni_ptr<T> operator= (const uni_ptr<T>& p) { storage = *p; return uni_ptr<T>(*storage); };
+        virtual uni_ptr<T> operator= (uni_arg<T> t) { storage = *t; return uni_ptr<T>(*storage); };
+        virtual uni_ptr<T> operator= (uni_ptr<T> p) { storage = *p; return uni_ptr<T>(*storage); };
 
         // experimental
         virtual operator T& () { return *storage; };
