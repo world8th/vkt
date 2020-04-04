@@ -817,7 +817,7 @@ namespace vkt
 
             // get supported present mode, but prefer mailBox
             auto presentMode = vk::PresentModeKHR::eImmediate;
-            std::vector<vk::PresentModeKHR> priorityModes = { vk::PresentModeKHR::eImmediate, vk::PresentModeKHR::eMailbox, vk::PresentModeKHR::eFifoRelaxed, vk::PresentModeKHR::eFifo };
+            std::vector<vk::PresentModeKHR> priorityModes = { vk::PresentModeKHR::eMailbox, vk::PresentModeKHR::eFifoRelaxed, vk::PresentModeKHR::eFifo, vk::PresentModeKHR::eImmediate };
 
             bool found = false; // 
             for (auto pm : priorityModes) {
