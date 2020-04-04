@@ -203,12 +203,12 @@ namespace vkt
 
             // 
             "VK_KHR_buffer_device_address",
-            //"VK_EXT_buffer_device_address"
+            "VK_EXT_buffer_device_address"
         };
 
         // instance layers
         std::vector<const char*> wantedLayers = {
-            "VK_LAYER_KHRONOS_validation",
+            //"VK_LAYER_KHRONOS_validation",
 
             //"VK_LAYER_LUNARG_assistant_layer",
             //"VK_LAYER_LUNARG_standard_validation",

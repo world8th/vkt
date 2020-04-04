@@ -138,10 +138,8 @@ namespace vkt {
     class VmaBufferAllocation : public BufferAllocation { public: 
         VmaBufferAllocation() {};
         VmaBufferAllocation(const vkt::uni_arg<VmaAllocator>& allocator, const vkt::uni_arg<vkh::VkBufferCreateInfo>& createInfo = vkh::VkBufferCreateInfo{}, VmaMemoryUsage vmaUsage = VMA_MEMORY_USAGE_GPU_ONLY) { this->construct(*allocator,  createInfo, vmaUsage); };
-        
         VmaBufferAllocation(const vkt::uni_ptr<VmaBufferAllocation>& allocation) : allocation(allocation->allocation), allocationInfo(allocation->allocationInfo), allocator(allocation->allocator) { *this = allocation; };
         VmaBufferAllocation(const vkt::uni_ptr<BufferAllocation>& allocation) { *this = dynamic_cast<const VmaBufferAllocation&>(*allocation); };
-
         //VmaBufferAllocation(const std::shared_ptr<VmaBufferAllocation>& allocation) : allocation(allocation->allocation), allocationInfo(allocation->allocationInfo), allocator(allocation->allocator) { *this = allocation; };
         //VmaBufferAllocation(const std::shared_ptr<BufferAllocation>& allocation) { *this = std::dynamic_pointer_cast<VmaBufferAllocation>(allocation); };
 

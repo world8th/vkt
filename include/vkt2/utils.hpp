@@ -415,7 +415,7 @@ namespace vkt {
     // 
     template<class T> 
     T handleHpp(vk::ResultValue<T> V) {
-        assert(V.result != VK_SUCCESS);
+        assert(V.result == vk::Result::eSuccess);
         return std::move(V.value);
     };
 
