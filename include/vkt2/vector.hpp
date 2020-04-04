@@ -113,12 +113,12 @@ namespace vkt {
 
         // 
         virtual vkh::VkDeviceOrHostAddressKHR deviceAddress() {
-            return vkh::VkDeviceOrHostAddressKHR{ .deviceAddress = this->usage.eSharedDeviceAddress ? getDevice().getBufferAddress(vkh::VkBufferDeviceAddressInfo{.buffer = this->buffer }.hpp()) : 0ull };
+            return vkh::VkDeviceOrHostAddressKHR{ .deviceAddress = this->usage.eSharedDeviceAddress ? getDevice().getBufferAddress(vkh::VkBufferDeviceAddressInfo{.buffer = this->buffer }.hpp(), this->info.dispatch) : 0ull };
         };
 
         // 
         virtual vkh::VkDeviceOrHostAddressConstKHR deviceAddress() const {
-            return vkh::VkDeviceOrHostAddressConstKHR{ .deviceAddress = this->usage.eSharedDeviceAddress ? getDevice().getBufferAddress(vkh::VkBufferDeviceAddressInfo{.buffer = this->buffer }.hpp()) : 0ull };
+            return vkh::VkDeviceOrHostAddressConstKHR{ .deviceAddress = this->usage.eSharedDeviceAddress ? getDevice().getBufferAddress(vkh::VkBufferDeviceAddressInfo{.buffer = this->buffer }.hpp(), this->info.dispatch) : 0ull };
         };
 
         // getter by operator (for direct pass)
@@ -154,6 +154,7 @@ namespace vkt {
             VmaAllocationCreateInfo vmaInfo = {}; vmaInfo.usage = vmaUsage;
             if (vmaUsage == VMA_MEMORY_USAGE_CPU_TO_GPU || vmaUsage == VMA_MEMORY_USAGE_GPU_TO_CPU) { vmaInfo.flags = VMA_ALLOCATION_CREATE_MAPPED_BIT; };
 
+            // 
             auto result = vmaCreateBuffer(this->allocator = allocator, *createInfo, &vmaInfo, &reinterpret_cast<VkBuffer&>(buffer), &allocation, &allocationInfo);
             assert(result == VK_SUCCESS);
             this->info.range = createInfo->size;
@@ -163,6 +164,12 @@ namespace vkt {
             this->info.offset = allocationInfo.offset;
             this->usage = createInfo->usage;
 
+            // Get Dispatch Loader From VMA Allocator Itself!
+            VmaAllocatorInfo info = {};
+            vmaGetAllocatorInfo(this->allocator, &info);
+            this->info.dispatch = vk::DispatchLoaderDynamic(info.instance, vkGetInstanceProcAddr, info.device, vkGetDeviceProcAddr); // 
+
+            // 
             return this;
         };
 
@@ -198,6 +205,16 @@ namespace vkt {
         // 
         virtual VmaBufferAllocation* address() { return this; };
         virtual const VmaBufferAllocation* address() const { return this; };
+
+        // VMA-Based Version
+        virtual vkh::VkDeviceOrHostAddressKHR deviceAddress() override {
+            return vkh::VkDeviceOrHostAddressKHR{ .deviceAddress = this->usage.eSharedDeviceAddress ? getDevice().getBufferAddress(vkh::VkBufferDeviceAddressInfo{.buffer = this->buffer }.hpp(), this->info.dispatch) : 0ull };
+        };
+
+        // VMA-Based Version
+        virtual vkh::VkDeviceOrHostAddressConstKHR deviceAddress() const override {
+            return vkh::VkDeviceOrHostAddressConstKHR{ .deviceAddress = this->usage.eSharedDeviceAddress ? getDevice().getBufferAddress(vkh::VkBufferDeviceAddressInfo{.buffer = this->buffer }.hpp(), this->info.dispatch) : 0ull };
+        };
 
     // 
     protected: friend VmaBufferAllocation; friend BufferAllocation; // 

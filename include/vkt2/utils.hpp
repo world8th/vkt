@@ -413,6 +413,13 @@ namespace vkt {
     };
 
     // 
+    template<class T> 
+    T handleHpp(vk::ResultValue<T> V) {
+        assert(V.result != VK_SUCCESS);
+        return std::move(V.value);
+    };
+
+    // 
     struct MemoryAllocationInfo { // 
         uint32_t glMemory = 0u, glID = 0u;
 
