@@ -64,8 +64,17 @@ namespace vkt {
         uni_ptr<T>(T* regular) { *this = regular; };
         uni_ptr<T>(T& regular) { *this = regular; }; // for argument passing
         
+        virtual uni_ptr* operator= (T* ptr) { regular = ptr; return this; };
+        virtual uni_ptr* operator= (T& ptr) { regular = &ptr; return this; }; // for argument passing
+        virtual uni_ptr* operator= (const std::shared_ptr<T>& ptr) { shared = ptr; return this; };
+
+        // 
+        template<class M = T>
+        uni_ptr<M> dyn_cast() { return shared ? uni_ptr<M>(std::dynamic_pointer_cast<M>(shared)) : uni_ptr<M>(dynamic_cast<M*>(*regular)); };
+
+        // 
         template<class... A>
-        uni_ptr<T>(A... args) : shared(std::make_shared<T>(args)) {};
+        uni_ptr<T>(A... args) : shared(std::make_shared<T>(args...)) {};
 
         // 
         virtual std::shared_ptr<T>& get_shared() { return (this->shared = (this->shared ? this->shared : std::shared_ptr<T>(*this->regular))); };
@@ -111,15 +120,10 @@ namespace vkt {
             this->shared = ptr;
         };*/
 
-        virtual uni_ptr* operator= (T* ptr) { regular = ptr; return this; };
-        virtual uni_ptr* operator= (T& ptr) { regular = &ptr; return this; }; // for argument passing
-
         //virtual uni_ptr* operator= (const T* p) { storage = *p; regular = &storage; return this; };
         //virtual uni_ptr* operator= (const T& p) { storage = p; regular = &storage; return this; };
         //virtual uni_ptr* operator= (T p) { storage = p; regular = &storage; return this; };
         //virtual uni_ptr* operator= (T&& p) { storage = std::move(p); regular = &storage; return this; };
-
-        virtual uni_ptr* operator= (const std::shared_ptr<T>& ptr) { shared = ptr; return this; };
 
         // 
         virtual T* operator->() { return get_ptr(); };
