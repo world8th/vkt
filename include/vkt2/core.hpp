@@ -54,7 +54,7 @@ namespace vkt {
     template<class T = uint8_t>
     class uni_ptr {
     protected: //using T = uint8_t;
-        std::optional<T*> regular = std::nullopt;
+        std::optional<std::reference_wrapper<T>> regular = std::nullopt;
         std::shared_ptr<T> shared = {};
         //T storage = {};
 
@@ -64,25 +64,34 @@ namespace vkt {
         uni_ptr<T>(T* regular) { *this = regular; };
         uni_ptr<T>(T& regular) { *this = regular; }; // for argument passing
 
-        virtual uni_ptr* operator= (T* ptr) { regular = ptr; return this; };
-        virtual uni_ptr* operator= (T& ptr) { regular = &ptr; return this; }; // for argument passing
+        // 
+        virtual uni_ptr* operator= (T* ptr) { regular = *ptr; return this; };
+        virtual uni_ptr* operator= (T& ptr) { regular =  ptr; return this; }; // for argument passing
         virtual uni_ptr* operator= (std::shared_ptr<T> ptr) { shared = ptr; return this; };
 
         // 
         template<class M = T>
-        uni_ptr<M> dyn_cast() { return shared ? uni_ptr<M>(std::dynamic_pointer_cast<M>(shared)) : uni_ptr<M>(dynamic_cast<M*>(*regular)); };
+        uni_ptr<M> dyn_cast() { T& r = *regular; return shared ? uni_ptr<M>(std::dynamic_pointer_cast<M>(shared)) : uni_ptr<M>(dynamic_cast<M&>(r)); };
 
         // 
         template<class... A>
         uni_ptr<T>(A... args) : shared(std::make_shared<T>(args...)) {};
 
         // 
-        virtual std::shared_ptr<T>& get_shared() { return (this->shared = (this->shared ? this->shared : std::shared_ptr<T>(*this->regular))); };
-        virtual const std::shared_ptr<T>& get_shared() const { return (this->shared ? this->shared : std::shared_ptr<T>(*this->regular)); };
+        virtual std::shared_ptr<T>& get_shared() { return (this->shared = (this->shared ? this->shared : std::shared_ptr<T>(get_ptr()))); };
+        virtual std::shared_ptr<T>  get_shared() const { return (this->shared ? this->shared : std::shared_ptr<T>(const_cast<T*>(get_ptr()))); };
 
         // 
-        virtual T* get_ptr() { return (regular ? *regular : &(*shared)); };
-        virtual const T* get_ptr() const { return (regular ? *regular : &(*shared)); };
+        virtual T* get_ptr() { 
+            T& r = *regular;
+            return (regular ? &r : &(*shared));
+        };
+
+        // 
+        virtual const T* get_ptr() const {
+            const T& r = *regular;
+            return (regular ? &r : &(*shared));
+        };
 
         // 
         virtual T* ptr() { return get_ptr(); };
