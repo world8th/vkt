@@ -33,7 +33,9 @@ namespace vkt {
 
     // boolean 32-bit capable for C++
     class bool32_t { // TODO: support operators
-    protected: uint32_t b_:1;
+    protected: union {
+        uint32_t b_ : 1; bool bb = false;
+    };
     public: friend bool32_t;
         constexpr bool32_t(): b_(0u) {};
         bool32_t(const bool&a=false): b_(a?1u:0u) {};
@@ -150,8 +152,8 @@ namespace vkt {
         uni_arg<T>() : storage(T{}) {};
         uni_arg<T>(const T& t) : storage(t) {};
         uni_arg<T>(const T* t) : storage(*t) {};
-        //uni_arg<T>(uni_arg<T> t) : storage(*t) {};
         uni_arg<T>(uni_ptr<T> p) : storage(*p) {}; // UnUsual and Vain
+        //uni_arg<T>(uni_arg<T> t) : storage(*t) {};
 
         // 
         virtual uni_ptr<T> operator= (const T& ptr) { storage =  ptr; return uni_ptr<T>(*storage); };
