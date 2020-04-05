@@ -76,7 +76,7 @@ namespace vkt
 
 
 
-    class GPUFramework {
+    class GPUFramework : std::enable_shared_from_this<GPUFramework> {
     protected:
 
         // instance extensions
@@ -229,7 +229,42 @@ namespace vkt
         };
 
 
-    public: GPUFramework() {};
+    public: friend GPUFramework;
+        GPUFramework() {};
+        //GPUFramework(const GPUFramework& fw) { *this = fw; };
+        //GPUFramework(GPUFramework* fw) { *this = fw; };
+        GPUFramework(vkt::uni_ptr<GPUFramework> fw) { *this = fw; };
+        //GPUFramework(std::shared_ptr<GPUFramework> fw) { *this = fw; };
+
+        // 
+        GPUFramework& operator=(vkt::uni_ptr<GPUFramework> fw) {
+            if (fw.ptr()) {
+                this->fence = fw->fence;
+                this->queue = fw->queue;
+                this->device = fw->device;
+                this->instance = fw->instance;
+                this->descriptorPool = fw->descriptorPool;
+                this->physicalDevice = fw->physicalDevice;
+                this->commandPool = fw->commandPool;
+                this->renderPass = fw->renderPass;
+                this->depthImage = fw->depthImage;
+                this->depthImageView = fw->depthImageView;
+                this->pipelineCache = fw->pipelineCache;
+                this->dispatch = fw->dispatch;
+                this->memoryProperties = fw->memoryProperties;
+                this->messenger = fw->messenger;
+                this->allocator = fw->allocator;
+                this->queueFamilyIndex = fw->queueFamilyIndex;
+                this->instanceVersion = fw->instanceVersion;
+                this->vmaDepthImageAllocation = fw->vmaDepthImageAllocation;
+                this->vmaDepthImageAllocationInfo = fw->vmaDepthImageAllocationInfo;
+                this->physicalDevices = fw->physicalDevices;
+                this->queueFamilyIndices = fw->queueFamilyIndices;
+            };
+            return *this;
+        };
+
+
         vk::Fence fence = {};
         vk::Queue queue = {};
         vk::Device device = {};

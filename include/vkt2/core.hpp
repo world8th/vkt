@@ -60,16 +60,27 @@ namespace vkt {
         std::shared_ptr<T> shared = {};
         //T storage = {};
 
-    public: // 
+    public: friend uni_ptr<T>; // 
         uni_ptr<T>() {};
         uni_ptr<T>(std::shared_ptr<T> shared) { *this = shared; };
         uni_ptr<T>(T* regular) { *this = regular; };
         uni_ptr<T>(T& regular) { *this = regular; }; // for argument passing
+        uni_ptr<T>(const uni_ptr<T>& ptr) { *this = ptr; };
 
         // 
-        virtual uni_ptr* operator= (T* ptr) { regular = *ptr; return this; };
-        virtual uni_ptr* operator= (T& ptr) { regular =  ptr; return this; }; // for argument passing
+        virtual uni_ptr* operator= (T* ptr) { regular = std::ref(*ptr); return this; };
+        virtual uni_ptr* operator= (T& ptr) { regular = std::ref( ptr); return this; }; // for argument passing
         virtual uni_ptr* operator= (std::shared_ptr<T> ptr) { shared = ptr; return this; };
+        virtual uni_ptr* operator= (const uni_ptr<T>& ptr) { 
+            T& ref = *ptr.regular;
+            shared = ptr.shared, regular = std::ref(ref);
+            return this;
+        };
+        virtual uni_ptr* operator= (uni_ptr<T>& ptr) { 
+            T& ref = *ptr.regular;
+            shared = ptr.shared, regular = std::ref(ref);
+            return this;
+        };
 
         // 
         template<class M = T>
@@ -86,55 +97,38 @@ namespace vkt {
         // 
         virtual T* get_ptr() { 
             T& r = *regular;
-            return (regular ? &r : &(*shared));
+            return (shared ? &(*shared) : &r);
         };
 
         // 
         virtual const T* get_ptr() const {
             const T& r = *regular;
-            return (regular ? &r : &(*shared));
+            return (shared ? &(*shared) : &r);
         };
+
+        // 
+        virtual bool has() { return regular && shared; };
+        virtual bool has() const { return regular && shared; };
 
         // 
         virtual T* ptr() { return get_ptr(); };
         virtual const T* ptr() const { return get_ptr(); };
 
         // 
-        virtual T& ref() { return *get_ptr(); };
-        virtual const T& ref() const { return *get_ptr(); };
+        virtual T& ref() { T& r = *regular, s = *shared; return regular ? r : s; };
+        virtual const T& ref() const { const T& r = *regular, s = *shared; return regular ? r : s; };
 
         // experimental
-        virtual operator T& () { return *get_ptr(); };
-        virtual operator const T& () const { return *get_ptr(); };
+        virtual operator T& () { return ref(); };
+        virtual operator const T& () const { return ref(); };
 
         // 
-        virtual operator T* () { return get_ptr(); };
-        virtual operator const T* () const { return get_ptr(); };
+        virtual operator T* () { return ptr(); };
+        virtual operator const T* () const { return ptr(); };
 
         // 
         virtual operator std::shared_ptr<T>& () { return get_shared(); };
         virtual operator const std::shared_ptr<T>& () const { return get_shared(); };
-
-        /* //
-        template<class M = T>
-        inline uni_ptr* operator=(const uni_ptr<M>& ptr) {
-            this->storage = ptr;
-            this->regular = ptr;
-            this->shared = ptr;
-        };
-
-        //
-        template<class M = T>
-        inline uni_ptr* set(const uni_ptr<M>& ptr) {
-            this->storage = ptr;
-            this->regular = ptr;
-            this->shared = ptr;
-        };*/
-
-        //virtual uni_ptr* operator= (const T* p) { storage = *p; regular = &storage; return this; };
-        //virtual uni_ptr* operator= (const T& p) { storage = p; regular = &storage; return this; };
-        //virtual uni_ptr* operator= (T p) { storage = p; regular = &storage; return this; };
-        //virtual uni_ptr* operator= (T&& p) { storage = std::move(p); regular = &storage; return this; };
 
         // 
         virtual T* operator->() { return get_ptr(); };
@@ -153,21 +147,21 @@ namespace vkt {
         uni_arg<T>(const T& t) : storage(t) {};
         uni_arg<T>(const T* t) : storage(*t) {};
         uni_arg<T>(uni_ptr<T> p) : storage(*p) {}; // UnUsual and Vain
-        //uni_arg<T>(uni_arg<T> t) : storage(*t) {};
+        uni_arg<T>(const uni_arg<T>& a) : storage(*a) {};
 
         // 
-        virtual uni_ptr<T> operator= (const T& ptr) { storage =  ptr; return uni_ptr<T>(*storage); };
-        virtual uni_ptr<T> operator= (const T* ptr) { storage = *ptr; return uni_ptr<T>(*storage); };
-        virtual uni_ptr<T> operator= (uni_arg<T> t) { storage = *t; return uni_ptr<T>(*storage); };
-        virtual uni_ptr<T> operator= (uni_ptr<T> p) { storage = *p; return uni_ptr<T>(*storage); };
+        virtual uni_arg<T>& operator= (const T& ptr) { storage =  ptr; return *this; };
+        virtual uni_arg<T>& operator= (const T* ptr) { storage = *ptr; return *this; };
+        virtual uni_arg<T>& operator= (uni_arg<T> t) { storage = t.ref(); return *this; };
+        virtual uni_arg<T>& operator= (uni_ptr<T> p) { storage = p.ref(); return *this; };
 
         // experimental
-        virtual operator T& () { return *storage; };
-        virtual operator const T& () const { return *storage; };
+        virtual operator T& () { return ref(); };
+        virtual operator const T& () const { return ref(); };
 
         // 
-        virtual operator T* () { return &(*storage); };
-        virtual operator const T* () const { return &(*storage); };
+        virtual operator T* () { return ptr(); };
+        virtual operator const T* () const { return ptr(); };
 
         // 
         virtual operator uni_ptr<T>() { return *storage; };
@@ -190,12 +184,12 @@ namespace vkt {
         //virtual operator bool() const { return storage; };
 
         // 
-        virtual T* operator->() { return &(*storage); };
-        virtual const T* operator->() const { return &(*storage); };
+        virtual T* operator->() { return ptr(); };
+        virtual const T* operator->() const { return ptr(); };
 
         //
-        virtual T& operator*() { return *storage; };
-        virtual const T& operator*() const { return *storage; };
+        virtual T& operator*() { return ref(); };
+        virtual const T& operator*() const { return ref(); };
     };
 
 };

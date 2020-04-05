@@ -19,7 +19,7 @@ namespace vkt {
     class ImageAllocation : public std::enable_shared_from_this<ImageAllocation> { public: 
         ImageAllocation() {};
         ImageAllocation(vkt::uni_arg<MemoryAllocationInfo> allocationInfo, vkt::uni_arg<vkh::VkImageCreateInfo> createInfo = vkh::VkImageCreateInfo{}) : info( allocationInfo) { this->construct( allocationInfo,  createInfo); }
-        ImageAllocation(vkt::uni_arg<ImageAllocation> allocation) : image(allocation->image), info(allocation->info) { *this = allocation; };
+        ImageAllocation(vkt::uni_ptr<ImageAllocation> allocation) : image(allocation->image), info(allocation->info) { *this = allocation; };
         //ImageAllocation(std::shared_ptr<ImageAllocation> allocation) : image(allocation->image), info(allocation->info) { *this = allocation; };
 
         // 
@@ -49,6 +49,7 @@ namespace vkt {
             this->info.handle = info.device.getMemoryWin32HandleKHR({ info.memory, vk::ExternalMemoryHandleTypeFlagBits::eOpaqueWin32 }, this->info.dispatch);
             this->info.range = memReqs.size;
             this->info.reqSize = memReqs.size;
+            
 
             // 
 #ifdef ENABLE_OPENGL_INTEROP
@@ -82,17 +83,17 @@ namespace vkt {
             return this;
         };
 
-        // UNIMPLEMENTED!
+        // BETA
         virtual vk::DispatchLoaderDynamic dispatchLoaderDynamic() {
-            return {};
+            return this->info.dispatch;
         }
 
-        // UNIMPLEMENTED!
+        // BETA
         virtual vk::DispatchLoaderDynamic dispatchLoaderDynamic() const {
-            return {};
+            return this->info.dispatch;
         }
 
-        virtual ImageAllocation& operator=(const vkt::uni_arg<ImageAllocation>& allocation) {
+        virtual ImageAllocation& operator=(vkt::uni_ptr<ImageAllocation> allocation) {
             this->image = allocation->image;
             this->info = allocation->info;
             return *this;
@@ -156,14 +157,11 @@ namespace vkt {
     };
 
     // 
-    class VmaImageAllocation : public ImageAllocation { public: // 
+    class VmaImageAllocation : public ImageAllocation {
+    public: friend VmaImageAllocation; friend ImageAllocation;// 
         VmaImageAllocation() {};
         VmaImageAllocation(vkt::uni_arg<VmaAllocator> allocator, vkt::uni_arg<vkh::VkImageCreateInfo> createInfo = vkh::VkImageCreateInfo{}, vkt::uni_arg<VmaMemoryUsage> vmaUsage = VMA_MEMORY_USAGE_GPU_ONLY) { this->construct(allocator, createInfo, vmaUsage); };
-
-        // 
         VmaImageAllocation(vkt::uni_ptr<VmaImageAllocation> allocation) : allocation(allocation->allocation), allocationInfo(allocation->allocationInfo), allocator(allocation->allocator) { *this = allocation; };
-
-        // 
         VmaImageAllocation(vkt::uni_ptr<ImageAllocation> allocation) { *this = dynamic_cast<VmaImageAllocation&>(*allocation); };
 
         // 
@@ -174,12 +172,20 @@ namespace vkt {
         ) {
             VmaAllocationCreateInfo vmaInfo = {}; vmaInfo.usage = vmaUsage;
             if (vmaUsage == VMA_MEMORY_USAGE_CPU_TO_GPU || vmaUsage == VMA_MEMORY_USAGE_GPU_TO_CPU) { vmaInfo.flags = VMA_ALLOCATION_CREATE_MAPPED_BIT; };
-            auto result = vmaCreateImage(this->allocator = allocator, *createInfo, &vmaInfo, &reinterpret_cast<VkImage&>(image), &allocation, &allocationInfo);
-            assert(result == VK_SUCCESS);
-            this->info.device = this->_getDevice();
+            assert(vmaCreateImage(this->allocator = allocator.ref(), *createInfo, &vmaInfo, &reinterpret_cast<VkImage&>(image), &allocation, &allocationInfo) == VK_SUCCESS);
+
+            // 
             this->info.initialLayout = vk::ImageLayout(createInfo->initialLayout);
             this->info.range = allocationInfo.size;
             this->info.vmaUsage = vmaUsage;
+            this->info.memory = allocationInfo.deviceMemory;
+
+            // Get Dispatch Loader From VMA Allocator Itself!
+            VmaAllocatorInfo info = {};
+            vmaGetAllocatorInfo(this->allocator = allocator.ref(), &info);
+            this->info.dispatch = vk::DispatchLoaderDynamic(info.instance, vkGetInstanceProcAddr, this->info.device = info.device, vkGetDeviceProcAddr); // 
+
+            // 
             return this;
         };
 
@@ -193,6 +199,7 @@ namespace vkt {
             this->allocationInfo = allocation.allocationInfo;
             this->allocator = allocation.allocator;
             this->info = allocation.info;
+
             //this->info.device = this->_getDevice();
             return *this;
         };
@@ -207,12 +214,12 @@ namespace vkt {
         virtual operator const VmaAllocationInfo& () const { return allocationInfo; };
 
         // 
-        virtual const vk::Device& _getDevice() const {
+        /*virtual const vk::Device& _getDevice() const {
             VmaAllocatorInfo info = {};
             vmaGetAllocatorInfo(this->allocator, &info);
             return info.device;
         };// const override { return device; };
-
+        */
         // 
         virtual operator VmaAllocation& () { return allocation; };
         virtual operator VmaAllocationInfo& () { return allocationInfo; };
@@ -234,8 +241,8 @@ namespace vkt {
 
     // 
     protected: friend VmaImageAllocation; friend ImageAllocation; // 
-        VmaAllocation allocation = {};
         VmaAllocationInfo allocationInfo = {};
+        VmaAllocation allocation = {};
         VmaAllocator allocator = {};
     };
 
@@ -264,7 +271,7 @@ namespace vkt {
     // 
     class ImageRegion : public std::enable_shared_from_this<ImageRegion> { public: 
         ImageRegion() {};
-        ImageRegion(vkt::uni_arg<ImageRegion> region) { *this = region; };
+        ImageRegion(vkt::uni_ptr<ImageRegion> region) { *this = region; };
         ImageRegion(vkt::uni_ptr<ImageAllocation> allocation, vkt::uni_arg<vkh::VkImageViewCreateInfo> info = vkh::VkImageViewCreateInfo{}, vkt::uni_arg<vk::ImageLayout> layout = vk::ImageLayout::eGeneral) : allocation(allocation), subresourceRange(info->subresourceRange) { this->construct(allocation, info, layout); };
         ImageRegion(vkt::uni_arg<MemoryAllocationInfo> allocationInfo, vkt::uni_arg<vkh::VkImageCreateInfo> createInfo = vkh::VkImageCreateInfo{}, vkt::uni_arg<vkh::VkImageViewCreateInfo> info = {}, vkt::uni_arg<vk::ImageLayout> layout = vk::ImageLayout::eGeneral) { this->construct(vkt::uni_ptr<ImageAllocation>(allocationInfo, createInfo), info, layout); };
         ImageRegion(vkt::uni_arg<VmaAllocator> allocator, vkt::uni_arg<vkh::VkImageCreateInfo> createInfo = vkh::VkImageCreateInfo{}, vkt::uni_arg<VmaMemoryUsage> vmaUsage = VMA_MEMORY_USAGE_GPU_ONLY, vkt::uni_arg<vkh::VkImageViewCreateInfo> info = vkh::VkImageViewCreateInfo{}, vkt::uni_arg<vk::ImageLayout> layout = vk::ImageLayout::eGeneral) { this->construct(vkt::uni_ptr<VmaImageAllocation>(allocator, createInfo, vmaUsage), info, layout); };
@@ -276,9 +283,10 @@ namespace vkt {
             vkt::uni_arg<vkh::VkImageViewCreateInfo> info = vkh::VkImageViewCreateInfo{},
             vkt::uni_arg<vk::ImageLayout> layout = vk::ImageLayout::eGeneral
         ) {
+            info->image = allocation->getImage();
             this->allocation = allocation;
             this->subresourceRange = info->subresourceRange;
-            this->imgInfo.imageView = this->allocation->getDevice().createImageView(info->hpp().setImage(this->allocation->getImage()));
+            this->imgInfo.imageView = this->allocation->getDevice().createImageView(info->hpp(), nullptr, this->allocation->info.dispatch);
             this->imgInfo.imageLayout = VkImageLayout(*layout);
 
             // 
@@ -307,7 +315,7 @@ namespace vkt {
         };
 
         // 
-        virtual ImageRegion& operator=(const vkt::uni_arg<ImageRegion>& region) {
+        virtual ImageRegion& operator=(vkt::uni_ptr<ImageRegion> region) {
             this->allocation = region->uniPtr();
             this->subresourceRange = region->subresourceRange;
             this->imgInfo = region->imgInfo;

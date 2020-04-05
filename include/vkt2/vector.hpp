@@ -18,12 +18,12 @@ namespace vkt {
     class VmaBufferAllocation;
     class BufferAllocation : public std::enable_shared_from_this<BufferAllocation> { public:
         BufferAllocation() {};
-        BufferAllocation(const vkt::uni_arg<MemoryAllocationInfo>& allocationInfo, const vkt::uni_arg<vkh::VkBufferCreateInfo>& createInfo = vkh::VkBufferCreateInfo{}) : info( allocationInfo) { this->construct( allocationInfo,  createInfo); };
-        BufferAllocation(const vkt::uni_ptr    <BufferAllocation>& allocation) : buffer(allocation->buffer), info(allocation->info) { *this = allocation; };
+        BufferAllocation(vkt::uni_arg<MemoryAllocationInfo> allocationInfo, vkt::uni_arg<vkh::VkBufferCreateInfo> createInfo = vkh::VkBufferCreateInfo{}) : info( allocationInfo) { this->construct( allocationInfo,  createInfo); };
+        BufferAllocation(vkt::uni_ptr    <BufferAllocation> allocation) : buffer(allocation->buffer), info(allocation->info) { *this = allocation; };
 
         virtual BufferAllocation* construct(
-            const vkt::uni_arg<MemoryAllocationInfo>& allocationInfo,
-            const vkt::uni_arg<vkh::VkBufferCreateInfo>& createInfo = vkh::VkBufferCreateInfo{}
+            vkt::uni_arg<MemoryAllocationInfo> allocationInfo,
+            vkt::uni_arg<vkh::VkBufferCreateInfo> createInfo = vkh::VkBufferCreateInfo{}
         ) {
             this->buffer = this->info.device.createBuffer(*createInfo);
             this->usage = createInfo->usage;
@@ -62,7 +62,8 @@ namespace vkt {
             return this;
         };
 
-        virtual BufferAllocation& operator=(const vkt::uni_ptr<BufferAllocation>& allocation) {
+        // 
+        virtual BufferAllocation& operator=(vkt::uni_ptr<BufferAllocation> allocation) {
             this->buffer = allocation->buffer;
             this->info = allocation->info;
             return *this;
@@ -137,26 +138,24 @@ namespace vkt {
     // 
     class VmaBufferAllocation : public BufferAllocation { public: 
         VmaBufferAllocation() {};
-        VmaBufferAllocation(const vkt::uni_arg<VmaAllocator>& allocator, const vkt::uni_arg<vkh::VkBufferCreateInfo>& createInfo = vkh::VkBufferCreateInfo{}, VmaMemoryUsage vmaUsage = VMA_MEMORY_USAGE_GPU_ONLY) { this->construct(*allocator,  createInfo, vmaUsage); };
-        VmaBufferAllocation(const vkt::uni_ptr<VmaBufferAllocation>& allocation) : allocation(allocation->allocation), allocationInfo(allocation->allocationInfo), allocator(allocation->allocator) { *this = allocation; };
-        VmaBufferAllocation(const vkt::uni_ptr<BufferAllocation>& allocation) { *this = dynamic_cast<const VmaBufferAllocation&>(*allocation); };
-        //VmaBufferAllocation(const std::shared_ptr<VmaBufferAllocation>& allocation) : allocation(allocation->allocation), allocationInfo(allocation->allocationInfo), allocator(allocation->allocator) { *this = allocation; };
-        //VmaBufferAllocation(const std::shared_ptr<BufferAllocation>& allocation) { *this = std::dynamic_pointer_cast<VmaBufferAllocation>(allocation); };
+        VmaBufferAllocation(vkt::uni_arg<VmaAllocator> allocator, const vkt::uni_arg<vkh::VkBufferCreateInfo>& createInfo = vkh::VkBufferCreateInfo{}, VmaMemoryUsage vmaUsage = VMA_MEMORY_USAGE_GPU_ONLY) { this->construct(*allocator,  createInfo, vmaUsage); };
+        VmaBufferAllocation(vkt::uni_ptr<VmaBufferAllocation> allocation) : allocation(allocation->allocation), allocationInfo(allocation->allocationInfo), allocator(allocation->allocator) { *this = allocation; };
+        VmaBufferAllocation(vkt::uni_ptr<BufferAllocation> allocation) { *this = dynamic_cast<const VmaBufferAllocation&>(*allocation); };
+        //VmaBufferAllocation(std::shared_ptr<VmaBufferAllocation> allocation) : allocation(allocation->allocation), allocationInfo(allocation->allocationInfo), allocator(allocation->allocator) { *this = allocation; };
+        //VmaBufferAllocation(std::shared_ptr<BufferAllocation> allocation) { *this = std::dynamic_pointer_cast<VmaBufferAllocation>(allocation); };
 
         //
         virtual VmaBufferAllocation* construct(
-            const vkt::uni_arg<VmaAllocator>& allocator,
-            const vkt::uni_arg<vkh::VkBufferCreateInfo>& createInfo = vkh::VkBufferCreateInfo{},
-            const vkt::uni_arg<VmaMemoryUsage>& vmaUsage = VMA_MEMORY_USAGE_GPU_ONLY
+            vkt::uni_arg<VmaAllocator> allocator,
+            vkt::uni_arg<vkh::VkBufferCreateInfo> createInfo = vkh::VkBufferCreateInfo{},
+            vkt::uni_arg<VmaMemoryUsage> vmaUsage = VMA_MEMORY_USAGE_GPU_ONLY
         ) {
             VmaAllocationCreateInfo vmaInfo = {}; vmaInfo.usage = vmaUsage;
             if (vmaUsage == VMA_MEMORY_USAGE_CPU_TO_GPU || vmaUsage == VMA_MEMORY_USAGE_GPU_TO_CPU) { vmaInfo.flags = VMA_ALLOCATION_CREATE_MAPPED_BIT; };
 
             // 
-            auto result = vmaCreateBuffer(this->allocator = allocator, *createInfo, &vmaInfo, &reinterpret_cast<VkBuffer&>(buffer), &allocation, &allocationInfo);
-            assert(result == VK_SUCCESS);
+            assert(vmaCreateBuffer(this->allocator = allocator.ref(), *createInfo, &vmaInfo, &reinterpret_cast<VkBuffer&>(buffer), &allocation, &allocationInfo) == VK_SUCCESS);
             this->info.range = createInfo->size;
-            this->info.device = this->_getDevice();
             this->info.vmaUsage = vmaUsage;
             this->info.memory = allocationInfo.deviceMemory;
             this->info.offset = allocationInfo.offset;
@@ -164,15 +163,15 @@ namespace vkt {
 
             // Get Dispatch Loader From VMA Allocator Itself!
             VmaAllocatorInfo info = {};
-            vmaGetAllocatorInfo(this->allocator, &info);
-            this->info.dispatch = vk::DispatchLoaderDynamic(info.instance, vkGetInstanceProcAddr, info.device, vkGetDeviceProcAddr); // 
+            vmaGetAllocatorInfo(this->allocator = allocator.ref(), &info);
+            this->info.dispatch = vk::DispatchLoaderDynamic(info.instance, vkGetInstanceProcAddr, this->info.device = info.device, vkGetDeviceProcAddr); // 
 
             // 
             return this;
         };
 
         // 
-        virtual VmaBufferAllocation& operator=(const vkt::uni_ptr<VmaBufferAllocation>& allocation) {
+        virtual VmaBufferAllocation& operator=(vkt::uni_ptr<VmaBufferAllocation> allocation) {
             if (allocation->allocation) {
                 vmaDestroyBuffer(allocator, *this, *allocation); // don't assign into already allocated
             };
@@ -190,11 +189,12 @@ namespace vkt {
         virtual void  unmap() { vmaUnmapMemory(allocator, allocation); allocationInfo.pMappedData = nullptr; };
 
         // 
-        virtual const vk::Device& _getDevice() const {
+        /*virtual const vk::Device& _getDevice() const {
             VmaAllocatorInfo info = {};
             vmaGetAllocatorInfo(this->allocator, &info);
             return info.device;
         };// const override { return device; };
+        */
 
         // Allocation
         virtual operator const VmaAllocation& () const { return allocation; };
@@ -216,8 +216,8 @@ namespace vkt {
 
     // 
     protected: friend VmaBufferAllocation; friend BufferAllocation; // 
-        VmaAllocation allocation = {};
         VmaAllocationInfo allocationInfo = {};
+        VmaAllocation allocation = {};
         VmaAllocator allocator = {};
     };
 
@@ -226,9 +226,9 @@ namespace vkt {
     class Vector { public: //
         ~Vector() {};
         Vector() {};
-        Vector(const vkt::uni_ptr<BufferAllocation>& allocation, const vkt::uni_arg<vk::DeviceSize>& offset = 0ull, const vkt::uni_arg<vk::DeviceSize>& size = VK_WHOLE_SIZE) : allocation(allocation), bufInfo({ allocation->buffer, offset, size }) { this->construct(allocation, offset, size, sizeof(T)); };
-        Vector(const vkt::uni_arg<MemoryAllocationInfo>& allocationInfo, const vkt::uni_arg<vkh::VkBufferCreateInfo>& createInfo = {}) { this->construct(std::make_shared<BufferAllocation>(allocationInfo, createInfo)); };
-        Vector(const vkt::uni_arg<VmaAllocator>& allocator, const vkt::uni_arg<vkh::VkBufferCreateInfo>& createInfo = {}, const vkt::uni_arg<VmaMemoryUsage>& vmaUsage = VMA_MEMORY_USAGE_GPU_ONLY) { this->construct(vkt::uni_ptr<BufferAllocation>(std::dynamic_pointer_cast<BufferAllocation>(std::make_shared<VmaBufferAllocation>(allocator, createInfo, vmaUsage)))); };
+        Vector(vkt::uni_ptr<BufferAllocation> allocation, vkt::uni_arg<vk::DeviceSize> offset = 0ull, vkt::uni_arg<vk::DeviceSize> size = VK_WHOLE_SIZE) : allocation(allocation), bufInfo({ allocation->buffer, offset, size }) { this->construct(allocation, offset, size, sizeof(T)); };
+        Vector(vkt::uni_arg<MemoryAllocationInfo> allocationInfo, vkt::uni_arg<vkh::VkBufferCreateInfo> createInfo = {}) { this->construct(std::make_shared<BufferAllocation>(allocationInfo, createInfo)); };
+        Vector(vkt::uni_arg<VmaAllocator> allocator, vkt::uni_arg<vkh::VkBufferCreateInfo> createInfo = {}, vkt::uni_arg<VmaMemoryUsage> vmaUsage = VMA_MEMORY_USAGE_GPU_ONLY) { this->construct(vkt::uni_ptr<BufferAllocation>(std::dynamic_pointer_cast<BufferAllocation>(std::make_shared<VmaBufferAllocation>(allocator, createInfo, vmaUsage)))); };
 
         // 
         template<class Tm = T> Vector(const Vector<Tm>& V) : allocation(V), bufInfo({ V.buffer(), V.offset(), V.range() }) { *this = V; };
@@ -244,7 +244,7 @@ namespace vkt {
         //template<class Tm = T> const vkt::uni_arg<Vector<Tm>>& cast() const { return Vector<Tm>(reinterpret_cast<Vector<T>&>(*this)); };
 
         //
-        virtual Vector<T>* construct(const vkt::uni_ptr<BufferAllocation>& allocation, const vkt::uni_arg<vk::DeviceSize>& offset = 0ull, const vkt::uni_arg<vk::DeviceSize>& size = VK_WHOLE_SIZE, const vkt::uni_arg<vk::DeviceSize>& stride = sizeof(T)) {
+        virtual Vector<T>* construct(vkt::uni_ptr<BufferAllocation> allocation, vkt::uni_arg<vk::DeviceSize> offset = 0ull, vkt::uni_arg<vk::DeviceSize> size = VK_WHOLE_SIZE, vkt::uni_arg<vk::DeviceSize> stride = sizeof(T)) {
             this->allocation = allocation;
             this->bufInfo = vkh::VkDescriptorBufferInfo{ static_cast<VkBuffer>(allocation->buffer),offset,size };
             this->bufRegion = vkh::VkStridedBufferRegionKHR{ static_cast<VkBuffer>(allocation->buffer),offset,stride,this->ranged()/stride };
@@ -273,7 +273,7 @@ namespace vkt {
 
         // alias Of getAllocation
         virtual vkt::uni_ptr<BufferAllocation>& uniPtr() { return allocation; };
-        virtual const vkt::uni_ptr<BufferAllocation>& uniPtr() const { return allocation; };
+        virtual vkt::uni_ptr<BufferAllocation> uniPtr() const { return allocation; };
 
         // 
         virtual operator    ::VkDescriptorBufferInfo& () { this->bufInfo.buffer = this->bufRegion.buffer = allocation->buffer; return bufInfo; };
@@ -294,8 +294,8 @@ namespace vkt {
         //
         virtual operator const    ::VkDescriptorBufferInfo& () const { return bufInfo; };
         virtual operator const vkh::VkDescriptorBufferInfo& () const { return bufInfo; };
-        virtual operator const vkt::uni_ptr<BufferAllocation>& () const { return allocation; };
-        virtual operator const std::shared_ptr<BufferAllocation>& () const { return allocation; };
+        virtual operator vkt::uni_ptr<BufferAllocation> () const { return allocation; };
+        virtual operator std::shared_ptr<BufferAllocation> () const { return allocation; };
         
         virtual operator const vk::DescriptorBufferInfo& () const { return bufInfo; };
         virtual operator const vk::Buffer& () const { return *allocation; };
@@ -352,10 +352,10 @@ namespace vkt {
         virtual bool has_value() const { return this->has(); };
 
         // 
-        virtual BufferAllocation* operator->() { return &(*allocation); };
-        virtual BufferAllocation& operator*() { return (*allocation); };
-        virtual const BufferAllocation* operator->() const { return &(*allocation); };
-        virtual const BufferAllocation& operator*() const { return (*allocation); };
+        virtual BufferAllocation* operator->() { return allocation.ptr(); };
+        virtual BufferAllocation& operator*() { return allocation.ref(); };
+        virtual const BufferAllocation* operator->() const { return allocation.ptr(); };
+        virtual const BufferAllocation& operator*() const { return allocation.ref(); };
 
         // 
         virtual vk::DeviceSize& rangeInfo() { return bufInfo.range; };
