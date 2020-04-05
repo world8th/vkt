@@ -434,7 +434,7 @@ namespace vkt {
         HANDLE handle = {};
         void* pMapped = nullptr;
         vkh::VkPhysicalDeviceMemoryProperties memoryProperties = {};
-        VmaMemoryUsage vmaUsage = VMA_MEMORY_USAGE_GPU_ONLY;
+        VmaMemoryUsage memUsage = VMA_MEMORY_USAGE_GPU_ONLY;
 
         // 
         int32_t getMemoryType(const uint32_t& memoryTypeBitsRequirement, const vkh::VkMemoryPropertyFlags& requiredProperties = { .eDeviceLocal = 1 }) const {

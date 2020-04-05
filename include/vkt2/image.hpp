@@ -28,9 +28,9 @@ namespace vkt {
             vkt::uni_arg<vkh::VkImageCreateInfo> createInfo = vkh::VkImageCreateInfo{}
         ) {
             vkh::VkImageUsageFlags usage = createInfo->usage;
-            if (allocationInfo->vmaUsage == VMA_MEMORY_USAGE_CPU_TO_GPU) { usage.eTransferSrc = 1; };
-            if (allocationInfo->vmaUsage == VMA_MEMORY_USAGE_GPU_TO_CPU) { usage.eTransferDst = 1; };
-            if (allocationInfo->vmaUsage == VMA_MEMORY_USAGE_GPU_ONLY) { usage.eTransferDst = 1, usage.eTransferSrc = 1; };
+            if (allocationInfo->memUsage == VMA_MEMORY_USAGE_CPU_TO_GPU) { usage.eTransferSrc = 1; };
+            if (allocationInfo->memUsage == VMA_MEMORY_USAGE_GPU_TO_CPU) { usage.eTransferDst = 1; };
+            if (allocationInfo->memUsage == VMA_MEMORY_USAGE_GPU_ONLY) { usage.eTransferDst = 1, usage.eTransferSrc = 1; };
 
             // 
             this->image = this->info.device.createImage(createInfo->hpp().setUsage(usage));
@@ -177,8 +177,8 @@ namespace vkt {
             // 
             this->info.initialLayout = vk::ImageLayout(createInfo->initialLayout);
             this->info.range = allocationInfo.size;
-            this->info.vmaUsage = vmaUsage;
             this->info.memory = allocationInfo.deviceMemory;
+            this->info.memUsage = vmaUsage;
 
             // Get Dispatch Loader From VMA Allocator Itself!
             VmaAllocatorInfo info = {};
@@ -263,7 +263,6 @@ namespace vkt {
     struct ImageRegionCreateInfoVMA {
         vkt::uni_arg<VmaAllocator> allocator = VmaAllocator{};
         vkt::uni_arg<vkh::VkImageCreateInfo> createInfo = vkh::VkImageCreateInfo{};
-        vkt::uni_arg<VmaMemoryUsage> vmaUsage = VMA_MEMORY_USAGE_GPU_ONLY;
         vkt::uni_arg<vkh::VkImageViewCreateInfo> info = vkh::VkImageViewCreateInfo{};
         vkt::uni_arg<vk::ImageLayout> layout = vk::ImageLayout::eGeneral;
     };
@@ -273,10 +272,12 @@ namespace vkt {
         ImageRegion() {};
         ImageRegion(vkt::uni_ptr<ImageRegion> region) { *this = region; };
         ImageRegion(vkt::uni_ptr<ImageAllocation> allocation, vkt::uni_arg<vkh::VkImageViewCreateInfo> info = vkh::VkImageViewCreateInfo{}, vkt::uni_arg<vk::ImageLayout> layout = vk::ImageLayout::eGeneral) : allocation(allocation), subresourceRange(info->subresourceRange) { this->construct(allocation, info, layout); };
-        ImageRegion(vkt::uni_arg<MemoryAllocationInfo> allocationInfo, vkt::uni_arg<vkh::VkImageCreateInfo> createInfo = vkh::VkImageCreateInfo{}, vkt::uni_arg<vkh::VkImageViewCreateInfo> info = {}, vkt::uni_arg<vk::ImageLayout> layout = vk::ImageLayout::eGeneral) { this->construct(vkt::uni_ptr<ImageAllocation>(allocationInfo, createInfo), info, layout); };
-        ImageRegion(vkt::uni_arg<VmaAllocator> allocator, vkt::uni_arg<vkh::VkImageCreateInfo> createInfo = vkh::VkImageCreateInfo{}, vkt::uni_arg<VmaMemoryUsage> vmaUsage = VMA_MEMORY_USAGE_GPU_ONLY, vkt::uni_arg<vkh::VkImageViewCreateInfo> info = vkh::VkImageViewCreateInfo{}, vkt::uni_arg<vk::ImageLayout> layout = vk::ImageLayout::eGeneral) { this->construct(vkt::uni_ptr<VmaImageAllocation>(allocator, createInfo, vmaUsage), info, layout); };
-        ~ImageRegion() {};
+        ImageRegion(vkt::uni_ptr<VmaImageAllocation> allocation, vkt::uni_arg<vkh::VkImageViewCreateInfo> info = vkh::VkImageViewCreateInfo{}, vkt::uni_arg<vk::ImageLayout> layout = vk::ImageLayout::eGeneral) : allocation(allocation.dyn_cast<ImageAllocation>()), subresourceRange(info->subresourceRange) { this->construct(allocation.dyn_cast<ImageAllocation>(), info, layout); };
         
+        //ImageRegion(vkt::uni_arg<MemoryAllocationInfo> allocationInfo, vkt::uni_arg<vkh::VkImageCreateInfo> createInfo = vkh::VkImageCreateInfo{}, vkt::uni_arg<vkh::VkImageViewCreateInfo> info = {}, vkt::uni_arg<vk::ImageLayout> layout = vk::ImageLayout::eGeneral) { this->construct(vkt::uni_ptr<ImageAllocation>(allocationInfo, createInfo), info, layout); };
+        //ImageRegion(vkt::uni_arg<VmaAllocator> allocator, vkt::uni_arg<vkh::VkImageCreateInfo> createInfo = vkh::VkImageCreateInfo{}, vkt::uni_arg<VmaMemoryUsage> vmaUsage = VMA_MEMORY_USAGE_GPU_ONLY, vkt::uni_arg<vkh::VkImageViewCreateInfo> info = vkh::VkImageViewCreateInfo{}, vkt::uni_arg<vk::ImageLayout> layout = vk::ImageLayout::eGeneral) { this->construct(vkt::uni_ptr<VmaImageAllocation>(allocator, createInfo, vmaUsage), info, layout); };
+        ~ImageRegion() {};
+
         // 
         virtual ImageRegion* construct(
             vkt::uni_ptr<ImageAllocation> allocation,

@@ -52,6 +52,11 @@ namespace vkt {
         virtual bool32_t& operator=(const bool32_t&a){b_=a;};
     };
 
+    void handle(const bool& valid = false) {
+        if (!valid) {
+            std::cerr << "std::optional is wrong or not initialized" << std::endl; assert(valid);
+        };
+    };
 
     template<class T = uint8_t>
     class uni_ptr {
@@ -87,8 +92,8 @@ namespace vkt {
         uni_ptr<M> dyn_cast() { T& r = *regular; return shared ? uni_ptr<M>(std::dynamic_pointer_cast<M>(shared)) : uni_ptr<M>(dynamic_cast<M&>(r)); };
 
         // 
-        template<class... A>
-        uni_ptr<T>(A... args) : shared(std::make_shared<T>(args...)) {};
+        //template<class... A>
+        //uni_ptr<T>(A... args) : shared(std::make_shared<T>(args...)) {};
 
         // 
         virtual std::shared_ptr<T>& get_shared() { return (this->shared = (this->shared ? this->shared : std::shared_ptr<T>(get_ptr()))); };
@@ -164,20 +169,20 @@ namespace vkt {
         virtual operator const T* () const { return ptr(); };
 
         // 
-        virtual operator uni_ptr<T>() { return *storage; };
-        virtual operator uni_ptr<const T>() const { return *storage; };
+        virtual operator uni_ptr<T>() { handle(has()); return *storage; };
+        virtual operator uni_ptr<const T>() const { handle(has()); return *storage; };
 
         // 
         virtual bool has_value() const { return storage.has_value(); };
         virtual bool has() const { return this->has_value(); };
 
         // 
-        virtual T* ptr() { return &(*storage); };
-        virtual const T* ptr() const { return &(*storage); };
+        virtual T* ptr() { handle(has()); return &(*storage); };
+        virtual const T* ptr() const { handle(has()); return &(*storage); };
 
         // 
-        virtual T& ref() { return *storage; };
-        virtual const T& ref() const { return *storage; };
+        virtual T& ref() { handle(has()); return *storage; };
+        virtual const T& ref() const { handle(has()); return *storage; };
 
         // 
         //virtual operator bool() { return storage; };
