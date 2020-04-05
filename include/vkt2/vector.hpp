@@ -176,6 +176,7 @@ namespace vkt {
                 vmaDestroyBuffer(allocator, *this, *allocation); // don't assign into already allocated
             };
             this->info = allocation->info;
+            this->usage = allocation->usage;
             this->buffer = allocation->buffer;
             this->allocation = allocation->allocation;
             this->allocationInfo = allocation->allocationInfo;
