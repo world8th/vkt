@@ -172,9 +172,7 @@ namespace vkt {
         ) {
             VmaAllocationCreateInfo vmaInfo = {}; vmaInfo.usage = vmaUsage;
             if (vmaUsage == VMA_MEMORY_USAGE_CPU_TO_GPU || vmaUsage == VMA_MEMORY_USAGE_GPU_TO_CPU) { vmaInfo.flags = VMA_ALLOCATION_CREATE_MAPPED_BIT; };
-            assert(vmaCreateImage(this->allocator = allocator.ref(), *createInfo, &vmaInfo, &reinterpret_cast<VkImage&>(image), &allocation, &allocationInfo) == VK_SUCCESS);
-
-            // 
+            auto result = vmaCreateImage(this->allocator = allocator.ref(), *createInfo, &vmaInfo, &reinterpret_cast<VkImage&>(image), &this->allocation, &this->allocationInfo);  assert(result == VK_SUCCESS);
             this->info.initialLayout = vk::ImageLayout(createInfo->initialLayout);
             this->info.range = allocationInfo.size;
             this->info.memory = allocationInfo.deviceMemory;

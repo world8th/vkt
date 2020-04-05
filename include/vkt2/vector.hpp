@@ -154,12 +154,16 @@ namespace vkt {
             if (vmaUsage == VMA_MEMORY_USAGE_CPU_TO_GPU || vmaUsage == VMA_MEMORY_USAGE_GPU_TO_CPU) { vmaInfo.flags = VMA_ALLOCATION_CREATE_MAPPED_BIT; };
 
             // 
-            assert(vmaCreateBuffer(this->allocator = allocator.ref(), *createInfo, &vmaInfo, &reinterpret_cast<VkBuffer&>(this->buffer), &allocation, &allocationInfo) == VK_SUCCESS);
+            auto result = vmaCreateBuffer(this->allocator = allocator.ref(), *createInfo, &vmaInfo, &reinterpret_cast<VkBuffer&>(this->buffer), &this->allocation, &this->allocationInfo); assert(result == VK_SUCCESS);
             this->info.range = createInfo->size;
             this->info.memUsage = vmaUsage;
             this->info.memory = allocationInfo.deviceMemory;
             this->info.offset = allocationInfo.offset;
             this->usage = createInfo->usage;
+
+            // 
+            //std::cout << "Allocation Code: " << result << std::endl;
+            //std::cout << "Vma Allocation PTR:  " << this->allocation << std::endl;
 
             // Get Dispatch Loader From VMA Allocator Itself!
             VmaAllocatorInfo info = {};
@@ -323,7 +327,7 @@ namespace vkt {
 
         // Get static and cached value
         virtual vk::DeviceSize& range() { return (this->bufInfo.range = (this->bufRegion.size * this->bufRegion.stride - 0u)); };
-        virtual const vk::DeviceSize& range() const { return (this->bufRegion.size * this->bufRegion.stride - 0u); };
+        virtual vk::DeviceSize  range() const { return (this->bufRegion.size * this->bufRegion.stride - 0u); };
 
         //virtual vk::DeviceSize size() const { return this->range() / this->stride; };
         virtual const vk::DeviceSize& size() const { return this->bufRegion.size; };
