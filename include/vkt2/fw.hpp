@@ -203,7 +203,8 @@ namespace vkt
 
             // 
             "VK_KHR_buffer_device_address",
-            "VK_EXT_buffer_device_address"
+            "VK_EXT_buffer_device_address",
+            "VK_NVX_image_view_handle"
         };
 
         // instance layers
