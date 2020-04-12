@@ -146,9 +146,9 @@ namespace vkt {
 
     template<class T = uint8_t>
     class uni_arg {
-    protected: std::optional<T> storage = { T{} };//std::nullopt;
+    protected: std::optional<T> storage;//= { T{} };//std::nullopt;
     public: // 
-        uni_arg<T>() : storage(T{}) {};
+        uni_arg<T>() {};
         uni_arg<T>(const T& t) : storage(t) {};
         uni_arg<T>(const T* t) : storage(*t) {};
         uni_arg<T>(uni_ptr<T> p) : storage(*p) {}; // UnUsual and Vain
@@ -183,10 +183,6 @@ namespace vkt {
         // 
         virtual T& ref() { handle(has()); return *storage; };
         virtual const T& ref() const { handle(has()); return *storage; };
-
-        // 
-        //virtual operator bool() { return storage; };
-        //virtual operator bool() const { return storage; };
 
         // 
         virtual T* operator->() { return ptr(); };
