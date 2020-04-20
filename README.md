@@ -4,11 +4,15 @@ Real-Time oriented Vulkan API rendering and computing library...
 Planned to beat world record as most perfect and most long-time development product... 
 Writing for C++20 prior...
 
+
 ## In-Use
 
 *   [LancER](https://github.com/hyperearth/LancER) - (WIP) Ray Tracing Library and Demo
 *   [RadX](https://github.com/world8th/RadX) - (WIP) Radix Sort for Newest GPU
 *   Hello triangle example, based on [VK_KHR_ray_tracing](https://github.com/helixd-2k18/VK_KHR_ray_tracing) extension, modified
+*   [My Discord](https://discord.gg/NqjBJsG), but currently we have no focus for them... 
+*   [My Puzzle](https://vk.cc/afiR3v) for psychologists, psychoanalysts, psychotherapists and students ...
+
 
 ## Tech Spec
 
@@ -31,3 +35,8 @@ Writing for C++20 prior...
 
 Date: 19.01.2020 helixd2k18@IMN
 ```
+
+## Authors P.S.
+
+- helix.d@IMN
+- RTX@NVIDIA
