@@ -1,0 +1,74 @@
+== From https://gamedev.ru/code/forum/?id=250820#m0 [18.03.2020][20:30] ==
+
+Я предлагаю к обсуждению в принципе общую тему про трассировку лучей на графических API, таких как Vulkan API или DirectX 12 (DXR 1.1)…
+Только БЕЗ холивара! Любой неадекватный холивар будет караться и/или пресекаться! 
+
+Чуть ниже расположу полезные ссылки по теме. 
+
+[spoiler=DirectX_12]
+- https://devblogs.microsoft.com/directx/dxr-1-1/ (новости)
+- https://microsoft.github.io/DirectX-Specs/d3d/Raytracing.html (спецификация)
+- https://microsoft.github.io/DirectX-Specs/d3d/HLSL_ShaderModel6_5.html (SM 6.5)
+- https://github.com/microsoft/DirectXShaderCompiler/blob/master/docs/DXIL.rst (DXIL как таковой)
+- https://github.com/microsoft/DirectXShaderCompiler/blob/master/docs/SPIR-V.rst (маппинг к SPIR-V)
+[/spoiler]
+
+[spoiler=Vulkan]
+- https://www.khronos.org/news/press/khronos-group-releases-vulkan-ray-tracing (новости)
+- https://github.com/KhronosGroup/GLSL/blob/master/extensions/ext/GLSL_EXT_ray_tracing.txt (Для шейдеров трассировки)
+- https://github.com/KhronosGroup/GLSL/blob/master/extensions/ext/GLSL_EXT_ray_query.txt (для Compute и Fragment)
+- https://github.com/KhronosGroup/SPIRV-Registry/blob/master/extensions/KHR/SPV_KHR_ray_tracing.asciidoc (для шейдеров трассировки)
+- https://github.com/KhronosGroup/SPIRV-Registry/blob/master/extensions/KHR/SPV_KHR_ray_query.asciidoc (для Compute и Fragment)
+- https://www.khronos.org/registry/vulkan/specs/1.2-extensions/html/vkspec.html#VK_KHR_ray_tracing (само расширение к Vulkan API)
+- https://www.khronos.org/blog/ray-tracing-in-vulkan (почти целый гайд)
+- https://vulkan.gpuinfo.org/displayreport.php?id=8225#extended (поддержка)
+[/spoiler]
+
+[spoiler=Other] В связи с дополнительными конструкциями... 
+- https://github.com/embree/embree (Intel Embree)
+- https://github.com/ospray/OSPRay (Intel OSPRay)
+- https://developer.nvidia.com/designworks/optix/download (NVIDIA OptiX)
+- https://developer.nvidia.com/vulkan-driver (NVIDIA Vulkan API бета-драйвера)
+- https://www.phoronix.com/scan.php?page=news_item&px=NVIDIA-DXR-To-Vulkan (прошлая новость про DXC)
+- https://devblogs.nvidia.com/bringing-hlsl-ray-tracing-to-vulkan/ (про HLSL в трассировке лучей, для Vulkan API)
+- https://github.com/microsoft/DirectXShaderCompiler/issues/2769 (рапорт issue насчет DXC и ре-маппингом)
+- https://github.com/hyperearth/LancER (первый по `VK_KHR_ray_tracing`)
+- https://github.com/maierfelix/VK_KHR_ray_tracing (второй...)
+- https://github.com/helixd-2k18/VK_KHR_ray_tracing (второй-А...)
+[/spoiler]
+
+Надо будет еще проверить, а можно ли OptiX денойзер нацепить на официальный ray-tracing. 
+
+
+== NVIDIA and Khronos == 
+
+- https://devblogs.nvidia.com/how-to-get-started-with-optix-7/ (OptiX 7)
+- https://www.tomshardware.com/news/khronos-group-releases-official-vulkan-ray-tracing-extensions (Slides)
+- https://www.khronos.org/assets/uploads/apis/Vulkan-Ray-Tracing-Launch-Mar20.pdf (Official Presentation)
+
+
+== Ray Tracing for OpenGL ==
+
+All possible ways to enable RT cores in OpenGL... also, I adding full version of documentation... 
+- https://developer.nvidia.com/designworks/optix/download
+- https://github.com/nvpro-samples/gl_vk_raytrace_interop
+- https://github.com/KhronosGroup/GLSL/blob/master/extensions/ext/GLSL_EXT_ray_query.txt
+- https://www.khronos.org/registry/OpenGL/extensions/EXT/EXT_external_objects_win32.txt
+- https://www.khronos.org/registry/OpenGL/extensions/EXT/EXT_external_objects_fd.txt
+- https://www.khronos.org/registry/OpenGL/extensions/EXT/EXT_external_objects.txt
+- https://www.khronos.org/registry/OpenGL/extensions/EXT/EXT_shader_image_load_store.txt
+- https://www.khronos.org/registry/OpenGL/extensions/ARB/ARB_bindless_texture.txt
+- https://www.khronos.org/registry/OpenGL/extensions/NV/NV_shader_buffer_store.txt
+- https://www.khronos.org/registry/OpenGL/extensions/NV/NV_shader_buffer_load.txt
+- https://www.khronos.org/registry/OpenGL/extensions/NV/NV_draw_vulkan_image.txt
+- https://www.khronos.org/registry/vulkan/specs/1.2-extensions/html/chap46.html#VK_KHR_ray_tracing
+- https://www.khronos.org/registry/vulkan/specs/1.2-extensions/html/chap46.html#VK_EXT_transform_feedback
+- https://www.khronos.org/registry/vulkan/specs/1.2-extensions/man/html/VK_NVX_image_view_handle.html
+- https://www.khronos.org/registry/vulkan/specs/1.2-extensions/man/html/VK_KHR_buffer_device_address.html
+- https://www.khronos.org/registry/vulkan/specs/1.2-extensions/man/html/VK_EXT_transform_feedback.html
+- https://www.khronos.org/opengl/wiki/Transform_Feedback
+
+
+== Issue Reports == 
+
+- 
