@@ -429,7 +429,7 @@ namespace vkt
             auto appinfo = vk::ApplicationInfo{};
             appinfo.pNext = nullptr;
             appinfo.pApplicationName = "VKTest";
-            appinfo.apiVersion = VK_MAKE_VERSION(1, 2, 131);
+            appinfo.apiVersion = VK_MAKE_VERSION(1, 2, 135);
 
             // create instance info
             auto cinstanceinfo = vk::InstanceCreateInfo{};
