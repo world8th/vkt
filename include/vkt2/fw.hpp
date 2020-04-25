@@ -203,13 +203,13 @@ namespace vkt
 
             // 
             "VK_KHR_buffer_device_address",
-            "VK_EXT_buffer_device_address",
+            //"VK_EXT_buffer_device_address",
             "VK_NVX_image_view_handle"
         };
 
         // instance layers
         std::vector<const char*> wantedLayers = {
-            //"VK_LAYER_KHRONOS_validation",
+            "VK_LAYER_KHRONOS_validation",
 
             //"VK_LAYER_LUNARG_assistant_layer",
             //"VK_LAYER_LUNARG_standard_validation",
@@ -826,6 +826,7 @@ namespace vkt
                 // 
                 //swapchainBuffers[i].semaphore = device.createSemaphore(vk::SemaphoreCreateInfo());
                 swapchainBuffers[i].drawSemaphore = device.createSemaphore(vk::SemaphoreCreateInfo());
+                swapchainBuffers[i].computeSemaphore = device.createSemaphore(vk::SemaphoreCreateInfo());
                 swapchainBuffers[i].presentSemaphore = device.createSemaphore(vk::SemaphoreCreateInfo());
                 swapchainBuffers[i].waitFence = device.createFence(vk::FenceCreateInfo().setFlags(vk::FenceCreateFlagBits::eSignaled));
                 ///swapchainBuffers[i].timeline = device.createSemaphore(vk::SemaphoreCreateInfo().setPNext(&timeline));

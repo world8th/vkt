@@ -21,7 +21,7 @@ namespace vkt {
         vk::Fence waitFence = {};
         //vk::Image image = {};
 
-        vk::Semaphore drawSemaphore = {}, presentSemaphore = {};
+        vk::Semaphore drawSemaphore = {}, computeSemaphore = {}, presentSemaphore = {};
 
         //vk::Semaphore timeline = {};
     };
