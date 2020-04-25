@@ -117,11 +117,13 @@ namespace vkt {
 
         // 
         virtual vkh::VkDeviceOrHostAddressKHR deviceAddress() {
+            if (!this->usage.eSharedDeviceAddress) { std::cerr << "Bad Device Address" << std::endl; assert(true); };
             return vkh::VkDeviceOrHostAddressKHR{ .deviceAddress = this->usage.eSharedDeviceAddress ? getDevice().getBufferAddress(vkh::VkBufferDeviceAddressInfo{.buffer = this->buffer }.hpp(), this->info.dispatch) : 0ull };
         };
 
         // 
         virtual vkh::VkDeviceOrHostAddressConstKHR deviceAddress() const {
+            if (!this->usage.eSharedDeviceAddress) { std::cerr << "Bad Device Address" << std::endl; assert(true); };
             return vkh::VkDeviceOrHostAddressConstKHR{ .deviceAddress = this->usage.eSharedDeviceAddress ? getDevice().getBufferAddress(vkh::VkBufferDeviceAddressInfo{.buffer = this->buffer }.hpp(), this->info.dispatch) : 0ull };
         };
 
@@ -157,7 +159,7 @@ namespace vkt {
             if (vmaUsage == VMA_MEMORY_USAGE_CPU_TO_GPU || vmaUsage == VMA_MEMORY_USAGE_GPU_TO_CPU) { vmaInfo.flags = VMA_ALLOCATION_CREATE_MAPPED_BIT; };
 
             // 
-            auto result = vmaCreateBuffer(this->allocator = allocator.ref(), *createInfo, &vmaInfo, &reinterpret_cast<VkBuffer&>(this->buffer), &this->allocation, &this->allocationInfo); assert(result == VK_SUCCESS);
+            auto result = vmaCreateBuffer(this->allocator = allocator.ref(), *createInfo, &vmaInfo, &reinterpret_cast<VkBuffer&>(this->buffer), &this->allocation, &this->allocationInfo); //assert(result == VK_SUCCESS);
             this->info.range = createInfo->size;
             this->info.memUsage = vmaUsage;
             this->info.memory = allocationInfo.deviceMemory;
@@ -214,11 +216,13 @@ namespace vkt {
 
         // VMA-Based Version
         virtual vkh::VkDeviceOrHostAddressKHR deviceAddress() override {
+            if (!this->usage.eSharedDeviceAddress) { std::cerr << "Bad Device Address" << std::endl; assert(true); };
             return vkh::VkDeviceOrHostAddressKHR{ .deviceAddress = this->usage.eSharedDeviceAddress ? getDevice().getBufferAddress(vkh::VkBufferDeviceAddressInfo{.buffer = this->buffer }.hpp(), this->info.dispatch) : 0ull };
         };
 
         // VMA-Based Version
         virtual vkh::VkDeviceOrHostAddressConstKHR deviceAddress() const override {
+            if (!this->usage.eSharedDeviceAddress) { std::cerr << "Bad Device Address" << std::endl; assert(true); };
             return vkh::VkDeviceOrHostAddressConstKHR{ .deviceAddress = this->usage.eSharedDeviceAddress ? getDevice().getBufferAddress(vkh::VkBufferDeviceAddressInfo{.buffer = this->buffer }.hpp(), this->info.dispatch) : 0ull };
         };
 
