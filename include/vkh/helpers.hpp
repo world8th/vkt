@@ -117,7 +117,7 @@ namespace vkh {
     };
 
 
-
+#ifdef VK_ENABLE_BETA_EXTENSIONS
     // TODO: REMOVE CODE TAFTOLOGY
     class VsRayTracingPipelineCreateInfoHelper { 
     protected: 
@@ -219,6 +219,7 @@ namespace vkh {
         inline operator const vk::RayTracingPipelineCreateInfoKHR& () const { return vkInfo; };
         inline operator vk::RayTracingPipelineCreateInfoKHR& () { return format(); };
     };
+#endif
 
     // 
     template<class T = uint8_t>

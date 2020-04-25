@@ -1210,7 +1210,8 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
 #endif
     } VkAccelerationStructureGeometryDataKHR;
 
-    // 
+    //
+#ifdef VK_ENABLE_BETA_EXTENSIONS
     typedef struct VkAccelerationStructureGeometryKHR {
         VkStructureType                           sType         = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR;
         const void*                               pNext         = nullptr;
@@ -1242,6 +1243,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         VK_HPP_STRUCT_OPERATORS(VkAccelerationStructureGeometryKHR, vk::AccelerationStructureGeometryKHR)
 #endif
     } VkAccelerationStructureGeometryKHR;
+#endif
 
     // 
     typedef struct VkAccelerationStructureBuildOffsetInfoKHR {
@@ -1259,7 +1261,8 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
     //VkAabbPositionsKHR {};
     //VkTransformMatrixKHR = {};
 
-    // 
+    //
+#ifdef VK_ENABLE_BETA_EXTENSIONS
     typedef struct VkAccelerationStructureBuildGeometryInfoKHR {
         VkStructureType                                     sType                    = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_GEOMETRY_INFO_KHR;
         const void*                                         pNext                    = nullptr;
@@ -1284,6 +1287,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         VK_HPP_STRUCT_OPERATORS(VkAccelerationStructureBuildGeometryInfoKHR, vk::AccelerationStructureBuildGeometryInfoKHR)
 #endif
     } VkAccelerationStructureBuildGeometryInfoKHR;
+#endif
 
     // 
     typedef struct VkAccelerationStructureCreateGeometryTypeInfoKHR {
@@ -1381,6 +1385,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
 #endif
     } VkRayTracingPipelineCreateInfoKHR;
 
+#ifdef VK_ENABLE_BETA_EXTENSIONS
     // 
     typedef struct VkAccelerationStructureMemoryRequirementsInfoKHR {
         VkStructureType                                     sType                 = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_MEMORY_REQUIREMENTS_INFO_KHR;
@@ -1399,6 +1404,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         VK_HPP_STRUCT_OPERATORS(VkAccelerationStructureMemoryRequirementsInfoKHR, vk::AccelerationStructureMemoryRequirementsInfoKHR)
 #endif
     } VkAccelerationStructureMemoryRequirementsInfoKHR;
+#endif
 
     // 
     typedef struct VkBindAccelerationStructureMemoryInfoKHR {
