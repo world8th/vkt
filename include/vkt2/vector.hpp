@@ -13,13 +13,20 @@
 
 namespace vkt {
 
-
     // 
     class VmaBufferAllocation;
     class BufferAllocation : public std::enable_shared_from_this<BufferAllocation> { public:
         BufferAllocation() {};
         BufferAllocation(vkt::uni_arg<MemoryAllocationInfo> allocationInfo, vkt::uni_arg<vkh::VkBufferCreateInfo> createInfo = vkh::VkBufferCreateInfo{}) : info( allocationInfo) { this->construct( allocationInfo,  createInfo); };
         BufferAllocation(vkt::uni_ptr    <BufferAllocation> allocation) : buffer(allocation->buffer), info(allocation->info) { *this = allocation; };
+        ~BufferAllocation() { // Broken Support, but supports Win32 memory export
+            if (this->buffer && this->info.device && this->info.memory) {
+                //this->info.device.waitIdle();
+                //this->info.device.destroyBuffer(this->buffer);
+                //this->info.device.freeMemory(this->info.memory);
+                //this->buffer = vk::Buffer{};
+            }
+        };
 
         virtual BufferAllocation* construct(
             vkt::uni_arg<MemoryAllocationInfo> allocationInfo,
@@ -148,6 +155,10 @@ namespace vkt {
         VmaBufferAllocation(vkt::uni_ptr<BufferAllocation> allocation) { *this = dynamic_cast<const VmaBufferAllocation&>(*allocation); };
         //VmaBufferAllocation(std::shared_ptr<VmaBufferAllocation> allocation) : allocation(allocation->allocation), allocationInfo(allocation->allocationInfo), allocator(allocation->allocator) { *this = allocation; };
         //VmaBufferAllocation(std::shared_ptr<BufferAllocation> allocation) { *this = std::dynamic_pointer_cast<VmaBufferAllocation>(allocation); };
+        ~VmaBufferAllocation() {
+            this->info.device.waitIdle();
+            vmaDestroyBuffer(allocator, buffer, allocation);
+        };
 
         //
         virtual VmaBufferAllocation* construct(
@@ -236,7 +247,12 @@ namespace vkt {
     // Wrapper Class
     template<class T = uint8_t>
     class Vector { public: //
-        ~Vector() {};
+        ~Vector() {
+            if (this->view) {
+                this->getDevice().destroyBufferView(view);
+                this->view = vk::BufferView{};
+            };
+        };
         Vector() {};
         Vector(vkt::uni_ptr<BufferAllocation> allocation, vkt::uni_arg<vk::DeviceSize> offset = 0ull, vkt::uni_arg<vk::DeviceSize> size = VK_WHOLE_SIZE) : allocation(allocation), bufInfo({ allocation->buffer, offset, size }) { this->construct(allocation, offset, size, sizeof(T)); };
         Vector(vkt::uni_ptr<VmaBufferAllocation> allocation, vkt::uni_arg<vk::DeviceSize> offset = 0ull, vkt::uni_arg<vk::DeviceSize> size = VK_WHOLE_SIZE) : allocation(allocation.dyn_cast<BufferAllocation>()), bufInfo({ allocation->buffer, offset, size }) { this->construct(allocation.dyn_cast<BufferAllocation>(), offset, size, sizeof(T)); };
