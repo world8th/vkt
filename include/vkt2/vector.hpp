@@ -254,8 +254,8 @@ namespace vkt {
             };
         };
         Vector() {};
-        Vector(vkt::uni_ptr<BufferAllocation> allocation, vkt::uni_arg<vk::DeviceSize> offset = 0ull, vkt::uni_arg<vk::DeviceSize> size = VK_WHOLE_SIZE) : allocation(allocation), bufInfo({ allocation->buffer, offset, size }) { this->construct(allocation, offset, size, sizeof(T)); };
-        Vector(vkt::uni_ptr<VmaBufferAllocation> allocation, vkt::uni_arg<vk::DeviceSize> offset = 0ull, vkt::uni_arg<vk::DeviceSize> size = VK_WHOLE_SIZE) : allocation(allocation.dyn_cast<BufferAllocation>()), bufInfo({ allocation->buffer, offset, size }) { this->construct(allocation.dyn_cast<BufferAllocation>(), offset, size, sizeof(T)); };
+        Vector(vkt::uni_ptr<BufferAllocation> allocation, vkt::uni_arg<vk::DeviceSize> offset = 0ull, vkt::uni_arg<vk::DeviceSize> size = VK_WHOLE_SIZE, vkt::uni_arg<vk::DeviceSize> stride = sizeof(T)) : allocation(allocation), bufInfo({ allocation->buffer, offset, size }) { this->construct(allocation, offset, size, stride); };
+        Vector(vkt::uni_ptr<VmaBufferAllocation> allocation, vkt::uni_arg<vk::DeviceSize> offset = 0ull, vkt::uni_arg<vk::DeviceSize> size = VK_WHOLE_SIZE, vkt::uni_arg<vk::DeviceSize> stride = sizeof(T)) : allocation(allocation.dyn_cast<BufferAllocation>()), bufInfo({ allocation->buffer, offset, size }) { this->construct(allocation.dyn_cast<BufferAllocation>(), offset, size, stride); };
 
         //Vector(vkt::uni_arg<MemoryAllocationInfo> allocationInfo, vkt::uni_arg<vkh::VkBufferCreateInfo> createInfo = {}) { this->construct(std::make_shared<BufferAllocation>(allocationInfo, createInfo)); };
         //Vector(vkt::uni_arg<VmaAllocator> allocator, vkt::uni_arg<vkh::VkBufferCreateInfo> createInfo = {}, vkt::uni_arg<VmaMemoryUsage> vmaUsage = VMA_MEMORY_USAGE_GPU_ONLY) { this->construct(vkt::uni_ptr<BufferAllocation>(std::dynamic_pointer_cast<BufferAllocation>(std::make_shared<VmaBufferAllocation>(allocator, createInfo, vmaUsage)))); };
@@ -469,4 +469,8 @@ namespace vkt {
         protected: vk::BufferView view = {};
         protected: vkt::uni_ptr<BufferAllocation> allocation = {};
     };
+
+    template<class T = uint8_t>
+    Vector<T>* MakeVmaVector(vkt::uni_ptr<VmaBufferAllocation> allocation, vkt::uni_arg<vk::DeviceSize> offset = 0ull, vkt::uni_arg<vk::DeviceSize> size = VK_WHOLE_SIZE, vkt::uni_arg<vk::DeviceSize> stride = sizeof(T)) { return new Vector<T>(allocation, offset, size, stride); };
+
 };
