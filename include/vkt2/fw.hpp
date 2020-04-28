@@ -344,8 +344,8 @@ namespace vkt
         inline operator const vk::PhysicalDeviceMemoryProperties2& () const { return memoryProperties; };
         inline operator const VmaAllocator&() const { return allocator; };
 
-        // 
-        inline void submitCommandWithSync(const vk::CommandBuffer & cmdBuf) {
+        // Deprecated!
+        /*inline void submitCommandWithSync(const vk::CommandBuffer & cmdBuf) {
             // submit command
             vk::SubmitInfo sbmi = {};
             sbmi.commandBufferCount = 1;//cmdBuffers.size();
@@ -357,7 +357,7 @@ namespace vkt
                 device.waitForFences({ fence }, true, INT32_MAX);
             };
             device.resetFences({ 1, &fence });
-        }
+        }*/
 
 #ifdef VKT_ENABLE_GLFW_SUPPORT
         struct SurfaceWindow {
