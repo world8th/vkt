@@ -286,9 +286,9 @@ namespace vkt {
         ImageRegion(vkt::uni_ptr<ImageRegion> region) { *this = region; };
         ImageRegion(vkt::uni_ptr<ImageAllocation> allocation, vkt::uni_arg<vkh::VkImageViewCreateInfo> info = vkh::VkImageViewCreateInfo{}, vkt::uni_arg<vk::ImageLayout> layout = vk::ImageLayout::eGeneral) : allocation(allocation), subresourceRange(info->subresourceRange) { this->construct(allocation, info, layout); };
         ImageRegion(vkt::uni_ptr<VmaImageAllocation> allocation, vkt::uni_arg<vkh::VkImageViewCreateInfo> info = vkh::VkImageViewCreateInfo{}, vkt::uni_arg<vk::ImageLayout> layout = vk::ImageLayout::eGeneral) : allocation(allocation.dyn_cast<ImageAllocation>()), subresourceRange(info->subresourceRange) { this->construct(allocation.dyn_cast<ImageAllocation>(), info, layout); };
-        
-        //ImageRegion(vkt::uni_arg<MemoryAllocationInfo> allocationInfo, vkt::uni_arg<vkh::VkImageCreateInfo> createInfo = vkh::VkImageCreateInfo{}, vkt::uni_arg<vkh::VkImageViewCreateInfo> info = {}, vkt::uni_arg<vk::ImageLayout> layout = vk::ImageLayout::eGeneral) { this->construct(vkt::uni_ptr<ImageAllocation>(allocationInfo, createInfo), info, layout); };
-        //ImageRegion(vkt::uni_arg<VmaAllocator> allocator, vkt::uni_arg<vkh::VkImageCreateInfo> createInfo = vkh::VkImageCreateInfo{}, vkt::uni_arg<VmaMemoryUsage> vmaUsage = VMA_MEMORY_USAGE_GPU_ONLY, vkt::uni_arg<vkh::VkImageViewCreateInfo> info = vkh::VkImageViewCreateInfo{}, vkt::uni_arg<vk::ImageLayout> layout = vk::ImageLayout::eGeneral) { this->construct(vkt::uni_ptr<VmaImageAllocation>(allocator, createInfo, vmaUsage), info, layout); };
+        ImageRegion(std::shared_ptr<ImageAllocation> allocation, vkt::uni_arg<vkh::VkImageViewCreateInfo> info = vkh::VkImageViewCreateInfo{}, vkt::uni_arg<vk::ImageLayout> layout = vk::ImageLayout::eGeneral) : allocation(allocation), subresourceRange(info->subresourceRange) { this->construct(allocation, info, layout); };
+        ImageRegion(std::shared_ptr<VmaImageAllocation> allocation, vkt::uni_arg<vkh::VkImageViewCreateInfo> info = vkh::VkImageViewCreateInfo{}, vkt::uni_arg<vk::ImageLayout> layout = vk::ImageLayout::eGeneral) : allocation(std::dynamic_pointer_cast<ImageAllocation>(allocation)), subresourceRange(info->subresourceRange) { this->construct(std::dynamic_pointer_cast<ImageAllocation>(allocation), info, layout); };
+
         ~ImageRegion() {};
 
         // 
@@ -339,6 +339,10 @@ namespace vkt {
         // alias Of getAllocation
         virtual vkt::uni_ptr<ImageAllocation>& uniPtr() { return this->allocation; };
         virtual const vkt::uni_ptr<ImageAllocation>& uniPtr() const { return this->allocation; };
+
+        // alias Of getAllocation
+        virtual vkt::uni_ptr<ImageAllocation>& uniPtrVma() { return this->allocation; };
+        virtual const vkt::uni_ptr<ImageAllocation>& uniPtrVma() const { return this->allocation; };
 
         //virtual vkh::VkImageSubresourceRange& subresourceRange() { return this->subresourceRange; };
         virtual vkh::VkImageSubresourceLayers subresourceLayers(const uint32_t mipLevel =  0u) const { return {
