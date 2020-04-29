@@ -80,6 +80,10 @@ namespace vkt {
         };
 
         // 
+        virtual unsigned getGLBuffer() const { return this->info.glID; };
+        virtual unsigned getGLMemory() const { return this->info.glMemory; };
+
+        // 
         virtual void* map() { return info.pMapped; };
         virtual void* mapped() { return info.pMapped; };
         virtual const void* map() const { return info.pMapped; };
@@ -467,6 +471,9 @@ namespace vkt {
         virtual const T* end() const { return &at(size() - 1ul); };
         virtual T* const end() { return &at(size() - 1ul); };
 
+        // 
+        virtual unsigned getGLBuffer() const { return this->allocation->getGLBuffer(); };
+        virtual unsigned getGLMemory() const { return this->allocation->getGLMemory(); };
 
         //
         protected: friend Vector<T>; // 

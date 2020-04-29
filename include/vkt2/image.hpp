@@ -94,6 +94,10 @@ namespace vkt {
             return this;
         };
 
+        // 
+        virtual unsigned getGLBuffer() const { return this->info.glID; };
+        virtual unsigned getGLMemory() const { return this->info.glMemory; };
+
         // BETA
         virtual vk::DispatchLoaderDynamic dispatchLoaderDynamic() {
             return this->info.dispatch;
@@ -466,6 +470,10 @@ namespace vkt {
         virtual const vk::ImageLayout& getImageLayout() const { return reinterpret_cast<const vk::ImageLayout&>(this->imgInfo.imageLayout); };
         virtual const vk::Sampler& getSampler() const { return reinterpret_cast<const vk::Sampler&>(this->imgInfo.sampler); };
         virtual const vk::ImageSubresourceRange& getImageSubresourceRange() const { return this->subresourceRange; };
+
+        // 
+        virtual unsigned getGLBuffer() const { return this->allocation->getGLBuffer(); };
+        virtual unsigned getGLMemory() const { return this->allocation->getGLMemory(); };
 
         // 
         virtual ImageAllocation* operator->() { return &(*allocation); };
