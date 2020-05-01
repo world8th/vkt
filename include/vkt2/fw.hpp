@@ -79,6 +79,15 @@ namespace vkt
     class GPUFramework : std::enable_shared_from_this<GPUFramework> {
     protected:
 
+        std::vector<const char*> usedDeviceExtensions = {};
+        std::vector<const char*> usedExtensions = {};
+
+        std::vector<const char*> usedDeviceLayers = {};
+        std::vector<const char*> usedLayers = {};
+
+        std::vector<vk::DeviceQueueCreateInfo> usedQueueCreateInfos = {};
+
+
         // instance extensions
         std::vector<const char*> wantedExtensions = {
             "VK_KHR_get_physical_device_properties2",
@@ -434,6 +443,10 @@ namespace vkt
                 }
             }
 
+            // 
+            this->usedExtensions = extensions;
+            this->usedLayers = layers;
+
             // app info
             auto appinfo = vk::ApplicationInfo{};
             appinfo.pNext = nullptr;
@@ -443,10 +456,10 @@ namespace vkt
             // create instance info
             auto cinstanceinfo = vk::InstanceCreateInfo{};
             cinstanceinfo.pApplicationInfo = &(this->applicationInfo = appinfo); // due JabaCPP unable to access
-            cinstanceinfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
-            cinstanceinfo.ppEnabledExtensionNames = extensions.data();
-            cinstanceinfo.enabledLayerCount = static_cast<uint32_t>(layers.size());
-            cinstanceinfo.ppEnabledLayerNames = layers.data();
+            cinstanceinfo.enabledExtensionCount = static_cast<uint32_t>(this->usedExtensions.size());
+            cinstanceinfo.ppEnabledExtensionNames = this->usedExtensions.data();
+            cinstanceinfo.enabledLayerCount = static_cast<uint32_t>(this->usedLayers.size());
+            cinstanceinfo.ppEnabledLayerNames = this->usedLayers.data();
 
             // 
             this->instanceCreate = cinstanceinfo;
@@ -506,16 +519,19 @@ namespace vkt
             };
 
             // use layers
-            auto layers = std::vector<const char*>();
-            auto deviceValidationLayers = std::vector<const char*>();
+            auto deviceLayers = std::vector<const char*>();
             auto gpuLayers = physicalDevice.enumerateDeviceLayerProperties();
             for (auto w : wantedLayers) {
                 for (auto i : gpuLayers) {
                     if (std::string(i.layerName).compare(w) == 0) {
-                        layers.emplace_back(w); break;
+                        deviceLayers.emplace_back(w); break;
                     };
                 };
             };
+
+            // 
+            this->usedDeviceExtensions = deviceExtensions;
+            this->usedDeviceLayers = deviceLayers;
 
             // minimal features
             auto gTrasformFeedback = vk::PhysicalDeviceTransformFeedbackFeaturesEXT{};
@@ -577,18 +593,21 @@ namespace vkt
             //gRayTracing.rayTracingIndirectAccelerationStructureBuild = true;
             //gRayTracing.rayQuery = true;
 
+            // 
+            this->usedQueueCreateInfos = queueCreateInfos;
+
             // return device with queue pointer
             const uint32_t qptr = 0;
             if (queueCreateInfos.size() > 0) {
                 this->queueFamilyIndex = queueFamilyIndices[qptr];
                 this->device = this->physicalDevice.createDevice(vkh::VkDeviceCreateInfo{
                     .pNext = &gFeatures,
-                    .queueCreateInfoCount = uint32_t(queueCreateInfos.size()),
-                    .pQueueCreateInfos = reinterpret_cast<::VkDeviceQueueCreateInfo*>(queueCreateInfos.data()),
-                    .enabledLayerCount = uint32_t(layers.size()),
-                    .ppEnabledLayerNames = layers.data(),
-                    .enabledExtensionCount = uint32_t(deviceExtensions.size()),
-                    .ppEnabledExtensionNames = deviceExtensions.data(),
+                    .queueCreateInfoCount = uint32_t(this->usedQueueCreateInfos.size()),
+                    .pQueueCreateInfos = reinterpret_cast<::VkDeviceQueueCreateInfo*>(this->usedQueueCreateInfos.data()),
+                    .enabledLayerCount = uint32_t(this->usedDeviceLayers.size()),
+                    .ppEnabledLayerNames = this->usedDeviceLayers.data(),
+                    .enabledExtensionCount = uint32_t(this->usedDeviceExtensions.size()),
+                    .ppEnabledExtensionNames = this->usedDeviceExtensions.data(),
                     //.pEnabledFeatures = &(VkPhysicalDeviceFeatures&)(gFeatures.features)
                 });
 #ifdef VOLK_H_
