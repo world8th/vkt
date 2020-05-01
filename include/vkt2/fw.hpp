@@ -265,6 +265,8 @@ namespace vkt
             return *this;
         };
 
+        vk::InstanceCreateInfo instanceCreate = {};
+        vk::DeviceCreateInfo deviceCreate = {};
 
         vk::Fence fence = {};
         vk::Queue queue = {};
@@ -294,6 +296,12 @@ namespace vkt
         //vk::Device createDevice(bool isComputePrior = true, std::string shaderPath = "./", bool enableAdvancedAcceleration = true);
         inline vk::PhysicalDevice& getPhysicalDevice(const uint32_t& gpuID) { physicalDevice = physicalDevices[gpuID]; return physicalDevice; };
         inline vk::PhysicalDevice& getPhysicalDevice() { if (!physicalDevice) { physicalDevice = physicalDevices[0u]; }; return physicalDevice; };
+
+        // Compatible with JavaCPP directly
+        inline uintptr_t getInstanceCreateInfoAddress() { return (uintptr_t)(&instanceCreate); };
+        inline uintptr_t getDeviceCreateInfoAddress() { return (uintptr_t)(&deviceCreate); };
+        inline uintptr_t getInstanceCreateInfoAddress() const { return (uintptr_t)(&instanceCreate); };
+        inline uintptr_t getDeviceCreateInfoAddress() const { return (uintptr_t)(&deviceCreate); };
 
         // 
         inline vk::DispatchLoaderDynamic getDispatch() { return dispatch; };
@@ -438,6 +446,9 @@ namespace vkt
             cinstanceinfo.ppEnabledExtensionNames = extensions.data();
             cinstanceinfo.enabledLayerCount = static_cast<uint32_t>(layers.size());
             cinstanceinfo.ppEnabledLayerNames = layers.data();
+
+            // 
+            this->instanceCreate = cinstanceinfo;
 
             // create the "debug utils EXT" callback object
             VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo{};
