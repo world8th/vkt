@@ -274,10 +274,23 @@ namespace vkt
             return *this;
         };
 
+        // minimal features
+        vk::PhysicalDeviceTransformFeedbackFeaturesEXT gTrasformFeedback{};
+        vk::PhysicalDeviceRayTracingFeaturesKHR gRayTracing{};
+        vk::PhysicalDeviceTexelBufferAlignmentFeaturesEXT gTexelBufferAligment{};
+        vk::PhysicalDevice16BitStorageFeatures gStorage16{};
+        vk::PhysicalDevice8BitStorageFeatures gStorage8{};
+        vk::PhysicalDeviceDescriptorIndexingFeaturesEXT gDescIndexing{};
+        vk::PhysicalDeviceFloat16Int8FeaturesKHR gFloat16U8{}; // Vulkan 1.3
+        vk::PhysicalDeviceFeatures2 gFeatures{};
+        vk::PhysicalDeviceBufferDeviceAddressFeatures gDeviceAddress{};
+
+        // 
         vk::ApplicationInfo applicationInfo = {};
         vk::InstanceCreateInfo instanceCreate = {};
         vk::DeviceCreateInfo deviceCreate = {};
 
+        // 
         vk::Fence fence = {};
         vk::Queue queue = {};
         vk::Device device = {};
@@ -533,17 +546,6 @@ namespace vkt
             this->usedDeviceExtensions = deviceExtensions;
             this->usedDeviceLayers = deviceLayers;
 
-            // minimal features
-            auto gTrasformFeedback = vk::PhysicalDeviceTransformFeedbackFeaturesEXT{};
-            auto gRayTracing = vk::PhysicalDeviceRayTracingFeaturesKHR{};
-            auto gTexelBufferAligment = vk::PhysicalDeviceTexelBufferAlignmentFeaturesEXT{};
-            auto gStorage16 = vk::PhysicalDevice16BitStorageFeatures{};
-            auto gStorage8 = vk::PhysicalDevice8BitStorageFeatures{};
-            auto gDescIndexing = vk::PhysicalDeviceDescriptorIndexingFeaturesEXT{};
-            auto gFloat16U8 = vk::PhysicalDeviceFloat16Int8FeaturesKHR{}; // Vulkan 1.3
-            auto gFeatures = vk::PhysicalDeviceFeatures2{};
-            auto gDeviceAddress = vk::PhysicalDeviceBufferDeviceAddressFeatures{};
-
             //auto gConsertvative = vk::PhysicalDeviceConservativeRasterizationPropertiesEXT{};
 
             // 
@@ -600,7 +602,7 @@ namespace vkt
             const uint32_t qptr = 0;
             if (queueCreateInfos.size() > 0) {
                 this->queueFamilyIndex = queueFamilyIndices[qptr];
-                this->device = this->physicalDevice.createDevice(vkh::VkDeviceCreateInfo{
+                this->device = this->physicalDevice.createDevice(deviceCreate = vkh::VkDeviceCreateInfo{
                     .pNext = &gFeatures,
                     .queueCreateInfoCount = uint32_t(this->usedQueueCreateInfos.size()),
                     .pQueueCreateInfos = reinterpret_cast<::VkDeviceQueueCreateInfo*>(this->usedQueueCreateInfos.data()),
@@ -609,7 +611,7 @@ namespace vkt
                     .enabledExtensionCount = uint32_t(this->usedDeviceExtensions.size()),
                     .ppEnabledExtensionNames = this->usedDeviceExtensions.data(),
                     //.pEnabledFeatures = &(VkPhysicalDeviceFeatures&)(gFeatures.features)
-                });
+                }.hpp());
 #ifdef VOLK_H_
                 volkLoadDevice(this->device);
 #endif
