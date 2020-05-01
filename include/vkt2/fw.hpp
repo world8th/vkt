@@ -265,6 +265,7 @@ namespace vkt
             return *this;
         };
 
+        vk::ApplicationInfo applicationInfo = {};
         vk::InstanceCreateInfo instanceCreate = {};
         vk::DeviceCreateInfo deviceCreate = {};
 
@@ -441,7 +442,7 @@ namespace vkt
 
             // create instance info
             auto cinstanceinfo = vk::InstanceCreateInfo{};
-            cinstanceinfo.pApplicationInfo = &appinfo;
+            cinstanceinfo.pApplicationInfo = &(this->applicationInfo = appinfo); // due JabaCPP unable to access
             cinstanceinfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
             cinstanceinfo.ppEnabledExtensionNames = extensions.data();
             cinstanceinfo.enabledLayerCount = static_cast<uint32_t>(layers.size());
