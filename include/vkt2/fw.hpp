@@ -517,7 +517,12 @@ namespace vkt
             return instance;
         };
 
-        // TODO: REMAKE MAKING
+        // New constructor for clarify physical device
+        inline vk::Device createDevice(const vk::PhysicalDevice& physicalDevice, bool isComputePrior = true, std::string shaderPath = "", bool enableAdvancedAcceleration = false) {
+            this->physicalDevice = physicalDevice; return this->createDevice(isComputePrior, shaderPath, enableAdvancedAcceleration);
+        };
+
+        //
         inline vk::Device createDevice(bool isComputePrior = true, std::string shaderPath = "", bool enableAdvancedAcceleration = false) {
 
             // use extensions
