@@ -133,7 +133,7 @@ namespace vkt {
 
         // 
         virtual operator std::shared_ptr<T>& () { return get_shared(); };
-        virtual operator const std::shared_ptr<T>& () const { return get_shared(); };
+        virtual operator std::shared_ptr<T>  () const { return get_shared(); };
 
         // 
         virtual T* operator->() { return get_ptr(); };
