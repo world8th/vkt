@@ -22,10 +22,10 @@ namespace vkt {
         ImageAllocation(vkt::uni_ptr<ImageAllocation> allocation) : image(allocation->image), info(allocation->info) { *this = allocation; };
         ~ImageAllocation() {
             if (this->image && this->info.device) {
-                this->info.device.waitIdle();
-                this->info.device.destroyImage(this->image);
-                this->info.device.freeMemory(this->info.memory);
-                this->image = vk::Image{};
+                //this->info.device.waitIdle();
+                //this->info.device.destroyImage(this->image);
+                //this->info.device.freeMemory(this->info.memory);
+                //this->image = vk::Image{};
             };
         };
         //ImageAllocation(std::shared_ptr<ImageAllocation> allocation) : image(allocation->image), info(allocation->info) { *this = allocation; };
