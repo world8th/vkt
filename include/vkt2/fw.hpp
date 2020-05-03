@@ -16,16 +16,20 @@
 #define ENABLE_EXTENSION_VMA
 #define ENABLE_EXTENSION_RTX
 //#define GLFW_INCLUDE_VULKAN
-#include "utils.hpp"
-#include "structs.hpp"
-#include "core.hpp"
-#include "vector.hpp"
-#include "image.hpp"
 
-#ifdef VKT_ENABLE_GLFW_SUPPORT
+
+// 
+#if defined(VKT_ENABLE_GLFW_SUPPORT) || defined(ENABLE_OPENGL_INTEROP)
 #include <GLFW/glfw3.h>
 #include <GLFW/glfw3native.h>
 #endif
+
+// Force include for avoid GLAD problem...
+#include <vkt2/utils.hpp>
+#include <vkt2/structs.hpp>
+#include <vkt2/core.hpp>
+#include <vkt2/vector.hpp>
+#include <vkt2/image.hpp>
 
 //#define VKT_ENABLE_DEBUG
 
@@ -240,11 +244,27 @@ namespace vkt
 
 
     public: friend GPUFramework;
-        GPUFramework() {};
+        GPUFramework() {
+
+#ifdef VOLK_H_
+            volkInitialize();
+#endif
+
+#ifdef ENABLE_OPENGL_INTEROP
+            // glad: load all OpenGL function pointers
+            // ---------------------------------------
+            if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+            {
+                std::cerr << "Failed to initialize GLAD" << std::endl;
+            };
+#endif
+        };
+
         //GPUFramework(const GPUFramework& fw) { *this = fw; };
         //GPUFramework(GPUFramework* fw) { *this = fw; };
-        GPUFramework(vkt::uni_ptr<GPUFramework> fw) { *this = fw; };
-        //GPUFramework(std::shared_ptr<GPUFramework> fw) { *this = fw; };
+        GPUFramework(vkt::uni_ptr<GPUFramework> fw) {
+            *this = fw; 
+        };
 
         // 
         GPUFramework& operator=(vkt::uni_ptr<GPUFramework> fw) {
@@ -409,11 +429,6 @@ namespace vkt
         };
 
         inline vk::Instance& createInstance() {
-
-#ifdef VOLK_H_
-            volkInitialize();
-#endif
-
             // 
             assert((instanceVersion = vk::enumerateInstanceVersion()) >= VK_MAKE_VERSION(1, 2, 131));
 
