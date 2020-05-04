@@ -63,10 +63,10 @@ namespace vkt {
 
             // 
 #ifdef ENABLE_OPENGL_INTEROP
-            glCreateBuffers(1u, &this->info.glID);
-            glCreateMemoryObjectsEXT(1u, &this->info.glMemory);
-            glImportMemoryWin32HandleEXT(this->info.glMemory, this->info.reqSize, GL_HANDLE_TYPE_OPAQUE_WIN32_EXT, this->info.handle);
-            glNamedBufferStorageMemEXT(this->info.glID, this->info.range, this->info.glMemory, 0u);
+            gl::glCreateBuffers(1u, &this->info.glID);
+            gl::glCreateMemoryObjectsEXT(1u, &this->info.glMemory);
+            gl::glImportMemoryWin32HandleEXT(this->info.glMemory, this->info.reqSize, gl::GL_HANDLE_TYPE_OPAQUE_WIN32_EXT, this->info.handle);
+            gl::glNamedBufferStorageMemEXT(this->info.glID, this->info.range, this->info.glMemory, 0u);
 #endif
 
             return this;
@@ -384,8 +384,8 @@ namespace vkt {
         template<class Tm = T> inline const Vector<Tm>& cast() const { return reinterpret_cast<const Vector<Tm>&>(*this); };
 
 #ifdef ENABLE_OPENGL_INTEROP
-        virtual GLuint& getGL() { return this->allocation->info.glID; };
-        virtual const GLuint& getGL() const { return this->allocation->info.glID; };
+        virtual gl::GLuint& getGL() { return this->allocation->info.glID; };
+        virtual const gl::GLuint& getGL() const { return this->allocation->info.glID; };
 #endif
 
         // 

@@ -64,31 +64,31 @@ namespace vkt {
 
             // 
 #ifdef ENABLE_OPENGL_INTEROP
-            GLuint format = GL_RGBA8;
-            if (createInfo->format == VK_FORMAT_R16G16B16A16_UNORM) { format = GL_RGBA16; };
-            if (createInfo->format == VK_FORMAT_R32G32B32A32_SFLOAT) { format = GL_RGBA32F; };
-            if (createInfo->format == VK_FORMAT_R16G16B16A16_SFLOAT) { format = GL_RGBA16F; };
-            if (createInfo->format == VK_FORMAT_R32G32B32_SFLOAT) { format = GL_RGB32F; };
-            if (createInfo->format == VK_FORMAT_R16G16B16_SFLOAT) { format = GL_RGB16F; };
-            if (createInfo->format == VK_FORMAT_R32G32_SFLOAT) { format = GL_RG32F; };
-            if (createInfo->format == VK_FORMAT_R16G16_SFLOAT) { format = GL_RG16F; };
+            gl::GLenum format = gl::GL_RGBA8;
+            if (createInfo->format == VK_FORMAT_R16G16B16A16_UNORM) { format = gl::GL_RGBA16; };
+            if (createInfo->format == VK_FORMAT_R32G32B32A32_SFLOAT) { format = gl::GL_RGBA32F; };
+            if (createInfo->format == VK_FORMAT_R16G16B16A16_SFLOAT) { format = gl::GL_RGBA16F; };
+            if (createInfo->format == VK_FORMAT_R32G32B32_SFLOAT) { format = gl::GL_RGB32F; };
+            if (createInfo->format == VK_FORMAT_R16G16B16_SFLOAT) { format = gl::GL_RGB16F; };
+            if (createInfo->format == VK_FORMAT_R32G32_SFLOAT) { format = gl::GL_RG32F; };
+            if (createInfo->format == VK_FORMAT_R16G16_SFLOAT) { format = gl::GL_RG16F; };
 
             // Import Memory
-            glCreateTextures(GL_TEXTURE_2D, 1, &this->info.glID);
-            glCreateMemoryObjectsEXT(1, &this->info.glMemory);
-            glImportMemoryWin32HandleEXT(this->info.glMemory, this->info.reqSize, GL_HANDLE_TYPE_OPAQUE_WIN32_EXT, this->info.handle);
+            gl::glCreateTextures(gl::GL_TEXTURE_2D, 1, &this->info.glID);
+            gl::glCreateMemoryObjectsEXT(1, &this->info.glMemory);
+            gl::glImportMemoryWin32HandleEXT(this->info.glMemory, this->info.reqSize, gl::GL_HANDLE_TYPE_OPAQUE_WIN32_EXT, this->info.handle);
 
             // Create GL Image
             if (createInfo->imageType == VK_IMAGE_TYPE_1D) {
-                glTextureStorageMem1DEXT(this->info.glID, createInfo->mipLevels, format, createInfo->extent.width, this->info.glMemory, 0);
+                gl::glTextureStorageMem1DEXT(this->info.glID, createInfo->mipLevels, format, createInfo->extent.width, this->info.glMemory, 0);
             }
             else
             if (createInfo->imageType == VK_IMAGE_TYPE_2D) {
-                glTextureStorageMem2DEXT(this->info.glID, createInfo->mipLevels, format, createInfo->extent.width, createInfo->extent.height, this->info.glMemory, 0);
+                gl::glTextureStorageMem2DEXT(this->info.glID, createInfo->mipLevels, format, createInfo->extent.width, createInfo->extent.height, this->info.glMemory, 0);
             }
             else
             if (createInfo->imageType == VK_IMAGE_TYPE_3D) {
-                glTextureStorageMem3DEXT(this->info.glID, createInfo->mipLevels, format, createInfo->extent.width, createInfo->extent.height, createInfo->extent.depth, this->info.glMemory, 0);
+                gl::glTextureStorageMem3DEXT(this->info.glID, createInfo->mipLevels, format, createInfo->extent.width, createInfo->extent.height, createInfo->extent.depth, this->info.glMemory, 0);
             }
 #endif
             return this;
@@ -156,13 +156,13 @@ namespace vkt {
 
         // Bindless Textures Directly
 #ifdef ENABLE_OPENGL_INTEROP
-        virtual GLuint& getGL() { return this->info.glID; };
-        virtual const GLuint& getGL() const { return this->info.glID; };
+        virtual gl::GLuint& getGL() { return this->info.glID; };
+        virtual const gl::GLuint& getGL() const { return this->info.glID; };
 
-        virtual uint64_t deviceAddress() { return glGetTextureHandleARB(this->info.glID); };
-        virtual const uint64_t deviceAddress() const { return glGetTextureHandleARB(this->info.glID); };
-        virtual uint64_t deviceAddress(GLuint sampler) { return glGetTextureSamplerHandleARB(this->info.glID, sampler); };
-        virtual const uint64_t deviceAddress(GLuint sampler) const { return glGetTextureSamplerHandleARB(this->info.glID, sampler); };
+        virtual uint64_t deviceAddress() { return gl::glGetTextureHandleARB(this->info.glID); };
+        virtual const uint64_t deviceAddress() const { return gl::glGetTextureHandleARB(this->info.glID); };
+        virtual uint64_t deviceAddress(gl::GLuint sampler) { return gl::glGetTextureSamplerHandleARB(this->info.glID, sampler); };
+        virtual const uint64_t deviceAddress(gl::GLuint sampler) const { return gl::glGetTextureSamplerHandleARB(this->info.glID, sampler); };
 #endif
 
     // 
@@ -435,7 +435,7 @@ namespace vkt {
         virtual vk::ImageSubresourceRange& getImageSubresourceRange() { return this->subresourceRange; };
 
 #ifdef ENABLE_OPENGL_INTEROP
-        virtual GLuint& getGL() { 
+        virtual gl::GLuint& getGL() {
             vk::ImageViewHandleInfoNVX handleInfo = {};
             handleInfo.imageView = this->imgInfo.imageView;
             handleInfo.sampler = this->imgInfo.sampler;
@@ -446,7 +446,7 @@ namespace vkt {
             return this->allocation->info.glID; 
         };
 
-        virtual const GLuint& getGL() const { 
+        virtual const gl::GLuint& getGL() const {
             vk::ImageViewHandleInfoNVX handleInfo = {};
             handleInfo.imageView = this->imgInfo.imageView;
             handleInfo.sampler = this->imgInfo.sampler;
@@ -458,10 +458,10 @@ namespace vkt {
         };
 
         // Bindless Textures Directly
-        virtual uint64_t deviceAddress () { return glGetTextureHandleARB(this->getGL()); };
-        virtual const uint64_t deviceAddress() const { return glGetTextureHandleARB(this->getGL()); };
-        virtual uint64_t deviceAddress(GLuint sampler) { return glGetTextureSamplerHandleARB(this->getGL(), sampler); };
-        virtual const uint64_t deviceAddress(GLuint sampler) const { return glGetTextureSamplerHandleARB(this->getGL(), sampler); };
+        virtual uint64_t deviceAddress () { return gl::glGetTextureHandleARB(this->getGL()); };
+        virtual const uint64_t deviceAddress() const { return gl::glGetTextureHandleARB(this->getGL()); };
+        virtual uint64_t deviceAddress(gl::GLuint sampler) { return gl::glGetTextureSamplerHandleARB(this->getGL(), sampler); };
+        virtual const uint64_t deviceAddress(gl::GLuint sampler) const { return gl::glGetTextureSamplerHandleARB(this->getGL(), sampler); };
 #endif
 
         // 

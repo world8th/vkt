@@ -26,7 +26,8 @@
 
 // 
 #ifdef ENABLE_OPENGL_INTEROP
-#include <glad/glad.h>
+#include <glbinding/glbinding.h>
+#include <glbinding/gl/gl.h>
 #endif
 
 // 

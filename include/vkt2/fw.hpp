@@ -249,21 +249,17 @@ namespace vkt
 #ifdef VOLK_H_
             volkInitialize();
 #endif
-
-#ifdef ENABLE_OPENGL_INTEROP
-            // glad: load all OpenGL function pointers
-            // ---------------------------------------
-            if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-            {
-                std::cerr << "Failed to initialize GLAD" << std::endl;
-            };
-#endif
         };
 
         //GPUFramework(const GPUFramework& fw) { *this = fw; };
         //GPUFramework(GPUFramework* fw) { *this = fw; };
         GPUFramework(vkt::uni_ptr<GPUFramework> fw) {
             *this = fw; 
+        };
+
+        // FOR LWJGL-3 Request!
+        GPUFramework& initializeGL(GLFWglproc (*glfwGetProcAddress)(const char*)) {
+            glbinding::initialize(glfwGetProcAddress); return *this;
         };
 
         // 
