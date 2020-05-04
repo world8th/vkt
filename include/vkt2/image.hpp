@@ -20,6 +20,7 @@ namespace vkt {
         ImageAllocation() {};
         ImageAllocation(vkt::uni_arg<MemoryAllocationInfo> allocationInfo, vkt::uni_arg<vkh::VkImageCreateInfo> createInfo = vkh::VkImageCreateInfo{}) : info( allocationInfo) { this->construct( allocationInfo,  createInfo); }
         ImageAllocation(vkt::uni_ptr<ImageAllocation> allocation) : image(allocation->image), info(allocation->info) { *this = allocation; };
+        ImageAllocation(std::shared_ptr<ImageAllocation> allocation) : image(allocation->image), info(allocation->info) { *this = vkt::uni_ptr<ImageAllocation>(allocation); };
         ~ImageAllocation() {
             if (this->image && this->info.device) {
                 //this->info.device.waitIdle();
@@ -176,8 +177,15 @@ namespace vkt {
     public: friend VmaImageAllocation; friend ImageAllocation;// 
         VmaImageAllocation() {};
         VmaImageAllocation(vkt::uni_arg<VmaAllocator> allocator, vkt::uni_arg<vkh::VkImageCreateInfo> createInfo = vkh::VkImageCreateInfo{}, vkt::uni_arg<VmaMemoryUsage> vmaUsage = VMA_MEMORY_USAGE_GPU_ONLY) { this->construct(allocator, createInfo, vmaUsage); };
+
+        // 
         VmaImageAllocation(vkt::uni_ptr<VmaImageAllocation> allocation) : allocation(allocation->allocation), allocationInfo(allocation->allocationInfo), allocator(allocation->allocator) { *this = allocation; };
         VmaImageAllocation(vkt::uni_ptr<ImageAllocation> allocation) { *this = dynamic_cast<VmaImageAllocation&>(*allocation); };
+
+        // 
+        VmaImageAllocation(std::shared_ptr<VmaImageAllocation> allocation) : allocation(allocation->allocation), allocationInfo(allocation->allocationInfo), allocator(allocation->allocator) { *this = vkt::uni_ptr<VmaImageAllocation>(allocation); };
+        VmaImageAllocation(std::shared_ptr<ImageAllocation> allocation) { *this = dynamic_cast<VmaImageAllocation&>(*vkt::uni_ptr<ImageAllocation>(allocation)); };
+
         ~VmaImageAllocation() {
             this->info.device.waitIdle();
             vmaDestroyImage(allocator, image, allocation);

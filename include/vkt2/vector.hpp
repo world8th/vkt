@@ -19,6 +19,7 @@ namespace vkt {
         BufferAllocation() {};
         BufferAllocation(vkt::uni_arg<MemoryAllocationInfo> allocationInfo, vkt::uni_arg<vkh::VkBufferCreateInfo> createInfo = vkh::VkBufferCreateInfo{}) : info( allocationInfo) { this->construct( allocationInfo,  createInfo); };
         BufferAllocation(vkt::uni_ptr    <BufferAllocation> allocation) : buffer(allocation->buffer), info(allocation->info) { *this = allocation; };
+        BufferAllocation(std::shared_ptr <BufferAllocation> allocation) : buffer(allocation->buffer), info(allocation->info) { *this = vkt::uni_ptr<BufferAllocation>(allocation); };
         ~BufferAllocation() { // Broken Support, but supports Win32 memory export
             if (this->buffer && this->info.device && this->info.memory) {
                 //this->info.device.waitIdle();
@@ -155,10 +156,16 @@ namespace vkt {
     class VmaBufferAllocation : public BufferAllocation { public: 
         VmaBufferAllocation() {};
         VmaBufferAllocation(vkt::uni_arg<VmaAllocator> allocator, const vkt::uni_arg<vkh::VkBufferCreateInfo>& createInfo = vkh::VkBufferCreateInfo{}, VmaMemoryUsage vmaUsage = VMA_MEMORY_USAGE_GPU_ONLY) { this->construct(*allocator,  createInfo, vmaUsage); };
+
+        // 
         VmaBufferAllocation(vkt::uni_ptr<VmaBufferAllocation> allocation) : allocation(allocation->allocation), allocationInfo(allocation->allocationInfo), allocator(allocation->allocator) { *this = allocation; };
         VmaBufferAllocation(vkt::uni_ptr<BufferAllocation> allocation) { *this = dynamic_cast<const VmaBufferAllocation&>(*allocation); };
-        //VmaBufferAllocation(std::shared_ptr<VmaBufferAllocation> allocation) : allocation(allocation->allocation), allocationInfo(allocation->allocationInfo), allocator(allocation->allocator) { *this = allocation; };
-        //VmaBufferAllocation(std::shared_ptr<BufferAllocation> allocation) { *this = std::dynamic_pointer_cast<VmaBufferAllocation>(allocation); };
+
+        // 
+        VmaBufferAllocation(std::shared_ptr<VmaBufferAllocation> allocation) : allocation(allocation->allocation), allocationInfo(allocation->allocationInfo), allocator(allocation->allocator) { *this = vkt::uni_ptr<VmaBufferAllocation>(allocation); };
+        VmaBufferAllocation(std::shared_ptr<BufferAllocation> allocation) { *this = dynamic_cast<const VmaBufferAllocation&>(*vkt::uni_ptr<BufferAllocation>(allocation)); };
+
+        // 
         ~VmaBufferAllocation() {
             this->info.device.waitIdle();
             vmaDestroyBuffer(allocator, buffer, allocation);
@@ -260,6 +267,8 @@ namespace vkt {
 
         // 
         Vector() {};
+
+        // 
         Vector(vkt::uni_ptr<BufferAllocation> allocation, vkt::uni_arg<vk::DeviceSize> offset = 0ull, vkt::uni_arg<vk::DeviceSize> size = VK_WHOLE_SIZE, vkt::uni_arg<vk::DeviceSize> stride = sizeof(T)) : allocation(allocation), bufInfo({ allocation->buffer, offset, size }) { this->construct(allocation, offset, size, stride); };
         Vector(vkt::uni_ptr<VmaBufferAllocation> allocation, vkt::uni_arg<vk::DeviceSize> offset = 0ull, vkt::uni_arg<vk::DeviceSize> size = VK_WHOLE_SIZE, vkt::uni_arg<vk::DeviceSize> stride = sizeof(T)) : allocation(allocation.dyn_cast<BufferAllocation>()), bufInfo({ allocation->buffer, offset, size }) { this->construct(allocation.dyn_cast<BufferAllocation>(), offset, size, stride); };
 
@@ -267,7 +276,7 @@ namespace vkt {
         Vector(std::shared_ptr<BufferAllocation> allocation, vkt::uni_arg<vk::DeviceSize> offset = 0ull, vkt::uni_arg<vk::DeviceSize> size = VK_WHOLE_SIZE, vkt::uni_arg<vk::DeviceSize> stride = sizeof(T)) : allocation(allocation), bufInfo({ allocation->buffer, offset, size }) { this->construct(allocation, offset, size, stride); };
         Vector(std::shared_ptr<VmaBufferAllocation> allocation, vkt::uni_arg<vk::DeviceSize> offset = 0ull, vkt::uni_arg<vk::DeviceSize> size = VK_WHOLE_SIZE, vkt::uni_arg<vk::DeviceSize> stride = sizeof(T)) : allocation(std::dynamic_pointer_cast<BufferAllocation>(allocation)), bufInfo({ allocation->buffer, offset, size }) { this->construct(std::dynamic_pointer_cast<BufferAllocation>(allocation), offset, size, stride); };
 
-
+        // 
         //Vector(vkt::uni_arg<MemoryAllocationInfo> allocationInfo, vkt::uni_arg<vkh::VkBufferCreateInfo> createInfo = {}) { this->construct(std::make_shared<BufferAllocation>(allocationInfo, createInfo)); };
         //Vector(vkt::uni_arg<VmaAllocator> allocator, vkt::uni_arg<vkh::VkBufferCreateInfo> createInfo = {}, vkt::uni_arg<VmaMemoryUsage> vmaUsage = VMA_MEMORY_USAGE_GPU_ONLY) { this->construct(vkt::uni_ptr<BufferAllocation>(std::dynamic_pointer_cast<BufferAllocation>(std::make_shared<VmaBufferAllocation>(allocator, createInfo, vmaUsage)))); };
 
