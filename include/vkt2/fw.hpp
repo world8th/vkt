@@ -257,11 +257,6 @@ namespace vkt
             *this = fw; 
         };
 
-        // FOR LWJGL-3 Request!
-        GPUFramework& initializeGL(GLFWglproc (*glfwGetProcAddress)(const char*)) {
-            glbinding::initialize(glfwGetProcAddress); return *this;
-        };
-
         // 
         GPUFramework& operator=(vkt::uni_ptr<GPUFramework> fw) {
             if (fw.ptr()) {

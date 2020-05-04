@@ -193,4 +193,16 @@ namespace vkt {
         virtual const T& operator*() const { return ref(); };
     };
 
+#ifdef ENABLE_OPENGL_INTEROP
+    // FOR LWJGL-3 Request!
+    void initializeGL(GLFWglproc(*glfwGetProcAddress)(const char*)) {
+        glbinding::initialize(glfwGetProcAddress);
+    };
+
+    // FOR LWJGL-3 Request!
+    void initializeGL() {
+        glbinding::initialize(glfwGetProcAddress);
+    };
+#endif
+
 };
