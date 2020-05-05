@@ -222,7 +222,7 @@ namespace vkt
 
         // instance layers
         std::vector<const char*> wantedLayers = {
-            "VK_LAYER_KHRONOS_validation",
+            //"VK_LAYER_KHRONOS_validation", // Still Validation SPAM by LancER
 
             //"VK_LAYER_LUNARG_assistant_layer",
             //"VK_LAYER_LUNARG_standard_validation",
@@ -898,7 +898,7 @@ namespace vkt
 
             // get supported present mode, but prefer mailBox
             auto presentMode = vk::PresentModeKHR::eImmediate;
-            std::vector<vk::PresentModeKHR> priorityModes = { vk::PresentModeKHR::eMailbox, vk::PresentModeKHR::eFifoRelaxed, vk::PresentModeKHR::eFifo, vk::PresentModeKHR::eImmediate };
+            std::vector<vk::PresentModeKHR> priorityModes = { vk::PresentModeKHR::eImmediate, vk::PresentModeKHR::eMailbox, vk::PresentModeKHR::eFifoRelaxed, vk::PresentModeKHR::eFifo, vk::PresentModeKHR::eImmediate };
 
             bool found = false; // 
             for (auto pm : priorityModes) {
