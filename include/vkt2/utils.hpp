@@ -419,6 +419,7 @@ namespace vkt {
     // 
     struct MemoryAllocationInfo { // 
         uint32_t glMemory = 0u, glID = 0u;
+        std::vector<uint32_t> queueFamilyIndices = {};
 
         vk::Device device = {};
         vk::DeviceMemory memory = {};

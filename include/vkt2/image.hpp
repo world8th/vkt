@@ -62,6 +62,11 @@ namespace vkt {
             this->info.range = memReqs.size;
             this->info.reqSize = memReqs.size;
             
+            // 
+            if (createInfo->queueFamilyIndexCount) {
+                this->info.queueFamilyIndices = std::vector<uint32_t>(createInfo->queueFamilyIndexCount);
+                memcpy(this->info.queueFamilyIndices.data(), createInfo->pQueueFamilyIndices, sizeof(uint32_t) * createInfo->queueFamilyIndexCount);
+            };
 
             // 
 #ifdef ENABLE_OPENGL_INTEROP
@@ -209,6 +214,12 @@ namespace vkt {
             VmaAllocatorInfo info = {};
             vmaGetAllocatorInfo(this->allocator = allocator.ref(), &info);
             this->info.dispatch = vk::DispatchLoaderDynamic(info.instance, vkGetInstanceProcAddr, this->info.device = info.device, vkGetDeviceProcAddr); // 
+
+            // 
+            if (createInfo->queueFamilyIndexCount) {
+                this->info.queueFamilyIndices = std::vector<uint32_t>(createInfo->queueFamilyIndexCount);
+                memcpy(this->info.queueFamilyIndices.data(), createInfo->pQueueFamilyIndices, sizeof(uint32_t) * createInfo->queueFamilyIndexCount);
+            };
 
             // 
             return this;
