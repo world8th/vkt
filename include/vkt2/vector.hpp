@@ -90,6 +90,16 @@ namespace vkt {
         virtual unsigned getGLBuffer() const { return this->info.glID; };
         virtual unsigned getGLMemory() const { return this->info.glMemory; };
 
+        // BETA
+        virtual vk::DispatchLoaderDynamic dispatchLoaderDynamic() {
+            return this->info.dispatch;
+        }
+
+        // BETA
+        virtual vk::DispatchLoaderDynamic dispatchLoaderDynamic() const {
+            return this->info.dispatch;
+        }
+
         // 
         virtual void* map() { return info.pMapped; };
         virtual void* mapped() { return info.pMapped; };
@@ -132,6 +142,10 @@ namespace vkt {
         // 
         virtual BufferAllocation* address() { return this; };
         virtual const BufferAllocation* address() const { return this; };
+
+        // Queue Family Indices
+        virtual std::vector<uint32_t>& getQueueFamilyIndices() { return this->info.queueFamilyIndices; };
+        virtual const std::vector<uint32_t>& getQueueFamilyIndices() const { return this->info.queueFamilyIndices; };
 
         // 
         virtual vkh::VkDeviceOrHostAddressKHR deviceAddress() {
@@ -454,6 +468,10 @@ namespace vkt {
             //return vkh::VkDeviceOrHostAddressConstKHR{ .deviceAddress = getDevice().getBufferAddress(vkh::VkBufferDeviceAddressInfo{ .buffer = this->buffer() }.hpp()) + this->offset() };
             return this->allocation->deviceAddress();
         };
+
+        // 
+        virtual std::vector<uint32_t>& getQueueFamilyIndices() { return this->allocation->getQueueFamilyIndices(); };
+        virtual const std::vector<uint32_t>& getQueueFamilyIndices() const { return this->allocation->getQueueFamilyIndices(); };
 
         // 
         virtual vkh::VkStridedBufferRegionKHR& getRegion() { return bufRegion; };

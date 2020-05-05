@@ -160,6 +160,10 @@ namespace vkt {
         virtual ImageAllocation* address() { return this; };
         virtual const ImageAllocation* address() const { return this; };
 
+        // Queue Family Indices
+        virtual std::vector<uint32_t>& getQueueFamilyIndices() { return this->info.queueFamilyIndices; };
+        virtual const std::vector<uint32_t>& getQueueFamilyIndices() const { return this->info.queueFamilyIndices; };
+
         // Bindless Textures Directly
 #ifdef ENABLE_OPENGL_INTEROP
         virtual gl::GLuint& getGL() { return this->info.glID; };
@@ -477,10 +481,29 @@ namespace vkt {
         };
 
         // Bindless Textures Directly
-        virtual uint64_t deviceAddress () { return gl::glGetTextureHandleARB(this->getGL()); };
-        virtual const uint64_t deviceAddress() const { return gl::glGetTextureHandleARB(this->getGL()); };
-        virtual uint64_t deviceAddress(gl::GLuint sampler) { return gl::glGetTextureSamplerHandleARB(this->getGL(), sampler); };
-        virtual const uint64_t deviceAddress(gl::GLuint sampler) const { return gl::glGetTextureSamplerHandleARB(this->getGL(), sampler); };
+        virtual uint64_t deviceAddress () { 
+            if (this->getGL()) {
+                return gl::glGetTextureHandleARB(this->getGL());
+            } else {
+                return this->allocation->getDevice().getImageViewAddressNVX(this->getImageView()).deviceAddress;
+            };
+        };
+        virtual const uint64_t deviceAddress() const { 
+            if (this->getGL()) {
+                return gl::glGetTextureHandleARB(this->getGL());
+            } else {
+                return this->allocation->getDevice().getImageViewAddressNVX(this->getImageView()).deviceAddress;
+            };
+        };
+        virtual uint64_t deviceAddress(gl::GLuint sampler) { 
+            return gl::glGetTextureSamplerHandleARB(this->getGL(), sampler); 
+        };
+        virtual const uint64_t deviceAddress(gl::GLuint sampler) const { 
+            return gl::glGetTextureSamplerHandleARB(this->getGL(), sampler); 
+        };
+#else   // Get By Vulkan API Directly
+        virtual uint64_t deviceAddress() { return this->allocation->getDevice().getImageViewAddressNVX(this->getImageView(), this->getAllocation()->dispatchLoaderDynamic()).deviceAddress; };
+        virtual const uint64_t deviceAddress() const { return this->allocation->getDevice().getImageViewAddressNVX(this->getImageView(), this->getAllocation()->dispatchLoaderDynamic()).deviceAddress; };
 #endif
 
         // 
@@ -493,6 +516,10 @@ namespace vkt {
         // 
         virtual unsigned getGLBuffer() const { return this->allocation->getGLBuffer(); };
         virtual unsigned getGLMemory() const { return this->allocation->getGLMemory(); };
+
+        // 
+        virtual std::vector<uint32_t>& getQueueFamilyIndices() { return this->allocation->getQueueFamilyIndices(); };
+        virtual const std::vector<uint32_t>& getQueueFamilyIndices() const { return this->allocation->getQueueFamilyIndices(); };
 
         // 
         virtual ImageAllocation* operator->() { return &(*allocation); };
