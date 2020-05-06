@@ -11,4 +11,4 @@ Planned...
 - [ ] Full C++20 support
 - [ ] Documentation
 - [ ] Debug utils 
-
+- [ ] Multi-threading
