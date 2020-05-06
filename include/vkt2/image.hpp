@@ -466,8 +466,10 @@ namespace vkt {
             return gl::glGetTextureSamplerHandleARB(this->getGL(), sampler); 
         };
 #else   // Get By Vulkan API Directly
+#ifdef ENABLE_NVX_IMAGE_ADDRESS
         virtual uint64_t deviceAddress() { return this->allocation->getDevice().getImageViewAddressNVX(this->getImageView(), this->getAllocation()->dispatchLoaderDynamic()).deviceAddress; };
         virtual const uint64_t deviceAddress() const { return this->allocation->getDevice().getImageViewAddressNVX(this->getImageView(), this->getAllocation()->dispatchLoaderDynamic()).deviceAddress; };
+#endif
 #endif
 
         // 

@@ -49,8 +49,8 @@ namespace vkh {
                     raygenShaderGroup.generalShader = last_idx;
                 };
             };
-
-            uintptr_t groupIdx = -1U;
+            
+            uintptr_t groupIdx = ~0U;
             for (auto& stage : stages_in) {
                 if (stage.stage == VK_SHADER_STAGE_MISS_BIT_NV) {
                     const uintptr_t lastIdx = stages.size(); stages.push_back(stage);
@@ -59,12 +59,12 @@ namespace vkh {
                     missShaderGroups[groupIdx].generalShader = lastIdx;//break;
                 };
             };
-
-            groupIdx = -1U; // Only One Hit Group Supported At Once
+             
+            groupIdx = ~0U;  // Only One Hit Group Supported At Once
             for (auto& stage : stages_in) {
                 if (stage.stage == VK_SHADER_STAGE_CLOSEST_HIT_BIT_NV || stage.stage == VK_SHADER_STAGE_ANY_HIT_BIT_NV || stage.stage == VK_SHADER_STAGE_INTERSECTION_BIT_NV) {
                     const uintptr_t lastIdx = stages.size(); stages.push_back(stage);
-                    if (groupIdx == -1U) { groupIdx = hitShaderGroups.size(); hitShaderGroups.push_back({}); };
+                    if (groupIdx == ~0U) { groupIdx = hitShaderGroups.size(); hitShaderGroups.push_back({}); };
                     auto& group = hitShaderGroups[groupIdx];
                     if (stage.stage == VK_SHADER_STAGE_CLOSEST_HIT_BIT_NV) {
                         group.type = prior_group_type;
@@ -154,7 +154,7 @@ namespace vkh {
                 };
             };
 
-            uintptr_t groupIdx = -1U;
+            uintptr_t groupIdx = ~0U;
             for (auto& stage : stages_in) {
                 if (stage.stage == VK_SHADER_STAGE_MISS_BIT_KHR) {
                     const uintptr_t lastIdx = stages.size(); stages.push_back(stage);
@@ -164,11 +164,14 @@ namespace vkh {
                 };
             };
 
-            groupIdx = -1U; // Only One Hit Group Supported At Once
+            groupIdx = ~0U;  // Only One Hit Group Supported At Once
             for (auto& stage : stages_in) {
                 if (stage.stage == VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR || stage.stage == VK_SHADER_STAGE_ANY_HIT_BIT_KHR || stage.stage == VK_SHADER_STAGE_INTERSECTION_BIT_KHR) {
                     const uintptr_t lastIdx = stages.size(); stages.push_back(stage);
-                    if (groupIdx == -1U) { groupIdx = static_cast<uint32_t>(hitShaderGroups.size()); hitShaderGroups.push_back({}); };
+                    if (groupIdx == ~0U) {
+                        groupIdx = static_cast<uint32_t>(hitShaderGroups.size());
+                        hitShaderGroups.push_back({});
+                    };
                     auto& group = hitShaderGroups[groupIdx];
                     if (stage.stage == VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR) {
                         group.type = prior_group_type;
