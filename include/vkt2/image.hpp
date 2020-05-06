@@ -460,14 +460,14 @@ namespace vkt {
             if (this->getGL()) {
                 return gl::glGetTextureHandleARB(this->getGL());
             } else {
-                return this->allocation->getDevice().getImageViewAddressNVX(this->getImageView()).deviceAddress;
+                return this->allocation->getDevice().getImageViewAddressNVX(this->getImageView(), this->allocation->dispatchLoaderDynamic()).deviceAddress;
             };
         };
         virtual const uint64_t deviceAddress() const { 
             if (this->getGL()) {
                 return gl::glGetTextureHandleARB(this->getGL());
             } else {
-                return this->allocation->getDevice().getImageViewAddressNVX(this->getImageView()).deviceAddress;
+                return this->allocation->getDevice().getImageViewAddressNVX(this->getImageView(), this->allocation->dispatchLoaderDynamic()).deviceAddress;
             };
         };
         virtual uint64_t deviceAddress(gl::GLuint sampler) { 
