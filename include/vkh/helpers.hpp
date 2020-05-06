@@ -111,9 +111,10 @@ namespace vkh {
         inline operator ::VkRayTracingPipelineCreateInfoNV& () { return format(); };
         inline operator VkRayTracingPipelineCreateInfoNV& () { return format(); };
 
-        // Vulkan-HPP
+#ifdef VULKAN_HPP // 
         inline operator const vk::RayTracingPipelineCreateInfoNV& () const { return vkInfo; };
         inline operator vk::RayTracingPipelineCreateInfoNV& () { return format(); };
+#endif
     };
 
 
@@ -218,9 +219,10 @@ namespace vkh {
         inline operator ::VkRayTracingPipelineCreateInfoKHR&() { return format(); };
         inline operator VkRayTracingPipelineCreateInfoKHR&() { return format(); };
 
-        // Vulkan-HPP
+#ifdef VULKAN_HPP // Vulkan-HPP
         inline operator const vk::RayTracingPipelineCreateInfoKHR& () const { return vkInfo; };
         inline operator vk::RayTracingPipelineCreateInfoKHR& () { return format(); };
+#endif
     };
 #endif
 
@@ -304,7 +306,7 @@ namespace vkh {
         };
 
         // 
-        inline VsDescriptorSetCreateInfoHelper& setDescriptorSet(const vk::DescriptorSet& set = {}) {
+        inline VsDescriptorSetCreateInfoHelper& setDescriptorSet(const VkDescriptorSet& set = {}) {
             this->set = set; return *this;
         };
 
@@ -351,13 +353,14 @@ namespace vkh {
         inline operator const VkDescriptorSetAllocateInfo& () const { return allocate_info; };
         inline operator const VkDescriptorUpdateTemplateCreateInfo& () const { return template_info; };
 
-        // Vulkan-HPP
+#ifdef VULKAN_HPP // Vulkan-HPP
         inline operator vk::DescriptorSetAllocateInfo& () { return allocate_info; };
         inline operator vk::DescriptorUpdateTemplateCreateInfo& () { return format(); };
 
         // Vulkan-HPP
         inline operator const vk::DescriptorSetAllocateInfo& () const { return allocate_info; };
         inline operator const vk::DescriptorUpdateTemplateCreateInfo& () const { return template_info; };
+#endif
 
         // 
         inline std::vector<VkWriteDescriptorSet>& mapWriteDescriptorSet() {
@@ -459,8 +462,10 @@ namespace vkh {
         inline operator ::VkDescriptorSetLayoutCreateInfo& () { return format(); };
 
         // Vulkan-HPP
+#ifdef VULKAN_HPP
         inline operator const vk::DescriptorSetLayoutCreateInfo& () const { return vk_info; };
         inline operator vk::DescriptorSetLayoutCreateInfo& () { return format(); };
+#endif
 
         // 
         inline operator const VkDescriptorSetLayoutCreateInfo&() const { return vk_info; };
@@ -526,8 +531,10 @@ namespace vkh {
         inline operator ::VkRenderPassCreateInfo& () { return format(); };
 
         // Vulkan-HPP
+#ifdef VULKAN_HPP
         inline operator const vk::RenderPassCreateInfo& () const { return vk_info; };
         inline operator vk::RenderPassCreateInfo& () { return format(); };
+#endif
 
         // 
         inline operator const std::vector<VkAttachmentDescription>&() const { return attachments; };
@@ -607,9 +614,10 @@ namespace vkh {
         inline operator VkGraphicsPipelineCreateInfo& () { construct(); return graphicsPipelineCreateInfo; };
         inline operator const VkGraphicsPipelineCreateInfo& () const { return graphicsPipelineCreateInfo; };
 
-        // Vulkan-HPP
+#ifdef VULKAN_HPP // Vulkan-HPP
         inline operator vk::GraphicsPipelineCreateInfo& () { construct(); return graphicsPipelineCreateInfo; };
         inline operator const vk::GraphicsPipelineCreateInfo& () const { return graphicsPipelineCreateInfo; };
+#endif
 
         //
         inline operator ::VkGraphicsPipelineCreateInfo* () { construct(); return graphicsPipelineCreateInfo; };

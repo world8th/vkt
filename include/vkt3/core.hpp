@@ -1,5 +1,9 @@
 #pragma once // #
 
+// Resolve conflict with another `core.hpp`
+#ifndef VKT_CORE_HPP
+#define VKT_CORE_HPP
+
 //#include "utils.hpp"
 //#include "structs.hpp"
 #include <memory>
@@ -207,3 +211,5 @@ namespace vkt {
 #endif
 
 };
+
+#endif

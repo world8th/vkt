@@ -4,8 +4,18 @@
 #include <vector>
 //#define VK_ENABLE_BETA_EXTENSIONS
 #include <glm/glm.hpp>
+
+// Enable Vulkan-HPP when defined
+#ifdef VULKAN_HPP
+#define ENABLE_VULKAN_HPP
+#endif
+
+// When enabled, use Vulkan-HPP support...
+#ifdef ENABLE_VULKAN_HPP
 #include <vulkan/vulkan.hpp>
-#include <vkt2/core.hpp>
+#endif
+
+#include "core.hpp"
 
 namespace vkh {
 
@@ -31,6 +41,7 @@ namespace vkh {
         explicit operator const COMP& () const { return reinterpret_cast<const COMP&>(*this); };
 
     // 
+#ifdef VULKAN_HPP
     #define VK_HPP_OPERATORS(NAME,FTYP,BITS) \
         NAME& operator=(const vkt::uni_arg<BITS>& F) { memcpy(this, F, sizeof(NAME)); return *this; };\
         NAME operator|(const BITS& F) { auto f = F | reinterpret_cast<BITS&>(*this); return std::move(reinterpret_cast<NAME&>(f)); };\
@@ -46,6 +57,9 @@ namespace vkh {
         operator const FTYP&() const {return reinterpret_cast<const FTYP&>(*this);};\
         FTYP& hpp() {return reinterpret_cast<FTYP&>(*this);};\
         const FTYP& hpp() const {return reinterpret_cast<const FTYP&>(*this);};
+#else 
+    #define VK_HPP_OPERATORS(NAME,FTYP,BITS) // Not Vulkan HPP Support
+#endif
 
 
     struct VkBufferCreateFlags { ::VkFlags

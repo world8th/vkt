@@ -25,6 +25,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         NAME& operator =( const vkt::uni_arg<::NAME>& info ) { memcpy(this, info, sizeof(NAME)); return *this; };\
         NAME& operator =( const vkt::uni_arg<NAME>& info ) { memcpy(this, info, sizeof(NAME)); return *this; }; 
 
+#ifdef VULKAN_HPP
     #define VK_HPP_STRUCT_OPERATORS(NAME,VKNAME)\
         operator VKNAME&() { return reinterpret_cast<VKNAME&>(*this); };\
         operator const VKNAME&() const { return reinterpret_cast<const VKNAME&>(*this); };\
@@ -37,6 +38,9 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         VKNAME chpp() { return reinterpret_cast<VKNAME&>(*this); };\
         const VKNAME chpp() const { return reinterpret_cast<const VKNAME&>(*this); };\
         NAME& operator =( const vkt::uni_arg<VKNAME>& info ) { memcpy(this, info, sizeof(NAME)); return *this; };
+#else
+        #define VK_HPP_STRUCT_OPERATORS(NAME,VKNAME) // Not Vulkan HPP Support
+#endif
 
     #define STRUCT_TYPE_COMPATIBLE(NAME,T)\
         NAME& operator=(const vkt::uni_arg<T>& V) { memcpy(this, V, sizeof(T)); return *this; };\
