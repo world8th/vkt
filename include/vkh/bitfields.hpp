@@ -480,8 +480,8 @@ namespace vkh {
 
     // 
     struct VkShaderModuleCreateFlags { //::VkFlags
-        OPERATORS(VkShaderModuleCreateFlags, ::VkShaderModuleCreateFlagBits, ::VkFlags)
-        VK_HPP_OPERATORS(VkShaderModuleCreateFlags, vk::ShaderModuleCreateFlags, vk::ShaderModuleCreateFlagBits)
+        //OPERATORS(VkShaderModuleCreateFlags, ::VkShaderModuleCreateFlagBits, ::VkFlags)
+        //VK_HPP_OPERATORS(VkShaderModuleCreateFlags, vk::ShaderModuleCreateFlags, vk::ShaderModuleCreateFlagBits)
     };
 
     // 
