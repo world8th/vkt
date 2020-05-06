@@ -87,8 +87,12 @@ namespace vkt {
         };
 
         // 
-        virtual unsigned getGLBuffer() const { return this->info.glID; };
-        virtual unsigned getGLMemory() const { return this->info.glMemory; };
+        virtual unsigned& getGLBuffer() { return this->info.glID; };
+        virtual unsigned& getGLMemory() { return this->info.glMemory; };
+
+        // 
+        virtual const unsigned& getGLBuffer() const { return this->info.glID; };
+        virtual const unsigned& getGLMemory() const { return this->info.glMemory; };
 
         // BETA
         virtual vk::DispatchLoaderDynamic dispatchLoaderDynamic() {
@@ -130,6 +134,10 @@ namespace vkt {
         //
         virtual vk::Device& getDevice() { return info.device; };
         virtual const vk::Device& getDevice() const { return info.device; };
+
+        // Avoid recursion or stack overflow
+        virtual vk::Buffer& getBuffer() { return buffer; };
+        virtual const vk::Buffer& getBuffer() const { return buffer; };
 
         // 
         virtual vk::DeviceSize& range() { return info.range; };
@@ -406,22 +414,32 @@ namespace vkt {
         virtual const vk::DeviceSize& stride() const { return this->bufRegion.stride; };
         virtual vk::DeviceSize& stride() { return this->bufRegion.stride; };
 
-        // 
-        virtual vk::Buffer& buffer() { return reinterpret_cast<vk::Buffer&>(allocation->buffer); };
-        //virtual VkBuffer& buffer() { return reinterpret_cast<VkBuffer&>(allocation->buffer); };
+        // ALIAS
+        virtual const vk::Buffer& buffer() const { return this->getBuffer(); };
+        virtual vk::Buffer& buffer() { return this->getBuffer(); };
 
         // 
-        virtual const vk::Buffer& buffer() const { return reinterpret_cast<const vk::Buffer&>(allocation->buffer); };
-        //virtual const VkBuffer& buffer() const { return reinterpret_cast<VkBuffer&>(allocation->buffer); };
+        virtual vk::Device& getDevice() { return reinterpret_cast<vk::Device&>(this->allocation->getDevice()); };
+        virtual vk::Buffer& getBuffer() { return reinterpret_cast<vk::Buffer&>(this->allocation->getBuffer()); };
+
+        // 
+        virtual const vk::Device& getDevice() const { return reinterpret_cast<const vk::Device&>(this->allocation->getDevice()); };
+        virtual const vk::Buffer& getBuffer() const { return reinterpret_cast<const vk::Buffer&>(this->allocation->getBuffer()); };
+
+        // For JavaCPP and LWJGL-3
+        virtual VkDevice& handleDevice() { return reinterpret_cast<VkDevice&>(this->getDevice()); };
+        virtual VkBuffer& handleBuffer() { return reinterpret_cast<VkBuffer&>(this->getBuffer()); };
+
+        // For JavaCPP and LWJGL-3
+        virtual const VkDevice& handleDevice() const { return reinterpret_cast<const VkDevice&>(this->getDevice()); };
+        virtual const VkBuffer& handleBuffer() const { return reinterpret_cast<const VkBuffer&>(this->getBuffer()); };
 
         // typed casting 
         template<class Tm = T> inline Vector<Tm>& cast() { return reinterpret_cast<Vector<Tm>&>(*this); };
         template<class Tm = T> inline const Vector<Tm>& cast() const { return reinterpret_cast<const Vector<Tm>&>(*this); };
 
-#ifdef ENABLE_OPENGL_INTEROP
-        virtual gl::GLuint& getGL() { return this->allocation->info.glID; };
-        virtual const gl::GLuint& getGL() const { return this->allocation->info.glID; };
-#endif
+        virtual unsigned& getGL() { return this->allocation->info.glID; };
+        virtual const unsigned& getGL() const { return this->allocation->info.glID; };
 
         // 
         virtual bool has() const { return allocation ? true : false; };
@@ -452,10 +470,6 @@ namespace vkt {
         // for JavaCPP
         virtual BufferAllocation* getAllocationPtr() { return allocation.ptr(); };
         virtual const BufferAllocation* getAllocationPtr() const { return allocation.ptr(); };
-
-        //
-        virtual vk::Device& getDevice() { return allocation->getDevice(); };
-        virtual const vk::Device& getDevice() const { return allocation->getDevice(); };
 
         // get deviceAddress with offset (currently, prefer unshifted)
         virtual vkh::VkDeviceOrHostAddressKHR deviceAddress() {
@@ -511,8 +525,12 @@ namespace vkt {
         virtual T* const end() { return &at(size() - 1ul); };
 
         // 
-        virtual unsigned getGLBuffer() const { return this->allocation->getGLBuffer(); };
-        virtual unsigned getGLMemory() const { return this->allocation->getGLMemory(); };
+        virtual unsigned& getGLBuffer() { return this->allocation->getGLBuffer(); };
+        virtual unsigned& getGLMemory() { return this->allocation->getGLMemory(); };
+
+        // 
+        virtual const unsigned& getGLBuffer() const { return this->allocation->getGLBuffer(); };
+        virtual const unsigned& getGLMemory() const { return this->allocation->getGLMemory(); };
 
         //
         protected: friend Vector<T>; // 

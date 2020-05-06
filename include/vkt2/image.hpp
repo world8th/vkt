@@ -101,8 +101,12 @@ namespace vkt {
         };
 
         // 
-        virtual unsigned getGLBuffer() const { return this->info.glID; };
-        virtual unsigned getGLMemory() const { return this->info.glMemory; };
+        virtual const unsigned& getGLImage() const { return this->info.glID; };
+        virtual const unsigned& getGLMemory() const { return this->info.glMemory; };
+
+        // 
+        virtual unsigned& getGLImage() { return this->info.glID; };
+        virtual unsigned& getGLMemory() { return this->info.glMemory; };
 
         // BETA
         virtual vk::DispatchLoaderDynamic dispatchLoaderDynamic() {
@@ -450,36 +454,7 @@ namespace vkt {
         virtual operator const VkDevice& () const { return reinterpret_cast<const VkDevice&>(this->allocation->getDevice()); };
         virtual operator const vk::ImageSubresourceLayers() const { return vk::ImageSubresourceLayers{ reinterpret_cast<const vk::ImageAspectFlags&>(subresourceRange.aspectMask), subresourceRange.baseMipLevel, subresourceRange.baseArrayLayer, subresourceRange.layerCount }; };
 
-        // 
-        virtual vk::Image& getImage() { return *this->allocation; };
-        virtual vk::ImageView& getImageView() { return reinterpret_cast<vk::ImageView&>(this->imgInfo.imageView); };
-        virtual vk::ImageLayout& getImageLayout() { return reinterpret_cast<vk::ImageLayout&>(this->imgInfo.imageLayout); };
-        virtual vk::Sampler& getSampler() { return reinterpret_cast<vk::Sampler&>(this->imgInfo.sampler); };
-        virtual vk::ImageSubresourceRange& getImageSubresourceRange() { return this->subresourceRange; };
-
 #ifdef ENABLE_OPENGL_INTEROP
-        virtual gl::GLuint& getGL() {
-            vk::ImageViewHandleInfoNVX handleInfo = {};
-            handleInfo.imageView = this->imgInfo.imageView;
-            handleInfo.sampler = this->imgInfo.sampler;
-            handleInfo.descriptorType = this->imgInfo.sampler ? vk::DescriptorType::eCombinedImageSampler : vk::DescriptorType::eSampledImage;
-            if (!this->allocation->info.glID) {
-                this->allocation->info.glID = this->allocation->getDevice().getImageViewHandleNVX(&handleInfo, this->allocation->dispatchLoaderDynamic());
-            };
-            return this->allocation->info.glID; 
-        };
-
-        virtual const gl::GLuint& getGL() const {
-            vk::ImageViewHandleInfoNVX handleInfo = {};
-            handleInfo.imageView = this->imgInfo.imageView;
-            handleInfo.sampler = this->imgInfo.sampler;
-            handleInfo.descriptorType = this->imgInfo.sampler ? vk::DescriptorType::eCombinedImageSampler : vk::DescriptorType::eSampledImage;
-            if (!this->allocation->info.glID) {
-                return this->allocation->getDevice().getImageViewHandleNVX(&handleInfo, this->allocation->dispatchLoaderDynamic());
-            };
-            return this->allocation->info.glID; 
-        };
-
         // Bindless Textures Directly
         virtual uint64_t deviceAddress () { 
             if (this->getGL()) {
@@ -507,15 +482,73 @@ namespace vkt {
 #endif
 
         // 
-        virtual const vk::Image& getImage() const { return *this->allocation; };
+        virtual vk::ImageView& getImageView() { return reinterpret_cast<vk::ImageView&>(this->imgInfo.imageView); };
+        virtual vk::ImageLayout& getImageLayout() { return reinterpret_cast<vk::ImageLayout&>(this->imgInfo.imageLayout); };
+        virtual vk::Sampler& getSampler() { return reinterpret_cast<vk::Sampler&>(this->imgInfo.sampler); };
+        virtual vk::ImageSubresourceRange& getImageSubresourceRange() { return this->subresourceRange; };
+
+        // 
         virtual const vk::ImageView& getImageView() const { return reinterpret_cast<const vk::ImageView&>(this->imgInfo.imageView); };
         virtual const vk::ImageLayout& getImageLayout() const { return reinterpret_cast<const vk::ImageLayout&>(this->imgInfo.imageLayout); };
         virtual const vk::Sampler& getSampler() const { return reinterpret_cast<const vk::Sampler&>(this->imgInfo.sampler); };
         virtual const vk::ImageSubresourceRange& getImageSubresourceRange() const { return this->subresourceRange; };
 
+
         // 
-        virtual unsigned getGLBuffer() const { return this->allocation->getGLBuffer(); };
-        virtual unsigned getGLMemory() const { return this->allocation->getGLMemory(); };
+        virtual unsigned& getGL() {
+            if (this->getGLImage()) {
+                return this->getGLImage();
+            } else {
+                vk::ImageViewHandleInfoNVX handleInfo = {};
+                handleInfo.imageView = this->imgInfo.imageView;
+                handleInfo.sampler = this->imgInfo.sampler;
+                handleInfo.descriptorType = this->imgInfo.sampler ? vk::DescriptorType::eCombinedImageSampler : vk::DescriptorType::eSampledImage;
+                if (!this->allocation->info.glID) {
+                    this->allocation->info.glID = this->allocation->getDevice().getImageViewHandleNVX(&handleInfo, this->allocation->dispatchLoaderDynamic());
+                };
+                return this->allocation->info.glID;
+            }
+        };
+
+        // 
+        virtual const unsigned& getGL() const {
+            if (this->getGLImage()) {
+                return this->getGLImage();
+            } else {
+                vk::ImageViewHandleInfoNVX handleInfo = {};
+                handleInfo.imageView = this->imgInfo.imageView;
+                handleInfo.sampler = this->imgInfo.sampler;
+                handleInfo.descriptorType = this->imgInfo.sampler ? vk::DescriptorType::eCombinedImageSampler : vk::DescriptorType::eSampledImage;
+                if (!this->allocation->info.glID) {
+                    return this->allocation->getDevice().getImageViewHandleNVX(&handleInfo, this->allocation->dispatchLoaderDynamic());
+                };
+                return this->allocation->info.glID;
+            };
+        };
+
+        // 
+        virtual const unsigned& getGLImage() const { return this->allocation->getGLImage(); };
+        virtual const unsigned& getGLMemory() const { return this->allocation->getGLMemory(); };
+
+        // 
+        virtual unsigned& getGLImage() { return this->allocation->getGLImage(); };
+        virtual unsigned& getGLMemory() { return this->allocation->getGLMemory(); };
+
+        // 
+        virtual vk::Device& getDevice() { return reinterpret_cast<vk::Device&>(allocation->getDevice()); };
+        virtual vk::Image& getImage() { return reinterpret_cast<vk::Image&>(allocation->getImage()); };
+
+        // 
+        virtual const vk::Device& getDevice() const { return reinterpret_cast<const vk::Device&>(allocation->getDevice()); };
+        virtual const vk::Image& getImage() const { return reinterpret_cast<const vk::Image&>(allocation->getImage()); };
+
+        // 
+        virtual VkDevice& deviceHandle() { return reinterpret_cast<VkDevice&>(allocation->getDevice()); };
+        virtual VkImage& imageHandle() { return reinterpret_cast<VkImage&>(allocation->getImage()); };
+
+        // 
+        virtual const VkDevice& deviceHandle() const { return reinterpret_cast<const VkDevice&>(allocation->getDevice()); };
+        virtual const VkImage& imageHandle() const { return reinterpret_cast<const VkImage&>(allocation->getImage()); };
 
         // 
         virtual std::vector<uint32_t>& getQueueFamilyIndices() { return this->allocation->getQueueFamilyIndices(); };
