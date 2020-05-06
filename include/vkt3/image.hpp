@@ -13,6 +13,10 @@
 
 namespace vkt {
 
+#ifdef ENABLE_OPENGL_INTEROP
+    using namespace gl;
+#endif
+
     // 
     class ImageRegion;
     class VmaImageAllocation;
@@ -41,18 +45,30 @@ namespace vkt {
             if (allocationInfo->memUsage == VMA_MEMORY_USAGE_GPU_ONLY) { usage.eTransferDst = 1, usage.eTransferSrc = 1; };
 
             // 
-            this->image = this->info.device.createImage(createInfo->hpp().setUsage(usage));
+            VkMemoryAllocateFlagsInfo allocFlags = {};
+            allocFlags.flags = VK_MEMORY_ALLOCATE_DEVICE_MASK_BIT;
 
             // 
-            VkMemoryRequirements memReqs = allocationInfo->device.getImageMemoryRequirements(image);
-            VkMemoryAllocateInfo memAllocInfo = {};
-            VkExportMemoryAllocateInfo exportAllocInfo{ VkExternalMemoryHandleTypeFlagBits::eOpaqueWin32 };
+            //this->image = this->info.device.createImage(createInfo->hpp().setUsage(usage));
+            createInfo->usage = usage;
+            vkCreateImage(this->info.device, *createInfo, nullptr, &this->image);
+
+            // 
+            VkMemoryRequirements memReqs = {};
+            vkGetImageMemoryRequirements(this->info.device, this->image, &memReqs);
+            vkh::VkExportMemoryAllocateInfo exportAllocInfo{.handleTypes = {.eOpaqueWin32 = 1}};
+
+            //
+            vkh::VkMemoryAllocateInfo memAllocInfo = {};
+            exportAllocInfo.pNext = &allocFlags;
             memAllocInfo.pNext = &exportAllocInfo;
             memAllocInfo.allocationSize = memReqs.size;
-            memAllocInfo.memoryTypeIndex = uint32_t(allocationInfo->getMemoryType(memReqs.memoryTypeBits, { .eDeviceLocal = 1 }));
-
+            memAllocInfo.memoryTypeIndex = uint32_t( allocationInfo->getMemoryType(memReqs.memoryTypeBits, {.eDeviceLocal = 1}));
+                  
             // 
-            this->info.device.bindImageMemory(image, info.memory = info.device.allocateMemory(memAllocInfo), 0);
+            VkDeviceMemory memory = {};
+            vkAllocateMemory(info.device, memAllocInfo, nullptr, &memory);
+            vkBindImageMemory(this->info.device, this->image, memory, 0u);
             this->info.initialLayout = VkImageLayout(createInfo->initialLayout);
 
 #if defined(ENABLE_OPENGL_INTEROP) && defined(VK_USE_PLATFORM_WIN32_KHR)
@@ -69,31 +85,31 @@ namespace vkt {
 
             // 
 #ifdef ENABLE_OPENGL_INTEROP
-            gl::GLenum format = gl::GL_RGBA8;
-            if (createInfo->format == VK_FORMAT_R16G16B16A16_UNORM) { format = gl::GL_RGBA16; };
-            if (createInfo->format == VK_FORMAT_R32G32B32A32_SFLOAT) { format = gl::GL_RGBA32F; };
-            if (createInfo->format == VK_FORMAT_R16G16B16A16_SFLOAT) { format = gl::GL_RGBA16F; };
-            if (createInfo->format == VK_FORMAT_R32G32B32_SFLOAT) { format = gl::GL_RGB32F; };
-            if (createInfo->format == VK_FORMAT_R16G16B16_SFLOAT) { format = gl::GL_RGB16F; };
-            if (createInfo->format == VK_FORMAT_R32G32_SFLOAT) { format = gl::GL_RG32F; };
-            if (createInfo->format == VK_FORMAT_R16G16_SFLOAT) { format = gl::GL_RG16F; };
+            GLenum format = GL_RGBA8;
+            if (createInfo->format == VK_FORMAT_R16G16B16A16_UNORM) { format = GL_RGBA16; };
+            if (createInfo->format == VK_FORMAT_R32G32B32A32_SFLOAT) { format = GL_RGBA32F; };
+            if (createInfo->format == VK_FORMAT_R16G16B16A16_SFLOAT) { format = GL_RGBA16F; };
+            if (createInfo->format == VK_FORMAT_R32G32B32_SFLOAT) { format = GL_RGB32F; };
+            if (createInfo->format == VK_FORMAT_R16G16B16_SFLOAT) { format = GL_RGB16F; };
+            if (createInfo->format == VK_FORMAT_R32G32_SFLOAT) { format = GL_RG32F; };
+            if (createInfo->format == VK_FORMAT_R16G16_SFLOAT) { format = GL_RG16F; };
 
             // Import Memory
-            gl::glCreateTextures(gl::GL_TEXTURE_2D, 1, &this->info.glID);
-            gl::glCreateMemoryObjectsEXT(1, &this->info.glMemory);
-            gl::glImportMemoryWin32HandleEXT(this->info.glMemory, this->info.reqSize, gl::GL_HANDLE_TYPE_OPAQUE_WIN32_EXT, this->info.handle);
+            glCreateTextures(GL_TEXTURE_2D, 1, &this->info.glID);
+            glCreateMemoryObjectsEXT(1, &this->info.glMemory);
+            glImportMemoryWin32HandleEXT(this->info.glMemory, this->info.reqSize, GL_HANDLE_TYPE_OPAQUE_WIN32_EXT, this->info.handle);
 
             // Create GL Image
             if (createInfo->imageType == VK_IMAGE_TYPE_1D) {
-                gl::glTextureStorageMem1DEXT(this->info.glID, createInfo->mipLevels, format, createInfo->extent.width, this->info.glMemory, 0);
+                glTextureStorageMem1DEXT(this->info.glID, createInfo->mipLevels, format, createInfo->extent.width, this->info.glMemory, 0);
             }
             else
             if (createInfo->imageType == VK_IMAGE_TYPE_2D) {
-                gl::glTextureStorageMem2DEXT(this->info.glID, createInfo->mipLevels, format, createInfo->extent.width, createInfo->extent.height, this->info.glMemory, 0);
+                glTextureStorageMem2DEXT(this->info.glID, createInfo->mipLevels, format, createInfo->extent.width, createInfo->extent.height, this->info.glMemory, 0);
             }
             else
             if (createInfo->imageType == VK_IMAGE_TYPE_3D) {
-                gl::glTextureStorageMem3DEXT(this->info.glID, createInfo->mipLevels, format, createInfo->extent.width, createInfo->extent.height, createInfo->extent.depth, this->info.glMemory, 0);
+                glTextureStorageMem3DEXT(this->info.glID, createInfo->mipLevels, format, createInfo->extent.width, createInfo->extent.height, createInfo->extent.depth, this->info.glMemory, 0);
             }
 #endif
             return this;
@@ -107,16 +123,7 @@ namespace vkt {
         virtual unsigned& getGLImage() { return this->info.glID; };
         virtual unsigned& getGLMemory() { return this->info.glMemory; };
 
-        // BETA
-        virtual VkDispatchLoaderDynamic dispatchLoaderDynamic() {
-            return this->info.dispatch;
-        }
-
-        // BETA
-        virtual VkDispatchLoaderDynamic dispatchLoaderDynamic() const {
-            return this->info.dispatch;
-        }
-
+        // 
         virtual ImageAllocation& operator=(vkt::uni_ptr<ImageAllocation> allocation) {
             this->image = allocation->image;
             this->info = allocation->info;
@@ -129,31 +136,15 @@ namespace vkt {
 
         // 
         virtual operator const VkImage& () const { return this->image; };
-        virtual operator const VkImage& () const { return this->image; };
-
-        // 
         virtual operator VkImage& () { return this->image; };
-        virtual operator VkImage& () { return reinterpret_cast<VkImage&>(this->image); };
 
         // 
         virtual operator const VkDevice& () const { return info.device; };
-        virtual operator const VkDevice& () const { return reinterpret_cast<const VkDevice&>(info.device); };
+        virtual operator VkDevice& () { return info.device; };
 
         //
         virtual VkDevice& getDevice() { return info.device; };
         virtual const VkDevice& getDevice() const { return info.device; };
-
-        // 
-        virtual const VkDevice& _getDevice() const { return info.device; };
-
-        // 
-        virtual operator VkDevice& () { return info.device; };
-        virtual operator VkDevice& () { return reinterpret_cast<VkDevice&>(info.device); };
-
-        // Get mapped memory
-        virtual void* map() { return (info.pMapped = info.device.mapMemory(info.memory, 0u, info.range, {})); };
-        virtual void* mapped() { return info.pMapped; };
-        virtual void  unmap() { info.device.unmapMemory(info.memory); };
 
         // 
         virtual MemoryAllocationInfo& getAllocationInfo() { return info; };
@@ -169,13 +160,13 @@ namespace vkt {
 
         // Bindless Textures Directly
 #ifdef ENABLE_OPENGL_INTEROP
-        virtual gl::GLuint& getGL() { return this->info.glID; };
-        virtual const gl::GLuint& getGL() const { return this->info.glID; };
+        virtual GLuint& getGL() { return this->info.glID; };
+        virtual const GLuint& getGL() const { return this->info.glID; };
 
-        virtual uint64_t deviceAddress() { return gl::glGetTextureHandleARB(this->info.glID); };
-        virtual const uint64_t deviceAddress() const { return gl::glGetTextureHandleARB(this->info.glID); };
-        virtual uint64_t deviceAddress(gl::GLuint sampler) { return gl::glGetTextureSamplerHandleARB(this->info.glID, sampler); };
-        virtual const uint64_t deviceAddress(gl::GLuint sampler) const { return gl::glGetTextureSamplerHandleARB(this->info.glID, sampler); };
+        virtual uint64_t deviceAddress() { return glGetTextureHandleARB(this->info.glID); };
+        virtual const uint64_t deviceAddress() const { return glGetTextureHandleARB(this->info.glID); };
+        virtual uint64_t deviceAddress(GLuint sampler) { return glGetTextureSamplerHandleARB(this->info.glID, sampler); };
+        virtual const uint64_t deviceAddress(GLuint sampler) const { return glGetTextureSamplerHandleARB(this->info.glID, sampler); };
 #endif
 
     // 
@@ -200,7 +191,7 @@ namespace vkt {
 
         //
         ~VmaImageAllocation() {
-            this->info.device.waitIdle();
+            vkDeviceWaitIdle(this->info.device);
             vmaDestroyImage(allocator, image, allocation);
         };
 
@@ -221,8 +212,8 @@ namespace vkt {
             // Get Dispatch Loader From VMA Allocator Itself!
             VmaAllocatorInfo info = {};
             vmaGetAllocatorInfo(this->allocator = allocator.ref(), &info);
-            this->info.dispatch = VkDispatchLoaderDynamic(info.instance, vkGetInstanceProcAddr, this->info.device = info.device, vkGetDeviceProcAddr); // 
-
+            //this->info.dispatch = VkDispatchLoaderDynamic(info.instance, vkGetInstanceProcAddr, this->info.device = info.device, vkGetDeviceProcAddr); // 
+             
             // 
             if (createInfo->queueFamilyIndexCount) {
                 this->info.queueFamilyIndices = std::vector<uint32_t>(createInfo->queueFamilyIndexCount);
@@ -248,11 +239,6 @@ namespace vkt {
             return *this;
         };
 
-        // Get mapped memory
-        virtual void* map() override { void* ptr = nullptr; vmaMapMemory(allocator, allocation, &ptr); return ptr; };
-        virtual void* mapped() override { if (!allocationInfo.pMappedData) { vmaMapMemory(allocator, allocation, &allocationInfo.pMappedData); }; return allocationInfo.pMappedData; };
-        virtual void  unmap() override { vmaUnmapMemory(allocator, allocation); allocationInfo.pMappedData = nullptr; };
-
         // Allocation
         virtual operator const VmaAllocation& () const { return allocation; };
         virtual operator const VmaAllocationInfo& () const { return allocationInfo; };
@@ -264,17 +250,6 @@ namespace vkt {
         // 
         virtual VmaImageAllocation* address() { return this; };
         virtual const VmaImageAllocation* address() const { return this; };
-
-        //VkDispatchLoaderDynamic(this->instance, vkGetInstanceProcAddr, this->device, vkGetDeviceProcAddr);
-        virtual VkDispatchLoaderDynamic dispatchLoaderDynamic() override {
-            VmaAllocatorInfo info = {}; vmaGetAllocatorInfo(this->allocator, &info);
-            return VkDispatchLoaderDynamic(info.instance, vkGetInstanceProcAddr, info.device, vkGetDeviceProcAddr);
-        };
-
-        virtual VkDispatchLoaderDynamic dispatchLoaderDynamic() const override {
-            VmaAllocatorInfo info = {}; vmaGetAllocatorInfo(this->allocator, &info);
-            return VkDispatchLoaderDynamic(info.instance, vkGetInstanceProcAddr, info.device, vkGetDeviceProcAddr);
-        };
 
     // 
     protected: friend VmaImageAllocation; friend ImageAllocation; // 
@@ -288,7 +263,7 @@ namespace vkt {
         vkt::uni_arg<MemoryAllocationInfo> allocationInfo = MemoryAllocationInfo{};
         vkt::uni_arg<vkh::VkImageCreateInfo> createInfo = vkh::VkImageCreateInfo{};
         vkt::uni_arg<vkh::VkImageViewCreateInfo> info = vkh::VkImageViewCreateInfo{};
-        vkt::uni_arg<VkImageLayout> layout = VkImageLayout::eGeneral;
+        vkt::uni_arg<VkImageLayout> layout = VK_IMAGE_LAYOUT_GENERAL;
     };
 
     // 
@@ -296,17 +271,17 @@ namespace vkt {
         vkt::uni_arg<VmaAllocator> allocator = VmaAllocator{};
         vkt::uni_arg<vkh::VkImageCreateInfo> createInfo = vkh::VkImageCreateInfo{};
         vkt::uni_arg<vkh::VkImageViewCreateInfo> info = vkh::VkImageViewCreateInfo{};
-        vkt::uni_arg<VkImageLayout> layout = VkImageLayout::eGeneral;
+        vkt::uni_arg<VkImageLayout> layout = VK_IMAGE_LAYOUT_GENERAL;
     };
 
     // 
     class ImageRegion : public std::enable_shared_from_this<ImageRegion> { public: 
         ImageRegion() {};
         ImageRegion(vkt::uni_ptr<ImageRegion> region) { *this = region; };
-        ImageRegion(vkt::uni_ptr<ImageAllocation> allocation, vkt::uni_arg<vkh::VkImageViewCreateInfo> info = vkh::VkImageViewCreateInfo{}, vkt::uni_arg<VkImageLayout> layout = VkImageLayout::eGeneral) : allocation(allocation), subresourceRange(info->subresourceRange) { this->construct(allocation, info, layout); };
-        ImageRegion(vkt::uni_ptr<VmaImageAllocation> allocation, vkt::uni_arg<vkh::VkImageViewCreateInfo> info = vkh::VkImageViewCreateInfo{}, vkt::uni_arg<VkImageLayout> layout = VkImageLayout::eGeneral) : allocation(allocation.dyn_cast<ImageAllocation>()), subresourceRange(info->subresourceRange) { this->construct(allocation.dyn_cast<ImageAllocation>(), info, layout); };
-        ImageRegion(std::shared_ptr<ImageAllocation> allocation, vkt::uni_arg<vkh::VkImageViewCreateInfo> info = vkh::VkImageViewCreateInfo{}, vkt::uni_arg<VkImageLayout> layout = VkImageLayout::eGeneral) : allocation(allocation), subresourceRange(info->subresourceRange) { this->construct(allocation, info, layout); };
-        ImageRegion(std::shared_ptr<VmaImageAllocation> allocation, vkt::uni_arg<vkh::VkImageViewCreateInfo> info = vkh::VkImageViewCreateInfo{}, vkt::uni_arg<VkImageLayout> layout = VkImageLayout::eGeneral) : allocation(std::dynamic_pointer_cast<ImageAllocation>(allocation)), subresourceRange(info->subresourceRange) { this->construct(std::dynamic_pointer_cast<ImageAllocation>(allocation), info, layout); };
+        ImageRegion(vkt::uni_ptr<ImageAllocation> allocation, vkt::uni_arg<vkh::VkImageViewCreateInfo> info = vkh::VkImageViewCreateInfo{}, vkt::uni_arg<VkImageLayout> layout = VK_IMAGE_LAYOUT_GENERAL) : allocation(allocation), subresourceRange(info->subresourceRange) { this->construct(allocation, info, layout); };
+        ImageRegion(vkt::uni_ptr<VmaImageAllocation> allocation, vkt::uni_arg<vkh::VkImageViewCreateInfo> info = vkh::VkImageViewCreateInfo{}, vkt::uni_arg<VkImageLayout> layout = VK_IMAGE_LAYOUT_GENERAL) : allocation(allocation.dyn_cast<ImageAllocation>()), subresourceRange(info->subresourceRange) { this->construct(allocation.dyn_cast<ImageAllocation>(), info, layout); };
+        ImageRegion(std::shared_ptr<ImageAllocation> allocation, vkt::uni_arg<vkh::VkImageViewCreateInfo> info = vkh::VkImageViewCreateInfo{}, vkt::uni_arg<VkImageLayout> layout = VK_IMAGE_LAYOUT_GENERAL) : allocation(allocation), subresourceRange(info->subresourceRange) { this->construct(allocation, info, layout); };
+        ImageRegion(std::shared_ptr<VmaImageAllocation> allocation, vkt::uni_arg<vkh::VkImageViewCreateInfo> info = vkh::VkImageViewCreateInfo{}, vkt::uni_arg<VkImageLayout> layout = VK_IMAGE_LAYOUT_GENERAL) : allocation(std::dynamic_pointer_cast<ImageAllocation>(allocation)), subresourceRange(info->subresourceRange) { this->construct(std::dynamic_pointer_cast<ImageAllocation>(allocation), info, layout); };
         ~ImageRegion() {
             
         };
@@ -315,13 +290,15 @@ namespace vkt {
         virtual ImageRegion* construct(
             vkt::uni_ptr<ImageAllocation> allocation,
             vkt::uni_arg<vkh::VkImageViewCreateInfo> info = vkh::VkImageViewCreateInfo{},
-            vkt::uni_arg<VkImageLayout> layout = VkImageLayout::eGeneral
+            vkt::uni_arg<VkImageLayout> layout = VK_IMAGE_LAYOUT_GENERAL
         ) {
             info->image = allocation->getImage();
             this->allocation = allocation;
             this->subresourceRange = info->subresourceRange;
-            this->imgInfo.imageView = this->allocation->getDevice().createImageView(info->hpp(), nullptr, this->allocation->info.dispatch);
             this->imgInfo.imageLayout = VkImageLayout(*layout);
+
+            // 
+            vkCreateImageView(this->getDevice(), *info, nullptr, &this->imgInfo.imageView);
 
             // 
 #ifdef ENABLE_OPENGL_INTEROP
@@ -337,12 +314,12 @@ namespace vkt {
             // 
             return this;
         };
-
+         
         // 
         virtual ImageRegion* construct(
             vkt::uni_ptr<VmaImageAllocation> allocation,
             vkt::uni_arg<vkh::VkImageViewCreateInfo> info = vkh::VkImageViewCreateInfo{},
-            vkt::uni_arg<VkImageLayout> layout = VkImageLayout::eGeneral
+            vkt::uni_arg<VkImageLayout> layout = VK_IMAGE_LAYOUT_GENERAL
         ) {
             this->construct(allocation.dyn_cast<ImageAllocation>(), info, layout);
             return this;
@@ -375,8 +352,6 @@ namespace vkt {
         // set methods for direct control
         virtual ImageRegion& setImageLayout(const VkImageLayout layout = {}) { this->imgInfo.imageLayout = layout; return *this; };
         virtual ImageRegion& setSampler(const VkSampler& sampler = {}) { this->imgInfo.sampler = sampler; return *this; };
-        virtual ImageRegion& setImageLayout(const VkImageLayout layout = {}) { this->imgInfo.imageLayout = reinterpret_cast<const VkImageLayout&>(layout); return *this; };
-        virtual ImageRegion& setSampler(const VkSampler& sampler = {}) { this->imgInfo.sampler = reinterpret_cast<const VkSampler&>(sampler); return *this; };
         virtual ImageRegion& transfer(VkCommandBuffer& cmdBuf) {
             vkt::imageBarrier(cmdBuf, vkt::ImageBarrierInfo{ 
                 .image = this->allocation->getImage(),
@@ -405,18 +380,9 @@ namespace vkt {
         virtual operator    ::VkImageSubresourceRange&() { return this->subresourceRange; };
         virtual operator vkh::VkDescriptorImageInfo&() { return this->imgInfo; };
         virtual operator    ::VkDescriptorImageInfo&() { return this->imgInfo; };
-        virtual operator VkDescriptorImageInfo&() { return this->imgInfo; };
-        virtual operator VkImageSubresourceRange&() { return this->subresourceRange; };
-        virtual operator VkImageView&() { return reinterpret_cast<VkImageView&>(this->imgInfo.imageView); };
-        virtual operator VkImageLayout&() { return reinterpret_cast<VkImageLayout&>(this->imgInfo.imageLayout); };
         virtual operator VkImage&() { return *this->allocation; };
-        virtual operator VkSampler&() { return reinterpret_cast<VkSampler&>(this->imgInfo.sampler); };
         virtual operator VkDevice&() { return *this->allocation; };
-        virtual operator VkImageView&() { return reinterpret_cast<VkImageView&>(this->imgInfo.imageView); };
-        virtual operator VkImageLayout&() { return reinterpret_cast<VkImageLayout&>(this->imgInfo.imageLayout); };
-        virtual operator VkImage&() { return *this->allocation; };
         virtual operator VkSampler&() { return this->imgInfo.sampler; };
-        virtual operator VkDevice&() { return reinterpret_cast<VkDevice&>(this->allocation->getDevice()); };
 
         // 
         virtual operator const ImageAllocation*() const { return this->allocation; };
@@ -427,43 +393,36 @@ namespace vkt {
         virtual operator const    ::VkImageSubresourceRange&() const { return this->subresourceRange; };
         virtual operator const vkh::VkDescriptorImageInfo&() const { return this->imgInfo; };
         virtual operator const    ::VkDescriptorImageInfo&() const { return this->imgInfo; };
-        virtual operator const VkDescriptorImageInfo&() const { return this->imgInfo; };
-        virtual operator const VkImageSubresourceRange&() const { return this->subresourceRange; };
-        virtual operator const VkImageView&() const { return reinterpret_cast<const VkImageView&>(this->imgInfo.imageView); };
-        virtual operator const VkImageLayout&() const { return reinterpret_cast<const VkImageLayout&>(this->imgInfo.imageLayout); };
         virtual operator const VkImage&() const { return *this->allocation; };
-        virtual operator const VkSampler&() const { return reinterpret_cast<const VkSampler&>(this->imgInfo.sampler); };
         virtual operator const VkDevice&() const { return *this->allocation; };
-        
-        // 
         virtual operator const VkImageView&() const { return this->imgInfo.imageView; };
         virtual operator const VkImageLayout&() const { return this->imgInfo.imageLayout; };
-        virtual operator const VkImage&() const { return *this->allocation; };
         virtual operator const VkSampler&() const { return this->imgInfo.sampler; };
-        virtual operator const VkDevice& () const { return reinterpret_cast<const VkDevice&>(this->allocation->getDevice()); };
+
+        // 
         virtual operator const VkImageSubresourceLayers() const { return VkImageSubresourceLayers{ reinterpret_cast<const VkImageAspectFlags&>(subresourceRange.aspectMask), subresourceRange.baseMipLevel, subresourceRange.baseArrayLayer, subresourceRange.layerCount }; };
 
 #ifdef ENABLE_OPENGL_INTEROP
         // Bindless Textures Directly
         virtual uint64_t deviceAddress () { 
             if (this->getGL()) {
-                return gl::glGetTextureHandleARB(this->getGL());
+                return glGetTextureHandleARB(this->getGL());
             } else {
                 return this->allocation->getDevice().getImageViewAddressNVX(this->getImageView(), this->allocation->dispatchLoaderDynamic()).deviceAddress;
             };
         };
         virtual const uint64_t deviceAddress() const { 
             if (this->getGL()) {
-                return gl::glGetTextureHandleARB(this->getGL());
+                return glGetTextureHandleARB(this->getGL());
             } else {
                 return this->allocation->getDevice().getImageViewAddressNVX(this->getImageView(), this->allocation->dispatchLoaderDynamic()).deviceAddress;
             };
         };
-        virtual uint64_t deviceAddress(gl::GLuint sampler) { 
-            return gl::glGetTextureSamplerHandleARB(this->getGL(), sampler); 
+        virtual uint64_t deviceAddress(GLuint sampler) { 
+            return glGetTextureSamplerHandleARB(this->getGL(), sampler); 
         };
-        virtual const uint64_t deviceAddress(gl::GLuint sampler) const { 
-            return gl::glGetTextureSamplerHandleARB(this->getGL(), sampler); 
+        virtual const uint64_t deviceAddress(GLuint sampler) const { 
+            return glGetTextureSamplerHandleARB(this->getGL(), sampler); 
         };
 #else   // Get By Vulkan API Directly
 #ifdef ENABLE_NVX_IMAGE_ADDRESS
@@ -487,34 +446,26 @@ namespace vkt {
 
         // 
         virtual unsigned& getGL() {
-            if (this->getGLImage()) {
-                return this->getGLImage();
-            } else {
-                VkImageViewHandleInfoNVX handleInfo = {};
-                handleInfo.imageView = this->imgInfo.imageView;
-                handleInfo.sampler = this->imgInfo.sampler;
-                handleInfo.descriptorType = this->imgInfo.sampler ? VkDescriptorType::eCombinedImageSampler : VkDescriptorType::eSampledImage;
-                if (!this->allocation->info.glID) {
-                    this->allocation->info.glID = this->allocation->getDevice().getImageViewHandleNVX(&handleInfo, this->allocation->dispatchLoaderDynamic());
-                };
-                return this->allocation->info.glID;
-            }
+            VkImageViewHandleInfoNVX handleInfo = {};
+            handleInfo.imageView = this->imgInfo.imageView;
+            handleInfo.sampler = this->imgInfo.sampler;
+            handleInfo.descriptorType = this->imgInfo.sampler ? VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER : VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
+            if (!this->getGLImage()) {
+                //this->getGLImage() = this->allocation->getDevice().getImageViewHandleNVX(&handleInfo, this->allocation->dispatchLoaderDynamic());
+            };
+            return this->getGLImage();
         };
 
         // 
         virtual const unsigned& getGL() const {
-            if (this->getGLImage()) {
-                return this->getGLImage();
-            } else {
-                VkImageViewHandleInfoNVX handleInfo = {};
-                handleInfo.imageView = this->imgInfo.imageView;
-                handleInfo.sampler = this->imgInfo.sampler;
-                handleInfo.descriptorType = this->imgInfo.sampler ? VkDescriptorType::eCombinedImageSampler : VkDescriptorType::eSampledImage;
-                if (!this->allocation->info.glID) {
-                    return this->allocation->getDevice().getImageViewHandleNVX(&handleInfo, this->allocation->dispatchLoaderDynamic());
-                };
-                return this->allocation->info.glID;
+            VkImageViewHandleInfoNVX handleInfo = {};
+            handleInfo.imageView = this->imgInfo.imageView;
+            handleInfo.sampler = this->imgInfo.sampler;
+            handleInfo.descriptorType = this->imgInfo.sampler ? VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER : VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
+            if (!this->getGLImage()) {
+                //return this->allocation->getDevice().getImageViewHandleNVX(&handleInfo, this->allocation->dispatchLoaderDynamic());
             };
+            return this->getGLImage();
         };
 
         // 

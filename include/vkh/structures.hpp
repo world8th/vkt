@@ -1521,6 +1521,23 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         VK_HPP_STRUCT_OPERATORS(VkInstanceCreateInfo, vk::InstanceCreateInfo)
     } VkInstanceCreateInfo;
 
+    //
+    typedef struct VkImageMemoryBarrier {
+        VkStructureType            sType                = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+        const void*                pNext                = nullptr;
+        VkAccessFlags              srcAccessMask        = {};
+        VkAccessFlags              dstAccessMask        = {};
+        VkImageLayout              oldLayout            = VK_IMAGE_LAYOUT_UNDEFINED;
+        VkImageLayout              newLayout            = VK_IMAGE_LAYOUT_GENERAL;
+        uint32_t                   srcQueueFamilyIndex  = 0u;
+        uint32_t                   dstQueueFamilyIndex  = 0u;
+        VkImage                    image                = {};
+        VkImageSubresourceRange    subresourceRange     = {};
+        
+        STRUCT_OPERATORS(VkImageMemoryBarrier)
+        VK_HPP_STRUCT_OPERATORS(VkImageMemoryBarrier, vk::ImageMemoryBarrier)
+    } VkImageMemoryBarrier;
+
 #pragma pack(pop)
 
 #pragma pack(push, 1)

@@ -227,6 +227,82 @@ namespace vkt {
         return cmdBuffer;
     };
 
+  
+    // TODO: native image barrier in library
+    struct ImageBarrierInfo {
+        vkt::uni_arg<VkImage> image = {};
+        vkt::uni_arg<VkImageLayout> targetLayout = VK_IMAGE_LAYOUT_GENERAL;
+        vkt::uni_arg<VkImageLayout> originLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+        vkt::uni_arg<vkh::VkImageSubresourceRange> subresourceRange = vkh::VkImageSubresourceRange{{}, 0u, 1u, 0u, 1u};
+    };
+
+    //
+    static inline auto imageBarrier(
+        const vkt::uni_arg<VkCommandBuffer>& cmd = VkCommandBuffer{},
+        const vkt::uni_arg<ImageBarrierInfo>& info = ImageBarrierInfo{}) {
+        VkResult result = VK_SUCCESS;  // planned to complete
+        if (*info->originLayout == *info->targetLayout)
+            return result;  // no need transfering more
+
+        vkh::VkImageMemoryBarrier imageMemoryBarriers = {};
+        imageMemoryBarriers.srcQueueFamilyIndex = ~0U;
+        imageMemoryBarriers.dstQueueFamilyIndex = ~0U;
+        imageMemoryBarriers.oldLayout = info->originLayout;
+        imageMemoryBarriers.newLayout = info->targetLayout;
+        imageMemoryBarriers.subresourceRange = reinterpret_cast<const VkImageSubresourceRange&>(*info->subresourceRange);
+        imageMemoryBarriers.image = info->image;
+
+        // Put barrier on top
+        const auto srcStageMask = vkh::VkPipelineStageFlags{.eBottomOfPipe = 1};
+        const auto dstStageMask = vkh::VkPipelineStageFlags{.eTopOfPipe = 1};
+        const auto dependencyFlags = vkh::VkDependencyFlags{};
+        auto srcMask = vkh::VkAccessFlags{}, dstMask = vkh::VkAccessFlags{};
+
+        typedef VkImageLayout il;
+        typedef VkAccessFlagBits afb;
+
+        // Is it me, or are these the same?
+        switch (info->originLayout) {
+            case VK_IMAGE_LAYOUT_UNDEFINED:                         break;
+            case VK_IMAGE_LAYOUT_GENERAL:                           srcMask.eTransferWrite = 1u; break;
+            case VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL:          srcMask.eColorAttachmentWrite = 1u; break;
+            case VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL:  srcMask.eDepthStencilAttachmentWrite = 1u; break;
+            case VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL:   srcMask.eDepthStencilAttachmentRead = 1u; break;
+            case VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL:          srcMask.eShaderRead = 1u; break;
+            case VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL:              srcMask.eTransferRead = 1u; break;
+            case VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL:              srcMask.eTransferWrite = 1u; break;
+            case VK_IMAGE_LAYOUT_PREINITIALIZED:                    srcMask.eTransferWrite = 1u, srcMask.eHostWrite = 1u; break; srcMask.eMemoryRead = 1u; break;
+            case VK_IMAGE_LAYOUT_PRESENT_SRC_KHR:                   srcMask.eMemoryRead = 1u; break;
+        };
+
+        // 
+        switch (info->targetLayout) {
+            case VK_IMAGE_LAYOUT_UNDEFINED:                         break;
+            case VK_IMAGE_LAYOUT_GENERAL:                           dstMask.eTransferWrite = 1u; break;
+            case VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL:          dstMask.eColorAttachmentWrite = 1u; break;
+            case VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL:  dstMask.eDepthStencilAttachmentWrite = 1u; break;
+            case VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL:   dstMask.eDepthStencilAttachmentRead = 1u; break;
+            case VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL:          dstMask.eShaderRead = 1u; break;
+            case VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL:              dstMask.eTransferRead = 1u; break;
+            case VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL:              dstMask.eTransferWrite = 1u; break;
+            case VK_IMAGE_LAYOUT_PREINITIALIZED:                    dstMask.eTransferWrite = 1u; break;
+            case VK_IMAGE_LAYOUT_PRESENT_SRC_KHR:                   dstMask.eMemoryRead = 1u; break;
+        };
+
+        // assign access masks
+        imageMemoryBarriers.srcAccessMask = srcMask;
+        imageMemoryBarriers.dstAccessMask = dstMask;
+
+        // 
+        vkCmdPipelineBarrier(cmd, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,
+                             VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, {}, 
+                             0u, nullptr, 
+                             0u, nullptr, 
+                             1u, imageMemoryBarriers);
+
+        return result;
+    };
+
      
     #ifdef TBA_VULKAN_HPP_DEPRECATED
     // general command buffer pipeline barrier (updated 26.04.2020)
@@ -446,8 +522,8 @@ namespace vkt {
         std::vector<uint32_t> queueFamilyIndices = {};
 
         // 
-        //xvk::Instance instanceDispatch = {};
-        //xvk::Device deviceDispatch = {};
+        xvk::Instance instanceDispatch = {};
+        xvk::Device deviceDispatch = {};
 
         // Required for dispatch load (and for XVK)
         VkInstance instance = {};
