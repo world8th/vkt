@@ -135,12 +135,13 @@ namespace vkt {
     static inline auto& createShaderModuleIntrusive(const vkt::uni_arg<VkDevice>& device, const std::vector<uint32_t>& code, vkt::uni_ptr<VkShaderModule> hndl) {
         //return (*hndl = device->createShaderModule(makeShaderModuleInfo(code)));
         vkCreateShaderModule(device, makeShaderModuleInfo(code), nullptr, hndl.get_ptr());
-        return *hndl;
+        return hndl;
     };
 
     static inline auto createShaderModule(const vkt::uni_arg<VkDevice>& device, const std::vector<uint32_t>& code) {
-        auto sm = VkShaderModule{}; return std::move(createShaderModuleIntrusive(device, code, sm));
-    };
+        vkt::uni_arg<VkShaderModule> sm = VkShaderModule{};
+        return std::move(createShaderModuleIntrusive(device, code, sm));
+    }; 
 
     struct FixConstruction {
         FixConstruction(vkh::VkPipelineShaderStageCreateInfo spi = {}, vkh::VkPipelineShaderStageRequiredSubgroupSizeCreateInfoEXT sgmp = {}) : spi(spi), sgmp(sgmp) {

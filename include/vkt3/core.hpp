@@ -73,8 +73,8 @@ namespace vkt {
     public: friend uni_ptr<T>; // 
         uni_ptr<T>() {};
         uni_ptr<T>(std::shared_ptr<T> shared) : shared(shared) {};
-        uni_ptr<T>(T* regular) : regular(std::ref(*ptr)) {};
-        uni_ptr<T>(T& regular) : regular(std::ref( ptr)) {};  // for argument passing
+        uni_ptr<T>(T* ptr) : regular(std::ref(*ptr)){};
+        uni_ptr<T>(T& ptr) : regular(std::ref(ptr)){};  // for argument passing
         uni_ptr<T>(const uni_ptr<T>& ptr) : shared(ptr.shared), regular(std::ref(*ptr.regular)) {};
         uni_ptr<T>(uni_ptr<T>& ptr) : shared(ptr.shared), regular(std::ref(*ptr.regular)){};
 
@@ -95,7 +95,7 @@ namespace vkt {
 
         // 
         template<class M = T>
-        uni_ptr<M> dyn_cast() { T& r = *regular; return shared ? uni_ptr<M>(std::dynamic_pointer_cast<M>(shared)) : uni_ptr<M>(dynamic_cast<M&>(r)); };
+        uni_ptr<M> dyn_cast() const { T& r = *regular; return shared ? uni_ptr<M>(std::dynamic_pointer_cast<M>(shared)) : uni_ptr<M>(dynamic_cast<M&>(r)); };
 
         // 
         //template<class... A>
