@@ -271,7 +271,6 @@ namespace vkt
                 this->depthImage = fw->depthImage;
                 this->depthImageView = fw->depthImageView;
                 this->pipelineCache = fw->pipelineCache;
-                this->dispatch = fw->dispatch;
                 this->memoryProperties = fw->memoryProperties;
                 this->messenger = fw->messenger;
                 this->allocator = fw->allocator;
@@ -281,6 +280,8 @@ namespace vkt
                 this->vmaDepthImageAllocationInfo = fw->vmaDepthImageAllocationInfo;
                 this->physicalDevices = fw->physicalDevices;
                 this->queueFamilyIndices = fw->queueFamilyIndices;
+                this->instanceDispatch = fw->instanceDispatch;
+                this->deviceDispatch = fw->deviceDispatch;
             };
             return *this;
         };
@@ -296,10 +297,15 @@ namespace vkt
         VkPhysicalDeviceFeatures2 gFeatures{};
         VkPhysicalDeviceBufferDeviceAddressFeatures gDeviceAddress{};
 
-        // 
-        VkApplicationInfo applicationInfo = {};
-        VkInstanceCreateInfo instanceCreate = {};
-        VkDeviceCreateInfo deviceCreate = {};
+        // XVK loaded (NEW!)
+        xvk::Instance instanceDispatch = {};
+        xvk::Device deviceDispatch = {};
+        xvk::Loader vulkanLoader = {};
+
+        // JavaCPP and XVK compatible (NEW!)
+        vkh::VkApplicationInfo applicationInfo = {};
+        vkh::VkInstanceCreateInfo instanceCreate = {};
+        vkh::VkDeviceCreateInfo deviceCreate = {};
 
         // 
         VkFence fence = {};
@@ -313,7 +319,6 @@ namespace vkt
         VkImage depthImage = {};
         VkImageView depthImageView = {};
         VkPipelineCache pipelineCache = {};
-        VkDispatchLoaderDynamic dispatch = {};
         VkPhysicalDeviceMemoryProperties2 memoryProperties = {};
         VkDebugUtilsMessengerEXT messenger = {};
 
@@ -338,7 +343,7 @@ namespace vkt
         inline uintptr_t getDeviceCreateInfoAddress() const { return (uintptr_t)(&deviceCreate); };
 
         // 
-        inline VkDispatchLoaderDynamic getDispatch() { return dispatch; };
+        //inline VkDispatchLoaderDynamic getDispatch() { return dispatch; };
         inline VkDevice& getDevice() { return device; };
         inline VkQueue& getQueue() { return queue; };
         inline VkFence& getFence() { return fence; };
@@ -350,7 +355,7 @@ namespace vkt
         inline VmaAllocator& getAllocator() { return allocator; };
 
         // 
-        inline const VkDispatchLoaderDynamic getDispatch() const { return dispatch; };
+        //inline const VkDispatchLoaderDynamic getDispatch() const { return dispatch; };
         inline const VkPhysicalDevice& getPhysicalDevice() const { return physicalDevice; };
         inline const VkDevice& getDevice() const { return device; };
         inline const VkQueue& getQueue() const { return queue; };
@@ -480,9 +485,6 @@ namespace vkt
             cinstanceinfo.enabledLayerCount = static_cast<uint32_t>(this->usedLayers.size());
             cinstanceinfo.ppEnabledLayerNames = this->usedLayers.data();
 
-            // 
-            this->instanceCreate = cinstanceinfo;
-
             // create the "debug utils EXT" callback object
             VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo{};
             debugCreateInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
@@ -500,17 +502,19 @@ namespace vkt
 
             // 
 #ifdef VKT_ENABLE_DEBUG
-            instance = VkcreateInstance(cinstanceinfo.setPNext(&debugCreateInfo));
+            //instance = VkcreateInstance(cinstanceinfo.setPNext(&debugCreateInfo));
 #else
-            instance = VkcreateInstance(cinstanceinfo);
+            //instance = VkcreateInstance(cinstanceinfo);
 #endif
 
-#ifdef VOLK_H_
-            volkLoadInstance(instance);
-#endif
+            // Dynamically Load the Vulkan library
+            if (!vulkanLoader()) { return -1; };
+            instanceDispatch = xvk::Instance(&vulkanLoader, (this->instanceCreate = cinstanceinfo));
+            instance = instanceDispatch.handle;
 
             // get physical device for application
-            physicalDevices = instance.enumeratePhysicalDevices();
+            //physicalDevices = instance.enumeratePhysicalDevices();
+            
 
             // 
 #ifdef VKT_ENABLE_DEBUG
@@ -602,18 +606,12 @@ namespace vkt
                 };
             };
 #endif
-            // TRYING
-            //gRayTracing.rayTracingIndirectAccelerationStructureBuild = true;
-            //gRayTracing.rayQuery = true;
-
-            // 
-            this->usedQueueCreateInfos = queueCreateInfos;
 
             // return device with queue pointer
             const uint32_t qptr = 0;
-            if (queueCreateInfos.size() > 0) {
+            if ((this->usedQueueCreateInfos = queueCreateInfos).size() > 0) {
                 this->queueFamilyIndex = queueFamilyIndices[qptr];
-                this->device = this->physicalDevice.createDevice(deviceCreate = vkh::VkDeviceCreateInfo{
+                this->deviceDispatch = xvk::Device(&this->instanceDispatch, this->physicalDevice, (deviceCreate = vkh::VkDeviceCreateInfo{
                     .pNext = &gFeatures,
                     .queueCreateInfoCount = uint32_t(this->usedQueueCreateInfos.size()),
                     .pQueueCreateInfos = reinterpret_cast<::VkDeviceQueueCreateInfo*>(this->usedQueueCreateInfos.data()),
@@ -622,25 +620,17 @@ namespace vkt
                     .enabledExtensionCount = uint32_t(this->usedDeviceExtensions.size()),
                     .ppEnabledExtensionNames = this->usedDeviceExtensions.data(),
                     //.pEnabledFeatures = &(VkPhysicalDeviceFeatures&)(gFeatures.features)
-                }.hpp());
-#ifdef VOLK_H_
-                volkLoadDevice(this->device);
-#endif
+                }));
                 this->pipelineCache = this->device.createPipelineCache(VkPipelineCacheCreateInfo());
             };
 
-            // 
-            this->queue = this->device.getQueue(queueFamilyIndex, 0); // 
-            this->fence = this->device.createFence(VkFenceCreateInfo().setFlags({}));
-            this->commandPool = this->device.createCommandPool(VkCommandPoolCreateInfo(VkCommandPoolCreateFlags(VkCommandPoolCreateFlagBits::eResetCommandBuffer), queueFamilyIndex));
+            // TODO: XVK version 
+            //this->queue = this->device.getQueue(queueFamilyIndex, 0); // 
+            //this->fence = this->device.createFence(VkFenceCreateInfo().setFlags({}));
+            //this->commandPool = this->device.createCommandPool(VkCommandPoolCreateInfo(VkCommandPoolCreateFlags(VkCommandPoolCreateFlagBits::eResetCommandBuffer), queueFamilyIndex));
+            
             //this->dispatch = VkDispatchLoaderDynamic(this->instance, this->device); // 
-            this->dispatch = VkDispatchLoaderDynamic(this->instance, vkGetInstanceProcAddr, this->device, vkGetDeviceProcAddr); // 
-
-            // 
-#ifdef VOLK_H_
-            VolkDeviceTable table = {};
-            volkLoadDeviceTable(&table, this->device);
-#endif
+            //this->dispatch = VkDispatchLoaderDynamic(this->instance, vkGetInstanceProcAddr, this->device, vkGetDeviceProcAddr); // 
 
             // 
             VmaAllocatorCreateInfo vma_info = {};
@@ -663,9 +653,10 @@ namespace vkt
                 vkh::VkDescriptorPoolSize{.type = VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, .descriptorCount = 256u}
             };
 
-            this->descriptorPool = device.createDescriptorPool(vkh::VkDescriptorPoolCreateInfo{
-                .maxSets = 256u, .poolSizeCount = static_cast<uint32_t>(dps.size()), .pPoolSizes = dps.data()
-            });
+            // TODO: XVK version 
+            //this->descriptorPool = device.createDescriptorPool(vkh::VkDescriptorPoolCreateInfo{
+            //    .maxSets = 256u, .poolSizeCount = static_cast<uint32_t>(dps.size()), .pPoolSizes = dps.data()
+            //});
 
             return device;
         };

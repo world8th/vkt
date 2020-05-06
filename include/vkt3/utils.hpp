@@ -444,6 +444,10 @@ namespace vkt {
         uint32_t glMemory = 0u, glID = 0u;
         std::vector<uint32_t> queueFamilyIndices = {};
 
+        // 
+        //xvk::Instance instanceDispatch = {};
+        //xvk::Device deviceDispatch = {};
+
         // Required for dispatch load (and for XVK)
         VkInstance instance = {};
         VkPhysicalDevice physicalDevice = {};

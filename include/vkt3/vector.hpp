@@ -28,29 +28,38 @@ namespace vkt {
                 //this->buffer = VkBuffer{};
             }
         };
-
+         
         virtual BufferAllocation* construct(
             vkt::uni_arg<MemoryAllocationInfo> allocationInfo,
             vkt::uni_arg<vkh::VkBufferCreateInfo> createInfo = vkh::VkBufferCreateInfo{}
         ) {
-            this->buffer = this->info.device.createBuffer(*createInfo);
+            //this->buffer = this->info.device.createBuffer(*createInfo);
+            vkCreateBuffer(allocationInfo->device, *createInfo, nullptr, &this->buffer);
             this->usage = createInfo->usage;
-
+              
             VkMemoryAllocateFlagsInfo allocFlags = {};
-            allocFlags.flags = VkMemoryAllocateFlagBits::eDeviceAddress;
-
+            allocFlags.flags = VK_MEMORY_ALLOCATE_DEVICE_MASK_BIT;
+                
             // 
-            VkMemoryRequirements memReqs = allocationInfo->device.getBufferMemoryRequirements(buffer);
-            VkExportMemoryAllocateInfo exportAllocInfo{ VkExternalMemoryHandleTypeFlagBits::eOpaqueWin32 };
-
+            VkMemoryRequirements memReqs = {};
+            vkGetBufferMemoryRequirements(allocationInfo->device, buffer, &memReqs);
+            //allocationInfo->device.getBufferMemoryRequirements(buffer);
+            vkh::VkExportMemoryAllocateInfo exportAllocInfo {
+                .handleTypes = { .eOpaqueWin32 = 1 }
+            };
+                  
             // 
-            VkMemoryAllocateInfo memAllocInfo = {};
-            memAllocInfo.pNext = &exportAllocInfo.setPNext(&allocFlags);
+            vkh::VkMemoryAllocateInfo memAllocInfo = {};
+            exportAllocInfo.pNext = &allocFlags;
+            memAllocInfo.pNext = &exportAllocInfo;
             memAllocInfo.allocationSize = memReqs.size;
             memAllocInfo.memoryTypeIndex = uint32_t(allocationInfo->getMemoryType(memReqs.memoryTypeBits, { .eDeviceLocal = 1 }));
-
+                 
             // 
-            this->info.device.bindBufferMemory(buffer, info.memory = info.device.allocateMemory(memAllocInfo), 0);
+            //this->info.device.bindBufferMemory(buffer, info.memory = info.device.allocateMemory(memAllocInfo), 0);
+            VkDeviceMemory memory = {};
+            vkAllocateMemory(info.device, memAllocInfo, nullptr, &memory);
+            vkBindBufferMemory(allocationInfo->device, buffer, memory, 0u);
 
 #if defined(ENABLE_OPENGL_INTEROP) && defined(VK_USE_PLATFORM_WIN32_KHR)
             this->info.handle = info.device.getMemoryWin32HandleKHR({ info.memory, VkExternalMemoryHandleTypeFlagBits::eOpaqueWin32 }, this->info.dispatch);
@@ -93,17 +102,7 @@ namespace vkt {
         // 
         virtual const unsigned& getGLBuffer() const { return this->info.glID; };
         virtual const unsigned& getGLMemory() const { return this->info.glMemory; };
-
-        // BETA
-        //virtual VkDispatchLoaderDynamic dispatchLoaderDynamic() {
-        //    return this->info.dispatch;
-        //}
          
-        // BETA
-        //virtual VkDispatchLoaderDynamic dispatchLoaderDynamic() const {
-        ///    return this->info.dispatch;
-        //}
-
         // 
         virtual void* map() { return info.pMapped; };
         virtual void* mapped() { return info.pMapped; };
@@ -142,29 +141,37 @@ namespace vkt {
         // Queue Family Indices
         virtual std::vector<uint32_t>& getQueueFamilyIndices() { return this->info.queueFamilyIndices; };
         virtual const std::vector<uint32_t>& getQueueFamilyIndices() const { return this->info.queueFamilyIndices; };
-         
+              
         // 
         virtual vkh::VkDeviceOrHostAddressKHR deviceAddress() {
-            if (!this->usage.eSharedDeviceAddress) { std::cerr << "Bad Device Address" << std::endl; assert(true); };
-            return vkh::VkDeviceOrHostAddressKHR{ .deviceAddress = this->usage.eSharedDeviceAddress ? getDevice().getBufferAddress(vkh::VkBufferDeviceAddressInfo{.buffer = this->buffer }.hpp(), this->info.dispatch) : 0ull };
+            if (!this->usage.eSharedDeviceAddress) {
+                std::cerr << "Bad Device Address" << std::endl;
+                assert(true);
+            };
+            return vkh::VkDeviceOrHostAddressKHR{ .deviceAddress = this->usage.eSharedDeviceAddress ? vkGetBufferDeviceAddress(device.handle, vkh::VkBufferDeviceAddressInfo{.buffer = this->buffer}) : 0ull };
         };
-
+                   
         // 
         virtual vkh::VkDeviceOrHostAddressConstKHR deviceAddress() const {
-            if (!this->usage.eSharedDeviceAddress) { std::cerr << "Bad Device Address" << std::endl; assert(true); };
-            return vkh::VkDeviceOrHostAddressConstKHR{ .deviceAddress = this->usage.eSharedDeviceAddress ? getDevice().getBufferAddress(vkh::VkBufferDeviceAddressInfo{.buffer = this->buffer }.hpp(), this->info.dispatch) : 0ull };
+            if (!this->usage.eSharedDeviceAddress) {
+                std::cerr << "Bad Device Address" << std::endl;
+                assert(true);
+            };
+            return vkh::VkDeviceOrHostAddressConstKHR{ .deviceAddress = this->usage.eSharedDeviceAddress ? vkGetBufferDeviceAddress(device.handle, vkh::VkBufferDeviceAddressInfo{.buffer = this->buffer}) : 0ull };
         };
-
+            
         // getter by operator (for direct pass)
         virtual operator vkh::VkDeviceOrHostAddressKHR() { return this->deviceAddress(); };
         virtual operator vkh::VkDeviceOrHostAddressConstKHR() const { return this->deviceAddress(); };
 
     public: // in-variant 
-        VkBuffer buffer = {};
-        vkh::VkBufferUsageFlags usage = {};
+        VkBuffer buffer = {}; vkh::VkBufferUsageFlags usage = {};
         VkDeviceAddress cached = {};
         MemoryAllocationInfo info = {};
-
+         
+        xvk::Device device = {};
+        xvk::Instance instance = {};
+          
     protected: friend BufferAllocation; friend VmaBufferAllocation;
     };
 
@@ -172,21 +179,22 @@ namespace vkt {
     class VmaBufferAllocation : public BufferAllocation { public: 
         VmaBufferAllocation() {};
         VmaBufferAllocation(vkt::uni_arg<VmaAllocator> allocator, const vkt::uni_arg<vkh::VkBufferCreateInfo>& createInfo = vkh::VkBufferCreateInfo{}, VmaMemoryUsage vmaUsage = VMA_MEMORY_USAGE_GPU_ONLY) { this->construct(*allocator,  createInfo, vmaUsage); };
-
+            
         // 
         VmaBufferAllocation(vkt::uni_ptr<VmaBufferAllocation> allocation) : allocation(allocation->allocation), allocationInfo(allocation->allocationInfo), allocator(allocation->allocator) { *this = allocation; };
-        VmaBufferAllocation(vkt::uni_ptr<BufferAllocation> allocation) { *this = dynamic_cast<const VmaBufferAllocation&>(*allocation); };
-
+        VmaBufferAllocation(vkt::uni_ptr<BufferAllocation> allocation) { *this = allocation.dyn_cast<VmaBufferAllocation>(); };
+              
         // 
         VmaBufferAllocation(std::shared_ptr<VmaBufferAllocation> allocation) : allocation(allocation->allocation), allocationInfo(allocation->allocationInfo), allocator(allocation->allocator) { *this = vkt::uni_ptr<VmaBufferAllocation>(allocation); };
-        VmaBufferAllocation(std::shared_ptr<BufferAllocation> allocation) { *this = dynamic_cast<const VmaBufferAllocation&>(*vkt::uni_ptr<BufferAllocation>(allocation)); };
-
+        VmaBufferAllocation(std::shared_ptr<BufferAllocation> allocation) { *this = vkt::uni_ptr<VmaBufferAllocation>(std::dynamic_pointer_cast<VmaBufferAllocation>(allocation)); };
+            
         // 
         ~VmaBufferAllocation() {
-            this->info.device.waitIdle();
+            //this->info.device.waitIdle();
+            vkDeviceWaitIdle(this->info.device);
             vmaDestroyBuffer(allocator, buffer, allocation);
         };
-
+         
         //
         virtual VmaBufferAllocation* construct(
             vkt::uni_arg<VmaAllocator> allocator,
@@ -211,8 +219,9 @@ namespace vkt {
             // Get Dispatch Loader From VMA Allocator Itself!
             VmaAllocatorInfo info = {};
             vmaGetAllocatorInfo(this->allocator = allocator.ref(), &info);
-            this->info.dispatch = VkDispatchLoaderDynamic(info.instance, vkGetInstanceProcAddr, this->info.device = info.device, vkGetDeviceProcAddr); // 
+            //this->info.dispatch = VkDispatchLoaderDynamic(info.instance, vkGetInstanceProcAddr, this->info.device = info.device, vkGetDeviceProcAddr); // 
 
+             
             // 
             if (createInfo->queueFamilyIndexCount) {
                 this->info.queueFamilyIndices = std::vector<uint32_t>(createInfo->queueFamilyIndexCount);
@@ -236,20 +245,12 @@ namespace vkt {
             this->allocator = allocation->allocator;
             return *this;
         };
-
+         
         // Get mapped memory
         virtual void* map() { void* ptr = nullptr; vmaMapMemory(allocator, allocation, &ptr); return ptr; };
         virtual void* mapped() { if (!allocationInfo.pMappedData) { vmaMapMemory(allocator, allocation, &allocationInfo.pMappedData); }; return allocationInfo.pMappedData; };
         virtual void  unmap() { vmaUnmapMemory(allocator, allocation); allocationInfo.pMappedData = nullptr; };
-
-        // 
-        /*virtual const VkDevice& _getDevice() const {
-            VmaAllocatorInfo info = {};
-            vmaGetAllocatorInfo(this->allocator, &info);
-            return info.device;
-        };// const override { return device; };
-        */
-
+        
         // Allocation
         virtual operator const VmaAllocation& () const { return allocation; };
         virtual operator const VmaAllocationInfo& () const { return allocationInfo; };
@@ -257,17 +258,23 @@ namespace vkt {
         // 
         virtual VmaBufferAllocation* address() { return this; };
         virtual const VmaBufferAllocation* address() const { return this; };
-
-        // VMA-Based Version
-        virtual vkh::VkDeviceOrHostAddressKHR deviceAddress() override {
-            if (!this->usage.eSharedDeviceAddress) { std::cerr << "Bad Device Address" << std::endl; assert(true); };
-            return vkh::VkDeviceOrHostAddressKHR{ .deviceAddress = this->usage.eSharedDeviceAddress ? getDevice().getBufferAddress(vkh::VkBufferDeviceAddressInfo{.buffer = this->buffer }.hpp(), this->info.dispatch) : 0ull };
+        
+        //
+        virtual vkh::VkDeviceOrHostAddressKHR deviceAddress() {
+            if (!this->usage.eSharedDeviceAddress) {
+                std::cerr << "Bad Device Address" << std::endl;
+                assert(true);
+            };
+            return vkh::VkDeviceOrHostAddressKHR{ .deviceAddress = this->usage.eSharedDeviceAddress ? vkGetBufferDeviceAddress(device.handle, vkh::VkBufferDeviceAddressInfo{.buffer = this->buffer}) : 0ull };
         };
-
-        // VMA-Based Version
-        virtual vkh::VkDeviceOrHostAddressConstKHR deviceAddress() const override {
-            if (!this->usage.eSharedDeviceAddress) { std::cerr << "Bad Device Address" << std::endl; assert(true); };
-            return vkh::VkDeviceOrHostAddressConstKHR{ .deviceAddress = this->usage.eSharedDeviceAddress ? getDevice().getBufferAddress(vkh::VkBufferDeviceAddressInfo{.buffer = this->buffer }.hpp(), this->info.dispatch) : 0ull };
+         
+        // 
+        virtual vkh::VkDeviceOrHostAddressConstKHR deviceAddress() const {
+            if (!this->usage.eSharedDeviceAddress) {
+                std::cerr << "Bad Device Address" << std::endl;
+                assert(true);
+            };
+            return vkh::VkDeviceOrHostAddressConstKHR{ .deviceAddress = this->usage.eSharedDeviceAddress ? vkGetBufferDeviceAddress(device.handle, vkh::VkBufferDeviceAddressInfo{.buffer = this->buffer}) : 0ull};
         };
 
     // 
@@ -306,11 +313,11 @@ namespace vkt {
             this->bufRegion = vkh::VkStridedBufferRegionKHR{ static_cast<VkBuffer>(V.buffer()), V.offset(), sizeof(T), V.ranged() / sizeof(T) };
             return *this;
         };
-
+         
         // 
         //template<class Tm = T> Vector<Tm> cast() { return *this; };
         //template<class Tm = T> const vkt::uni_arg<Vector<Tm>>& cast() const { return Vector<Tm>(reinterpret_cast<Vector<T>&>(*this)); };
-
+         
         //
         virtual Vector<T>* construct(vkt::uni_ptr<BufferAllocation> allocation, vkt::uni_arg<VkDeviceSize> offset = 0ull, vkt::uni_arg<VkDeviceSize> size = VK_WHOLE_SIZE, vkt::uni_arg<VkDeviceSize> stride = sizeof(T)) {
             this->allocation = allocation;
@@ -342,46 +349,37 @@ namespace vkt {
         // alias Of getAllocation
         virtual vkt::uni_ptr<BufferAllocation>& uniPtr() { return allocation; };
         virtual vkt::uni_ptr<BufferAllocation> uniPtr() const { return allocation; };
-
+         
         // 
         virtual operator    ::VkDescriptorBufferInfo& () { this->bufInfo.buffer = this->bufRegion.buffer = allocation->buffer; return bufInfo; };
         virtual operator vkh::VkDescriptorBufferInfo& () { this->bufInfo.buffer = this->bufRegion.buffer = allocation->buffer; return bufInfo; };
         virtual operator vkt::uni_ptr<BufferAllocation>& () { return allocation; };
         virtual operator std::shared_ptr<BufferAllocation>& () { return allocation; };
-
-        virtual operator VkDescriptorBufferInfo& () { this->bufInfo.buffer = this->bufRegion.buffer = allocation->buffer; return bufInfo; };
-        virtual operator VkBuffer& () { return reinterpret_cast<VkBuffer&>(this->bufInfo.buffer = this->bufRegion.buffer = allocation->buffer); };
-        virtual operator VkDevice& () { return *allocation; };
-        virtual operator VkBufferView& () { return view; };
-        
-        virtual operator BufferAllocation*() { return allocation; };
-        virtual operator VkBuffer& () { return reinterpret_cast<VkBuffer&>(bufInfo.buffer = allocation->buffer); };
-        virtual operator VkDevice& () { return *allocation; };
-        virtual operator VkBufferView& () { return reinterpret_cast<VkBufferView&>(view); };
-
+              
         //
-        virtual operator const    ::VkDescriptorBufferInfo& () const { return bufInfo; };
-        virtual operator const vkh::VkDescriptorBufferInfo& () const { return bufInfo; };
-        virtual operator vkt::uni_ptr<BufferAllocation> () const { return allocation; };
-        virtual operator std::shared_ptr<BufferAllocation> () const { return allocation; };
+        virtual operator const ::VkDescriptorBufferInfo &() const { return bufInfo; };
+        virtual operator const vkh::VkDescriptorBufferInfo&() const { return bufInfo; };
+        virtual operator const vkt::uni_ptr<BufferAllocation>&() const { return allocation; };
+        virtual operator const std::shared_ptr<BufferAllocation>&() const { return allocation; };
         
-        virtual operator const VkDescriptorBufferInfo& () const { return bufInfo; };
+        // 
+        virtual operator BufferAllocation*() { return allocation; };
+        virtual operator const BufferAllocation*() const { return allocation; };
+           
+        // 
+        virtual operator VkBufferView&() { return view; };
+        virtual operator VkDevice& () { return *allocation; };
+        virtual operator VkBuffer&() { return *allocation; };
+           
+        // 
         virtual operator const VkBuffer& () const { return *allocation; };
         virtual operator const VkDevice& () const { return *allocation; };
         virtual operator const VkBufferView& () const { return view; };
-
-        virtual operator const BufferAllocation*() const { return allocation; };
-        virtual operator const VkBuffer&() const { return *allocation; };
-        virtual operator const VkDevice&() const { return *allocation; };
-        virtual operator const VkBufferView& () const { return reinterpret_cast<const VkBufferView&>(view);; };
-
+         
+         
         // 
         virtual VkDeviceSize& offset() { return this->bufRegion.offset; };
-        //virtual VkDeviceSize& stride() { return this->stride; };
-
-        // 
         virtual const VkDeviceSize& offset() const { return this->bufRegion.offset; };
-        //virtual const VkDeviceSize& stride() const { return this->stride; };
 
         // LEGACY, used for constructor only
         virtual VkDeviceSize ranged() const { return (this->bufInfo.range != VK_WHOLE_SIZE ? std::min(VkDeviceSize(this->bufInfo.range), VkDeviceSize(this->allocation->range() - this->offset())) : VkDeviceSize(this->allocation->range() - this->offset())); };
@@ -454,19 +452,17 @@ namespace vkt {
         // for JavaCPP
         virtual BufferAllocation* getAllocationPtr() { return allocation.ptr(); };
         virtual const BufferAllocation* getAllocationPtr() const { return allocation.ptr(); };
-
+        
         // get deviceAddress with offset (currently, prefer unshifted)
         virtual vkh::VkDeviceOrHostAddressKHR deviceAddress() {
-            //return vkh::VkDeviceOrHostAddressKHR{ .deviceAddress = getDevice().getBufferAddress(vkh::VkBufferDeviceAddressInfo{ .buffer = this->buffer() }.hpp()) + this->offset() };
             return this->allocation->deviceAddress();
         };
-
+         
         // get deviceAddress with offset (currently, prefer unshifted)
         virtual vkh::VkDeviceOrHostAddressConstKHR deviceAddress() const {
-            //return vkh::VkDeviceOrHostAddressConstKHR{ .deviceAddress = getDevice().getBufferAddress(vkh::VkBufferDeviceAddressInfo{ .buffer = this->buffer() }.hpp()) + this->offset() };
             return this->allocation->deviceAddress();
         };
-
+           
         // 
         virtual std::vector<uint32_t>& getQueueFamilyIndices() { return this->allocation->getQueueFamilyIndices(); };
         virtual const std::vector<uint32_t>& getQueueFamilyIndices() const { return this->allocation->getQueueFamilyIndices(); };

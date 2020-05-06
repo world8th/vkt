@@ -72,10 +72,11 @@ namespace vkt {
 
     public: friend uni_ptr<T>; // 
         uni_ptr<T>() {};
-        uni_ptr<T>(std::shared_ptr<T> shared) { *this = shared; };
-        uni_ptr<T>(T* regular) { *this = regular; };
-        uni_ptr<T>(T& regular) { *this = regular; }; // for argument passing
-        uni_ptr<T>(const uni_ptr<T>& ptr) { *this = ptr; };
+        uni_ptr<T>(std::shared_ptr<T> shared) : shared(shared) {};
+        uni_ptr<T>(T* regular) : regular(std::ref(*ptr)) {};
+        uni_ptr<T>(T& regular) : regular(std::ref( ptr)) {};  // for argument passing
+        uni_ptr<T>(const uni_ptr<T>& ptr) : shared(ptr.shared), regular(std::ref(*ptr.regular)) {};
+        uni_ptr<T>(uni_ptr<T>& ptr) : shared(ptr.shared), regular(std::ref(*ptr.regular)){};
 
         // 
         virtual uni_ptr* operator= (T* ptr) { regular = std::ref(*ptr); return this; };

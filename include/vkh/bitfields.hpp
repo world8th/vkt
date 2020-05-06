@@ -484,6 +484,26 @@ namespace vkh {
         VK_HPP_OPERATORS(VkShaderModuleCreateFlags, vk::ShaderModuleCreateFlags, vk::ShaderModuleCreateFlagBits)
     };
 
+    // 
+    struct VkExternalMemoryHandleTypeFlags { ::VkFlags
+        eOpaqueFd:1,
+        eOpaqueWin32:1,
+        eOpaqueWin32Kmt:1,
+        eD3D11Texture:1,
+        eD3D11TextureKmt:1,
+        eD3D12Heap:1,
+        eD3D12Resource:1,
+        eHostAllocation:1,
+        eHostMappedForeignMemory:1,
+        eDmaBuf:1,
+        eAndroidHardwareBuffer:1;
+
+        OPERATORS(VkExternalMemoryHandleTypeFlags, ::VkExternalMemoryHandleTypeFlagBits, ::VkFlags)
+        VK_HPP_OPERATORS(VkExternalMemoryHandleTypeFlags, vk::ExternalMemoryHandleTypeFlags, vk::ExternalMemoryHandleTypeFlagBits)
+    };
+
+
+
 #pragma pack(pop)
     
     // Extras

@@ -1471,6 +1471,55 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         VK_HPP_STRUCT_OPERATORS(VkCommandBufferBeginInfo, vk::CommandBufferBeginInfo)
     } VkCommandBufferBeginInfo;
 
+    // 
+    typedef struct VkExportMemoryAllocateInfo {
+        VkStructureType                    sType        = VK_STRUCTURE_TYPE_EXPORT_MEMORY_ALLOCATE_INFO;
+        const void*                        pNext        = nullptr;
+        VkExternalMemoryHandleTypeFlags    handleTypes  = {};
+
+        STRUCT_OPERATORS(VkExportMemoryAllocateInfo)
+        VK_HPP_STRUCT_OPERATORS(VkExportMemoryAllocateInfo, vk::ExportMemoryAllocateInfo)
+    } VkExportMemoryAllocateInfo;
+
+    // 
+    typedef struct VkMemoryAllocateInfo {
+        VkStructureType    sType            = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+        const void*        pNext            = nullptr;
+        VkDeviceSize       allocationSize   = 0u;
+        uint32_t           memoryTypeIndex  = 0u;
+
+        STRUCT_OPERATORS(VkMemoryAllocateInfo)
+        VK_HPP_STRUCT_OPERATORS(VkMemoryAllocateInfo, vk::MemoryAllocateInfo)
+    } VkMemoryAllocateInfo;
+
+    // 
+    typedef struct VkApplicationInfo {
+        VkStructureType    sType                = VK_STRUCTURE_TYPE_APPLICATION_INFO;
+        const void*        pNext                = nullptr;
+        const char*        pApplicationName     = "vkh-based";
+        uint32_t           applicationVersion   = 0u;
+        const char*        pEngineName          = "vkh-based";
+        uint32_t           engineVersion        = 0u;
+        uint32_t           apiVersion           = VK_API_VERSION_1_2;
+    } VkApplicationInfo;
+
+    // 
+    typedef struct VkInstanceCreateInfo {
+        VkStructureType             sType                   = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
+        const void*                 pNext                   = nullptr;
+        VkInstanceCreateFlags       flags                   = {};
+        const VkApplicationInfo*    pApplicationInfo        = nullptr;
+        uint32_t                    enabledLayerCount       = 0u;
+        const char* const*          ppEnabledLayerNames     = nullptr;
+        uint32_t                    enabledExtensionCount   = 0u;
+        const char* const*          ppEnabledExtensionNames = nullptr;
+
+        VkInstanceCreateInfo& setEnabledExtensionNames(const std::vector<char *>& V = {}) { ppEnabledExtensionNames = V.data(); enabledExtensionCount = static_cast<uint32_t>(V.size()); return *this; };
+        VkInstanceCreateInfo& setEnabledLayerNames(const std::vector<char *>& V = {}) { ppEnabledLayerNames = V.data(); enabledLayerCount = static_cast<uint32_t>(V.size()); return *this; };
+
+        STRUCT_OPERATORS(VkInstanceCreateInfo)
+        VK_HPP_STRUCT_OPERATORS(VkInstanceCreateInfo, vk::InstanceCreateInfo)
+    } VkInstanceCreateInfo;
 
 #pragma pack(pop)
 
