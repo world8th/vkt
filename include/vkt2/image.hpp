@@ -29,7 +29,6 @@ namespace vkt {
                 //this->image = vk::Image{};
             };
         };
-        //ImageAllocation(std::shared_ptr<ImageAllocation> allocation) : image(allocation->image), info(allocation->info) { *this = allocation; };
 
         // 
         virtual ImageAllocation* construct(
@@ -199,6 +198,7 @@ namespace vkt {
         VmaImageAllocation(std::shared_ptr<VmaImageAllocation> allocation) : allocation(allocation->allocation), allocationInfo(allocation->allocationInfo), allocator(allocation->allocator) { *this = vkt::uni_ptr<VmaImageAllocation>(allocation); };
         VmaImageAllocation(std::shared_ptr<ImageAllocation> allocation) { *this = dynamic_cast<VmaImageAllocation&>(*vkt::uni_ptr<ImageAllocation>(allocation)); };
 
+        //
         ~VmaImageAllocation() {
             this->info.device.waitIdle();
             vmaDestroyImage(allocator, image, allocation);
@@ -258,13 +258,6 @@ namespace vkt {
         virtual operator const VmaAllocationInfo& () const { return allocationInfo; };
 
         // 
-        /*virtual const vk::Device& _getDevice() const {
-            VmaAllocatorInfo info = {};
-            vmaGetAllocatorInfo(this->allocator, &info);
-            return info.device;
-        };// const override { return device; };
-        */
-        // 
         virtual operator VmaAllocation& () { return allocation; };
         virtual operator VmaAllocationInfo& () { return allocationInfo; };
 
@@ -290,11 +283,6 @@ namespace vkt {
         VmaAllocator allocator = {};
     };
 
-//#ifdef VMA_IMPLEMENTATION // Fix Implementation Issue
-//    const vk::Device& VmaBufferAllocation::_getDevice() const { return this->allocator->m_hDevice; };
-//    const vk::Device& VmaImageAllocation::_getDevice() const { return this->allocator->m_hDevice; };
-//#endif
-
     // 
     struct ImageRegionCreateInfoAllocated {
         vkt::uni_arg<MemoryAllocationInfo> allocationInfo = MemoryAllocationInfo{};
@@ -319,8 +307,9 @@ namespace vkt {
         ImageRegion(vkt::uni_ptr<VmaImageAllocation> allocation, vkt::uni_arg<vkh::VkImageViewCreateInfo> info = vkh::VkImageViewCreateInfo{}, vkt::uni_arg<vk::ImageLayout> layout = vk::ImageLayout::eGeneral) : allocation(allocation.dyn_cast<ImageAllocation>()), subresourceRange(info->subresourceRange) { this->construct(allocation.dyn_cast<ImageAllocation>(), info, layout); };
         ImageRegion(std::shared_ptr<ImageAllocation> allocation, vkt::uni_arg<vkh::VkImageViewCreateInfo> info = vkh::VkImageViewCreateInfo{}, vkt::uni_arg<vk::ImageLayout> layout = vk::ImageLayout::eGeneral) : allocation(allocation), subresourceRange(info->subresourceRange) { this->construct(allocation, info, layout); };
         ImageRegion(std::shared_ptr<VmaImageAllocation> allocation, vkt::uni_arg<vkh::VkImageViewCreateInfo> info = vkh::VkImageViewCreateInfo{}, vkt::uni_arg<vk::ImageLayout> layout = vk::ImageLayout::eGeneral) : allocation(std::dynamic_pointer_cast<ImageAllocation>(allocation)), subresourceRange(info->subresourceRange) { this->construct(std::dynamic_pointer_cast<ImageAllocation>(allocation), info, layout); };
-
-        ~ImageRegion() {};
+        ~ImageRegion() {
+            
+        };
 
         // 
         virtual ImageRegion* construct(

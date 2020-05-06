@@ -291,15 +291,7 @@ namespace vkt {
 
     // Wrapper Class
     template<class T = uint8_t>
-    class Vector { public: //
-        ~Vector() {
-            if (this->view) {
-                this->getDevice().destroyBufferView(view);
-                this->view = vk::BufferView{};
-            };
-        };
-
-        // 
+    class Vector : public std::enable_shared_from_this<Vector<T>> { public: //
         Vector() {};
 
         // 
@@ -311,9 +303,13 @@ namespace vkt {
         Vector(std::shared_ptr<VmaBufferAllocation> allocation, vkt::uni_arg<vk::DeviceSize> offset = 0ull, vkt::uni_arg<vk::DeviceSize> size = VK_WHOLE_SIZE, vkt::uni_arg<vk::DeviceSize> stride = sizeof(T)) : allocation(std::dynamic_pointer_cast<BufferAllocation>(allocation)), bufInfo({ allocation->buffer, offset, size }) { this->construct(std::dynamic_pointer_cast<BufferAllocation>(allocation), offset, size, stride); };
 
         // 
-        //Vector(vkt::uni_arg<MemoryAllocationInfo> allocationInfo, vkt::uni_arg<vkh::VkBufferCreateInfo> createInfo = {}) { this->construct(std::make_shared<BufferAllocation>(allocationInfo, createInfo)); };
-        //Vector(vkt::uni_arg<VmaAllocator> allocator, vkt::uni_arg<vkh::VkBufferCreateInfo> createInfo = {}, vkt::uni_arg<VmaMemoryUsage> vmaUsage = VMA_MEMORY_USAGE_GPU_ONLY) { this->construct(vkt::uni_ptr<BufferAllocation>(std::dynamic_pointer_cast<BufferAllocation>(std::make_shared<VmaBufferAllocation>(allocator, createInfo, vmaUsage)))); };
-
+        ~Vector() {
+            if (this->view) {
+                this->getDevice().destroyBufferView(this->view);
+                this->view = vk::BufferView{};
+            };
+        };
+        
         // 
         template<class Tm = T> Vector(const Vector<Tm>& V) : allocation(V), bufInfo({ V.buffer(), V.offset(), V.range() }) { *this = V; };
         template<class Tm = T> inline Vector<T>& operator=(const Vector<Tm>& V) { 
