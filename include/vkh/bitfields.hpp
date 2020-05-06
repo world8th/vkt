@@ -478,6 +478,12 @@ namespace vkh {
         VK_HPP_OPERATORS(VkPipelineCreateFlags, vk::PipelineCreateFlags, vk::PipelineCreateFlagBits)
     };
 
+    // 
+    struct VkShaderModuleCreateFlags { //::VkFlags
+        OPERATORS(VkShaderModuleCreateFlags, ::VkShaderModuleCreateFlagBits, ::VkFlags)
+        VK_HPP_OPERATORS(VkShaderModuleCreateFlags, vk::ShaderModuleCreateFlags, vk::ShaderModuleCreateFlagBits)
+    };
+
 #pragma pack(pop)
     
     // Extras

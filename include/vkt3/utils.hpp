@@ -31,8 +31,9 @@
 #endif
 
 // 
-#include <vulkan/vulkan.hpp>
+//#include <vulkan/vulkan.hpp>
 #include <vma/vk_mem_alloc.h>
+#include <xvk/xvk.hpp>
 
 // 
 #include <misc/args.hxx>
@@ -127,16 +128,14 @@ namespace vkt {
     };
 
     static inline auto makeShaderModuleInfo(const std::vector<uint32_t>& code) {
-        auto smi = VkShaderModuleCreateInfo{};
-        smi.pCode = (uint32_t *)code.data();
-        smi.codeSize = code.size()*4;
-        smi.flags = {};
-        return smi;
+        return vkh::VkShaderModuleCreateInfo{}.setCode(code);
     };
-
+     
     // create shader module
     static inline auto& createShaderModuleIntrusive(const vkt::uni_arg<VkDevice>& device, const std::vector<uint32_t>& code, vkt::uni_ptr<VkShaderModule> hndl) {
-        return (*hndl = device->createShaderModule(makeShaderModuleInfo(code)));
+        //return (*hndl = device->createShaderModule(makeShaderModuleInfo(code)));
+        vkCreateShaderModule(device, makeShaderModuleInfo(code), nullptr, hndl.get_ptr());
+        return *hndl;
     };
 
     static inline auto createShaderModule(const vkt::uni_arg<VkDevice>& device, const std::vector<uint32_t>& code) {
@@ -159,11 +158,11 @@ namespace vkt {
     };
 
     // create shader module
-    static inline auto makePipelineStageInfo(const vkt::uni_arg<VkDevice>& device, const std::vector<uint32_t>& code, const vkt::uni_arg<VkShaderStageFlagBits>& stage = VkShaderStageFlagBits::eCompute, const vkt::uni_arg<const char *>& entry = "main") {
+    static inline auto makePipelineStageInfo(const vkt::uni_arg<VkDevice>& device, const std::vector<uint32_t>& code, const vkt::uni_arg<vkh::VkShaderStageFlags>& stage = vkh::VkShaderStageFlags{.eCompute = 1u}, const vkt::uni_arg<const char *>& entry = "main") {
         VkPipelineShaderStageCreateInfo spi = {};
         createShaderModuleIntrusive(device, code, spi.module);
         spi.pName = entry;
-        spi.stage = stage;
+        spi.stage = stage->c();
         spi.pSpecializationInfo = {};
         return std::move(spi);
     };
@@ -171,8 +170,8 @@ namespace vkt {
     // create shader module
     static inline auto makeComputePipelineStageInfo(const vkt::uni_arg<VkDevice>& device, const std::vector<uint32_t>& code, const vkt::uni_arg<const char *>& entry = "main", const vkt::uni_arg<uint32_t>& subgroupSize = 0u) {
         auto f = FixConstruction{};
-        f.spi = makePipelineStageInfo(device,code,VkShaderStageFlagBits::eCompute,entry);
-        f.spi.flags = VkPipelineShaderStageCreateFlagBits::eRequireFullSubgroupsEXT;
+        f.spi = makePipelineStageInfo(device, code, vkh::VkShaderStageFlags{.eCompute = 1u}, entry);
+        f.spi.flags = vkh::VkPipelineShaderStageCreateFlags{.eRequireFullSubgroups = 1u};
         createShaderModuleIntrusive(device, code, (VkShaderModule&)(f.spi.module));
         f.sgmp = vkh::VkPipelineShaderStageRequiredSubgroupSizeCreateInfoEXT{};
         f.sgmp.requiredSubgroupSize = subgroupSize;
@@ -187,7 +186,9 @@ namespace vkt {
         cmpi.layout = VkPipelineLayout(*layout);
         cmpi.stage = *spi;
         cmpi.basePipelineIndex = -1;
-        return device->createComputePipeline(cache, cmpi);
+        VkPipeline pipeline = {};
+        vkCreateComputePipelines(device, cache, 1u, cmpi, nullptr, &pipeline);
+        return pipeline;
     };
 
     // create compute pipelines
@@ -201,38 +202,56 @@ namespace vkt {
     static inline auto createCompute(const vkt::uni_arg<VkDevice>& device, const vkt::uni_arg<std::string>& path, const vkt::uni_arg<VkPipelineLayout>& layout, const vkt::uni_arg<VkPipelineCache>& cache = VkPipelineCache{}, const vkt::uni_arg<uint32_t>& subgroupSize = 0u) {
         return createCompute(device, readBinary(path), layout, cache, subgroupSize);
     };
-
-    // general command buffer pipeline barrier (updated 26.04.2020)
-    static inline void commandBarrier(const vkt::uni_arg<VkCommandBuffer>& cmdBuffer) {
-        VkMemoryBarrier memoryBarrier = {};
-        memoryBarrier.srcAccessMask = (VkAccessFlagBits::eHostWrite | VkAccessFlagBits::eColorAttachmentWrite | VkAccessFlagBits::eAccelerationStructureWriteNV | VkAccessFlagBits::eShaderWrite | VkAccessFlagBits::eTransferWrite | VkAccessFlagBits::eTransformFeedbackCounterWriteEXT | VkAccessFlagBits::eMemoryWrite | VkAccessFlagBits::eTransformFeedbackWriteEXT);
-        memoryBarrier.dstAccessMask = (VkAccessFlagBits::eHostRead  | VkAccessFlagBits::eColorAttachmentRead  | VkAccessFlagBits::eAccelerationStructureReadNV  | VkAccessFlagBits::eShaderRead  | VkAccessFlagBits::eTransferRead  | VkAccessFlagBits::eTransformFeedbackCounterReadEXT  | VkAccessFlagBits::eMemoryRead  | VkAccessFlagBits::eUniformRead);
-        const auto srcStageMask = VkPipelineStageFlagBits::eTransformFeedbackEXT | VkPipelineStageFlagBits::eTransfer | VkPipelineStageFlagBits::eComputeShader | VkPipelineStageFlagBits::eRayTracingShaderNV | VkPipelineStageFlagBits::eAccelerationStructureBuildNV | VkPipelineStageFlagBits::eHost | VkPipelineStageFlagBits::eAllGraphics | VkPipelineStageFlagBits::eColorAttachmentOutput;// | VkPipelineStageFlagBits::eBottomOfPipe;
-        const auto dstStageMask = VkPipelineStageFlagBits::eTransformFeedbackEXT | VkPipelineStageFlagBits::eTransfer | VkPipelineStageFlagBits::eComputeShader | VkPipelineStageFlagBits::eRayTracingShaderNV | VkPipelineStageFlagBits::eAccelerationStructureBuildNV | VkPipelineStageFlagBits::eHost | VkPipelineStageFlagBits::eAllGraphics | VkPipelineStageFlagBits::eColorAttachmentOutput;// | VkPipelineStageFlagBits::eTopOfPipe;
-        cmdBuffer->pipelineBarrier(srcStageMask, dstStageMask, {}, { memoryBarrier }, {}, {});
-    };
-
+    
     // create secondary command buffers for batching compute invocations
     static inline auto createCommandBuffer(const vkt::uni_arg<VkDevice>& device, const vkt::uni_arg<VkCommandPool>& cmdPool, const vkt::uni_arg<bool>& secondary = false, const vkt::uni_arg<bool>& once = false) {
         VkCommandBuffer cmdBuffer = {};
 
-        VkCommandBufferAllocateInfo cmdi = VkCommandBufferAllocateInfo{};
+        vkh::VkCommandBufferAllocateInfo cmdi = vkh::VkCommandBufferAllocateInfo{};
         cmdi.commandPool = cmdPool;
-        cmdi.level = (secondary ? VkCommandBufferLevel::eSecondary : VkCommandBufferLevel::ePrimary);
+        cmdi.level = (secondary ? VK_COMMAND_BUFFER_LEVEL_SECONDARY : VK_COMMAND_BUFFER_LEVEL_PRIMARY);
         cmdi.commandBufferCount = 1;
-        cmdBuffer = (device->allocateCommandBuffers(cmdi))[0];
+        //cmdBuffer = (device->allocateCommandBuffers(cmdi))[0];
+        vkAllocateCommandBuffers(device, cmdi, &cmdBuffer);
 
         //VkCommandBufferInheritanceInfo inhi = VkCommandBufferInheritanceInfo{};
         //inhi.pipelineStatistics = VkQueryPipelineStatisticFlagBits::eComputeShaderInvocations;
 
-        VkCommandBufferBeginInfo bgi = {};
-        bgi.flags = {};
-        bgi.flags = once ? VkCommandBufferUsageFlagBits::eOneTimeSubmit : VkCommandBufferUsageFlagBits::eSimultaneousUse;
+        vkh::VkCommandBufferBeginInfo bgi = {};
+        bgi.flags = once ? VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT : VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT;
         //bgi.pInheritanceInfo = secondary ? &inhi : nullptr;
-        cmdBuffer.begin(bgi);
+
+        //cmdBuffer.begin(bgi);
 
         return cmdBuffer;
     };
+
+     
+    #ifdef TBA_VULKAN_HPP_DEPRECATED
+    // general command buffer pipeline barrier (updated 26.04.2020)
+    /*static inline void commandBarrier(const vkt::uni_arg<VkCommandBuffer>& cmdBuffer) { // TODO:
+    ReMake Command Barrier VkMemoryBarrier memoryBarrier = {}; memoryBarrier.srcAccessMask =
+    (VkAccessFlagBits::eHostWrite | VkAccessFlagBits::eColorAttachmentWrite |
+    VkAccessFlagBits::eAccelerationStructureWriteNV | VkAccessFlagBits::eShaderWrite |
+    VkAccessFlagBits::eTransferWrite | VkAccessFlagBits::eTransformFeedbackCounterWriteEXT |
+    VkAccessFlagBits::eMemoryWrite | VkAccessFlagBits::eTransformFeedbackWriteEXT);
+        memoryBarrier.dstAccessMask = (VkAccessFlagBits::eHostRead  |
+    VkAccessFlagBits::eColorAttachmentRead  | VkAccessFlagBits::eAccelerationStructureReadNV  |
+    VkAccessFlagBits::eShaderRead  | VkAccessFlagBits::eTransferRead  |
+    VkAccessFlagBits::eTransformFeedbackCounterReadEXT  | VkAccessFlagBits::eMemoryRead  |
+    VkAccessFlagBits::eUniformRead); const auto srcStageMask =
+    VkPipelineStageFlagBits::eTransformFeedbackEXT | VkPipelineStageFlagBits::eTransfer |
+    VkPipelineStageFlagBits::eComputeShader | VkPipelineStageFlagBits::eRayTracingShaderNV |
+    VkPipelineStageFlagBits::eAccelerationStructureBuildNV | VkPipelineStageFlagBits::eHost |
+    VkPipelineStageFlagBits::eAllGraphics | VkPipelineStageFlagBits::eColorAttachmentOutput;// |
+    VkPipelineStageFlagBits::eBottomOfPipe; const auto dstStageMask =
+    VkPipelineStageFlagBits::eTransformFeedbackEXT | VkPipelineStageFlagBits::eTransfer |
+    VkPipelineStageFlagBits::eComputeShader | VkPipelineStageFlagBits::eRayTracingShaderNV |
+    VkPipelineStageFlagBits::eAccelerationStructureBuildNV | VkPipelineStageFlagBits::eHost |
+    VkPipelineStageFlagBits::eAllGraphics | VkPipelineStageFlagBits::eColorAttachmentOutput;// |
+    VkPipelineStageFlagBits::eTopOfPipe; cmdBuffer->pipelineBarrier(srcStageMask, dstStageMask, {},
+    { memoryBarrier }, {}, {});
+    };*/
 
     // add dispatch in command buffer (with default pipeline barrier)
     static inline auto cmdDispatch(const vkt::uni_arg<VkCommandBuffer>& cmd, const vkt::uni_arg<VkPipeline>& pipeline, const vkt::uni_arg<uint32_t>& x = 1u, const vkt::uni_arg<uint32_t>& y = 1u, const vkt::uni_arg<uint32_t>& z = 1u, const vkt::uni_arg<bool>& barrier = true) {
@@ -408,26 +427,35 @@ namespace vkt {
         buildCommand.setCheckpointNV(labelName.c_str(), dispatch);
 #endif
     };
+    #endif
+
 
     // 
+ #ifdef VULKAN_HPP
     template<class T> 
-    T handleHpp(VkResultValue<T> V) {
+    T handleHpp(vk::ResultValue<T> V) {
         assert(V.result == VkResult::eSuccess);
         return std::move(V.value);
     };
+ #endif
 
-    // 
+    // TODO: Add XVK support
     struct MemoryAllocationInfo { // 
         uint32_t glMemory = 0u, glID = 0u;
         std::vector<uint32_t> queueFamilyIndices = {};
 
+        // Required for dispatch load (and for XVK)
+        VkInstance instance = {};
+        VkPhysicalDevice physicalDevice = {};
         VkDevice device = {};
+
+        // 
         VkDeviceMemory memory = {};
         VkDeviceSize offset = 0ull;
         VkDeviceSize range = 0ull;
         VkDeviceSize reqSize = 0ull;
-        VkImageLayout initialLayout = VkImageLayout::eUndefined;
-        VkDispatchLoaderDynamic dispatch = {};
+        VkImageLayout initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+        //VkDispatchLoaderDynamic dispatch = {};
 
         HANDLE handle = {};
         void* pMapped = nullptr;

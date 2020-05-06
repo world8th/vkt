@@ -1434,6 +1434,43 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
 #endif
     } VkBindAccelerationStructureMemoryInfoKHR;
 
+    //
+    typedef struct VkShaderModuleCreateInfo {
+        VkStructureType              sType      = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+        const void*                  pNext      = nullptr;
+        VkShaderModuleCreateFlags    flags      = {};
+        size_t                       codeSize   = 0ull;
+        const uint32_t*              pCode      = nullptr;
+
+        VkShaderModuleCreateInfo& setCode(const std::vector<uint32_t>& V = {}) { pCode = V.data(); codeSize = V.size(); return *this; };
+
+        STRUCT_OPERATORS(VkShaderModuleCreateInfo)
+        VK_HPP_STRUCT_OPERATORS(VkShaderModuleCreateInfo, vk::ShaderModuleCreateInfo)
+    } VkShaderModuleCreateInfo;
+
+    // 
+    typedef struct VkCommandBufferAllocateInfo {
+        VkStructureType         sType               = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+        const void*             pNext               = nullptr;
+        VkCommandPool           commandPool         = {};
+        VkCommandBufferLevel    level               = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+        uint32_t                commandBufferCount  = 1u;
+
+        STRUCT_OPERATORS(VkCommandBufferAllocateInfo)
+        VK_HPP_STRUCT_OPERATORS(VkCommandBufferAllocateInfo, vk::CommandBufferAllocateInfo)
+    } VkCommandBufferAllocateInfo;
+
+    // 
+    typedef struct VkCommandBufferBeginInfo {
+        VkStructureType                          sType              = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+        const void*                              pNext              = nullptr;
+        VkCommandBufferUsageFlags                flags              = {};
+        const VkCommandBufferInheritanceInfo*    pInheritanceInfo   = nullptr;
+
+        STRUCT_OPERATORS(VkCommandBufferBeginInfo)
+        VK_HPP_STRUCT_OPERATORS(VkCommandBufferBeginInfo, vk::CommandBufferBeginInfo)
+    } VkCommandBufferBeginInfo;
+
 
 #pragma pack(pop)
 

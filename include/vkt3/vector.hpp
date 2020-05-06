@@ -95,14 +95,14 @@ namespace vkt {
         virtual const unsigned& getGLMemory() const { return this->info.glMemory; };
 
         // BETA
-        virtual VkDispatchLoaderDynamic dispatchLoaderDynamic() {
-            return this->info.dispatch;
-        }
-
+        //virtual VkDispatchLoaderDynamic dispatchLoaderDynamic() {
+        //    return this->info.dispatch;
+        //}
+         
         // BETA
-        virtual VkDispatchLoaderDynamic dispatchLoaderDynamic() const {
-            return this->info.dispatch;
-        }
+        //virtual VkDispatchLoaderDynamic dispatchLoaderDynamic() const {
+        ///    return this->info.dispatch;
+        //}
 
         // 
         virtual void* map() { return info.pMapped; };
@@ -112,24 +112,12 @@ namespace vkt {
         virtual void  unmap() {};
 
         // 
-        virtual const VkBuffer& getImage() const { return this->buffer; };
-        virtual VkBuffer& getImage() { return this->buffer; };
-
-        // 
-        virtual operator VkBuffer& () { return buffer; };
-        virtual operator VkBuffer& () { return reinterpret_cast<VkBuffer&>(buffer); };
-
-        // 
         virtual operator const VkBuffer& () const { return buffer; };
-        virtual operator const VkBuffer& () const { return reinterpret_cast<const VkBuffer&>(buffer); };
-
-        // VMA HACK FOR EXTRACT DEVICE
         virtual operator const VkDevice& () const { return info.device; };
-        virtual operator const VkDevice& () const { return reinterpret_cast<const VkDevice&>(info.device); };
 
-        // 
+        //
+        virtual operator VkBuffer &() { return buffer; };
         virtual operator VkDevice& () { return info.device; };
-        virtual operator VkDevice& () { return reinterpret_cast<VkDevice&>(info.device); };
 
         //
         virtual VkDevice& getDevice() { return info.device; };
@@ -138,7 +126,7 @@ namespace vkt {
         // Avoid recursion or stack overflow
         virtual VkBuffer& getBuffer() { return buffer; };
         virtual const VkBuffer& getBuffer() const { return buffer; };
-
+         
         // 
         virtual VkDeviceSize& range() { return info.range; };
         virtual const VkDeviceSize& range() const { return info.range; };
@@ -154,7 +142,7 @@ namespace vkt {
         // Queue Family Indices
         virtual std::vector<uint32_t>& getQueueFamilyIndices() { return this->info.queueFamilyIndices; };
         virtual const std::vector<uint32_t>& getQueueFamilyIndices() const { return this->info.queueFamilyIndices; };
-
+         
         // 
         virtual vkh::VkDeviceOrHostAddressKHR deviceAddress() {
             if (!this->usage.eSharedDeviceAddress) { std::cerr << "Bad Device Address" << std::endl; assert(true); };
