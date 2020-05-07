@@ -86,7 +86,7 @@ namespace vkt
     }
 
 
-
+    // CRITICAL: NEEDS SUPPORT FOR JAVACPP!!! 
     class GPUFramework : std::enable_shared_from_this<GPUFramework> {
     protected:
 
@@ -289,7 +289,11 @@ namespace vkt
         };
 
         // minimal features
-        vk::PhysicalDeviceProperties2 gProperties{};
+        vkh::VkPhysicalDeviceProperties2 gProperties{};
+        vkh::VkPhysicalDeviceFeatures2 gFeatures{};
+        vkh::VkPhysicalDeviceMemoryProperties2 memoryProperties = {};
+
+        // 
         vk::PhysicalDeviceTransformFeedbackFeaturesEXT gTrasformFeedback{};
         vk::PhysicalDeviceRayTracingFeaturesKHR gRayTracing{};
         vk::PhysicalDeviceTexelBufferAlignmentFeaturesEXT gTexelBufferAligment{};
@@ -297,7 +301,6 @@ namespace vkt
         vk::PhysicalDevice8BitStorageFeatures gStorage8{};
         vk::PhysicalDeviceDescriptorIndexingFeaturesEXT gDescIndexing{};
         vk::PhysicalDeviceFloat16Int8FeaturesKHR gFloat16U8{}; // Vulkan 1.3
-        vk::PhysicalDeviceFeatures2 gFeatures{};
         vk::PhysicalDeviceBufferDeviceAddressFeatures gDeviceAddress{};
 
         // XVK loaded (NEW!)
@@ -321,7 +324,6 @@ namespace vkt
         VkImage depthImage = {};
         VkImageView depthImageView = {};
         VkPipelineCache pipelineCache = {};
-        VkPhysicalDeviceMemoryProperties2 memoryProperties = {};
         VkDebugUtilsMessengerEXT messenger = {};
 
         VmaAllocator allocator = {};
@@ -475,32 +477,17 @@ namespace vkt
             // create the "debug utils EXT" callback object
             VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo{};
             debugCreateInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
-            debugCreateInfo.messageSeverity =
-                VkDebugUtilsMessageSeverityFlagBitsEXT::VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT |
-                //VkDebugUtilsMessageSeverityFlagBitsEXT::VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT |
-                VkDebugUtilsMessageSeverityFlagBitsEXT::VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
-                VkDebugUtilsMessageSeverityFlagBitsEXT::VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
-            debugCreateInfo.messageType =
-                VkDebugUtilsMessageTypeFlagBitsEXT::VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
-                VkDebugUtilsMessageTypeFlagBitsEXT::VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
-                VkDebugUtilsMessageTypeFlagBitsEXT::VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
+            debugCreateInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
+            debugCreateInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
             debugCreateInfo.pfnUserCallback = DebugCallback;    // global function
             debugCreateInfo.pUserData = nullptr;
-
-            // 
-#ifdef VKT_ENABLE_DEBUG
-            //instance = VkcreateInstance(cinstanceinfo.setPNext(&debugCreateInfo));
-#else
-            //instance = VkcreateInstance(cinstanceinfo);
-#endif
 
             // Dynamically Load the Vulkan library
             instanceDispatch = std::make_shared<xvk::Instance>(vkt::vkGlobal::loader, (this->instanceCreate = cinstanceinfo));
             instance = instanceDispatch->handle;
 
             // get physical device for application
-            //physicalDevices = instance.enumeratePhysicalDevices();
-
+            physicalDevices = vkh::vsEnumeratePhysicalDevices(this->instance);
 
             // 
 #ifdef VKT_ENABLE_DEBUG
@@ -560,13 +547,11 @@ namespace vkt
             this->gFeatures.pNext = &this->gDescIndexing;
 
             // 
-            vkGetPhysicalDeviceFeatures2(physicalDevice, &reinterpret_cast<VkPhysicalDeviceFeatures2&>(this->gFeatures));
-            vkGetPhysicalDeviceProperties2(physicalDevice, &reinterpret_cast<VkPhysicalDeviceProperties2&>(this->gProperties));
-            vkGetPhysicalDeviceMemoryProperties2(physicalDevice, &reinterpret_cast<VkPhysicalDeviceMemoryProperties2&>(this->memoryProperties));
-            this->memoryProperties = vk::PhysicalDevice(physicalDevice).getMemoryProperties2(); // TODO: vkh helper for getting
+            vkh::vsGetPhysicalDeviceFeatures2(physicalDevice, this->gFeatures);
+            vkh::vsGetPhysicalDeviceProperties2(physicalDevice, this->gProperties);
+            vkh::vsGetPhysicalDeviceMemoryProperties2(physicalDevice, this->memoryProperties);
 
             // get features and queue family properties
-            //auto gpuFeatures = gpu.getFeatures();
             auto gpuQueueProps = vkh::vsGetPhysicalDeviceQueueFamilyProperties(physicalDevice); // TODO: vkh helper for getting
 
             // queue family initial

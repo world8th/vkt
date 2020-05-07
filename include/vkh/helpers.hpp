@@ -72,9 +72,33 @@ namespace vkh {
         VkFormatProperties props = {}; vkGetPhysicalDeviceFormatProperties(physicalDevice, format, &props); return props;
     };
 
+
     inline auto vsGetPhysicalDeviceMemoryProperties(const VkPhysicalDevice& physicalDevice) {
         VkPhysicalDeviceMemoryProperties props = {}; vkGetPhysicalDeviceMemoryProperties(physicalDevice, &reinterpret_cast<::VkPhysicalDeviceMemoryProperties&>(props)); return props;
     };
+
+    inline auto vsGetPhysicalDeviceMemoryProperties2(const VkPhysicalDevice& physicalDevice, vkh::VkPhysicalDeviceMemoryProperties2& props) {
+        vkGetPhysicalDeviceMemoryProperties2(physicalDevice, &reinterpret_cast<::VkPhysicalDeviceMemoryProperties2&>(props)); return props;
+    };
+
+
+    inline auto vsGetPhysicalDeviceProperties(const VkPhysicalDevice& physicalDevice) {
+        VkPhysicalDeviceProperties props = {}; vkGetPhysicalDeviceProperties(physicalDevice, &reinterpret_cast<::VkPhysicalDeviceProperties&>(props)); return props;
+    };
+
+    inline auto vsGetPhysicalDeviceProperties2(const VkPhysicalDevice& physicalDevice, vkh::VkPhysicalDeviceProperties2& props) {
+        vkGetPhysicalDeviceProperties2(physicalDevice, &reinterpret_cast<::VkPhysicalDeviceProperties2&>(props)); return props;
+    };
+
+
+    inline auto vsGetPhysicalDeviceFeatures(const VkPhysicalDevice& physicalDevice) {
+        VkPhysicalDeviceProperties props = {}; vkGetPhysicalDeviceFeatures(physicalDevice, &reinterpret_cast<::VkPhysicalDeviceFeatures&>(props)); return props;
+    };
+
+    inline auto vsGetPhysicalDeviceFeatures2(const VkPhysicalDevice& physicalDevice, vkh::VkPhysicalDeviceFeatures2& props) {
+        vkGetPhysicalDeviceFeatures2(physicalDevice, &reinterpret_cast<::VkPhysicalDeviceFeatures2&>(props)); return props;
+    };
+
 
     inline auto vsGetPhysicalDeviceSurfaceFormatsKHR(const VkDevice& device, const VkSwapchainKHR& swapchain) { // TODO: V2
         uint32_t count = 0u; vkGetSwapchainImagesKHR(device, swapchain, &count, nullptr);

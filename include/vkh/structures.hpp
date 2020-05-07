@@ -1630,6 +1630,66 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         VK_HPP_STRUCT_OPERATORS(VkSemaphoreCreateInfo, vk::SemaphoreCreateInfo)
     } VkSemaphoreCreateInfo;
 
+    // 
+    typedef struct VkPhysicalDeviceMemoryProperties2 {
+        VkStructureType                     sType            = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MEMORY_PROPERTIES_2;
+        void*                               pNext            = nullptr;
+        VkPhysicalDeviceMemoryProperties    memoryProperties = {};
+
+        operator const VkPhysicalDeviceMemoryProperties&() const { return memoryProperties; };
+        operator VkPhysicalDeviceMemoryProperties&() { return memoryProperties; };
+        operator const VkPhysicalDeviceMemoryProperties*() const { return &memoryProperties; };
+        operator VkPhysicalDeviceMemoryProperties*() { return &memoryProperties; };
+
+        STRUCT_OPERATORS(VkPhysicalDeviceMemoryProperties2)
+        VK_HPP_STRUCT_OPERATORS(VkPhysicalDeviceMemoryProperties2, vk::PhysicalDeviceMemoryProperties2)
+    } VkPhysicalDeviceMemoryProperties2;
+
+    // 
+    typedef struct VkPhysicalDeviceProperties2 {
+        VkStructureType               sType      = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
+        void*                         pNext      = nullptr;
+        VkPhysicalDeviceProperties    properties = {};
+
+        operator const VkPhysicalDeviceProperties&() const { return properties; };
+        operator VkPhysicalDeviceProperties&() { return properties; };
+        operator const VkPhysicalDeviceProperties*() const { return &properties; };
+        operator VkPhysicalDeviceProperties*() { return &properties; };
+
+        STRUCT_OPERATORS(VkPhysicalDeviceProperties2)
+        VK_HPP_STRUCT_OPERATORS(VkPhysicalDeviceProperties2, vk::PhysicalDeviceProperties2)
+    } VkPhysicalDeviceProperties2;
+
+    // 
+    typedef struct VkPhysicalDeviceFeatures2 {
+        VkStructureType             sType    = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
+        void*                       pNext    = nullptr;
+        VkPhysicalDeviceFeatures    features = {};
+
+        operator const VkPhysicalDeviceFeatures&() const { return features; };
+        operator VkPhysicalDeviceFeatures&() { return features; };
+        operator const VkPhysicalDeviceFeatures*() const { return &features; };
+        operator VkPhysicalDeviceFeatures*() { return &features; };
+
+        STRUCT_OPERATORS(VkPhysicalDeviceFeatures2)
+        VK_HPP_STRUCT_OPERATORS(VkPhysicalDeviceFeatures2, vk::PhysicalDeviceFeatures2)
+    } VkPhysicalDeviceFeatures2;
+
+    // 
+    typedef struct VkMemoryRequirements2 {
+        VkStructureType         sType               = VK_STRUCTURE_TYPE_MEMORY_REQUIREMENTS_2;
+        void*                   pNext               = nullptr;
+        VkMemoryRequirements    memoryRequirements  = {};
+
+        operator const VkMemoryRequirements&() const { return memoryRequirements; };
+        operator VkMemoryRequirements&() { return memoryRequirements; };
+        operator const VkMemoryRequirements*() const { return &memoryRequirements; };
+        operator VkMemoryRequirements*() { return &memoryRequirements; };
+
+        STRUCT_OPERATORS(VkMemoryRequirements2)
+        VK_HPP_STRUCT_OPERATORS(VkMemoryRequirements2, vk::MemoryRequirements2)
+    } VkMemoryRequirements2;
+
 
 #pragma pack(pop)
 
