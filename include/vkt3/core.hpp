@@ -72,16 +72,15 @@ namespace vkt {
 
     public: friend uni_ptr<T>; // 
         uni_ptr<T>() {};
-        uni_ptr<T>(std::shared_ptr<T> shared) : shared(shared) {};
-        uni_ptr<T>(T* ptr) : regular(std::ref(*ptr)){};
-        uni_ptr<T>(T& ptr) : regular(std::ref(ptr)){};  // for argument passing
-        //uni_ptr<T>(uni_ptr<T>&& ptr) : shared(ptr.shared), regular(std::ref(*ptr.regular)) {};
+        uni_ptr<T>(std::shared_ptr<T> shared) : shared(shared), regular(std::ref(*shared)) {};
+        uni_ptr<T>(T* ptr) : regular(std::ref(*ptr)) {};
+        uni_ptr<T>(T& ptr) : regular(std::ref(ptr)) {};  // for argument passing
         uni_ptr<T>(const uni_ptr<T>& ptr) : shared(ptr.shared), regular(std::ref(*ptr.regular)) {};
 
         // 
         virtual inline uni_ptr* operator= (T* ptr) { regular = std::ref(*ptr); return this; };
         virtual inline uni_ptr* operator= (T& ptr) { regular = std::ref( ptr); return this; }; // for argument passing
-        virtual inline uni_ptr* operator= (std::shared_ptr<T> ptr) { shared = ptr; return this; };
+        virtual inline uni_ptr* operator= (std::shared_ptr<T> ptr) { shared = ptr, regular = std::ref(*ptr); return this; };
         virtual inline uni_ptr* operator= (const uni_ptr<T>& ptr) { 
             T& ref = *ptr.regular;
             shared = ptr.shared, regular = std::ref(ref);
@@ -103,7 +102,7 @@ namespace vkt {
 
         // 
         virtual inline std::shared_ptr<T>& get_shared() { return (this->shared = (this->shared ? this->shared : std::shared_ptr<T>(get_ptr()))); };
-        virtual inline  std::shared_ptr<T>  get_shared() const { return (this->shared ? this->shared : std::shared_ptr<T>(const_cast<T*>(get_ptr()))); };
+        virtual inline std::shared_ptr<T>  get_shared() const { return (this->shared ? this->shared : std::shared_ptr<T>(const_cast<T*>(get_ptr()))); };
 
         // 
         virtual inline T* get_ptr() { 
@@ -126,12 +125,12 @@ namespace vkt {
         virtual inline const T* ptr() const { return get_ptr(); };
 
         // 
-        virtual inline T& ref() { T& r = *regular, s = *shared; return regular ? r : s; };
-        //virtual inline const T& ref() const { const T& r = *regular, s = *shared; return regular ? r : s; };
+        virtual inline T& ref() { return *regular; };
+        virtual inline const T& ref() const { return *regular; };
 
         // experimental
         virtual inline operator T& () { return ref(); };
-        //virtual inline operator const T& () const { return ref(); };
+        virtual inline operator const T& () const { return ref(); };
 
         // 
         virtual inline operator T* () { return ptr(); };
@@ -147,7 +146,7 @@ namespace vkt {
 
         //
         virtual inline T& operator*() { return *get_ptr(); };
-        //virtual inline const T& operator*() const { return *get_ptr(); };
+        virtual inline const T& operator*() const { return *get_ptr(); };
     };
 
     template<class T = uint8_t>
@@ -163,8 +162,8 @@ namespace vkt {
         // 
         virtual uni_arg<T>& operator= (const T& ptr) { storage =  ptr; return *this; };
         virtual uni_arg<T>& operator= (const T* ptr) { storage = *ptr; return *this; };
-        virtual uni_arg<T>& operator= (uni_arg<T> t) { storage = t.ref(); return *this; };
-        virtual uni_arg<T>& operator= (uni_ptr<T> p) { storage = p.ref(); return *this; };
+        virtual uni_arg<T>& operator= (uni_arg<T> t) { storage =  t.ref(); return *this; };
+        virtual uni_arg<T>& operator= (uni_ptr<T> p) { storage = *p.ptr(); return *this; };
 
         // experimental
         virtual operator T& () { return ref(); };
