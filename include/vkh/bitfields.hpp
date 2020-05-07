@@ -1,8 +1,8 @@
 #pragma once // #
 
+// 
 #include <memory>
 #include <vector>
-//#define VK_ENABLE_BETA_EXTENSIONS
 #include <glm/glm.hpp>
 
 // Enable Vulkan-HPP when defined
@@ -10,13 +10,19 @@
 #define ENABLE_VULKAN_HPP
 #endif
 
+//
+#include <vulkan/vulkan.h>
+
 // When enabled, use Vulkan-HPP support...
 #ifdef ENABLE_VULKAN_HPP
 #include <vulkan/vulkan.hpp>
 #endif
 
+// 
+#include <xvk/xvk.hpp>
 #include "core.hpp"
 
+// 
 namespace vkh {
 
     #pragma pack(push, 4) // Mostly, should be uint32_t
@@ -502,6 +508,15 @@ namespace vkh {
         VK_HPP_OPERATORS(VkExternalMemoryHandleTypeFlags, vk::ExternalMemoryHandleTypeFlags, vk::ExternalMemoryHandleTypeFlagBits)
     };
 
+    //
+    struct VkCommandPoolCreateFlags { ::VkFlags
+        eTransient : 1,
+        eResetCommandBuffer : 1,
+        eProtected : 1;
+
+        OPERATORS(VkCommandPoolCreateFlags, ::VkCommandPoolCreateFlagBits, ::VkFlags)
+        VK_HPP_OPERATORS(VkCommandPoolCreateFlags, vk::CommandPoolCreateFlags, vk::CommandPoolCreateFlagBits)
+    };
 
 
 #pragma pack(pop)

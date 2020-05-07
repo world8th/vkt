@@ -229,27 +229,6 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
     } VkDescriptorPoolCreateInfo;
 
     // 
-    typedef struct VkDeviceCreateInfo {
-        VkStructureType                    sType                    = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-        const void*                        pNext                    = nullptr;
-        VkDeviceCreateFlags                flags                    = {}; // TODO: FLAGS
-        uint32_t                           queueCreateInfoCount     = 0u;
-        const VkDeviceQueueCreateInfo*     pQueueCreateInfos        = nullptr; // TODO: NATIVE
-        uint32_t                           enabledLayerCount        = 0u;
-        const char* const*                 ppEnabledLayerNames      = nullptr;
-        uint32_t                           enabledExtensionCount    = 0u;
-        const char* const*                 ppEnabledExtensionNames  = nullptr;
-        const VkPhysicalDeviceFeatures*    pEnabledFeatures         = nullptr; // TODO: NATIVE
-
-        VkDeviceCreateInfo& setQueueCreateInfos(const std::vector<VkDeviceQueueCreateInfo>& V = {}) { pQueueCreateInfos = V.data(); queueCreateInfoCount = static_cast<uint32_t>(V.size()); return *this; };
-        VkDeviceCreateInfo& setPEnabledExtensionNames(const std::vector<const char*>& V = {}) { ppEnabledExtensionNames = V.data(); enabledExtensionCount = static_cast<uint32_t>(V.size()); return *this; };
-        VkDeviceCreateInfo& setPEnabledLayerNames(const std::vector<const char* >& V = {}) { ppEnabledLayerNames = V.data(); enabledLayerCount = static_cast<uint32_t>(V.size()); return *this; };
-
-        STRUCT_OPERATORS(VkDeviceCreateInfo)
-        VK_HPP_STRUCT_OPERATORS(VkDeviceCreateInfo,vk::DeviceCreateInfo)
-    } VkDeviceCreateInfo;
-
-    // 
     typedef struct VkBufferViewCreateInfo {
         VkStructureType            sType    = VK_STRUCTURE_TYPE_BUFFER_VIEW_CREATE_INFO;
         const void*                pNext    = nullptr;
@@ -1567,6 +1546,80 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         STRUCT_OPERATORS(VkSubmitInfo)
         VK_HPP_STRUCT_OPERATORS(VkSubmitInfo, vk::SubmitInfo)
     } VkSubmitInfo;
+
+    // 
+    typedef struct VkPipelineCacheCreateInfo {
+        VkStructureType               sType             = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
+        const void*                   pNext             = nullptr;
+        VkPipelineCacheCreateFlags    flags             = {};
+        size_t                        initialDataSize   = 0ull;
+        const void*                   pInitialData      = nullptr;
+
+        template<class T = uint8_t> 
+        VkPipelineCacheCreateInfo& setInitialData(const std::vector<T>& V = {}) { pInitialData = V.data(); initialDataSize = V.size(); return *this; };
+
+        STRUCT_OPERATORS(VkPipelineCacheCreateInfo)
+        VK_HPP_STRUCT_OPERATORS(VkPipelineCacheCreateInfo, vk::PipelineCacheCreateInfo)
+    } VkPipelineCacheCreateInfo;
+
+    // 
+    typedef struct VkQueueFamilyProperties {
+        VkQueueFlags    queueFlags                  = {};
+        uint32_t        queueCount                  = 0u;
+        uint32_t        timestampValidBits          = 0u;
+        VkExtent3D      minImageTransferGranularity = {};
+
+        STRUCT_OPERATORS(VkQueueFamilyProperties)
+        VK_HPP_STRUCT_OPERATORS(VkQueueFamilyProperties, vk::QueueFamilyProperties)
+    } VkQueueFamilyProperties;
+
+    // 
+    typedef struct VkDeviceQueueCreateInfo {
+        VkStructureType             sType            = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+        const void*                 pNext            = nullptr;
+        VkDeviceQueueCreateFlags    flags            = {};
+        uint32_t                    queueFamilyIndex = 0u;
+        uint32_t                    queueCount       = 0u;
+        const float*                pQueuePriorities = nullptr;
+
+        VkDeviceQueueCreateInfo& setQueuePriorities(const std::vector<float>& V = {}) { pQueuePriorities = V.data(); queueCount = static_cast<uint32_t>(V.size()); return *this; };
+
+        STRUCT_OPERATORS(VkDeviceQueueCreateInfo)
+        VK_HPP_STRUCT_OPERATORS(VkDeviceQueueCreateInfo, vk::DeviceQueueCreateInfo)
+    } VkDeviceQueueCreateInfo;
+
+    // 
+    typedef struct VkCommandPoolCreateInfo {
+        VkStructureType             sType            = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+        const void*                 pNext            = nullptr;
+        VkCommandPoolCreateFlags    flags            = {};
+        uint32_t                    queueFamilyIndex = 0u;
+
+        STRUCT_OPERATORS(VkCommandPoolCreateInfo)
+        VK_HPP_STRUCT_OPERATORS(VkCommandPoolCreateInfo, vk::CommandPoolCreateInfo)
+    } VkCommandPoolCreateInfo;
+
+        // 
+    typedef struct VkDeviceCreateInfo {
+        VkStructureType                    sType                    = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+        const void*                        pNext                    = nullptr;
+        VkDeviceCreateFlags                flags                    = {}; // TODO: FLAGS
+        uint32_t                           queueCreateInfoCount     = 0u;
+        const VkDeviceQueueCreateInfo*     pQueueCreateInfos        = nullptr; // TODO: NATIVE
+        uint32_t                           enabledLayerCount        = 0u;
+        const char* const*                 ppEnabledLayerNames      = nullptr;
+        uint32_t                           enabledExtensionCount    = 0u;
+        const char* const*                 ppEnabledExtensionNames  = nullptr;
+        const VkPhysicalDeviceFeatures*    pEnabledFeatures         = nullptr; // TODO: NATIVE
+
+        VkDeviceCreateInfo& setQueueCreateInfos(const std::vector<VkDeviceQueueCreateInfo>& V = {}) { pQueueCreateInfos = V.data(); queueCreateInfoCount = static_cast<uint32_t>(V.size()); return *this; };
+        VkDeviceCreateInfo& setPEnabledExtensionNames(const std::vector<const char*>& V = {}) { ppEnabledExtensionNames = V.data(); enabledExtensionCount = static_cast<uint32_t>(V.size()); return *this; };
+        VkDeviceCreateInfo& setPEnabledLayerNames(const std::vector<const char* >& V = {}) { ppEnabledLayerNames = V.data(); enabledLayerCount = static_cast<uint32_t>(V.size()); return *this; };
+
+        STRUCT_OPERATORS(VkDeviceCreateInfo)
+        VK_HPP_STRUCT_OPERATORS(VkDeviceCreateInfo,vk::DeviceCreateInfo)
+    } VkDeviceCreateInfo;
+
 
 #pragma pack(pop)
 

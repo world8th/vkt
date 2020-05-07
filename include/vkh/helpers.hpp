@@ -14,6 +14,54 @@ namespace vkh {
     // W - Work in Progress, V - Verified, D - deprecated...
 
 
+    inline auto vsEnumeratePhysicalDevices(const VkInstance& instance) {
+        uint32_t count = 0u; vkEnumeratePhysicalDevices(instance, &count, nullptr);
+        std::vector<VkPhysicalDevice> data(count);
+        vkEnumeratePhysicalDevices(instance, &count, data.data());
+        return data;
+    };
+
+    inline auto vsEnumerateDeviceExtensionProperties(const VkPhysicalDevice& physicalDevice, const std::string layerName = "") {
+        uint32_t count = 0u; vkEnumerateDeviceExtensionProperties(physicalDevice, layerName.c_str(), &count, nullptr);
+        std::vector<VkExtensionProperties> data(count);
+        vkEnumerateDeviceExtensionProperties(physicalDevice, layerName.c_str(), &count, data.data());
+        return data;
+    };
+
+    inline auto vsEnumerateDeviceLayerProperties(const VkPhysicalDevice& physicalDevice) {
+        uint32_t count = 0u; vkEnumerateDeviceLayerProperties(physicalDevice, &count, nullptr);
+        std::vector<VkLayerProperties> data(count);
+        vkEnumerateDeviceLayerProperties(physicalDevice, &count, data.data());
+        return data;
+    };
+
+    inline auto vsGetPhysicalDeviceQueueFamilyProperties(const VkPhysicalDevice& physicalDevice) {
+        uint32_t count = 0u; vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &count, nullptr);
+        std::vector<vkh::VkQueueFamilyProperties> data(count);
+        vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &count, reinterpret_cast<::VkQueueFamilyProperties*>(data.data()));
+        return data;
+    };
+
+    inline auto vsEnumerateInstanceExtensionProperties(const std::string layerName = "") {
+        uint32_t count = 0u; vkEnumerateInstanceExtensionProperties(layerName.c_str(), &count, nullptr);
+        std::vector<VkExtensionProperties> data(count);
+        vkEnumerateInstanceExtensionProperties(layerName.c_str(), &count, data.data());
+        return data;
+    };
+
+    inline auto vsEnumerateInstanceLayerProperties() {
+        uint32_t count = 0u; vkEnumerateInstanceLayerProperties(&count, nullptr);
+        std::vector<VkLayerProperties> data(count);
+        vkEnumerateInstanceLayerProperties(&count, data.data());
+        return data;
+    };
+
+    inline auto vsEnumerateInstanceVersion() {
+        uint32_t version = 0u; vkEnumerateInstanceVersion(&version);
+        return version;
+    };
+
+
     // LEGACY Functional
     class VsRayTracingPipelineCreateInfoHelperNV {
     protected:

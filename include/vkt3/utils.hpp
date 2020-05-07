@@ -31,8 +31,9 @@
 #endif
 
 // 
-//#include <vulkan/vulkan.hpp>
 #include <vma/vk_mem_alloc.h>
+#include <vulkan/vulkan.h>
+#include <vulkan/vulkan.hpp>
 #include <xvk/xvk.hpp>
 
 // 
@@ -385,9 +386,14 @@ namespace vkt {
 
     // Global initials
     class vkGlobal { public: // Currently, only Vulkan Loader
-        static inline xvk::Loader loader = {};
         static inline bool initialized = false;
-        vkGlobal(){ if (!(initialized = loader())) { std::cerr << "vulkan load failed..." << std::endl; }; };
+        static inline vkt::uni_ptr<xvk::Loader> loader = {};
+        vkGlobal() { 
+            if (!initialized) {
+                loader = std::make_shared<xvk::Loader>();
+                if (!(initialized = (*loader)())) { std::cerr << "vulkan load failed..." << std::endl; }; 
+            };
+        };
     };
 
     // TODO: Add XVK support

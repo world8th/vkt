@@ -227,7 +227,7 @@ namespace vkt {
 
             // when loader initialized
             if (vkt::vkGlobal::initialized) {
-                this->info.instanceDispatch = std::make_shared<xvk::Instance>(&vkt::vkGlobal::loader, info.instance);
+                this->info.instanceDispatch = std::make_shared<xvk::Instance>(vkt::vkGlobal::loader, info.instance);
                 this->info.deviceDispatch = std::make_shared<xvk::Device>(this->info.instanceDispatch, info.device);
             };
 

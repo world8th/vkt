@@ -19,17 +19,24 @@
 #define GLFW_INCLUDE_VULKAN
 
 // 
+#include <vulkan/vulkan.h>
+#include <vulkan/vulkan.hpp>
+#include <xvk/xvk.hpp>
+
+// 
 #if defined(VKT_ENABLE_GLFW_SUPPORT) || defined(ENABLE_OPENGL_INTEROP)
 #include <GLFW/glfw3.h>
 #include <GLFW/glfw3native.h>
 #endif
 
 // Force include for avoid GLAD problem...
-#include <vkt2/utils.hpp>
-#include <vkt2/structs.hpp>
-#include <vkt2/core.hpp>
-#include <vkt2/vector.hpp>
-#include <vkt2/image.hpp>
+#include <vkh/structures.hpp>
+#include <vkh/helpers.hpp>
+#include <vkt3/utils.hpp>
+#include <vkt3/structs.hpp>
+#include <vkt3/core.hpp>
+#include <vkt3/vector.hpp>
+#include <vkt3/image.hpp>
 
 //#define VKT_ENABLE_DEBUG
 
@@ -89,7 +96,7 @@ namespace vkt
         std::vector<const char*> usedDeviceLayers = {};
         std::vector<const char*> usedLayers = {};
 
-        std::vector<VkDeviceQueueCreateInfo> usedQueueCreateInfos = {};
+        std::vector<vkh::VkDeviceQueueCreateInfo> usedQueueCreateInfos = {};
 
 
         // instance extensions
@@ -250,7 +257,7 @@ namespace vkt
         //GPUFramework(const GPUFramework& fw) { *this = fw; };
         //GPUFramework(GPUFramework* fw) { *this = fw; };
         GPUFramework(vkt::uni_ptr<GPUFramework> fw) {
-            *this = fw; 
+            *this = fw; vkt::vkGlobal();
         };
 
         // 
@@ -283,20 +290,20 @@ namespace vkt
         };
 
         // minimal features
-        VkPhysicalDeviceTransformFeedbackFeaturesEXT gTrasformFeedback{};
-        VkPhysicalDeviceRayTracingFeaturesKHR gRayTracing{};
-        VkPhysicalDeviceTexelBufferAlignmentFeaturesEXT gTexelBufferAligment{};
-        VkPhysicalDevice16BitStorageFeatures gStorage16{};
-        VkPhysicalDevice8BitStorageFeatures gStorage8{};
-        VkPhysicalDeviceDescriptorIndexingFeaturesEXT gDescIndexing{};
-        VkPhysicalDeviceFloat16Int8FeaturesKHR gFloat16U8{}; // Vulkan 1.3
-        VkPhysicalDeviceFeatures2 gFeatures{};
-        VkPhysicalDeviceBufferDeviceAddressFeatures gDeviceAddress{};
+        vk::PhysicalDeviceProperties2 gProperties{};
+        vk::PhysicalDeviceTransformFeedbackFeaturesEXT gTrasformFeedback{};
+        vk::PhysicalDeviceRayTracingFeaturesKHR gRayTracing{};
+        vk::PhysicalDeviceTexelBufferAlignmentFeaturesEXT gTexelBufferAligment{};
+        vk::PhysicalDevice16BitStorageFeatures gStorage16{};
+        vk::PhysicalDevice8BitStorageFeatures gStorage8{};
+        vk::PhysicalDeviceDescriptorIndexingFeaturesEXT gDescIndexing{};
+        vk::PhysicalDeviceFloat16Int8FeaturesKHR gFloat16U8{}; // Vulkan 1.3
+        vk::PhysicalDeviceFeatures2 gFeatures{};
+        vk::PhysicalDeviceBufferDeviceAddressFeatures gDeviceAddress{};
 
         // XVK loaded (NEW!)
-        xvk::Instance instanceDispatch = {};
-        xvk::Device deviceDispatch = {};
-        xvk::Loader vulkanLoader = {};
+        vkt::uni_ptr<xvk::Instance> instanceDispatch = {};
+        vkt::uni_ptr<xvk::Device> deviceDispatch = {};
 
         // JavaCPP and XVK compatible (NEW!)
         vkh::VkApplicationInfo applicationInfo = {};
@@ -422,7 +429,7 @@ namespace vkt
 
         inline VkInstance& createInstance() {
             // 
-            assert((instanceVersion = VkenumerateInstanceVersion()) >= VK_MAKE_VERSION(1, 2, 131));
+            assert((instanceVersion = vkh::vsEnumerateInstanceVersion()) >= VK_MAKE_VERSION(1, 2, 131));
 
             // get required extensions
 #ifdef VKT_ENABLE_GLFW_SUPPORT
@@ -436,7 +443,7 @@ namespace vkt
 #endif
 
             // get our needed extensions
-            auto installedExtensions = VkenumerateInstanceExtensionProperties();
+            auto installedExtensions = vkh::vsEnumerateInstanceExtensionProperties();
             auto extensions = std::vector<const char*>();
             for (auto w : wantedExtensions) {
                 for (auto i : installedExtensions)
@@ -450,7 +457,7 @@ namespace vkt
             }
 
             // get validation layers
-            auto installedLayers = VkenumerateInstanceLayerProperties();
+            auto installedLayers = vkh::vsEnumerateInstanceLayerProperties();
             auto layers = std::vector<const char*>();
             for (auto w : wantedLayers) {
                 for (auto i : installedLayers)
@@ -468,13 +475,13 @@ namespace vkt
             this->usedLayers = layers;
 
             // app info
-            auto appinfo = VkApplicationInfo{};
+            auto appinfo = vkh::VkApplicationInfo{};
             appinfo.pNext = nullptr;
             appinfo.pApplicationName = "VKTest";
             appinfo.apiVersion = VK_MAKE_VERSION(1, 2, 135);
 
             // create instance info
-            auto cinstanceinfo = VkInstanceCreateInfo{};
+            auto cinstanceinfo = vkh::VkInstanceCreateInfo{};
             cinstanceinfo.pApplicationInfo = &(this->applicationInfo = appinfo); // due JabaCPP unable to access
             cinstanceinfo.enabledExtensionCount = static_cast<uint32_t>(this->usedExtensions.size());
             cinstanceinfo.ppEnabledExtensionNames = this->usedExtensions.data();
@@ -504,13 +511,12 @@ namespace vkt
 #endif
 
             // Dynamically Load the Vulkan library
-            if (!vulkanLoader()) { return -1; };
-            instanceDispatch = xvk::Instance(&vulkanLoader, (this->instanceCreate = cinstanceinfo));
-            instance = instanceDispatch.handle;
+            instanceDispatch = std::make_shared<xvk::Instance>(vkt::vkGlobal::loader, (this->instanceCreate = cinstanceinfo));
+            instance = instanceDispatch->handle;
 
             // get physical device for application
             //physicalDevices = instance.enumeratePhysicalDevices();
-            
+
 
             // 
 #ifdef VKT_ENABLE_DEBUG
@@ -533,7 +539,7 @@ namespace vkt
 
             // use extensions
             auto deviceExtensions = std::vector<const char*>();
-            auto gpuExtensions = physicalDevice.enumerateDeviceExtensionProperties();
+            auto gpuExtensions = vkh::vsEnumerateDeviceExtensionProperties(physicalDevice); // TODO: vkh helper for getting
             for (auto w : wantedDeviceExtensions) {
                 for (auto i : gpuExtensions) {
                     if (std::string(i.extensionName).compare(w) == 0) {
@@ -544,7 +550,7 @@ namespace vkt
 
             // use layers
             auto deviceLayers = std::vector<const char*>();
-            auto gpuLayers = physicalDevice.enumerateDeviceLayerProperties();
+            auto gpuLayers = vkh::vsEnumerateDeviceLayerProperties(physicalDevice); // TODO: vkh helper for getting
             for (auto w : wantedLayers) {
                 for (auto i : gpuLayers) {
                     if (std::string(i.layerName).compare(w) == 0) {
@@ -560,34 +566,35 @@ namespace vkt
             //auto gConsertvative = VkPhysicalDeviceConservativeRasterizationPropertiesEXT{};
 
             // 
-            gTrasformFeedback.pNext = &gRayTracing;
-            gDeviceAddress.pNext = &gTrasformFeedback;
-            gTexelBufferAligment.pNext = &gDeviceAddress;
-            gFloat16U8.pNext = &gTexelBufferAligment;
-            gStorage8.pNext = &gFloat16U8;
-            gStorage16.pNext = &gStorage8;
-            gDescIndexing.pNext = &gStorage16;
-            gFeatures.pNext = &gDescIndexing;
+            this->gTrasformFeedback.pNext = &this->gRayTracing;
+            this->gDeviceAddress.pNext = &this->gTrasformFeedback;
+            this->gTexelBufferAligment.pNext = &this->gDeviceAddress;
+            this->gFloat16U8.pNext = &this->gTexelBufferAligment;
+            this->gStorage8.pNext = &this->gFloat16U8;
+            this->gStorage16.pNext = &this->gStorage8;
+            this->gDescIndexing.pNext = &this->gStorage16;
+            this->gFeatures.pNext = &this->gDescIndexing;
 
             // 
-            vkGetPhysicalDeviceFeatures2(physicalDevice, &reinterpret_cast<VkPhysicalDeviceFeatures2&>(gFeatures));
-            //physicalDevice.getFeatures2(&(VkPhysicalDeviceFeatures2&)gFeatures);
-            this->memoryProperties = physicalDevice.getMemoryProperties2();
+            vkGetPhysicalDeviceFeatures2(physicalDevice, &reinterpret_cast<VkPhysicalDeviceFeatures2&>(this->gFeatures));
+            vkGetPhysicalDeviceProperties2(physicalDevice, &reinterpret_cast<VkPhysicalDeviceProperties2&>(this->gProperties));
+            vkGetPhysicalDeviceMemoryProperties2(physicalDevice, &reinterpret_cast<VkPhysicalDeviceMemoryProperties2&>(this->memoryProperties));
+            this->memoryProperties = vk::PhysicalDevice(physicalDevice).getMemoryProperties2(); // TODO: vkh helper for getting
 
             // get features and queue family properties
             //auto gpuFeatures = gpu.getFeatures();
-            auto gpuQueueProps = physicalDevice.getQueueFamilyProperties();
+            auto gpuQueueProps = vkh::vsGetPhysicalDeviceQueueFamilyProperties(physicalDevice); // TODO: vkh helper for getting
 
             // queue family initial
             float priority = 1.0f;
             uint32_t computeFamilyIndex = -1, graphicsFamilyIndex = -1;
-            auto queueCreateInfos = std::vector<VkDeviceQueueCreateInfo>();
+            auto queueCreateInfos = std::vector<vkh::VkDeviceQueueCreateInfo>();
 
 #ifdef VKT_ENABLE_GLFW_SUPPORT
             for (auto queuefamily : gpuQueueProps) {
                 graphicsFamilyIndex++;
-                if (queuefamily.queueFlags & (VkQueueFlagBits::eCompute) && queuefamily.queueFlags & (VkQueueFlagBits::eGraphics) && physicalDevice.getSurfaceSupportKHR(graphicsFamilyIndex, surface())) {
-                    queueCreateInfos.push_back(VkDeviceQueueCreateInfo(VkDeviceQueueCreateFlags()).setQueueFamilyIndex(graphicsFamilyIndex).setQueueCount(1).setPQueuePriorities(&priority));
+                if (queuefamily.queueFlags.eCompute && queuefamily.queueFlags.eGraphics && physicalDevice.getSurfaceSupportKHR(graphicsFamilyIndex, surface())) {
+                    queueCreateInfos.push_back(vk::DeviceQueueCreateInfo(vk::DeviceQueueCreateFlags()).setQueueFamilyIndex(graphicsFamilyIndex).setQueueCount(1).setPQueuePriorities(&priority));
                     queueFamilyIndices.push_back(graphicsFamilyIndex);
                     break;
                 };
@@ -595,8 +602,8 @@ namespace vkt
 #else
             for (auto queuefamily : gpuQueueProps) {
                 computeFamilyIndex++;
-                if (queuefamily.queueFlags & (VkQueueFlagBits::eCompute)) {
-                    queueCreateInfos.push_back(VkDeviceQueueCreateInfo(VkDeviceQueueCreateFlags()).setQueueFamilyIndex(computeFamilyIndex).setQueueCount(1).setPQueuePriorities(&priority));
+                if (queuefamily.queueFlags.eCompute) { // TODO: vkh helper for getting, bitfeilds support
+                    queueCreateInfos.push_back(vkh::VkDeviceQueueCreateInfo{ .queueFamilyIndex = computeFamilyIndex, .queueCount = 1, .pQueuePriorities = &priority });
                     queueFamilyIndices.push_back(computeFamilyIndex);
                     break;
                 };
@@ -607,26 +614,23 @@ namespace vkt
             const uint32_t qptr = 0;
             if ((this->usedQueueCreateInfos = queueCreateInfos).size() > 0) {
                 this->queueFamilyIndex = queueFamilyIndices[qptr];
-                this->deviceDispatch = xvk::Device(&this->instanceDispatch, this->physicalDevice, (deviceCreate = vkh::VkDeviceCreateInfo{
-                    .pNext = &gFeatures,
+                this->deviceDispatch = std::make_shared<xvk::Device>(this->instanceDispatch, this->physicalDevice, (deviceCreate = vkh::VkDeviceCreateInfo{
+                    .pNext = reinterpret_cast<VkPhysicalDeviceFeatures2*>(&gFeatures),
                     .queueCreateInfoCount = uint32_t(this->usedQueueCreateInfos.size()),
-                    .pQueueCreateInfos = reinterpret_cast<::VkDeviceQueueCreateInfo*>(this->usedQueueCreateInfos.data()),
+                    .pQueueCreateInfos = reinterpret_cast<vkh::VkDeviceQueueCreateInfo*>(this->usedQueueCreateInfos.data()),
                     .enabledLayerCount = uint32_t(this->usedDeviceLayers.size()),
                     .ppEnabledLayerNames = this->usedDeviceLayers.data(),
                     .enabledExtensionCount = uint32_t(this->usedDeviceExtensions.size()),
                     .ppEnabledExtensionNames = this->usedDeviceExtensions.data(),
                     //.pEnabledFeatures = &(VkPhysicalDeviceFeatures&)(gFeatures.features)
                 }));
-                this->pipelineCache = this->device.createPipelineCache(VkPipelineCacheCreateInfo());
+                this->deviceDispatch->CreatePipelineCache(vkh::VkPipelineCacheCreateInfo(), nullptr, &this->pipelineCache);
             };
 
-            // TODO: XVK version 
-            //this->queue = this->device.getQueue(queueFamilyIndex, 0); // 
-            //this->fence = this->device.createFence(VkFenceCreateInfo().setFlags({}));
-            //this->commandPool = this->device.createCommandPool(VkCommandPoolCreateInfo(VkCommandPoolCreateFlags(VkCommandPoolCreateFlagBits::eResetCommandBuffer), queueFamilyIndex));
-            
-            //this->dispatch = VkDispatchLoaderDynamic(this->instance, this->device); // 
-            //this->dispatch = VkDispatchLoaderDynamic(this->instance, vkGetInstanceProcAddr, this->device, vkGetDeviceProcAddr); // 
+            // 
+            this->deviceDispatch->GetDeviceQueue(queueFamilyIndex, 0u, &this->queue);
+            this->deviceDispatch->CreateFence(vkh::VkFenceCreateInfo{}, nullptr, &this->fence);
+            this->deviceDispatch->CreateCommandPool(vkh::VkCommandPoolCreateInfo{ .flags = {.eResetCommandBuffer = 1}, .queueFamilyIndex = queueFamilyIndex }, nullptr, &this->commandPool);
 
             // 
             VmaAllocatorCreateInfo vma_info = {};
@@ -649,10 +653,10 @@ namespace vkt
                 vkh::VkDescriptorPoolSize{.type = VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, .descriptorCount = 256u}
             };
 
-            // TODO: XVK version 
-            //this->descriptorPool = device.createDescriptorPool(vkh::VkDescriptorPoolCreateInfo{
-            //    .maxSets = 256u, .poolSizeCount = static_cast<uint32_t>(dps.size()), .pPoolSizes = dps.data()
-            //});
+            // 
+            this->deviceDispatch->CreateDescriptorPool(vkh::VkDescriptorPoolCreateInfo{
+                .maxSets = 256u, .poolSizeCount = static_cast<uint32_t>(dps.size()), .pPoolSizes = dps.data()
+            }, nullptr, &this->descriptorPool);
 
             return device;
         };
