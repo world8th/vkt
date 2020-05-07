@@ -387,10 +387,8 @@ namespace vkt {
     struct MemoryAllocationInfo { // 
         uint32_t glMemory = 0u, glID = 0u;
         std::vector<uint32_t> queueFamilyIndices = {};
-
-        // 
-        xvk::Instance instanceDispatch = {};
-        xvk::Device deviceDispatch = {};
+        std::shared_ptr<xvk::Instance> instanceDispatch = {};
+        std::shared_ptr<xvk::Device> deviceDispatch = {};
 
         // Required for dispatch load (and for XVK)
         VkInstance instance = {};

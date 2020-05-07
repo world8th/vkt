@@ -79,15 +79,15 @@ namespace vkt {
         uni_ptr<T>(uni_ptr<T>& ptr) : shared(ptr.shared), regular(std::ref(*ptr.regular)){};
 
         // 
-        virtual uni_ptr* operator= (T* ptr) { regular = std::ref(*ptr); return this; };
-        virtual uni_ptr* operator= (T& ptr) { regular = std::ref( ptr); return this; }; // for argument passing
-        virtual uni_ptr* operator= (std::shared_ptr<T> ptr) { shared = ptr; return this; };
-        virtual uni_ptr* operator= (const uni_ptr<T>& ptr) { 
+        virtual inline uni_ptr* operator= (T* ptr) { regular = std::ref(*ptr); return this; };
+        virtual inline uni_ptr* operator= (T& ptr) { regular = std::ref( ptr); return this; }; // for argument passing
+        virtual inline uni_ptr* operator= (std::shared_ptr<T> ptr) { shared = ptr; return this; };
+        virtual inline uni_ptr* operator= (const uni_ptr<T>& ptr) { 
             T& ref = *ptr.regular;
             shared = ptr.shared, regular = std::ref(ref);
             return this;
         };
-        virtual uni_ptr* operator= (uni_ptr<T>& ptr) { 
+        virtual inline uni_ptr* operator= (uni_ptr<T>& ptr) { 
             T& ref = *ptr.regular;
             shared = ptr.shared, regular = std::ref(ref);
             return this;
@@ -95,59 +95,59 @@ namespace vkt {
 
         // 
         template<class M = T>
-        uni_ptr<M> dyn_cast() const { T& r = *regular; return shared ? uni_ptr<M>(std::dynamic_pointer_cast<M>(shared)) : uni_ptr<M>(dynamic_cast<M&>(r)); };
+        inline uni_ptr<M> dyn_cast() const { T& r = *regular; return shared ? uni_ptr<M>(std::dynamic_pointer_cast<M>(shared)) : uni_ptr<M>(dynamic_cast<M&>(r)); };
 
         // 
         //template<class... A>
         //uni_ptr<T>(A... args) : shared(std::make_shared<T>(args...)) {};
 
         // 
-        virtual std::shared_ptr<T>& get_shared() { return (this->shared = (this->shared ? this->shared : std::shared_ptr<T>(get_ptr()))); };
-        virtual std::shared_ptr<T>  get_shared() const { return (this->shared ? this->shared : std::shared_ptr<T>(const_cast<T*>(get_ptr()))); };
+        virtual inline std::shared_ptr<T>& get_shared() { return (this->shared = (this->shared ? this->shared : std::shared_ptr<T>(get_ptr()))); };
+        virtual inline  std::shared_ptr<T>  get_shared() const { return (this->shared ? this->shared : std::shared_ptr<T>(const_cast<T*>(get_ptr()))); };
 
         // 
-        virtual T* get_ptr() { 
+        virtual inline T* get_ptr() { 
             T& r = *regular;
             return (shared ? &(*shared) : &r);
         };
 
         // 
-        virtual const T* get_ptr() const {
+        virtual inline const T* get_ptr() const {
             const T& r = *regular;
             return (shared ? &(*shared) : &r);
         };
 
         // 
-        virtual bool has() { return regular && shared; };
-        virtual bool has() const { return regular && shared; };
+        virtual inline bool has() { return regular && shared; };
+        virtual inline bool has() const { return regular && shared; };
 
         // 
-        virtual T* ptr() { return get_ptr(); };
-        virtual const T* ptr() const { return get_ptr(); };
+        virtual inline T* ptr() { return get_ptr(); };
+        virtual inline const T* ptr() const { return get_ptr(); };
 
         // 
-        virtual T& ref() { T& r = *regular, s = *shared; return regular ? r : s; };
-        virtual const T& ref() const { const T& r = *regular, s = *shared; return regular ? r : s; };
+        virtual inline T& ref() { T& r = *regular, s = *shared; return regular ? r : s; };
+        virtual inline const T& ref() const { const T& r = *regular, s = *shared; return regular ? r : s; };
 
         // experimental
-        virtual operator T& () { return ref(); };
-        virtual operator const T& () const { return ref(); };
+        virtual inline operator T& () { return ref(); };
+        virtual inline operator const T& () const { return ref(); };
 
         // 
-        virtual operator T* () { return ptr(); };
-        virtual operator const T* () const { return ptr(); };
+        virtual inline operator T* () { return ptr(); };
+        virtual inline operator const T* () const { return ptr(); };
 
         // 
-        virtual operator std::shared_ptr<T>& () { return get_shared(); };
-        virtual operator std::shared_ptr<T>  () const { return get_shared(); };
+        virtual inline operator std::shared_ptr<T>& () { return get_shared(); };
+        virtual inline operator std::shared_ptr<T>  () const { return get_shared(); };
 
         // 
-        virtual T* operator->() { return get_ptr(); };
-        virtual const T* operator->() const { return get_ptr(); };
+        virtual inline T* operator->() { return get_ptr(); };
+        virtual inline const T* operator->() const { return get_ptr(); };
 
         //
-        virtual T& operator*() { return *get_ptr(); };
-        virtual const T& operator*() const { return *get_ptr(); };
+        virtual inline T& operator*() { return *get_ptr(); };
+        virtual inline const T& operator*() const { return *get_ptr(); };
     };
 
     template<class T = uint8_t>
