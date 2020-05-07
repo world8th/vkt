@@ -383,12 +383,22 @@ namespace vkt {
     };
 #endif
 
+    // Global initials
+    class vkGlobal { public: // Currently, only Vulkan Loader
+        static inline xvk::Loader loader = {};
+        static inline bool initialized = false;
+        vkGlobal(){ if (!(initialized = loader())) { std::cerr << "vulkan load failed..." << std::endl; }; };
+    };
+
     // TODO: Add XVK support
     struct MemoryAllocationInfo { // 
         uint32_t glMemory = 0u, glID = 0u;
         std::vector<uint32_t> queueFamilyIndices = {};
+        
+        // 
         vkt::uni_ptr<xvk::Instance> instanceDispatch = {};
         vkt::uni_ptr<xvk::Device> deviceDispatch = {};
+        //vkt::uni_ptr<xvk::Loader> loader = {};
 
         // Required for dispatch load (and for XVK)
         VkInstance instance = {};

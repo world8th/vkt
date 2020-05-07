@@ -245,10 +245,6 @@ namespace vkt
 
     public: friend GPUFramework;
         GPUFramework() {
-
-#ifdef VOLK_H_
-            volkInitialize();
-#endif
         };
 
         //GPUFramework(const GPUFramework& fw) { *this = fw; };

@@ -32,7 +32,7 @@ namespace vkt {
                 //this->buffer = VkBuffer{};
             }
         };
-         
+        
         virtual BufferAllocation* construct(
             vkt::uni_arg<MemoryAllocationInfo> allocationInfo,
             vkt::uni_arg<vkh::VkBufferCreateInfo> createInfo = vkh::VkBufferCreateInfo{}
@@ -40,10 +40,10 @@ namespace vkt {
             //this->buffer = this->info.device.createBuffer(*createInfo);
             vkCreateBuffer(allocationInfo->device, *createInfo, nullptr, &this->buffer);
             this->usage = createInfo->usage;
-              
+            
             VkMemoryAllocateFlagsInfo allocFlags = {};
             allocFlags.flags = VK_MEMORY_ALLOCATE_DEVICE_MASK_BIT;
-                
+            
             // 
             VkMemoryRequirements memReqs = {};
             vkGetBufferMemoryRequirements(allocationInfo->device, buffer, &memReqs);
@@ -51,14 +51,14 @@ namespace vkt {
             vkh::VkExportMemoryAllocateInfo exportAllocInfo {
                 .handleTypes = { .eOpaqueWin32 = 1 }
             };
-                  
+            
             // 
             vkh::VkMemoryAllocateInfo memAllocInfo = {};
             exportAllocInfo.pNext = &allocFlags;
             memAllocInfo.pNext = &exportAllocInfo;
             memAllocInfo.allocationSize = memReqs.size;
             memAllocInfo.memoryTypeIndex = uint32_t(allocationInfo->getMemoryType(memReqs.memoryTypeBits, { .eDeviceLocal = 1 }));
-                 
+
             // 
             //this->info.device.bindBufferMemory(buffer, info.memory = info.device.allocateMemory(memAllocInfo), 0);
             VkDeviceMemory memory = {};
@@ -224,9 +224,13 @@ namespace vkt {
             // Get Dispatch Loader From VMA Allocator Itself!
             VmaAllocatorInfo info = {};
             vmaGetAllocatorInfo(this->allocator = allocator.ref(), &info);
-            //this->info.dispatch = VkDispatchLoaderDynamic(info.instance, vkGetInstanceProcAddr, this->info.device = info.device, vkGetDeviceProcAddr); // 
 
-             
+            // when loader initialized
+            if (vkt::vkGlobal::initialized) {
+                this->info.instanceDispatch = std::make_shared<xvk::Instance>(&vkt::vkGlobal::loader, info.instance);
+                this->info.deviceDispatch = std::make_shared<xvk::Device>(this->info.instanceDispatch, info.device);
+            };
+
             // 
             if (createInfo->queueFamilyIndexCount) {
                 this->info.queueFamilyIndices = std::vector<uint32_t>(createInfo->queueFamilyIndexCount);
