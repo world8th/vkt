@@ -75,8 +75,8 @@ namespace vkt {
         uni_ptr<T>(std::shared_ptr<T> shared) : shared(shared) {};
         uni_ptr<T>(T* ptr) : regular(std::ref(*ptr)){};
         uni_ptr<T>(T& ptr) : regular(std::ref(ptr)){};  // for argument passing
+        //uni_ptr<T>(uni_ptr<T>&& ptr) : shared(ptr.shared), regular(std::ref(*ptr.regular)) {};
         uni_ptr<T>(const uni_ptr<T>& ptr) : shared(ptr.shared), regular(std::ref(*ptr.regular)) {};
-        uni_ptr<T>(uni_ptr<T>& ptr) : shared(ptr.shared), regular(std::ref(*ptr.regular)){};
 
         // 
         virtual inline uni_ptr* operator= (T* ptr) { regular = std::ref(*ptr); return this; };
@@ -127,11 +127,11 @@ namespace vkt {
 
         // 
         virtual inline T& ref() { T& r = *regular, s = *shared; return regular ? r : s; };
-        virtual inline const T& ref() const { const T& r = *regular, s = *shared; return regular ? r : s; };
+        //virtual inline const T& ref() const { const T& r = *regular, s = *shared; return regular ? r : s; };
 
         // experimental
         virtual inline operator T& () { return ref(); };
-        virtual inline operator const T& () const { return ref(); };
+        //virtual inline operator const T& () const { return ref(); };
 
         // 
         virtual inline operator T* () { return ptr(); };
@@ -147,7 +147,7 @@ namespace vkt {
 
         //
         virtual inline T& operator*() { return *get_ptr(); };
-        virtual inline const T& operator*() const { return *get_ptr(); };
+        //virtual inline const T& operator*() const { return *get_ptr(); };
     };
 
     template<class T = uint8_t>

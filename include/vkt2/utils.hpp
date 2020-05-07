@@ -301,7 +301,7 @@ namespace vkt {
     // TODO: return VkResult
     static inline auto submitOnce(const vkt::uni_arg<vk::Device>& device, const vkt::uni_arg<vk::Queue>& queue, const vkt::uni_arg<vk::CommandPool>& cmdPool, const std::function<void(vk::CommandBuffer&)>& cmdFn = {}, const vkt::uni_arg<vk::SubmitInfo>& smbi = vk::SubmitInfo{}) {
         auto cmdBuf = createCommandBuffer(device, cmdPool, false); cmdFn(cmdBuf); cmdBuf.end();
-        submitCmd(device, queue, { cmdBuf }); device->freeCommandBuffers(cmdPool, 1, &cmdBuf); // free that command buffer
+        submitCmd(device, queue, { cmdBuf }); device->freeCommandBuffers(cmdPool, { cmdBuf }); // free that command buffer
     };
 
     // submit command (with async wait)
