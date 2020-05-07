@@ -9,7 +9,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
 
     // Structures should be packed accurately as Vulkan.H and Vulkan.HPP
     #pragma pack(push, 8) // BUT Vulkan Should PACK ONLY BY ONE BYTE
-
+    
     // 
     #define STRUCT_OPERATORS(NAME)\
         operator NAME*() { return this; };\
@@ -1537,6 +1537,36 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         STRUCT_OPERATORS(VkImageMemoryBarrier)
         VK_HPP_STRUCT_OPERATORS(VkImageMemoryBarrier, vk::ImageMemoryBarrier)
     } VkImageMemoryBarrier;
+
+    // 
+    typedef struct VkFenceCreateInfo {
+        VkStructureType       sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+        const void*           pNext = nullptr;
+        VkFenceCreateFlags    flags = {}; // Нет смысла...
+
+        STRUCT_OPERATORS(VkFenceCreateInfo)
+        VK_HPP_STRUCT_OPERATORS(VkFenceCreateInfo, vk::FenceCreateInfo)
+    } VkFenceCreateInfo;
+
+    // 
+    typedef struct VkSubmitInfo {
+        VkStructureType                sType                = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+        const void*                    pNext                = nullptr;
+        uint32_t                       waitSemaphoreCount   = 0u;
+        const VkSemaphore*             pWaitSemaphores      = nullptr;
+        const VkPipelineStageFlags*    pWaitDstStageMask    = nullptr;
+        uint32_t                       commandBufferCount   = 0u;
+        const VkCommandBuffer*         pCommandBuffers      = nullptr;
+        uint32_t                       signalSemaphoreCount = 0u;
+        const VkSemaphore*             pSignalSemaphores    = nullptr;
+
+        VkSubmitInfo& setCommandBuffers(const std::vector<VkCommandBuffer>& V = {}) { pCommandBuffers = V.data(); commandBufferCount = static_cast<uint32_t>(V.size()); return *this; };
+        VkSubmitInfo& setSignalSemaphores(const std::vector<VkSemaphore>& V = {}) { pSignalSemaphores = V.data(); signalSemaphoreCount = static_cast<uint32_t>(V.size()); return *this; };
+        VkSubmitInfo& setWaitSemaphores(const std::vector<VkSemaphore>& V = {}) { pWaitSemaphores = V.data(); waitSemaphoreCount = static_cast<uint32_t>(V.size()); return *this; };
+
+        STRUCT_OPERATORS(VkSubmitInfo)
+        VK_HPP_STRUCT_OPERATORS(VkSubmitInfo, vk::SubmitInfo)
+    } VkSubmitInfo;
 
 #pragma pack(pop)
 

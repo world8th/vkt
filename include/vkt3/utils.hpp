@@ -222,6 +222,7 @@ namespace vkt {
         bgi.flags = once ? VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT : VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT;
         //bgi.pInheritanceInfo = secondary ? &inhi : nullptr;
 
+        vkBeginCommandBuffer(cmdBuffer, bgi);
         //cmdBuffer.begin(bgi);
 
         return cmdBuffer;
@@ -303,218 +304,84 @@ namespace vkt {
         return result;
     };
 
-     
-    #ifdef TBA_VULKAN_HPP_DEPRECATED
+    template <class T> static inline auto makeVector(const T* ptr, const size_t& size = 1) { std::vector<T>v(size); memcpy(v.data(), ptr, strided<T>(size)); return v; };
+
+    template<class T, class Ty = T>
+    std::vector<T> vector_cast(const std::vector<Ty>& Vy) {
+        std::vector<T> V{}; for (auto& v : Vy) { V.push_back(reinterpret_cast<const T&>(v)); }; return std::move(V);
+    };
+
     // general command buffer pipeline barrier (updated 26.04.2020)
-    /*static inline void commandBarrier(const vkt::uni_arg<VkCommandBuffer>& cmdBuffer) { // TODO:
-    ReMake Command Barrier VkMemoryBarrier memoryBarrier = {}; memoryBarrier.srcAccessMask =
-    (VkAccessFlagBits::eHostWrite | VkAccessFlagBits::eColorAttachmentWrite |
-    VkAccessFlagBits::eAccelerationStructureWriteNV | VkAccessFlagBits::eShaderWrite |
-    VkAccessFlagBits::eTransferWrite | VkAccessFlagBits::eTransformFeedbackCounterWriteEXT |
-    VkAccessFlagBits::eMemoryWrite | VkAccessFlagBits::eTransformFeedbackWriteEXT);
-        memoryBarrier.dstAccessMask = (VkAccessFlagBits::eHostRead  |
-    VkAccessFlagBits::eColorAttachmentRead  | VkAccessFlagBits::eAccelerationStructureReadNV  |
-    VkAccessFlagBits::eShaderRead  | VkAccessFlagBits::eTransferRead  |
-    VkAccessFlagBits::eTransformFeedbackCounterReadEXT  | VkAccessFlagBits::eMemoryRead  |
-    VkAccessFlagBits::eUniformRead); const auto srcStageMask =
-    VkPipelineStageFlagBits::eTransformFeedbackEXT | VkPipelineStageFlagBits::eTransfer |
-    VkPipelineStageFlagBits::eComputeShader | VkPipelineStageFlagBits::eRayTracingShaderNV |
-    VkPipelineStageFlagBits::eAccelerationStructureBuildNV | VkPipelineStageFlagBits::eHost |
-    VkPipelineStageFlagBits::eAllGraphics | VkPipelineStageFlagBits::eColorAttachmentOutput;// |
-    VkPipelineStageFlagBits::eBottomOfPipe; const auto dstStageMask =
-    VkPipelineStageFlagBits::eTransformFeedbackEXT | VkPipelineStageFlagBits::eTransfer |
-    VkPipelineStageFlagBits::eComputeShader | VkPipelineStageFlagBits::eRayTracingShaderNV |
-    VkPipelineStageFlagBits::eAccelerationStructureBuildNV | VkPipelineStageFlagBits::eHost |
-    VkPipelineStageFlagBits::eAllGraphics | VkPipelineStageFlagBits::eColorAttachmentOutput;// |
-    VkPipelineStageFlagBits::eTopOfPipe; cmdBuffer->pipelineBarrier(srcStageMask, dstStageMask, {},
-    { memoryBarrier }, {}, {});
-    };*/
-
-    // add dispatch in command buffer (with default pipeline barrier)
-    static inline auto cmdDispatch(const vkt::uni_arg<VkCommandBuffer>& cmd, const vkt::uni_arg<VkPipeline>& pipeline, const vkt::uni_arg<uint32_t>& x = 1u, const vkt::uni_arg<uint32_t>& y = 1u, const vkt::uni_arg<uint32_t>& z = 1u, const vkt::uni_arg<bool>& barrier = true) {
-        cmd->bindPipeline(VkPipelineBindPoint::eCompute, pipeline);
-        cmd->dispatch(x, y, z);
-        if (barrier) {
-            commandBarrier(cmd); // put shader barrier
-        }
-        return VkResult::eSuccess;
-    };
-
-    // low level copy command between (prefer for host and device)
-    static inline auto cmdCopyBufferL(const vkt::uni_arg<VkCommandBuffer>& cmd, const vkt::uni_arg<VkBuffer>& srcBuffer, const vkt::uni_arg<VkBuffer>& dstBuffer, const std::vector<VkBufferCopy>& regions, std::function<void(VkCommandBuffer)> barrierFn = commandBarrier) {
-        if (srcBuffer && dstBuffer && regions.size() > 0) {
-            VkCommandBuffer(cmd).copyBuffer(srcBuffer, dstBuffer, regions); barrierFn(cmd); // put copy barrier
-        };
-        return VkResult::eSuccess;
+    static inline void commandBarrier(const vkt::uni_arg<VkCommandBuffer>& cmdBuffer) {
+        vkh::VkMemoryBarrier memoryBarrier = {};
+        memoryBarrier.srcAccessMask = { .eShaderWrite = 1,                   .eColorAttachmentWrite = 1, .eDepthStencilAttachmentWrite = 1, .eTransferWrite = 1, .eHostWrite = 1, .eMemoryWrite = 1, .eCommandProcessWrite = 1, .eAccelerationStructureWrite = 1, .eTransformFeedbackWrite = 1, .eTransformFeedbackCounterWrite = 1 };
+        memoryBarrier.dstAccessMask = { .eUniformRead = 1, .eShaderRead = 1, .eColorAttachmentRead  = 1, .eDepthStencilAttachmentRead  = 1, .eTransferRead  = 1, .eHostRead  = 1, .eMemoryRead  = 1, .eCommandProcessRead  = 1, .eAccelerationStructureRead  = 1,                               .eTransformFeedbackCounterRead  = 1 };
+        const vkh::VkPipelineStageFlags srcStageMask = { .eVertexShader = 1, .eTessellationEvaluationShader = 1, .eGeometryShader = 1, .eFragmentShader = 1, .eColorAttachmentOutput = 1, .eComputeShader = 1, .eTransfer = 1, .eHost = 1, .eRayTracing = 1, .eTransformFeedback = 1, .eAccelerationStructureBuild = 1 };
+        const vkh::VkPipelineStageFlags dstStageMask = { .eVertexInput  = 1, .eTessellationControlShader    = 1, .eGeometryShader = 1, .eFragmentShader = 1,                              .eComputeShader = 1, .eTransfer = 1, .eHost = 1, .eRayTracing = 1, .eTransformFeedback = 1, .eAccelerationStructureBuild = 1 };
+        vkCmdPipelineBarrier(cmdBuffer, srcStageMask, dstStageMask, {},
+            1u, memoryBarrier,
+            0u, nullptr,
+            0u, nullptr);
     };
 
 
-    // short data set with command buffer (alike push constant)
-    template<class T>
-    static inline auto cmdUpdateBuffer(const vkt::uni_arg<VkCommandBuffer>& cmd, const vkt::uni_arg<VkBuffer>& dstBuffer, const vkt::uni_arg<VkDeviceSize>& offset, const std::vector<T>& data) {
-        VkCommandBuffer(cmd).updateBuffer(dstBuffer, offset, data);
-        //updateCommandBarrier(cmd);
-        return VkResult::eSuccess;
+    // create fence function
+    static inline auto createFence(const vkt::uni_arg<VkDevice>& device, const vkt::uni_arg<bool>& signaled = true) {
+        VkFenceCreateInfo info = {};
+        info.flags = signaled & 1;
+        VkFence fence = {}; vkCreateFence(device, vkh::VkFenceCreateInfo{}, nullptr, &fence);
+        return fence;
     };
-
-    // short data set with command buffer (alike push constant)
-    template<class T>
-    static inline auto cmdUpdateBuffer(const vkt::uni_arg<VkCommandBuffer>& cmd, const vkt::uni_arg<VkBuffer>& dstBuffer, const vkt::uni_arg<VkDeviceSize>& offset, const vkt::uni_arg<VkDeviceSize>& size, const vkt::uni_arg<T*> data = nullptr) {
-        VkCommandBuffer(cmd).updateBuffer(dstBuffer, offset, size, data);
-        //updateCommandBarrier(cmd);
-        return VkResult::eSuccess;
-    };
-
-
-    // template function for fill buffer by constant value
-    // use for create repeat variant
-    template<uint32_t Rv>
-    static inline auto cmdFillBuffer(const vkt::uni_arg<VkCommandBuffer>& cmd, const vkt::uni_arg<VkBuffer>& dstBuffer, const vkt::uni_arg<VkDeviceSize>& size = 0xFFFFFFFFull, const vkt::uni_arg<VkDeviceSize>& offset = 0ull) {
-        VkCommandBuffer(cmd).fillBuffer(VkBuffer(dstBuffer), offset, size, Rv);
-        //updateCommandBarrier(cmd);
-        return VkResult::eSuccess;
-    };
-
 
     // submit command (with async wait)
-    // TODO: return VkResult 
-    static inline auto submitCmd(const vkt::uni_arg<VkDevice>& device, const vkt::uni_arg<VkQueue>& queue, const std::vector<VkCommandBuffer>& cmds, vkt::uni_arg<VkSubmitInfo> smbi = VkSubmitInfo{}) {
+// TODO: return VkResult 
+    static inline auto submitCmd(const vkt::uni_arg<VkDevice>& device, const vkt::uni_arg<VkQueue>& queue, const std::vector<VkCommandBuffer>& cmds, vkt::uni_arg<vkh::VkSubmitInfo> smbi = vkh::VkSubmitInfo{}) {
         // no commands 
         if (cmds.size() <= 0) return;
         smbi->commandBufferCount = static_cast<uint32_t>(cmds.size());
         smbi->pCommandBuffers = (VkCommandBuffer*)cmds.data();
 
-        VkFence fence = {}; VkFenceCreateInfo fin = VkFenceCreateInfo{};
-        device->createFence(&fin, nullptr, &fence);
-        queue->submit(*smbi, fence);
-        device->waitForFences(1, &fence, true, INT64_MAX);
-        device->destroyFence(fence, nullptr);
+        VkFence fence = createFence(device, false);
+        vkQueueSubmit(queue, 1u, *smbi, fence);
+        vkWaitForFences(device, 1u, &fence, true, 30ull * 1000ull * 1000ull * 1000ull);
+        vkDestroyFence(device, fence, nullptr);
 
         return;
     };
 
     // once submit command buffer
     // TODO: return VkResult
-    static inline auto submitOnce(const vkt::uni_arg<VkDevice>& device, const vkt::uni_arg<VkQueue>& queue, const vkt::uni_arg<VkCommandPool>& cmdPool, const std::function<void(VkCommandBuffer&)>& cmdFn = {}, const vkt::uni_arg<VkSubmitInfo>& smbi = VkSubmitInfo{}) {
-        auto cmdBuf = createCommandBuffer(device, cmdPool, false); cmdFn(cmdBuf); cmdBuf.end();
-        submitCmd(device, queue, { cmdBuf }); device->freeCommandBuffers(cmdPool, 1, &cmdBuf); // free that command buffer
+    static inline auto submitOnce(const vkt::uni_arg<VkDevice>& device, const vkt::uni_arg<VkQueue>& queue, const vkt::uni_arg<VkCommandPool>& cmdPool, const std::function<void(VkCommandBuffer&)>& cmdFn = {}, const vkt::uni_arg<vkh::VkSubmitInfo>& smbi = vkh::VkSubmitInfo{}) {
+        auto cmdBuf = createCommandBuffer(device, cmdPool, false); cmdFn(cmdBuf); vkEndCommandBuffer(cmdBuf);
+        submitCmd(device, queue, { cmdBuf }); vkFreeCommandBuffers(device, cmdPool, 1u, &cmdBuf);
     };
 
     // submit command (with async wait)
     // TODO: return VkResult
-    static inline auto submitCmdAsync(const vkt::uni_arg<VkDevice>& device, const vkt::uni_arg<VkQueue>& queue, const std::vector<VkCommandBuffer>& cmds, const vkt::uni_arg<VkSubmitInfo>& smbi = VkSubmitInfo{}) {
-        return std::async(std::launch::async | std::launch::deferred, [=](){
+    static inline auto submitCmdAsync(const vkt::uni_arg<VkDevice>& device, const vkt::uni_arg<VkQueue>& queue, const std::vector<VkCommandBuffer>& cmds, const vkt::uni_arg<vkh::VkSubmitInfo>& smbi = vkh::VkSubmitInfo{}) {
+        return std::async(std::launch::async | std::launch::deferred, [=]() {
             return submitCmd(device, queue, cmds, smbi);
         });
     };
 
     // once submit command buffer
     // TODO: return VkResult
-    static inline auto submitOnceAsync(const vkt::uni_arg<VkDevice>& device, const vkt::uni_arg<VkQueue>& queue, const vkt::uni_arg<VkCommandPool>& cmdPool, const std::function<void(VkCommandBuffer&)>& cmdFn = {}, const vkt::uni_arg<VkSubmitInfo>& smbi = VkSubmitInfo{}) {
-        VkCommandBuffer cmdBuf = createCommandBuffer(device, cmdPool, false); cmdFn(cmdBuf); cmdBuf.end();
+    static inline auto submitOnceAsync(const vkt::uni_arg<VkDevice>& device, const vkt::uni_arg<VkQueue>& queue, const vkt::uni_arg<VkCommandPool>& cmdPool, const std::function<void(VkCommandBuffer&)>& cmdFn = {}, const vkt::uni_arg<vkh::VkSubmitInfo>& smbi = vkh::VkSubmitInfo{}) {
+        VkCommandBuffer cmdBuf = createCommandBuffer(device, cmdPool, false); cmdFn(cmdBuf); vkEndCommandBuffer(cmdBuf);
         return std::async(std::launch::async | std::launch::deferred, [=]() {
             submitCmdAsync(device, queue, { cmdBuf }, smbi).get();
-            device->freeCommandBuffers(cmdPool, 1, &cmdBuf);
+            vkFreeCommandBuffers(device, cmdPool, 1u, &cmdBuf);
         });
     };
 
-    template <class T> static inline auto makeVector(const T * ptr, const size_t& size = 1) { std::vector<T>v(size); memcpy(v.data(), ptr, strided<T>(size)); return v; };
-
-    // create fence function
-    static inline auto createFence(const vkt::uni_arg<VkDevice>& device, const vkt::uni_arg<bool>& signaled = true) {
-        VkFenceCreateInfo info = {};
-        if (signaled) info.setFlags(VkFenceCreateFlagBits::eSignaled);
-        return VkDevice(device).createFence(info);
-    };
-
-    // TODO: native image barrier in library 
-    struct ImageBarrierInfo {
-        vkt::uni_arg<VkImage> image = {};
-        vkt::uni_arg<VkImageLayout> targetLayout = VkImageLayout::eGeneral;
-        vkt::uni_arg<VkImageLayout> originLayout = VkImageLayout::eUndefined;
-        vkt::uni_arg<vkh::VkImageSubresourceRange> subresourceRange = vkh::VkImageSubresourceRange{ {}, 0u, 1u, 0u, 1u };
-    };
-
     // 
-    static inline auto imageBarrier(const vkt::uni_arg<VkCommandBuffer>& cmd = VkCommandBuffer{}, const vkt::uni_arg<ImageBarrierInfo>& info = ImageBarrierInfo{}) {
-        VkResult result = VkResult::eSuccess; // planned to complete
-        if (*info->originLayout == *info->targetLayout) return result; // no need transfering more
-
-        VkImageMemoryBarrier imageMemoryBarriers = {};
-        imageMemoryBarriers.srcQueueFamilyIndex = ~0U;
-        imageMemoryBarriers.dstQueueFamilyIndex = ~0U;
-        imageMemoryBarriers.oldLayout = info->originLayout;
-        imageMemoryBarriers.newLayout = info->targetLayout;
-        imageMemoryBarriers.subresourceRange = reinterpret_cast<const VkImageSubresourceRange&>(*info->subresourceRange);
-        imageMemoryBarriers.image = info->image;
-
-        // Put barrier on top
-        const auto  srcStageMask = vkh::VkPipelineStageFlags{ .eBottomOfPipe = 1 };
-        const auto  dstStageMask = vkh::VkPipelineStageFlags{ .eTopOfPipe = 1 };
-        const auto  dependencyFlags = vkh::VkDependencyFlags{};
-              auto  srcMask = VkAccessFlags{}, dstMask = VkAccessFlags{};
-
-        typedef VkImageLayout il;
-        typedef VkAccessFlagBits afb;
-
-        // Is it me, or are these the same?
-        switch (info->originLayout) {
-            case il::eUndefined: break;
-            case il::eGeneral: srcMask = afb::eTransferWrite; break;
-            case il::eColorAttachmentOptimal: srcMask = afb::eColorAttachmentWrite; break;
-            case il::eDepthStencilAttachmentOptimal: srcMask = afb::eDepthStencilAttachmentWrite; break;
-            case il::eDepthStencilReadOnlyOptimal: srcMask = afb::eDepthStencilAttachmentRead; break;
-            case il::eShaderReadOnlyOptimal: srcMask = afb::eShaderRead; break;
-            case il::eTransferSrcOptimal: srcMask = afb::eTransferRead; break;
-            case il::eTransferDstOptimal: srcMask = afb::eTransferWrite; break;
-            case il::ePreinitialized: srcMask = afb::eTransferWrite | afb::eHostWrite; break;
-            case il::ePresentSrcKHR: srcMask = afb::eMemoryRead; break;
-        };
-
-        switch (info->targetLayout) {
-            case il::eUndefined: break;
-            case il::eGeneral: dstMask = afb::eTransferWrite; break;
-            case il::eColorAttachmentOptimal: dstMask = afb::eColorAttachmentWrite; break;
-            case il::eDepthStencilAttachmentOptimal: dstMask = afb::eDepthStencilAttachmentWrite; break;
-            case il::eDepthStencilReadOnlyOptimal: dstMask = afb::eDepthStencilAttachmentRead; break;
-            case il::eShaderReadOnlyOptimal: dstMask = afb::eShaderRead; break;
-            case il::eTransferSrcOptimal: dstMask = afb::eTransferRead; break;
-            case il::eTransferDstOptimal: dstMask = afb::eTransferWrite; break;
-            case il::ePreinitialized: dstMask = afb::eTransferWrite; break;
-            case il::ePresentSrcKHR: dstMask = afb::eMemoryRead; break;
-        };
-
-        // assign access masks
-        imageMemoryBarriers.srcAccessMask = srcMask;
-        imageMemoryBarriers.dstAccessMask = dstMask;
-
-        // barrier
-        cmd->pipelineBarrier(VkPipelineStageFlagBits::eAllCommands, VkPipelineStageFlagBits::eAllCommands, {}, {}, {}, std::array<VkImageMemoryBarrier, 1>{imageMemoryBarriers});
-        return result;
-    };
-
-    template<class T,class Ty = T>
-    std::vector<T> vector_cast(const std::vector<Ty>& Vy){
-        std::vector<T> V{}; for (auto& v : Vy) {V.push_back(reinterpret_cast<const T&>(v));}; return std::move(V);
-    };
-
-    void debugLabel(const VkCommandBuffer& buildCommand, const std::string& labelName = "", const VkDispatchLoaderDynamic& dispatch = {}) {
-#ifdef VKT_ENABLE_DEBUG_MARK
-        buildCommand.insertDebugUtilsLabelEXT(VkDebugUtilsLabelEXT().setColor({ 1.f,0.75,0.25f }).setPLabelName(labelName.c_str()), dispatch);
-        buildCommand.setCheckpointNV(labelName.c_str(), dispatch);
-#endif
-    };
-    #endif
-
-
-    // 
- #ifdef VULKAN_HPP
-    template<class T> 
+#ifdef VULKAN_HPP
+    template<class T>
     T handleHpp(vk::ResultValue<T> V) {
         assert(V.result == VkResult::eSuccess);
         return std::move(V.value);
     };
- #endif
+#endif
 
     // TODO: Add XVK support
     struct MemoryAllocationInfo { // 
@@ -556,6 +423,64 @@ namespace vkt {
             return -1;
         }
     };
+
+
+
+
+
+    #ifdef TBA_VULKAN_HPP_DEPRECATED
+    // add dispatch in command buffer (with default pipeline barrier)
+    static inline auto cmdDispatch(const vkt::uni_arg<VkCommandBuffer>& cmd, const vkt::uni_arg<VkPipeline>& pipeline, const vkt::uni_arg<uint32_t>& x = 1u, const vkt::uni_arg<uint32_t>& y = 1u, const vkt::uni_arg<uint32_t>& z = 1u, const vkt::uni_arg<bool>& barrier = true) {
+        cmd->bindPipeline(VkPipelineBindPoint::eCompute, pipeline);
+        cmd->dispatch(x, y, z);
+        if (barrier) {
+            commandBarrier(cmd); // put shader barrier
+        }
+        return VkResult::eSuccess;
+    };
+
+    // low level copy command between (prefer for host and device)
+    static inline auto cmdCopyBufferL(const vkt::uni_arg<VkCommandBuffer>& cmd, const vkt::uni_arg<VkBuffer>& srcBuffer, const vkt::uni_arg<VkBuffer>& dstBuffer, const std::vector<VkBufferCopy>& regions, std::function<void(VkCommandBuffer)> barrierFn = commandBarrier) {
+        if (srcBuffer && dstBuffer && regions.size() > 0) {
+            VkCommandBuffer(cmd).copyBuffer(srcBuffer, dstBuffer, regions); barrierFn(cmd); // put copy barrier
+        };
+        return VkResult::eSuccess;
+    };
+
+
+    // short data set with command buffer (alike push constant)
+    template<class T>
+    static inline auto cmdUpdateBuffer(const vkt::uni_arg<VkCommandBuffer>& cmd, const vkt::uni_arg<VkBuffer>& dstBuffer, const vkt::uni_arg<VkDeviceSize>& offset, const std::vector<T>& data) {
+        VkCommandBuffer(cmd).updateBuffer(dstBuffer, offset, data);
+        //updateCommandBarrier(cmd);
+        return VkResult::eSuccess;
+    };
+
+    // short data set with command buffer (alike push constant)
+    template<class T>
+    static inline auto cmdUpdateBuffer(const vkt::uni_arg<VkCommandBuffer>& cmd, const vkt::uni_arg<VkBuffer>& dstBuffer, const vkt::uni_arg<VkDeviceSize>& offset, const vkt::uni_arg<VkDeviceSize>& size, const vkt::uni_arg<T*> data = nullptr) {
+        VkCommandBuffer(cmd).updateBuffer(dstBuffer, offset, size, data);
+        //updateCommandBarrier(cmd);
+        return VkResult::eSuccess;
+    };
+
+    // template function for fill buffer by constant value
+    // use for create repeat variant
+    template<uint32_t Rv>
+    static inline auto cmdFillBuffer(const vkt::uni_arg<VkCommandBuffer>& cmd, const vkt::uni_arg<VkBuffer>& dstBuffer, const vkt::uni_arg<VkDeviceSize>& size = 0xFFFFFFFFull, const vkt::uni_arg<VkDeviceSize>& offset = 0ull) {
+        VkCommandBuffer(cmd).fillBuffer(VkBuffer(dstBuffer), offset, size, Rv);
+        //updateCommandBarrier(cmd);
+        return VkResult::eSuccess;
+    };
+
+    void debugLabel(const VkCommandBuffer& buildCommand, const std::string& labelName = "", const VkDispatchLoaderDynamic& dispatch = {}) {
+#ifdef VKT_ENABLE_DEBUG_MARK
+        buildCommand.insertDebugUtilsLabelEXT(VkDebugUtilsLabelEXT().setColor({ 1.f,0.75,0.25f }).setPLabelName(labelName.c_str()), dispatch);
+        buildCommand.setCheckpointNV(labelName.c_str(), dispatch);
+#endif
+    };
+    #endif
+
 
 //#endif
 };
