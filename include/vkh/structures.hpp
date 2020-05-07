@@ -1599,7 +1599,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         VK_HPP_STRUCT_OPERATORS(VkCommandPoolCreateInfo, vk::CommandPoolCreateInfo)
     } VkCommandPoolCreateInfo;
 
-        // 
+    // 
     typedef struct VkDeviceCreateInfo {
         VkStructureType                    sType                    = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
         const void*                        pNext                    = nullptr;
@@ -1619,6 +1619,16 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         STRUCT_OPERATORS(VkDeviceCreateInfo)
         VK_HPP_STRUCT_OPERATORS(VkDeviceCreateInfo,vk::DeviceCreateInfo)
     } VkDeviceCreateInfo;
+
+    //
+    typedef struct VkSemaphoreCreateInfo {
+        VkStructureType           sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+        const void*               pNext = nullptr;
+        VkSemaphoreCreateFlags    flags = {};
+
+        STRUCT_OPERATORS(VkSemaphoreCreateInfo)
+        VK_HPP_STRUCT_OPERATORS(VkSemaphoreCreateInfo, vk::SemaphoreCreateInfo)
+    } VkSemaphoreCreateInfo;
 
 
 #pragma pack(pop)

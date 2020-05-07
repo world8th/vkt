@@ -123,7 +123,6 @@ namespace vkt
             "VK_EXT_swapchain_colorspace",
             "VK_EXT_external_memory_host",
             "VK_EXT_queue_family_foreign",
-            "VK_EXT_swapchain_colorspace",
             "VK_EXT_sample_locations",
             "VK_EXT_conservative_rasterization",
             "VK_EXT_hdr_metadata",
@@ -394,21 +393,6 @@ namespace vkt
         inline operator const VkPhysicalDeviceMemoryProperties2& () const { return memoryProperties; };
         inline operator const VmaAllocator&() const { return allocator; };
 
-        // Deprecated!
-        /*inline void submitCommandWithSync(const VkCommandBuffer & cmdBuf) {
-            // submit command
-            VkSubmitInfo sbmi = {};
-            sbmi.commandBufferCount = 1;//cmdBuffers.size();
-            sbmi.pCommandBuffers = &cmdBuf;
-
-            // submit commands
-            auto fence = getFence(); {
-                getQueue().submit(sbmi, fence);
-                device.waitForFences({ fence }, true, INT32_MAX);
-            };
-            device.resetFences({ 1, &fence });
-        }*/
-
 #ifdef VKT_ENABLE_GLFW_SUPPORT
         struct SurfaceWindow {
             SurfaceFormat surfaceFormat = {};
@@ -593,8 +577,11 @@ namespace vkt
 #ifdef VKT_ENABLE_GLFW_SUPPORT
             for (auto queuefamily : gpuQueueProps) {
                 graphicsFamilyIndex++;
-                if (queuefamily.queueFlags.eCompute && queuefamily.queueFlags.eGraphics && physicalDevice.getSurfaceSupportKHR(graphicsFamilyIndex, surface())) {
-                    queueCreateInfos.push_back(vk::DeviceQueueCreateInfo(vk::DeviceQueueCreateFlags()).setQueueFamilyIndex(graphicsFamilyIndex).setQueueCount(1).setPQueuePriorities(&priority));
+
+                VkBool32 support = false;
+                vkGetPhysicalDeviceSurfaceSupportKHR(physicalDevice, graphicsFamilyIndex, surface(), &support);
+                if (queuefamily.queueFlags.eCompute && queuefamily.queueFlags.eGraphics && support) {
+                    queueCreateInfos.push_back(vkh::VkDeviceQueueCreateInfo{ .queueFamilyIndex = computeFamilyIndex, .queueCount = 1, .pQueuePriorities = &priority });
                     queueFamilyIndices.push_back(graphicsFamilyIndex);
                     break;
                 };
@@ -693,14 +680,16 @@ namespace vkt
         // 
         inline SurfaceFormat& getSurfaceFormat(VkPhysicalDevice gpu)
         {
-            auto surfaceFormats = gpu.getSurfaceFormatsKHR(applicationWindow.surface);
+            //auto surfaceFormats = gpu.getSurfaceFormatsKHR(applicationWindow.surface);
+            auto surfaceFormats = vkh::vsGetPhysicalDeviceSurfaceFormatsKHR(gpu, applicationWindow.surface);
 
-            const std::vector<VkFormat> preferredFormats = { VkFormat::eR16G16B16A16Unorm, VkFormat::eA2B10G10R10UnormPack32, VkFormat::eA2R10G10B10UintPack32, VkFormat::eR8G8B8A8Srgb, VkFormat::eB8G8R8A8Srgb, VkFormat::eA8B8G8R8SrgbPack32, VkFormat::eR8G8B8A8Unorm, VkFormat::eB8G8R8A8Unorm, VkFormat::eA8B8G8R8UnormPack32 };
+            //const std::vector<VkFormat> preferredFormats = { VkFormat::eR16G16B16A16Unorm, VkFormat::eA2B10G10R10UnormPack32, VkFormat::eA2R10G10B10UintPack32, VkFormat::eR8G8B8A8Srgb, VkFormat::eB8G8R8A8Srgb, VkFormat::eA8B8G8R8SrgbPack32, VkFormat::eR8G8B8A8Unorm, VkFormat::eB8G8R8A8Unorm, VkFormat::eA8B8G8R8UnormPack32 };
+            const std::vector<VkFormat> preferredFormats = { VK_FORMAT_R16G16B16A16_UNORM, VK_FORMAT_A2B10G10R10_UNORM_PACK32, VK_FORMAT_A2R10G10B10_UNORM_PACK32, VK_FORMAT_R8G8B8A8_SRGB, VK_FORMAT_B8G8R8A8_SRGB, VK_FORMAT_A8B8G8R8_SRGB_PACK32, VK_FORMAT_R8G8B8A8_UNORM, VK_FORMAT_B8G8R8A8_UNORM, VK_FORMAT_A8B8G8R8_UNORM_PACK32 };
 
             VkFormat surfaceColorFormat =
                 surfaceFormats.size() == 1 &&
-                surfaceFormats[0].format == VkFormat::eUndefined
-                ? VkFormat::eR8G8B8A8Srgb
+                surfaceFormats[0].format == VK_FORMAT_UNDEFINED
+                ? VK_FORMAT_R8G8B8A8_SRGB
                 : surfaceFormats[0].format;
 
             // search preferred surface format support
@@ -725,19 +714,18 @@ namespace vkt
             VkColorSpaceKHR surfaceColorSpace = surfaceFormats[surfaceFormatID].colorSpace;
 
             // get format properties?
-            auto formatProperties = gpu.getFormatProperties(surfaceColorFormat);
+            auto formatProperties = vkh::vsGetPhysicalDeviceFormatProperties(gpu, surfaceColorFormat);//gpu.getFormatProperties(surfaceColorFormat);
 
             // only if these depth formats
             std::vector<VkFormat> depthFormats = {
-                VkFormat::eD32SfloatS8Uint, VkFormat::eD32Sfloat,
-                VkFormat::eD24UnormS8Uint, VkFormat::eD16UnormS8Uint,
-                VkFormat::eD16Unorm };
+                VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT,
+                VK_FORMAT_D32_SFLOAT,         VK_FORMAT_D16_UNORM };
 
             // choice supported depth format
             VkFormat surfaceDepthFormat = depthFormats[0];
             for (auto format : depthFormats) {
-                auto depthFormatProperties = gpu.getFormatProperties(format);
-                if (depthFormatProperties.optimalTilingFeatures & VkFormatFeatureFlagBits::eDepthStencilAttachment) {
+                auto depthFormatProperties = vkh::vsGetPhysicalDeviceFormatProperties(gpu, format);
+                if (depthFormatProperties.optimalTilingFeatures & VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT) {
                     surfaceDepthFormat = format; break;
                 }
             };
@@ -797,7 +785,8 @@ namespace vkt
                 .dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT,
             });
 
-            return (renderPass = device.createRenderPass(render_pass_helper));
+            this->deviceDispatch->CreateRenderPass(render_pass_helper, nullptr, &this->renderPass);
+            return this->renderPass;
         }
 
         // update swapchain framebuffer
@@ -805,22 +794,22 @@ namespace vkt
         {
             // The swapchain handles allocating frame images.
             auto& surfaceFormats = getSurfaceFormat(this->physicalDevice);
-            auto  gpuMemoryProps = physicalDevice.getMemoryProperties();
+            auto  gpuMemoryProps = vkh::vsGetPhysicalDeviceMemoryProperties(physicalDevice);//physicalDevice.getMemoryProperties();
 
             // 
-            auto imageInfoVK = VkImageCreateInfo{};
-            imageInfoVK.initialLayout = VkImageLayout::eUndefined;
-            imageInfoVK.sharingMode = VkSharingMode::eExclusive;
+            auto imageInfoVK = vkh::VkImageCreateInfo{};
+            imageInfoVK.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+            imageInfoVK.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
             imageInfoVK.flags = {};
             imageInfoVK.pNext = nullptr;
             imageInfoVK.arrayLayers = 1;
             imageInfoVK.extent = VkExtent3D{ applicationWindow.surfaceSize.width, applicationWindow.surfaceSize.height, 1u };
             imageInfoVK.format = { surfaceFormats.depthFormat };
-            imageInfoVK.imageType = VkImageType::e2D;
+            imageInfoVK.imageType = VK_IMAGE_TYPE_2D;
             imageInfoVK.mipLevels = 1;
-            imageInfoVK.samples = VkSampleCountFlagBits::e1;
-            imageInfoVK.tiling = VkImageTiling::eOptimal;
-            imageInfoVK.usage = VkImageUsageFlagBits::eDepthStencilAttachment|VkImageUsageFlagBits::eTransferSrc;
+            imageInfoVK.samples = VK_SAMPLE_COUNT_1_BIT;
+            imageInfoVK.tiling = VK_IMAGE_TILING_OPTIMAL;
+            imageInfoVK.usage = { .eTransferSrc = 1, .eDepthStencilAttachment = 1 };
 
             // 
             VmaAllocationCreateInfo allocCreateInfo = {};
@@ -834,17 +823,24 @@ namespace vkt
                 .usage = { .eDepthStencilAttachment = 1 }
             };
             vmaCreateImage(this->allocator, (VkImageCreateInfo*)&image_info, &allocCreateInfo, &reinterpret_cast<VkImage&>(depthImage), &vmaDepthImageAllocation, &vmaDepthImageAllocationInfo);
-            depthImageView = device.createImageView(VkImageViewCreateInfo{{}, depthImage, VkImageViewType::e2D, surfaceFormats.depthFormat, VkComponentMapping(), VkImageSubresourceRange{VkImageAspectFlagBits::eDepth, 0, 1, 0, 1} });
+            this->deviceDispatch->CreateImageView(vkh::VkImageViewCreateInfo{
+                .flags = {},
+                .image = depthImage,
+                .viewType = VK_IMAGE_VIEW_TYPE_2D,
+                .format = surfaceFormats.depthFormat,
+                .components = vkh::VkComponentMapping(),
+                .subresourceRange = vkh::VkImageSubresourceRange{{.eDepth = 1}, 0, 1, 0, 1}
+            }, nullptr, &depthImageView);
 
             // 
-            auto swapchainImages = device.getSwapchainImagesKHR(swapchain);
+            auto swapchainImages = vkh::vsGetPhysicalDeviceSurfaceFormatsKHR(device, swapchain);
             swapchainBuffers.resize(swapchainImages.size());
             for (int i = 0; i < swapchainImages.size(); i++)
             { // create framebuffers
                 std::array<VkImageView, 2> views = {}; // predeclare views
-                views[0] = device.createImageView(VkImageViewCreateInfo{ {}, swapchainImages[i], VkImageViewType::e2D, surfaceFormats.colorFormat, VkComponentMapping(), VkImageSubresourceRange{VkImageAspectFlagBits::eColor, 0, 1, 0, 1} }); // color view
+                deviceDispatch->CreateImageView(vkh::VkImageViewCreateInfo{ .flags = {}, .image = swapchainImages[i], .viewType = VK_IMAGE_VIEW_TYPE_2D, .format = surfaceFormats.colorFormat, .components = vkh::VkComponentMapping{}, .subresourceRange = vkh::VkImageSubresourceRange{{ .eColor = 1 }, 0, 1, 0, 1} }, nullptr, &views[0]);
                 views[1] = depthImageView; // depth view
-                swapchainBuffers[i].frameBuffer = device.createFramebuffer(VkFramebufferCreateInfo{ {}, renderpass, uint32_t(views.size()), views.data(), applicationWindow.surfaceSize.width, applicationWindow.surfaceSize.height, 1u });
+                deviceDispatch->CreateFramebuffer(vkh::VkFramebufferCreateInfo{ .flags = {}, .renderPass = renderpass, .attachmentCount = uint32_t(views.size()), .pAttachments = views.data(), .width = applicationWindow.surfaceSize.width, .height = applicationWindow.surfaceSize.height, .layers = 1u }, nullptr, &swapchainBuffers[i].frameBuffer);
             };
         }
 
@@ -855,19 +851,14 @@ namespace vkt
             for (int i = 0; i < swapchainBuffers.size(); i++)
             { // create semaphore
                 VkSemaphoreTypeCreateInfo timeline = {};
-                timeline.semaphoreType = VkSemaphoreType::eTimeline;
+                timeline.semaphoreType = VK_SEMAPHORE_TYPE_TIMELINE;
                 timeline.initialValue = i;
 
                 // 
-                //swapchainBuffers[i].semaphore = device.createSemaphore(VkSemaphoreCreateInfo());
-                swapchainBuffers[i].drawSemaphore = device.createSemaphore(VkSemaphoreCreateInfo());
-                swapchainBuffers[i].computeSemaphore = device.createSemaphore(VkSemaphoreCreateInfo());
-                swapchainBuffers[i].presentSemaphore = device.createSemaphore(VkSemaphoreCreateInfo());
-                swapchainBuffers[i].waitFence = device.createFence(VkFenceCreateInfo().setFlags(VkFenceCreateFlagBits::eSignaled));
-                ///swapchainBuffers[i].timeline = device.createSemaphore(VkSemaphoreCreateInfo().setPNext(&timeline));
-
-                // 
-                //device.signalSemaphore(VkSemaphoreSignalInfo().setSemaphore(swapchainBuffers[i].timeline).setValue(i));
+                this->deviceDispatch->CreateSemaphoreW(vkh::VkSemaphoreCreateInfo{}, nullptr, &swapchainBuffers[i].drawSemaphore);
+                this->deviceDispatch->CreateSemaphoreW(vkh::VkSemaphoreCreateInfo{}, nullptr, &swapchainBuffers[i].computeSemaphore);
+                this->deviceDispatch->CreateSemaphoreW(vkh::VkSemaphoreCreateInfo{}, nullptr, &swapchainBuffers[i].presentSemaphore);
+                this->deviceDispatch->CreateFence(vkh::VkFenceCreateInfo{ .flags{} }, nullptr, &swapchainBuffers[i].waitFence);
             };
             return swapchainBuffers;
         }
@@ -877,8 +868,8 @@ namespace vkt
         {
             auto& formats = getSurfaceFormat(this->physicalDevice);
             auto& surface = applicationWindow.surface;
-            auto surfaceCapabilities = physicalDevice.getSurfaceCapabilitiesKHR(surface);
-            auto surfacePresentModes = physicalDevice.getSurfacePresentModesKHR(surface);
+            auto surfaceCapabilities = vkh::vsGetPhysicalDeviceSurfaceCapabilitiesKHR(physicalDevice, surface);
+            auto surfacePresentModes = vkh::vsGetPhysicalDeviceSurfacePresentModesKHR(physicalDevice, surface);
 
             // check the surface width/height.
             if (!(surfaceCapabilities.currentExtent.width == -1 ||
@@ -888,8 +879,8 @@ namespace vkt
             }
 
             // get supported present mode, but prefer mailBox
-            auto presentMode = VkPresentModeKHR::eImmediate;
-            std::vector<VkPresentModeKHR> priorityModes = { VkPresentModeKHR::eImmediate, VkPresentModeKHR::eMailbox, VkPresentModeKHR::eFifoRelaxed, VkPresentModeKHR::eFifo, VkPresentModeKHR::eImmediate };
+            auto presentMode = VK_PRESENT_MODE_IMMEDIATE_KHR;
+            std::vector<VkPresentModeKHR> priorityModes = { VK_PRESENT_MODE_IMMEDIATE_KHR, VK_PRESENT_MODE_MAILBOX_KHR, VK_PRESENT_MODE_FIFO_RELAXED_KHR, VK_PRESENT_MODE_FIFO_KHR };
 
             bool found = false; // 
             for (auto pm : priorityModes) {
@@ -905,15 +896,17 @@ namespace vkt
             swapchainCreateInfo.imageColorSpace = formats.colorSpace;
             swapchainCreateInfo.imageExtent = applicationWindow.surfaceSize;
             swapchainCreateInfo.imageArrayLayers = 1;
-            swapchainCreateInfo.imageUsage = VkImageUsageFlagBits::eColorAttachment;
-            swapchainCreateInfo.imageSharingMode = VkSharingMode::eExclusive;
-            swapchainCreateInfo.preTransform = VkSurfaceTransformFlagBitsKHR::eIdentity;
-            swapchainCreateInfo.compositeAlpha = VkCompositeAlphaFlagBitsKHR::eOpaque;
+            swapchainCreateInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+            swapchainCreateInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
+            swapchainCreateInfo.preTransform = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;
+            swapchainCreateInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
             swapchainCreateInfo.presentMode = presentMode;
             swapchainCreateInfo.clipped = true;
 
             // create swapchain
-            return device.createSwapchainKHR(swapchainCreateInfo, nullptr);
+            VkSwapchainKHR swapchain = {};
+            this->deviceDispatch->CreateSwapchainKHR(&swapchainCreateInfo, nullptr, &swapchain);
+            return swapchain;
         }
 #endif
     };

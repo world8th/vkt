@@ -61,6 +61,39 @@ namespace vkh {
         return version;
     };
 
+    inline auto vsGetPhysicalDeviceSurfaceFormatsKHR(const VkPhysicalDevice& physicalDevice, const VkSurfaceKHR& surface) { // TODO: V2
+        uint32_t count = 0u; vkGetPhysicalDeviceSurfaceFormatsKHR(physicalDevice, surface, &count, nullptr);
+        std::vector<VkSurfaceFormatKHR> data(count);
+        vkGetPhysicalDeviceSurfaceFormatsKHR(physicalDevice, surface, &count, reinterpret_cast<VkSurfaceFormatKHR*>(data.data()));
+        return data;
+    };
+
+    inline auto vsGetPhysicalDeviceFormatProperties(const VkPhysicalDevice& physicalDevice, const VkFormat& format) {
+        VkFormatProperties props = {}; vkGetPhysicalDeviceFormatProperties(physicalDevice, format, &props); return props;
+    };
+
+    inline auto vsGetPhysicalDeviceMemoryProperties(const VkPhysicalDevice& physicalDevice) {
+        VkPhysicalDeviceMemoryProperties props = {}; vkGetPhysicalDeviceMemoryProperties(physicalDevice, &reinterpret_cast<::VkPhysicalDeviceMemoryProperties&>(props)); return props;
+    };
+
+    inline auto vsGetPhysicalDeviceSurfaceFormatsKHR(const VkDevice& device, const VkSwapchainKHR& swapchain) { // TODO: V2
+        uint32_t count = 0u; vkGetSwapchainImagesKHR(device, swapchain, &count, nullptr);
+        std::vector<VkImage> data(count);
+        vkGetSwapchainImagesKHR(device, swapchain, &count, reinterpret_cast<VkImage*>(data.data()));
+        return data;
+    };
+
+    inline auto vsGetPhysicalDeviceSurfaceCapabilitiesKHR(const VkPhysicalDevice& physicalDevice, const VkSurfaceKHR& surface) {
+        VkSurfaceCapabilitiesKHR props = {}; vkGetPhysicalDeviceSurfaceCapabilitiesKHR(physicalDevice, surface, &reinterpret_cast<::VkSurfaceCapabilitiesKHR&>(props)); return props;
+    };
+
+    inline auto vsGetPhysicalDeviceSurfacePresentModesKHR(const VkPhysicalDevice& physicalDevice, const VkSurfaceKHR& surface) { // TODO: V2
+        uint32_t count = 0u; vkGetPhysicalDeviceSurfacePresentModesKHR(physicalDevice, surface, &count, nullptr);
+        std::vector<VkPresentModeKHR> data(count);
+        vkGetPhysicalDeviceSurfacePresentModesKHR(physicalDevice, surface, &count, reinterpret_cast<::VkPresentModeKHR*>(data.data()));
+        return data;
+    };
+
 
     // LEGACY Functional
     class VsRayTracingPipelineCreateInfoHelperNV {
