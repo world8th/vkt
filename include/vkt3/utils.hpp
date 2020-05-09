@@ -161,7 +161,7 @@ namespace vkt {
 
     // create shader module
     static inline auto makePipelineStageInfo(const vkt::uni_arg<VkDevice>& device, const std::vector<uint32_t>& code, const vkt::uni_arg<vkh::VkShaderStageFlags>& stage = vkh::VkShaderStageFlags{.eCompute = 1u}, const vkt::uni_arg<const char *>& entry = "main") {
-        VkPipelineShaderStageCreateInfo spi = {};
+        vkh::VkPipelineShaderStageCreateInfo spi = {};
         createShaderModuleIntrusive(device, code, spi.module);
         spi.pName = entry;
         spi.stage = stage->c();

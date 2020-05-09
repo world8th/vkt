@@ -194,7 +194,7 @@ namespace vkh {
         eConditionalRendering:1,
         eTaskShader:1,
         eMeshShader:1,
-        eRayTracing:1,
+        eRayTracingShader:1,
         eShadingRateImage:1,
         eFragmentDensityProcess:1,
         eTransformFeedback:1,

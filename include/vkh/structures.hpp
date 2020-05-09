@@ -1776,6 +1776,56 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         VK_HPP_STRUCT_OPERATORS(VkPipelineRasterizationStateStreamCreateInfoEXT, vk::PipelineRasterizationStateStreamCreateInfoEXT)
     } VkPipelineRasterizationStateStreamCreateInfoEXT;
 
+    // 
+    typedef struct VkPhysicalDeviceRayTracingPropertiesKHR {
+        VkStructureType sType                                   = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PROPERTIES_KHR;
+        void*           pNext                                   = nullptr;
+        uint32_t        shaderGroupHandleSize                   = 8u;
+        uint32_t        maxRecursionDepth                       = 1u;
+        uint32_t        maxShaderGroupStride                    = 8u;
+        uint32_t        shaderGroupBaseAlignment                = 16u;
+        uint64_t        maxGeometryCount                        = 1u;
+        uint64_t        maxInstanceCount                        = 1u;
+        uint64_t        maxPrimitiveCount                       = 1u;
+        uint32_t        maxDescriptorSetAccelerationStructures  = 1u;
+        uint32_t        shaderGroupHandleCaptureReplaySize      = 1u;
+
+#ifdef VK_ENABLE_BETA_EXTENSIONS
+        STRUCT_OPERATORS(VkPhysicalDeviceRayTracingPropertiesKHR)
+        VK_HPP_STRUCT_OPERATORS(VkPhysicalDeviceRayTracingPropertiesKHR, vk::PhysicalDeviceRayTracingPropertiesKHR)
+#endif
+    } VkPhysicalDeviceRayTracingPropertiesKHR;
+
+    //
+    typedef struct VkSemaphoreSignalInfo {
+        VkStructureType     sType       = VK_STRUCTURE_TYPE_SEMAPHORE_SIGNAL_INFO;
+        const void*         pNext       = nullptr;
+        VkSemaphore         semaphore   = {};
+        uint64_t            value       = 0u;
+
+        STRUCT_OPERATORS(VkSemaphoreSignalInfo)
+        VK_HPP_STRUCT_OPERATORS(VkSemaphoreSignalInfo, vk::SemaphoreSignalInfo)
+    } VkSemaphoreSignalInfo;
+
+    // 
+    typedef struct VkPresentInfoKHR {
+        VkStructureType         sType               = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+        const void*             pNext               = nullptr;
+        uint32_t                waitSemaphoreCount  = 0u;
+        const VkSemaphore*      pWaitSemaphores     = nullptr;
+        uint32_t                swapchainCount      = 0u;
+        const VkSwapchainKHR*   pSwapchains         = nullptr;
+        const uint32_t*         pImageIndices       = nullptr;
+        VkResult*               pResults            = nullptr;
+
+        VkPresentInfoKHR& setSwapchains(const std::vector<VkSwapchainKHR>& V = {}) { pSwapchains = V.data(); swapchainCount = static_cast<uint32_t>(V.size()); return *this; };
+        VkPresentInfoKHR& setWaitSemaphores(const std::vector<VkSemaphore>& V = {}) { pWaitSemaphores = V.data(); waitSemaphoreCount = static_cast<uint32_t>(V.size()); return *this; };
+
+        STRUCT_OPERATORS(VkPresentInfoKHR)
+        VK_HPP_STRUCT_OPERATORS(VkPresentInfoKHR, vk::PresentInfoKHR)
+    } VkPresentInfoKHR;
+
+
 #pragma pack(pop)
 
 #pragma pack(push, 1)

@@ -733,6 +733,7 @@ namespace vkt
             return sfd;
         }
 
+        // 
         inline VkRenderPass& createRenderPass()
         { // TODO: Render Pass V2
             auto formats = applicationWindow.surfaceFormat;
@@ -837,6 +838,7 @@ namespace vkt
             };
         }
 
+        // 
         inline std::vector<Framebuffer> createSwapchainFramebuffer(VkSwapchainKHR swapchain, VkRenderPass renderpass) {
             // framebuffers vector
             std::vector<Framebuffer> swapchainBuffers = {};
@@ -848,9 +850,9 @@ namespace vkt
                 timeline.initialValue = i;
 
                 // 
-                this->deviceDispatch->CreateSemaphoreW(vkh::VkSemaphoreCreateInfo{}, nullptr, &swapchainBuffers[i].drawSemaphore);
-                this->deviceDispatch->CreateSemaphoreW(vkh::VkSemaphoreCreateInfo{}, nullptr, &swapchainBuffers[i].computeSemaphore);
-                this->deviceDispatch->CreateSemaphoreW(vkh::VkSemaphoreCreateInfo{}, nullptr, &swapchainBuffers[i].presentSemaphore);
+                this->deviceDispatch->CreateSemaphore(vkh::VkSemaphoreCreateInfo{}, nullptr, &swapchainBuffers[i].drawSemaphore);
+                this->deviceDispatch->CreateSemaphore(vkh::VkSemaphoreCreateInfo{}, nullptr, &swapchainBuffers[i].computeSemaphore);
+                this->deviceDispatch->CreateSemaphore(vkh::VkSemaphoreCreateInfo{}, nullptr, &swapchainBuffers[i].presentSemaphore);
                 this->deviceDispatch->CreateFence(vkh::VkFenceCreateInfo{ .flags{} }, nullptr, &swapchainBuffers[i].waitFence);
             };
             return swapchainBuffers;
