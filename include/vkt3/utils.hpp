@@ -317,8 +317,8 @@ namespace vkt {
         vkh::VkMemoryBarrier memoryBarrier = {};
         memoryBarrier.srcAccessMask = { .eShaderWrite = 1,                   .eColorAttachmentWrite = 1, .eDepthStencilAttachmentWrite = 1, .eTransferWrite = 1, .eHostWrite = 1, .eMemoryWrite = 1, .eCommandProcessWrite = 1, .eAccelerationStructureWrite = 1, .eTransformFeedbackWrite = 1, .eTransformFeedbackCounterWrite = 1 };
         memoryBarrier.dstAccessMask = { .eUniformRead = 1, .eShaderRead = 1, .eColorAttachmentRead  = 1, .eDepthStencilAttachmentRead  = 1, .eTransferRead  = 1, .eHostRead  = 1, .eMemoryRead  = 1, .eCommandProcessRead  = 1, .eAccelerationStructureRead  = 1,                               .eTransformFeedbackCounterRead  = 1 };
-        const vkh::VkPipelineStageFlags srcStageMask = { .eVertexShader = 1, .eTessellationEvaluationShader = 1, .eGeometryShader = 1, .eFragmentShader = 1, .eColorAttachmentOutput = 1, .eComputeShader = 1, .eTransfer = 1, .eHost = 1, .eRayTracing = 1, .eTransformFeedback = 1, .eAccelerationStructureBuild = 1 };
-        const vkh::VkPipelineStageFlags dstStageMask = { .eVertexInput  = 1, .eTessellationControlShader    = 1, .eGeometryShader = 1, .eFragmentShader = 1,                              .eComputeShader = 1, .eTransfer = 1, .eHost = 1, .eRayTracing = 1, .eTransformFeedback = 1, .eAccelerationStructureBuild = 1 };
+        const vkh::VkPipelineStageFlags srcStageMask = { .eVertexShader = 1, .eTessellationEvaluationShader = 1, .eGeometryShader = 1, .eFragmentShader = 1, .eColorAttachmentOutput = 1, .eComputeShader = 1, .eTransfer = 1, .eHost = 1, .eRayTracingShader = 1, .eTransformFeedback = 1, .eAccelerationStructureBuild = 1 };
+        const vkh::VkPipelineStageFlags dstStageMask = { .eVertexInput  = 1, .eTessellationControlShader    = 1, .eGeometryShader = 1, .eFragmentShader = 1,                              .eComputeShader = 1, .eTransfer = 1, .eHost = 1, .eRayTracingShader = 1, .eTransformFeedback = 1, .eAccelerationStructureBuild = 1 };
         vkCmdPipelineBarrier(cmdBuffer, srcStageMask, dstStageMask, {},
             1u, memoryBarrier,
             0u, nullptr,
