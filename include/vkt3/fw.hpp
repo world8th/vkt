@@ -228,7 +228,7 @@ namespace vkt
 
         // instance layers
         std::vector<const char*> wantedLayers = {
-            //"VK_LAYER_KHRONOS_validation", // Still Validation SPAM by LancER
+            "VK_LAYER_KHRONOS_validation", // Still Validation SPAM by LancER
 
             //"VK_LAYER_LUNARG_assistant_layer",
             //"VK_LAYER_LUNARG_standard_validation",
@@ -371,7 +371,15 @@ namespace vkt
         inline const VkPhysicalDeviceMemoryProperties2& getMemoryProperties() const { return memoryProperties; };
         inline const VmaAllocator& getAllocator() const { return allocator; };
 
-        //
+        // 
+        inline vkt::uni_ptr<xvk::Device>& getDeviceDispatch() { return deviceDispatch; };
+        inline vkt::uni_ptr<xvk::Instance>& getInstanceDispatch() { return instanceDispatch; };
+
+        // 
+        inline const VkDevice& getDeviceDispatch() const { return device; };
+        inline const VkInstance& getInstanceDispatch() const { return instance; };
+
+        // 
         inline operator VkPhysicalDevice&() { return physicalDevice; };
         inline operator VkDevice&() { return device; };
         inline operator VkQueue&() { return queue; };

@@ -32,18 +32,22 @@ namespace vkt {
                 //this->buffer = VkBuffer{};
             }
         };
-        
+
         virtual BufferAllocation* construct(
             vkt::uni_arg<MemoryAllocationInfo> allocationInfo,
             vkt::uni_arg<vkh::VkBufferCreateInfo> createInfo = vkh::VkBufferCreateInfo{}
-        ) {
+        ) { // 
+            VkMemoryAllocateFlagsInfo allocFlags = {};
+            allocFlags.flags = VK_MEMORY_ALLOCATE_DEVICE_MASK_BIT;
+
+            // reload device and instance
+            if (!this->info.device) { this->info.device = this->info.deviceDispatch->handle; };
+            if (!this->info.instance) { this->info.instance = this->info.instanceDispatch->handle; };
+
             //this->buffer = this->info.device.createBuffer(*createInfo);
             vkCreateBuffer(allocationInfo->device, *createInfo, nullptr, &this->buffer);
             this->usage = createInfo->usage;
-            
-            VkMemoryAllocateFlagsInfo allocFlags = {};
-            allocFlags.flags = VK_MEMORY_ALLOCATE_DEVICE_MASK_BIT;
-            
+
             // 
             VkMemoryRequirements memReqs = {};
             vkGetBufferMemoryRequirements(allocationInfo->device, buffer, &memReqs);
@@ -51,7 +55,7 @@ namespace vkt {
             vkh::VkExportMemoryAllocateInfo exportAllocInfo {
                 .handleTypes = { .eOpaqueWin32 = 1 }
             };
-            
+
             // 
             vkh::VkMemoryAllocateInfo memAllocInfo = {};
             exportAllocInfo.pNext = &allocFlags;
@@ -227,9 +231,13 @@ namespace vkt {
 
             // when loader initialized
             if (vkt::vkGlobal::initialized) {
-                this->info.instanceDispatch = std::make_shared<xvk::Instance>(vkt::vkGlobal::loader, info.instance);
-                this->info.deviceDispatch = std::make_shared<xvk::Device>(this->info.instanceDispatch, info.device);
+                if (!this->info.instanceDispatch) this->info.instanceDispatch = std::make_shared<xvk::Instance>(vkt::vkGlobal::loader, info.instance);
+                if (!this->info.deviceDispatch) this->info.deviceDispatch = std::make_shared<xvk::Device>(this->info.instanceDispatch, info.device);
             };
+
+            // reload device and instance
+            if (!this->info.device) { this->info.device = info.device; };
+            if (!this->info.instance) { this->info.instance = info.instance; };
 
             // 
             if (createInfo->queueFamilyIndexCount) {
@@ -342,22 +350,25 @@ namespace vkt {
 
         // 
         virtual VkBufferView& createBufferView(const VkFormat& format = VkFormat::eUndefined) {
-            return (view = allocation->getDevice().createBufferView(vkh::VkBufferViewCreateInfo{
+            this->allocation->info.deviceDispatch->CreateBufferView(vkh::VkBufferViewCreateInfo{
                 .buffer = static_cast<VkBuffer>(this->bufRegion.buffer),
                 .format = static_cast<VkFormat>(format),
                 .offset = this->bufRegion.offset,
                 .range = this->bufInfo.range
-            }));
+                }, nullptr, & view);
+            return view;
         };
 
         // 
         virtual VkBufferView createBufferView(const VkFormat& format = VkFormat::eUndefined) const {
-            return allocation->getDevice().createBufferView(vkh::VkBufferViewCreateInfo{
+            VkBufferView view = {};
+            this->allocation->info.deviceDispatch->CreateBufferView(vkh::VkBufferViewCreateInfo{
                 .buffer = static_cast<VkBuffer>(this->bufRegion.buffer),
                 .format = static_cast<VkFormat>(format),
                 .offset = this->bufRegion.offset,
                 .range = this->bufInfo.range
-            });
+                }, nullptr, &view);
+            return view;
         };
 
         // alias Of getAllocation

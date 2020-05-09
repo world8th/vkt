@@ -187,16 +187,16 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
 
     // 
     typedef struct VkWriteDescriptorSet {
-        VkStructureType                  sType              = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-        const void*                      pNext              = nullptr;
-        VkDescriptorSet                  dstSet             = 0u;
-        uint32_t                         dstBinding         = 0u;
-        uint32_t                         dstArrayElement    = 0u;
-        uint32_t                         descriptorCount    = 1u;
-        VkDescriptorType                 descriptorType     = VK_DESCRIPTOR_TYPE_SAMPLER;
-        const vkh::VkDescriptorImageInfo*     pImageInfo         = nullptr;
-        const vkh::VkDescriptorBufferInfo*    pBufferInfo        = nullptr;
-        const VkBufferView*              pTexelBufferView   = nullptr;
+        VkStructureType                     sType              = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        const void*                         pNext              = nullptr;
+        VkDescriptorSet                     dstSet             = 0u;
+        uint32_t                            dstBinding         = 0u;
+        uint32_t                            dstArrayElement    = 0u;
+        uint32_t                            descriptorCount    = 1u;
+        VkDescriptorType                    descriptorType     = VK_DESCRIPTOR_TYPE_SAMPLER;
+        const vkh::VkDescriptorImageInfo*   pImageInfo         = nullptr;
+        const vkh::VkDescriptorBufferInfo*  pBufferInfo        = nullptr;
+        const VkBufferView*                 pTexelBufferView   = nullptr;
 
         STRUCT_OPERATORS(VkWriteDescriptorSet)
         VK_HPP_STRUCT_OPERATORS(VkWriteDescriptorSet,vk::WriteDescriptorSet)
@@ -1690,6 +1690,91 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         VK_HPP_STRUCT_OPERATORS(VkMemoryRequirements2, vk::MemoryRequirements2)
     } VkMemoryRequirements2;
 
+    // 
+    typedef union VkClearValue;
+
+    // 
+    typedef union VkClearColorValue {
+        glm::vec4 float32;
+        glm::ivec4 int32;
+        glm::uvec4 uint32 = glm::uvec4(0u);
+
+        operator glm::vec4&() { return float32; };
+        operator glm::ivec4& () { return int32; };
+        operator glm::uvec4& () { return uint32; };
+
+        operator const glm::vec4& () const { return float32; };
+        operator const glm::ivec4& () const { return int32; };
+        operator const glm::uvec4& () const { return uint32; };
+
+        VkClearColorValue& operator=(const glm::vec4& float32) { this->float32 = float32; };
+        VkClearColorValue& operator=(const glm::ivec4& int32) { this->int32 = int32; };
+        VkClearColorValue& operator=(const glm::uvec4& uint32) { this->uint32 = uint32; };
+
+        operator VkClearValue& () { return reinterpret_cast<VkClearValue&>(*this); };
+        operator const VkClearValue& () const { return reinterpret_cast<const VkClearValue&>(*this); };
+
+        STRUCT_OPERATORS(VkClearColorValue)
+        VK_HPP_STRUCT_OPERATORS(VkClearColorValue, vk::ClearColorValue)
+    } VkClearColorValue;
+
+    // 
+    typedef struct VkClearDepthStencilValue {
+        float       depth = 1u;
+        uint32_t    stencil : 8;
+
+        // WARNING! DON'T CONSTRUCT FROM THAT!
+        operator VkClearValue& () { return reinterpret_cast<VkClearValue&>(*this); };
+        operator const VkClearValue& () const { return reinterpret_cast<const VkClearValue&>(*this); };
+
+        STRUCT_OPERATORS(VkClearDepthStencilValue)
+        VK_HPP_STRUCT_OPERATORS(VkClearDepthStencilValue, vk::ClearDepthStencilValue)
+    } VkClearDepthStencilValue;
+
+    // 
+    typedef union VkClearValue {
+        VkClearColorValue           color = {};
+        VkClearDepthStencilValue    depthStencil;
+
+        operator VkClearColorValue& () { return color; };
+        operator VkClearDepthStencilValue& () { return depthStencil; };
+
+        operator const VkClearColorValue& () const { return color; };
+        operator const VkClearDepthStencilValue& () const { return depthStencil; };
+
+        VkClearValue& operator=(const VkClearColorValue& color) { this->color = color; };
+        VkClearValue& operator=(const VkClearDepthStencilValue& depthStencil) { this->depthStencil = depthStencil; };
+
+        STRUCT_OPERATORS(VkClearValue)
+        VK_HPP_STRUCT_OPERATORS(VkClearValue, vk::ClearValue)
+    } VkClearValue;
+
+    // 
+    typedef struct VkRenderPassBeginInfo {
+        VkStructureType     sType           = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+        const void*         pNext           = nullptr;
+        VkRenderPass        renderPass      = {};
+        VkFramebuffer       framebuffer     = {};
+        VkRect2D            renderArea      = {};
+        uint32_t            clearValueCount = 0u;
+        const VkClearValue* pClearValues    = nullptr;
+
+        VkRenderPassBeginInfo& setClearValues(const std::vector<VkClearValue>& V = {}) { pClearValues = V.data(); clearValueCount = static_cast<uint32_t>(V.size()); return *this; };
+
+        STRUCT_OPERATORS(VkRenderPassBeginInfo)
+        VK_HPP_STRUCT_OPERATORS(VkRenderPassBeginInfo, vk::RenderPassBeginInfo)
+    } VkRenderPassBeginInfo;
+
+    //
+    typedef struct VkPipelineRasterizationStateStreamCreateInfoEXT {
+        VkStructureType                                     sType               = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_STREAM_CREATE_INFO_EXT;
+        const void*                                         pNext               = nullptr;
+        VkPipelineRasterizationStateStreamCreateFlagsEXT    flags               = {};
+        uint32_t                                            rasterizationStream = 0u;
+
+        STRUCT_OPERATORS(VkPipelineRasterizationStateStreamCreateInfoEXT)
+        VK_HPP_STRUCT_OPERATORS(VkPipelineRasterizationStateStreamCreateInfoEXT, vk::PipelineRasterizationStateStreamCreateInfoEXT)
+    } VkPipelineRasterizationStateStreamCreateInfoEXT;
 
 #pragma pack(pop)
 

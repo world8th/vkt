@@ -438,6 +438,12 @@ namespace vkt {
         }
     };
 
+    // 
+    VkResult AllocateDescriptorSetWithUpdate(vkt::uni_ptr<xvk::Device>& device, vkh::VsDescriptorSetCreateInfoHelper& helper, VkDescriptorSet& descriptorSet) {
+        if (!descriptorSet) { device->AllocateDescriptorSets(helper, &descriptorSet); };
+        device->UpdateDescriptorSets(1u, helper.mapWriteDescriptorSet()[0], 0u, {});
+        return VK_SUCCESS;
+    };
 
 
 

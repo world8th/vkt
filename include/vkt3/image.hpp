@@ -48,6 +48,10 @@ namespace vkt {
             VkMemoryAllocateFlagsInfo allocFlags = {};
             allocFlags.flags = VK_MEMORY_ALLOCATE_DEVICE_MASK_BIT;
 
+            // reload device and instance
+            if (!this->info.device) { this->info.device = this->info.deviceDispatch->handle; };
+            if (!this->info.instance) { this->info.instance = this->info.instanceDispatch->handle; };
+
             // 
             //this->image = this->info.device.createImage(createInfo->hpp().setUsage(usage));
             createInfo->usage = usage;
@@ -64,7 +68,7 @@ namespace vkt {
             memAllocInfo.pNext = &exportAllocInfo;
             memAllocInfo.allocationSize = memReqs.size;
             memAllocInfo.memoryTypeIndex = uint32_t( allocationInfo->getMemoryType(memReqs.memoryTypeBits, {.eDeviceLocal = 1}));
-                  
+
             // 
             VkDeviceMemory memory = {};
             vkAllocateMemory(info.device, memAllocInfo, nullptr, &memory);
@@ -213,7 +217,17 @@ namespace vkt {
             VmaAllocatorInfo info = {};
             vmaGetAllocatorInfo(this->allocator = allocator.ref(), &info);
             //this->info.dispatch = VkDispatchLoaderDynamic(info.instance, vkGetInstanceProcAddr, this->info.device = info.device, vkGetDeviceProcAddr); // 
-             
+
+            // when loader initialized
+            if (vkt::vkGlobal::initialized) {
+                if (!this->info.instanceDispatch) this->info.instanceDispatch = std::make_shared<xvk::Instance>(vkt::vkGlobal::loader, info.instance);
+                if (!this->info.deviceDispatch) this->info.deviceDispatch = std::make_shared<xvk::Device>(this->info.instanceDispatch, info.device);
+            };
+
+            // reload device and instance
+            if (!this->info.device) { this->info.device = info.device; };
+            if (!this->info.instance) { this->info.instance = info.instance; };
+
             // 
             if (createInfo->queueFamilyIndexCount) {
                 this->info.queueFamilyIndices = std::vector<uint32_t>(createInfo->queueFamilyIndexCount);
@@ -400,6 +414,10 @@ namespace vkt {
         virtual operator const VkSampler&() const { return this->imgInfo.sampler; };
 
         // 
+        virtual operator const vkh::VkImageSubresourceLayers& () const { return this->subresourceLayers(); };
+        virtual operator const    ::VkImageSubresourceLayers& () const { return this->subresourceLayers(); };
+
+        // 
         virtual operator const VkImageSubresourceLayers() const { return VkImageSubresourceLayers{ reinterpret_cast<const VkImageAspectFlags&>(subresourceRange.aspectMask), subresourceRange.baseMipLevel, subresourceRange.baseArrayLayer, subresourceRange.layerCount }; };
 
 #ifdef ENABLE_OPENGL_INTEROP
@@ -435,14 +453,16 @@ namespace vkt {
         virtual VkImageView& getImageView() { return reinterpret_cast<VkImageView&>(this->imgInfo.imageView); };
         virtual VkImageLayout& getImageLayout() { return reinterpret_cast<VkImageLayout&>(this->imgInfo.imageLayout); };
         virtual VkSampler& getSampler() { return reinterpret_cast<VkSampler&>(this->imgInfo.sampler); };
-        virtual VkImageSubresourceRange& getImageSubresourceRange() { return this->subresourceRange; };
+        virtual vkh::VkImageSubresourceRange& getImageSubresourceRange() { return this->subresourceRange; };
 
         // 
         virtual const VkImageView& getImageView() const { return reinterpret_cast<const VkImageView&>(this->imgInfo.imageView); };
         virtual const VkImageLayout& getImageLayout() const { return reinterpret_cast<const VkImageLayout&>(this->imgInfo.imageLayout); };
         virtual const VkSampler& getSampler() const { return reinterpret_cast<const VkSampler&>(this->imgInfo.sampler); };
-        virtual const VkImageSubresourceRange& getImageSubresourceRange() const { return this->subresourceRange; };
+        virtual const vkh::VkImageSubresourceRange& getImageSubresourceRange() const { return this->subresourceRange; };
 
+        // ALIASES
+        virtual vkh::VkImageSubresourceLayers getImageSubresourceLayers() const { return this->subresourceLayers(); };
 
         // 
         virtual unsigned& getGL() {
