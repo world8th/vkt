@@ -200,6 +200,8 @@ namespace vkh {
         eTransformFeedback:1,
         eAccelerationStructureBuild:1;
 
+#define eRayTracing eRayTracingShader
+
         OPERATORS(VkPipelineStageFlags,::VkPipelineStageFlagBits,::VkFlags)
         VK_HPP_OPERATORS(VkPipelineStageFlags,vk::PipelineStageFlags,vk::PipelineStageFlagBits)
     };
