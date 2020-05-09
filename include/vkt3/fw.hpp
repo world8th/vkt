@@ -250,14 +250,8 @@ namespace vkt
 
 
     public: friend GPUFramework;
-        GPUFramework() {
-        };
-
-        //GPUFramework(const GPUFramework& fw) { *this = fw; };
-        //GPUFramework(GPUFramework* fw) { *this = fw; };
-        GPUFramework(vkt::uni_ptr<GPUFramework> fw) {
-            *this = fw; vkt::vkGlobal();
-        };
+        GPUFramework() { vkt::vkGlobal(); };
+        GPUFramework(vkt::uni_ptr<GPUFramework> fw) { *this = fw; vkt::vkGlobal(); };
 
         // 
         GPUFramework& operator=(vkt::uni_ptr<GPUFramework> fw) {
@@ -304,6 +298,7 @@ namespace vkt
         vk::PhysicalDeviceBufferDeviceAddressFeatures gDeviceAddress{};
 
         // XVK loaded (NEW!)
+        VmaVulkanFunctions func = {};
         vkt::uni_ptr<xvk::Instance> instanceDispatch = {};
         vkt::uni_ptr<xvk::Device> deviceDispatch = {};
 
@@ -422,7 +417,6 @@ namespace vkt
         };
 
         inline VkInstance& createInstance() {
-            // 
             assert((instanceVersion = vkh::vsEnumerateInstanceVersion()) >= VK_MAKE_VERSION(1, 2, 131));
 
             // get required extensions
@@ -491,11 +485,11 @@ namespace vkt
             debugCreateInfo.pUserData = nullptr;
 
             // Dynamically Load the Vulkan library
-            instanceDispatch = std::make_shared<xvk::Instance>(vkt::vkGlobal::loader, (this->instanceCreate = cinstanceinfo));
-            instance = instanceDispatch->handle;
+            this->instanceDispatch = std::make_shared<xvk::Instance>(vkt::vkGlobal::loader, (this->instanceCreate = cinstanceinfo));
+            this->instance = instanceDispatch->handle;
 
             // get physical device for application
-            physicalDevices = vkh::vsEnumeratePhysicalDevices(this->instance);
+            physicalDevices = vkh::vsEnumeratePhysicalDevices(this->instanceDispatch);
 
             // 
 #ifdef VKT_ENABLE_DEBUG
@@ -518,7 +512,7 @@ namespace vkt
 
             // use extensions
             auto deviceExtensions = std::vector<const char*>();
-            auto gpuExtensions = vkh::vsEnumerateDeviceExtensionProperties(physicalDevice); // TODO: vkh helper for getting
+            auto gpuExtensions = vkh::vsEnumerateDeviceExtensionProperties(this->instanceDispatch, physicalDevice); // TODO: vkh helper for getting
             for (auto w : wantedDeviceExtensions) {
                 for (auto i : gpuExtensions) {
                     if (std::string(i.extensionName).compare(w) == 0) {
@@ -529,7 +523,7 @@ namespace vkt
 
             // use layers
             auto deviceLayers = std::vector<const char*>();
-            auto gpuLayers = vkh::vsEnumerateDeviceLayerProperties(physicalDevice); // TODO: vkh helper for getting
+            auto gpuLayers = vkh::vsEnumerateDeviceLayerProperties(this->instanceDispatch, physicalDevice); // TODO: vkh helper for getting
             for (auto w : wantedLayers) {
                 for (auto i : gpuLayers) {
                     if (std::string(i.layerName).compare(w) == 0) {
@@ -555,16 +549,16 @@ namespace vkt
             this->gFeatures.pNext = &this->gDescIndexing;
 
             // 
-            vkh::vsGetPhysicalDeviceFeatures2(physicalDevice, this->gFeatures);
-            vkh::vsGetPhysicalDeviceProperties2(physicalDevice, this->gProperties);
-            vkh::vsGetPhysicalDeviceMemoryProperties2(physicalDevice, this->memoryProperties);
+            vkh::vsGetPhysicalDeviceFeatures2(this->instanceDispatch, physicalDevice, this->gFeatures);
+            vkh::vsGetPhysicalDeviceProperties2(this->instanceDispatch, physicalDevice, this->gProperties);
+            vkh::vsGetPhysicalDeviceMemoryProperties2(this->instanceDispatch, physicalDevice, this->memoryProperties);
 
             // get features and queue family properties
-            auto gpuQueueProps = vkh::vsGetPhysicalDeviceQueueFamilyProperties(physicalDevice); // TODO: vkh helper for getting
+            auto gpuQueueProps = vkh::vsGetPhysicalDeviceQueueFamilyProperties(this->instanceDispatch, physicalDevice); // TODO: vkh helper for getting
 
             // queue family initial
             float priority = 1.0f;
-            uint32_t computeFamilyIndex = -1, graphicsFamilyIndex = -1;
+            int32_t computeFamilyIndex = -1, graphicsFamilyIndex = -1;
             auto queueCreateInfos = std::vector<vkh::VkDeviceQueueCreateInfo>();
 
 #ifdef VKT_ENABLE_GLFW_SUPPORT
@@ -574,8 +568,9 @@ namespace vkt
                 VkBool32 support = false;
                 vkGetPhysicalDeviceSurfaceSupportKHR(physicalDevice, graphicsFamilyIndex, surface(), &support);
                 if (queuefamily.queueFlags.eCompute && queuefamily.queueFlags.eGraphics && support) {
-                    queueCreateInfos.push_back(vkh::VkDeviceQueueCreateInfo{ .queueFamilyIndex = computeFamilyIndex, .queueCount = 1, .pQueuePriorities = &priority });
-                    queueFamilyIndices.push_back(graphicsFamilyIndex);
+                    queueCreateInfos.push_back(vkh::VkDeviceQueueCreateInfo{ .queueFamilyIndex = uint32_t(computeFamilyIndex), .queueCount = 1, .pQueuePriorities = &priority });
+                    queueFamilyIndices.push_back(uint32_t(graphicsFamilyIndex));
+                    queueCreateInfos.back().queueFamilyIndex = uint32_t(graphicsFamilyIndex);
                     break;
                 };
             };
@@ -583,8 +578,9 @@ namespace vkt
             for (auto queuefamily : gpuQueueProps) {
                 computeFamilyIndex++;
                 if (queuefamily.queueFlags.eCompute) { // TODO: vkh helper for getting, bitfeilds support
-                    queueCreateInfos.push_back(vkh::VkDeviceQueueCreateInfo{ .queueFamilyIndex = computeFamilyIndex, .queueCount = 1, .pQueuePriorities = &priority });
-                    queueFamilyIndices.push_back(computeFamilyIndex);
+                    queueCreateInfos.push_back(vkh::VkDeviceQueueCreateInfo{ .queueFamilyIndex = uint32_t(computeFamilyIndex), .queueCount = 1, .pQueuePriorities = &priority });
+                    queueFamilyIndices.push_back(uint32_t(computeFamilyIndex));
+                    queueCreateInfos.back().queueFamilyIndex = uint32_t(computeFamilyIndex);
                     break;
                 };
             };
@@ -605,6 +601,7 @@ namespace vkt
                     //.pEnabledFeatures = &(VkPhysicalDeviceFeatures&)(gFeatures.features)
                 }));
                 this->deviceDispatch->CreatePipelineCache(vkh::VkPipelineCacheCreateInfo(), nullptr, &this->pipelineCache);
+                this->device = this->deviceDispatch->handle;
             };
 
             // 
@@ -612,8 +609,33 @@ namespace vkt
             this->deviceDispatch->CreateFence(vkh::VkFenceCreateInfo{}, nullptr, &this->fence);
             this->deviceDispatch->CreateCommandPool(vkh::VkCommandPoolCreateInfo{ .flags = {.eResetCommandBuffer = 1}, .queueFamilyIndex = queueFamilyIndex }, nullptr, &this->commandPool);
 
+            // REMAP WITH XVK AGAIN!
+            func.vkAllocateMemory = this->deviceDispatch->vkAllocateMemory;
+            func.vkBindBufferMemory = this->deviceDispatch->vkBindBufferMemory;
+            func.vkBindBufferMemory2KHR = this->deviceDispatch->vkBindBufferMemory2;
+            func.vkBindImageMemory = this->deviceDispatch->vkBindImageMemory;
+            func.vkBindImageMemory2KHR = this->deviceDispatch->vkBindImageMemory2;
+            func.vkCmdCopyBuffer = this->deviceDispatch->vkCmdCopyBuffer;
+            func.vkCreateBuffer = this->deviceDispatch->vkCreateBuffer;
+            func.vkCreateImage = this->deviceDispatch->vkCreateImage;
+            func.vkDestroyBuffer = this->deviceDispatch->vkDestroyBuffer;
+            func.vkDestroyImage = this->deviceDispatch->vkDestroyImage;
+            func.vkFlushMappedMemoryRanges = this->deviceDispatch->vkFlushMappedMemoryRanges;
+            func.vkFreeMemory = this->deviceDispatch->vkFreeMemory;
+            func.vkGetBufferMemoryRequirements = this->deviceDispatch->vkGetBufferMemoryRequirements;
+            func.vkGetBufferMemoryRequirements2KHR = this->deviceDispatch->vkGetBufferMemoryRequirements2;
+            func.vkGetImageMemoryRequirements = this->deviceDispatch->vkGetImageMemoryRequirements;
+            func.vkGetImageMemoryRequirements2KHR = this->deviceDispatch->vkGetImageMemoryRequirements2;
+            func.vkGetPhysicalDeviceMemoryProperties = this->instanceDispatch->vkGetPhysicalDeviceMemoryProperties;
+            func.vkGetPhysicalDeviceMemoryProperties2KHR = this->instanceDispatch->vkGetPhysicalDeviceMemoryProperties2;
+            func.vkGetPhysicalDeviceProperties = this->instanceDispatch->vkGetPhysicalDeviceProperties;
+            func.vkInvalidateMappedMemoryRanges = this->deviceDispatch->vkInvalidateMappedMemoryRanges;
+            func.vkMapMemory = this->deviceDispatch->vkMapMemory;
+            func.vkUnmapMemory = this->deviceDispatch->vkUnmapMemory;
+
             // 
             VmaAllocatorCreateInfo vma_info = {};
+            vma_info.pVulkanFunctions = &func;
             vma_info.device = this->device;
             vma_info.instance = this->instance;
             vma_info.physicalDevice = this->physicalDevice;
@@ -674,7 +696,7 @@ namespace vkt
         inline SurfaceFormat& getSurfaceFormat(VkPhysicalDevice gpu)
         {
             //auto surfaceFormats = gpu.getSurfaceFormatsKHR(applicationWindow.surface);
-            auto surfaceFormats = vkh::vsGetPhysicalDeviceSurfaceFormatsKHR(gpu, applicationWindow.surface);
+            auto surfaceFormats = vkh::vsGetPhysicalDeviceSurfaceFormatsKHR(this->instanceDispatch, gpu, applicationWindow.surface);
 
             //const std::vector<VkFormat> preferredFormats = { VkFormat::eR16G16B16A16Unorm, VkFormat::eA2B10G10R10UnormPack32, VkFormat::eA2R10G10B10UintPack32, VkFormat::eR8G8B8A8Srgb, VkFormat::eB8G8R8A8Srgb, VkFormat::eA8B8G8R8SrgbPack32, VkFormat::eR8G8B8A8Unorm, VkFormat::eB8G8R8A8Unorm, VkFormat::eA8B8G8R8UnormPack32 };
             const std::vector<VkFormat> preferredFormats = { VK_FORMAT_R16G16B16A16_UNORM, VK_FORMAT_A2B10G10R10_UNORM_PACK32, VK_FORMAT_A2R10G10B10_UNORM_PACK32, VK_FORMAT_R8G8B8A8_SRGB, VK_FORMAT_B8G8R8A8_SRGB, VK_FORMAT_A8B8G8R8_SRGB_PACK32, VK_FORMAT_R8G8B8A8_UNORM, VK_FORMAT_B8G8R8A8_UNORM, VK_FORMAT_A8B8G8R8_UNORM_PACK32 };
@@ -707,7 +729,7 @@ namespace vkt
             VkColorSpaceKHR surfaceColorSpace = surfaceFormats[surfaceFormatID].colorSpace;
 
             // get format properties?
-            auto formatProperties = vkh::vsGetPhysicalDeviceFormatProperties(gpu, surfaceColorFormat);//gpu.getFormatProperties(surfaceColorFormat);
+            auto formatProperties = vkh::vsGetPhysicalDeviceFormatProperties(this->instanceDispatch, gpu, surfaceColorFormat);//gpu.getFormatProperties(surfaceColorFormat);
 
             // only if these depth formats
             std::vector<VkFormat> depthFormats = {
@@ -717,7 +739,7 @@ namespace vkt
             // choice supported depth format
             VkFormat surfaceDepthFormat = depthFormats[0];
             for (auto format : depthFormats) {
-                auto depthFormatProperties = vkh::vsGetPhysicalDeviceFormatProperties(gpu, format);
+                auto depthFormatProperties = vkh::vsGetPhysicalDeviceFormatProperties(this->instanceDispatch, gpu, format);
                 if (depthFormatProperties.optimalTilingFeatures & VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT) {
                     surfaceDepthFormat = format; break;
                 }
@@ -788,7 +810,7 @@ namespace vkt
         {
             // The swapchain handles allocating frame images.
             auto& surfaceFormats = getSurfaceFormat(this->physicalDevice);
-            auto  gpuMemoryProps = vkh::vsGetPhysicalDeviceMemoryProperties(physicalDevice);//physicalDevice.getMemoryProperties();
+            auto  gpuMemoryProps = vkh::vsGetPhysicalDeviceMemoryProperties(this->instanceDispatch, physicalDevice);//physicalDevice.getMemoryProperties();
 
             // 
             auto imageInfoVK = vkh::VkImageCreateInfo{};
@@ -827,7 +849,7 @@ namespace vkt
             }, nullptr, &depthImageView);
 
             // 
-            auto swapchainImages = vkh::vsGetPhysicalDeviceSurfaceFormatsKHR(device, swapchain);
+            auto swapchainImages = vkh::vsGetPhysicalDeviceSurfaceFormatsKHR(this->deviceDispatch, swapchain);
             swapchainBuffers.resize(swapchainImages.size());
             for (int i = 0; i < swapchainImages.size(); i++)
             { // create framebuffers
@@ -863,8 +885,8 @@ namespace vkt
         {
             auto& formats = getSurfaceFormat(this->physicalDevice);
             auto& surface = applicationWindow.surface;
-            auto surfaceCapabilities = vkh::vsGetPhysicalDeviceSurfaceCapabilitiesKHR(physicalDevice, surface);
-            auto surfacePresentModes = vkh::vsGetPhysicalDeviceSurfacePresentModesKHR(physicalDevice, surface);
+            auto surfaceCapabilities = vkh::vsGetPhysicalDeviceSurfaceCapabilitiesKHR(this->instanceDispatch, physicalDevice, surface);
+            auto surfacePresentModes = vkh::vsGetPhysicalDeviceSurfacePresentModesKHR(this->instanceDispatch, physicalDevice, surface);
 
             // check the surface width/height.
             if (!(surfaceCapabilities.currentExtent.width == -1 ||
@@ -884,14 +906,14 @@ namespace vkt
             };
 
             // swapchain info
-            auto swapchainCreateInfo = VkSwapchainCreateInfoKHR();
+            auto swapchainCreateInfo = vkh::VkSwapchainCreateInfoKHR{};
             swapchainCreateInfo.surface = surface;
             swapchainCreateInfo.minImageCount = std::min(surfaceCapabilities.maxImageCount, 3u);
             swapchainCreateInfo.imageFormat = formats.colorFormat;
             swapchainCreateInfo.imageColorSpace = formats.colorSpace;
             swapchainCreateInfo.imageExtent = applicationWindow.surfaceSize;
             swapchainCreateInfo.imageArrayLayers = 1;
-            swapchainCreateInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+            swapchainCreateInfo.imageUsage = { .eColorAttachment = 1 };
             swapchainCreateInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
             swapchainCreateInfo.preTransform = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;
             swapchainCreateInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
@@ -900,7 +922,7 @@ namespace vkt
 
             // create swapchain
             VkSwapchainKHR swapchain = {};
-            this->deviceDispatch->CreateSwapchainKHR(&swapchainCreateInfo, nullptr, &swapchain);
+            this->deviceDispatch->CreateSwapchainKHR(swapchainCreateInfo, nullptr, &swapchain);
             return swapchain;
         }
 #endif

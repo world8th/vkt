@@ -1825,6 +1825,33 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         VK_HPP_STRUCT_OPERATORS(VkPresentInfoKHR, vk::PresentInfoKHR)
     } VkPresentInfoKHR;
 
+    // 
+    typedef struct VkSwapchainCreateInfoKHR {
+        VkStructureType                 sType                   = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+        const void*                     pNext                   = nullptr;
+        VkSwapchainCreateFlagsKHR       flags                   = {};
+        VkSurfaceKHR                    surface                 = {};
+        uint32_t                        minImageCount           = 0u;
+        VkFormat                        imageFormat             = VK_FORMAT_R8G8B8A8_SRGB;
+        VkColorSpaceKHR                 imageColorSpace         = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
+        VkExtent2D                      imageExtent             = {1u, 1u};
+        uint32_t                        imageArrayLayers        = 1u;
+        VkImageUsageFlags               imageUsage              = { .eColorAttachment = 1};
+        VkSharingMode                   imageSharingMode        = VK_SHARING_MODE_EXCLUSIVE;
+        uint32_t                        queueFamilyIndexCount   = 1u;
+        const uint32_t*                 pQueueFamilyIndices     = nullptr;
+        VkSurfaceTransformFlagBitsKHR   preTransform            = VK_SURFACE_TRANSFORM_INHERIT_BIT_KHR;
+        VkCompositeAlphaFlagBitsKHR     compositeAlpha          = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+        VkPresentModeKHR                presentMode             = VK_PRESENT_MODE_IMMEDIATE_KHR;
+        VkBool32                        clipped                 = true;
+        VkSwapchainKHR                  oldSwapchain            = {};
+
+        VkSwapchainCreateInfoKHR& setQueueFamilyIndices(const std::vector<uint32_t>& V = {}) { pQueueFamilyIndices = V.data(); queueFamilyIndexCount = static_cast<uint32_t>(V.size()); return *this; };
+
+        STRUCT_OPERATORS(VkSwapchainCreateInfoKHR)
+        VK_HPP_STRUCT_OPERATORS(VkSwapchainCreateInfoKHR, vk::SwapchainCreateInfoKHR)
+    } VkSwapchainCreateInfoKHR;
+
 
 #pragma pack(pop)
 

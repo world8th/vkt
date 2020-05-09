@@ -55,11 +55,13 @@ namespace vkt {
             // 
             //this->image = this->info.device.createImage(createInfo->hpp().setUsage(usage));
             createInfo->usage = usage;
-            vkCreateImage(this->info.device, *createInfo, nullptr, &this->image);
+            //vkCreateImage(this->info.device, *createInfo, nullptr, &this->image);
+            this->info.deviceDispatch->CreateImage(*createInfo, nullptr, &this->image);
 
             // 
             VkMemoryRequirements memReqs = {};
-            vkGetImageMemoryRequirements(this->info.device, this->image, &memReqs);
+            //vkGetImageMemoryRequirements(this->info.device, this->image, &memReqs);
+            this->info.deviceDispatch->GetImageMemoryRequirements(this->image, &memReqs);
             vkh::VkExportMemoryAllocateInfo exportAllocInfo{.handleTypes = {.eOpaqueWin32 = 1}};
 
             //
@@ -71,9 +73,11 @@ namespace vkt {
 
             // 
             VkDeviceMemory memory = {};
-            vkAllocateMemory(info.device, memAllocInfo, nullptr, &memory);
-            vkBindImageMemory(this->info.device, this->image, memory, 0u);
-            this->info.initialLayout = VkImageLayout(createInfo->initialLayout);
+            //vkAllocateMemory(info.device, memAllocInfo, nullptr, &memory);
+            //vkBindImageMemory(this->info.device, this->image, memory, 0u);
+            this->info.deviceDispatch->AllocateMemory(memAllocInfo, nullptr, &memory);
+            this->info.deviceDispatch->BindImageMemory(this->image, memory, 0u);
+            this->info.initialLayout = createInfo->initialLayout;
 
 #if defined(ENABLE_OPENGL_INTEROP) && defined(VK_USE_PLATFORM_WIN32_KHR)
             this->info.handle = info.device.getMemoryWin32HandleKHR({ info.memory, VkExternalMemoryHandleTypeFlagBits::eOpaqueWin32 }, this->info.dispatch);
@@ -371,7 +375,8 @@ namespace vkt {
         virtual const VkSampler& refSampler() const { return this->imgInfo.sampler; };
 
         virtual ImageRegion& transfer(VkCommandBuffer& cmdBuf) {
-            vkt::imageBarrier(cmdBuf, vkt::ImageBarrierInfo{ 
+            vkt::imageBarrier(cmdBuf, vkt::ImageBarrierInfo{
+                .device = this->allocation->info.deviceDispatch,
                 .image = this->allocation->getImage(),
                 .targetLayout = reinterpret_cast<const VkImageLayout&>(this->imgInfo.imageLayout),
                 .originLayout = this->allocation->info.initialLayout,
@@ -379,8 +384,10 @@ namespace vkt {
             });
             return *this;
         };
+
         virtual const ImageRegion& transfer(VkCommandBuffer& cmdBuf) const {
             vkt::imageBarrier(cmdBuf, vkt::ImageBarrierInfo{
+                .device = this->allocation->info.deviceDispatch,
                 .image = this->allocation->getImage(),
                 .targetLayout = reinterpret_cast<const VkImageLayout&>(this->imgInfo.imageLayout),
                 .originLayout = this->allocation->info.initialLayout,

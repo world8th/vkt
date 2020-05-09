@@ -41,16 +41,17 @@ namespace vkt {
             allocFlags.flags = VK_MEMORY_ALLOCATE_DEVICE_MASK_BIT;
 
             // reload device and instance
+            //this->info = allocationInfo;
             if (!this->info.device) { this->info.device = this->info.deviceDispatch->handle; };
             if (!this->info.instance) { this->info.instance = this->info.instanceDispatch->handle; };
 
             //this->buffer = this->info.device.createBuffer(*createInfo);
-            vkCreateBuffer(allocationInfo->device, *createInfo, nullptr, &this->buffer);
+            this->info.deviceDispatch->CreateBuffer(*createInfo, nullptr, &this->buffer);
             this->usage = createInfo->usage;
 
             // 
             VkMemoryRequirements memReqs = {};
-            vkGetBufferMemoryRequirements(allocationInfo->device, buffer, &memReqs);
+            this->info.deviceDispatch->GetBufferMemoryRequirements(buffer, &memReqs);
             //allocationInfo->device.getBufferMemoryRequirements(buffer);
             vkh::VkExportMemoryAllocateInfo exportAllocInfo {
                 .handleTypes = { .eOpaqueWin32 = 1 }
@@ -66,8 +67,8 @@ namespace vkt {
             // 
             //this->info.device.bindBufferMemory(buffer, info.memory = info.device.allocateMemory(memAllocInfo), 0);
             VkDeviceMemory memory = {};
-            vkAllocateMemory(info.device, memAllocInfo, nullptr, &memory);
-            vkBindBufferMemory(allocationInfo->device, buffer, memory, 0u);
+            this->info.deviceDispatch->AllocateMemory(memAllocInfo, nullptr, &memory);
+            this->info.deviceDispatch->BindBufferMemory(buffer, memory, 0u);
 
 #if defined(ENABLE_OPENGL_INTEROP) && defined(VK_USE_PLATFORM_WIN32_KHR)
             this->info.handle = info.device.getMemoryWin32HandleKHR({ info.memory, VkExternalMemoryHandleTypeFlagBits::eOpaqueWin32 }, this->info.dispatch);
@@ -161,7 +162,7 @@ namespace vkt {
                 std::cerr << "Bad Device Address" << std::endl;
                 assert(true);
             };
-            return vkh::VkDeviceOrHostAddressKHR{ .deviceAddress = this->usage.eSharedDeviceAddress ? vkGetBufferDeviceAddress(this->info.device, vkh::VkBufferDeviceAddressInfo{.buffer = this->buffer}) : 0ull };
+            return vkh::VkDeviceOrHostAddressKHR{ .deviceAddress = this->usage.eSharedDeviceAddress ? this->info.deviceDispatch->GetBufferDeviceAddress(vkh::VkBufferDeviceAddressInfo{.buffer = this->buffer}) : 0ull };
         };
                    
         // 
@@ -170,7 +171,7 @@ namespace vkt {
                 std::cerr << "Bad Device Address" << std::endl;
                 assert(true);
             };
-            return vkh::VkDeviceOrHostAddressConstKHR{ .deviceAddress = this->usage.eSharedDeviceAddress ? vkGetBufferDeviceAddress(this->info.device, vkh::VkBufferDeviceAddressInfo{.buffer = this->buffer}) : 0ull };
+            return vkh::VkDeviceOrHostAddressConstKHR{ .deviceAddress = this->usage.eSharedDeviceAddress ? const_cast<MemoryAllocationInfo&>(this->info).deviceDispatch->GetBufferDeviceAddress(vkh::VkBufferDeviceAddressInfo{.buffer = this->buffer}) : 0ull };
         };
             
         // getter by operator (for direct pass)
@@ -287,16 +288,16 @@ namespace vkt {
                 std::cerr << "Bad Device Address" << std::endl;
                 assert(true);
             };
-            return vkh::VkDeviceOrHostAddressKHR{ .deviceAddress = this->usage.eSharedDeviceAddress ? vkGetBufferDeviceAddress(this->info.device, vkh::VkBufferDeviceAddressInfo{.buffer = this->buffer}) : 0ull };
+            return vkh::VkDeviceOrHostAddressKHR{ .deviceAddress = this->usage.eSharedDeviceAddress ? this->info.deviceDispatch->GetBufferDeviceAddress(vkh::VkBufferDeviceAddressInfo{.buffer = this->buffer}) : 0ull };
         };
-         
+
         // 
         virtual vkh::VkDeviceOrHostAddressConstKHR deviceAddress() const {
             if (!this->usage.eSharedDeviceAddress) {
                 std::cerr << "Bad Device Address" << std::endl;
                 assert(true);
             };
-            return vkh::VkDeviceOrHostAddressConstKHR{ .deviceAddress = this->usage.eSharedDeviceAddress ? vkGetBufferDeviceAddress(this->info.device, vkh::VkBufferDeviceAddressInfo{.buffer = this->buffer}) : 0ull};
+            return vkh::VkDeviceOrHostAddressConstKHR{ .deviceAddress = this->usage.eSharedDeviceAddress ? const_cast<MemoryAllocationInfo&>(this->info).deviceDispatch->GetBufferDeviceAddress(vkh::VkBufferDeviceAddressInfo{.buffer = this->buffer}) : 0ull};
         };
 
     // 
@@ -483,12 +484,12 @@ namespace vkt {
         virtual vkh::VkDeviceOrHostAddressKHR deviceAddress() {
             return this->allocation->deviceAddress();
         };
-         
+
         // get deviceAddress with offset (currently, prefer unshifted)
         virtual vkh::VkDeviceOrHostAddressConstKHR deviceAddress() const {
             return this->allocation->deviceAddress();
         };
-           
+
         // 
         virtual std::vector<uint32_t>& getQueueFamilyIndices() { return this->allocation->getQueueFamilyIndices(); };
         virtual const std::vector<uint32_t>& getQueueFamilyIndices() const { return this->allocation->getQueueFamilyIndices(); };

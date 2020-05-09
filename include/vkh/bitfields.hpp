@@ -486,11 +486,13 @@ namespace vkh {
         VK_HPP_OPERATORS(VkPipelineCreateFlags, vk::PipelineCreateFlags, vk::PipelineCreateFlagBits)
     };
 
-    // 
-    struct VkShaderModuleCreateFlags { //::VkFlags
-        //OPERATORS(VkShaderModuleCreateFlags, ::VkShaderModuleCreateFlagBits, ::VkFlags)
-        //VK_HPP_OPERATORS(VkShaderModuleCreateFlags, vk::ShaderModuleCreateFlags, vk::ShaderModuleCreateFlagBits)
-    };
+    // EMPTY GET ERROR! USED STUB!
+    /*struct VkShaderModuleCreateFlags {
+        ::VkFlags flags = 0u;
+
+        OPERATORS(VkShaderModuleCreateFlags, ::VkShaderModuleCreateFlagBits, ::VkFlags)
+        VK_HPP_OPERATORS(VkShaderModuleCreateFlags, vk::ShaderModuleCreateFlags, vk::ShaderModuleCreateFlagBits)
+    };*/
 
     // 
     struct VkExternalMemoryHandleTypeFlags { ::VkFlags
