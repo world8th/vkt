@@ -322,11 +322,12 @@ namespace vkt {
         // 
         ~Vector() {
             if (this->view) {
-                this->getDevice().destroyBufferView(this->view);
+                //this->getDevice().destroyBufferView(this->view);
+                this->allocation->info.deviceDispatch->DestroyBufferView(this->view, nullptr);
                 this->view = VkBufferView{};
             };
         };
-        
+
         // 
         template<class Tm = T> Vector(const Vector<Tm>& V) : allocation(V), bufInfo({ V.buffer(), V.offset(), V.range() }) { *this = V; };
         template<class Tm = T> inline Vector<T>& operator=(const Vector<Tm>& V) { 
@@ -362,12 +363,12 @@ namespace vkt {
         // 
         virtual VkBufferView createBufferView(const VkFormat& format = VkFormat::eUndefined) const {
             VkBufferView view = {};
-            this->allocation->info.deviceDispatch->CreateBufferView(vkh::VkBufferViewCreateInfo{
+            const_cast<vkt::MemoryAllocationInfo&>(this->allocation->info).deviceDispatch->CreateBufferView(vkh::VkBufferViewCreateInfo{
                 .buffer = static_cast<VkBuffer>(this->bufRegion.buffer),
                 .format = static_cast<VkFormat>(format),
                 .offset = this->bufRegion.offset,
                 .range = this->bufInfo.range
-                }, nullptr, &view);
+            }, nullptr, &view);
             return view;
         };
 
