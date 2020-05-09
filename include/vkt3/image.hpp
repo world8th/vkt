@@ -366,6 +366,10 @@ namespace vkt {
         // set methods for direct control
         virtual ImageRegion& setImageLayout(const VkImageLayout layout = {}) { this->imgInfo.imageLayout = layout; return *this; };
         virtual ImageRegion& setSampler(const VkSampler& sampler = {}) { this->imgInfo.sampler = sampler; return *this; };
+
+        virtual VkSampler& refSampler() { return this->imgInfo.sampler; };
+        virtual const VkSampler& refSampler() const { return this->imgInfo.sampler; };
+
         virtual ImageRegion& transfer(VkCommandBuffer& cmdBuf) {
             vkt::imageBarrier(cmdBuf, vkt::ImageBarrierInfo{ 
                 .image = this->allocation->getImage(),
