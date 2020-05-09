@@ -402,6 +402,13 @@ namespace vkt {
         };
     };
 
+    // 
+    struct VmaMemoryInfo {
+        VmaMemoryUsage memUsage = VMA_MEMORY_USAGE_GPU_ONLY;
+        vkt::uni_ptr<xvk::Device> deviceDispatch = {};
+        vkt::uni_ptr<xvk::Instance> instanceDispatch = {};
+    };
+
     // TODO: Add XVK support
     struct MemoryAllocationInfo { // 
         uint32_t glMemory = 0u, glID = 0u;

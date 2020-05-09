@@ -189,7 +189,7 @@ namespace vkt {
     // 
     class VmaBufferAllocation : public BufferAllocation { public: 
         VmaBufferAllocation() {};
-        VmaBufferAllocation(const vkt::uni_arg<VmaAllocator>& allocator, const vkt::uni_arg<vkh::VkBufferCreateInfo>& createInfo = vkh::VkBufferCreateInfo{}, VmaMemoryUsage vmaUsage = VMA_MEMORY_USAGE_GPU_ONLY) { this->construct(*allocator,  createInfo, vmaUsage); };
+        VmaBufferAllocation(const vkt::uni_arg<VmaAllocator>& allocator, const vkt::uni_arg<vkh::VkBufferCreateInfo>& createInfo = vkh::VkBufferCreateInfo{}, vkt::uni_arg<VmaMemoryInfo> vmaInfo = VmaMemoryInfo{.memUsage = VMA_MEMORY_USAGE_GPU_ONLY }) { this->construct(*allocator, createInfo, vmaInfo); };
               
         // 
         VmaBufferAllocation(const vkt::uni_ptr<VmaBufferAllocation>& allocation) : allocation(allocation->allocation), allocationInfo(allocation->allocationInfo), allocator(allocation->allocator) { this->assign(allocation); };
@@ -209,15 +209,15 @@ namespace vkt {
         virtual VmaBufferAllocation* construct(
             vkt::uni_arg<VmaAllocator> allocator,
             vkt::uni_arg<vkh::VkBufferCreateInfo> createInfo = vkh::VkBufferCreateInfo{},
-            vkt::uni_arg<VmaMemoryUsage> vmaUsage = VMA_MEMORY_USAGE_GPU_ONLY
+            vkt::uni_arg<VmaMemoryInfo> memInfo = VmaMemoryInfo{ .memUsage = VMA_MEMORY_USAGE_GPU_ONLY }
         ) {
-            VmaAllocationCreateInfo vmaInfo = {}; vmaInfo.usage = vmaUsage;
-            if (vmaUsage == VMA_MEMORY_USAGE_CPU_TO_GPU || vmaUsage == VMA_MEMORY_USAGE_GPU_TO_CPU) { vmaInfo.flags = VMA_ALLOCATION_CREATE_MAPPED_BIT; };
+            VmaAllocationCreateInfo vmaInfo = {}; vmaInfo.usage = memInfo->memUsage;
+            if (memInfo->memUsage == VMA_MEMORY_USAGE_CPU_TO_GPU || memInfo->memUsage == VMA_MEMORY_USAGE_GPU_TO_CPU) { vmaInfo.flags = VMA_ALLOCATION_CREATE_MAPPED_BIT; };
 
             // 
             auto result = vmaCreateBuffer(this->allocator = allocator.ref(), *createInfo, &vmaInfo, &reinterpret_cast<VkBuffer&>(this->buffer), &this->allocation, &this->allocationInfo); //assert(result == VK_SUCCESS);
             this->info.range = createInfo->size;
-            this->info.memUsage = vmaUsage;
+            this->info.memUsage = memInfo->memUsage;
             this->info.memory = allocationInfo.deviceMemory;
             this->info.offset = allocationInfo.offset;
             this->usage = createInfo->usage;
@@ -229,6 +229,10 @@ namespace vkt {
             // Get Dispatch Loader From VMA Allocator Itself!
             VmaAllocatorInfo info = {};
             vmaGetAllocatorInfo(this->allocator = allocator.ref(), &info);
+
+            // 
+            this->info.instanceDispatch = memInfo->instanceDispatch;
+            this->info.deviceDispatch = memInfo->deviceDispatch;
 
             // when loader initialized
             if (vkt::vkGlobal::initialized) {
