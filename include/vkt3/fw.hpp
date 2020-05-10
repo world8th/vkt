@@ -73,7 +73,7 @@ namespace vkt
     std::vector<const char*> GetRequiredExtensions() {
 #ifdef VKT_ENABLE_GLFW_SUPPORT
         uint32_t glfwExtensionCount = 0;
-        const char** glfwExtensions;
+        const char** glfwExtensions = nullptr;
         glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
         std::vector<const char*> extensions(glfwExtensions, glfwExtensions + glfwExtensionCount);
 #else
@@ -484,6 +484,9 @@ namespace vkt
             debugCreateInfo.pfnUserCallback = DebugCallback;    // global function
             debugCreateInfo.pUserData = nullptr;
 
+            // 
+            cinstanceinfo.pNext = &debugCreateInfo;
+
             // Dynamically Load the Vulkan library
             this->instanceDispatch = std::make_shared<xvk::Instance>(vkt::vkGlobal::loader, (this->instanceCreate = cinstanceinfo));
             this->instance = this->instanceDispatch->handle;
@@ -567,7 +570,7 @@ namespace vkt
                 graphicsFamilyIndex++;
 
                 VkBool32 support = false;
-                vkGetPhysicalDeviceSurfaceSupportKHR(physicalDevice, graphicsFamilyIndex, surface(), &support);
+                vkh::handleVk(vkGetPhysicalDeviceSurfaceSupportKHR(physicalDevice, graphicsFamilyIndex, surface(), &support));
                 if (queuefamily.queueFlags.eCompute && queuefamily.queueFlags.eGraphics && support) {
                     queueCreateInfos.push_back(vkh::VkDeviceQueueCreateInfo{ .queueFamilyIndex = uint32_t(computeFamilyIndex), .queueCount = 1, .pQueuePriorities = &priority });
                     queueFamilyIndices.push_back(uint32_t(graphicsFamilyIndex));
@@ -601,15 +604,15 @@ namespace vkt
                     .ppEnabledExtensionNames = this->usedDeviceExtensions.data(),
                     //.pEnabledFeatures = &(VkPhysicalDeviceFeatures&)(gFeatures.features)
                 }));
-                this->deviceDispatch->CreatePipelineCache(vkh::VkPipelineCacheCreateInfo(), nullptr, &this->pipelineCache);
+                vkh::handleVk(this->deviceDispatch->CreatePipelineCache(vkh::VkPipelineCacheCreateInfo(), nullptr, &this->pipelineCache));
                 this->device = this->deviceDispatch->handle;
                 vkt::vkGlobal::device = this->deviceDispatch;
             };
 
             // 
-            this->deviceDispatch->GetDeviceQueue(queueFamilyIndex, 0u, &this->queue);
-            this->deviceDispatch->CreateFence(vkh::VkFenceCreateInfo{}, nullptr, &this->fence);
-            this->deviceDispatch->CreateCommandPool(vkh::VkCommandPoolCreateInfo{ .flags = {.eResetCommandBuffer = 1}, .queueFamilyIndex = queueFamilyIndex }, nullptr, &this->commandPool);
+                          this->deviceDispatch->GetDeviceQueue(queueFamilyIndex, 0u, &this->queue);
+            vkh::handleVk(this->deviceDispatch->CreateFence(vkh::VkFenceCreateInfo{}, nullptr, &this->fence));
+            vkh::handleVk(this->deviceDispatch->CreateCommandPool(vkh::VkCommandPoolCreateInfo{ .flags = {.eResetCommandBuffer = 1}, .queueFamilyIndex = queueFamilyIndex }, nullptr, &this->commandPool));
 
             // REMAP WITH XVK AGAIN!
             func.vkAllocateMemory = this->deviceDispatch->vkAllocateMemory;
@@ -642,7 +645,7 @@ namespace vkt
             vma_info.instance = this->instance;
             vma_info.physicalDevice = this->physicalDevice;
             vma_info.flags = VMA_ALLOCATOR_CREATE_BUFFER_DEVICE_ADDRESS_BIT;
-            vmaCreateAllocator(&vma_info, &this->allocator);
+            vkh::handleVk(vmaCreateAllocator(&vma_info, &this->allocator));
 
             // Manually Create Descriptor Pool
             auto dps = std::vector<vkh::VkDescriptorPoolSize>{
@@ -658,9 +661,9 @@ namespace vkt
             };
 
             // 
-            this->deviceDispatch->CreateDescriptorPool(vkh::VkDescriptorPoolCreateInfo{
+            vkh::handleVk(this->deviceDispatch->CreateDescriptorPool(vkh::VkDescriptorPoolCreateInfo{
                 .maxSets = 256u, .poolSizeCount = static_cast<uint32_t>(dps.size()), .pPoolSizes = dps.data()
-            }, nullptr, &this->descriptorPool);
+            }, nullptr, &this->descriptorPool));
 
             return device;
         };
@@ -803,7 +806,7 @@ namespace vkt
                 .dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT,
             });
 
-            this->deviceDispatch->CreateRenderPass(render_pass_helper, nullptr, &this->renderPass);
+            vkh::handleVk(this->deviceDispatch->CreateRenderPass(render_pass_helper, nullptr, &this->renderPass));
             return this->renderPass;
         }
 
@@ -840,15 +843,15 @@ namespace vkt
                 .extent = {applicationWindow.surfaceSize.width, applicationWindow.surfaceSize.height, 1u},
                 .usage = { .eDepthStencilAttachment = 1 }
             };
-            vmaCreateImage(this->allocator, (VkImageCreateInfo*)&image_info, &allocCreateInfo, &reinterpret_cast<VkImage&>(depthImage), &vmaDepthImageAllocation, &vmaDepthImageAllocationInfo);
-            this->deviceDispatch->CreateImageView(vkh::VkImageViewCreateInfo{
+            vkh::handleVk(vmaCreateImage(this->allocator, (VkImageCreateInfo*)&image_info, &allocCreateInfo, &reinterpret_cast<VkImage&>(depthImage), &vmaDepthImageAllocation, &vmaDepthImageAllocationInfo));
+            vkh::handleVk(this->deviceDispatch->CreateImageView(vkh::VkImageViewCreateInfo{
                 .flags = {},
                 .image = depthImage,
                 .viewType = VK_IMAGE_VIEW_TYPE_2D,
                 .format = surfaceFormats.depthFormat,
                 .components = vkh::VkComponentMapping(),
                 .subresourceRange = vkh::VkImageSubresourceRange{{.eDepth = 1}, 0, 1, 0, 1}
-            }, nullptr, &depthImageView);
+            }, nullptr, &depthImageView));
 
             // 
             auto swapchainImages = vkh::vsGetPhysicalDeviceSurfaceFormatsKHR(this->deviceDispatch, swapchain);
@@ -856,9 +859,9 @@ namespace vkt
             for (int i = 0; i < swapchainImages.size(); i++)
             { // create framebuffers
                 std::array<VkImageView, 2> views = {}; // predeclare views
-                deviceDispatch->CreateImageView(vkh::VkImageViewCreateInfo{ .flags = {}, .image = swapchainImages[i], .viewType = VK_IMAGE_VIEW_TYPE_2D, .format = surfaceFormats.colorFormat, .components = vkh::VkComponentMapping{}, .subresourceRange = vkh::VkImageSubresourceRange{{ .eColor = 1 }, 0, 1, 0, 1} }, nullptr, &views[0]);
                 views[1] = depthImageView; // depth view
-                deviceDispatch->CreateFramebuffer(vkh::VkFramebufferCreateInfo{ .flags = {}, .renderPass = renderpass, .attachmentCount = uint32_t(views.size()), .pAttachments = views.data(), .width = applicationWindow.surfaceSize.width, .height = applicationWindow.surfaceSize.height, .layers = 1u }, nullptr, &swapchainBuffers[i].frameBuffer);
+                vkh::handleVk(deviceDispatch->CreateImageView(vkh::VkImageViewCreateInfo{ .flags = {}, .image = swapchainImages[i], .viewType = VK_IMAGE_VIEW_TYPE_2D, .format = surfaceFormats.colorFormat, .components = vkh::VkComponentMapping{}, .subresourceRange = vkh::VkImageSubresourceRange{{ .eColor = 1 }, 0, 1, 0, 1} }, nullptr, &views[0]));
+                vkh::handleVk(deviceDispatch->CreateFramebuffer(vkh::VkFramebufferCreateInfo{ .flags = {}, .renderPass = renderpass, .attachmentCount = uint32_t(views.size()), .pAttachments = views.data(), .width = applicationWindow.surfaceSize.width, .height = applicationWindow.surfaceSize.height, .layers = 1u }, nullptr, &swapchainBuffers[i].frameBuffer));
             };
         }
 
@@ -874,10 +877,10 @@ namespace vkt
                 timeline.initialValue = i;
 
                 // 
-                this->deviceDispatch->CreateSemaphore(vkh::VkSemaphoreCreateInfo{}, nullptr, &swapchainBuffers[i].drawSemaphore);
-                this->deviceDispatch->CreateSemaphore(vkh::VkSemaphoreCreateInfo{}, nullptr, &swapchainBuffers[i].computeSemaphore);
-                this->deviceDispatch->CreateSemaphore(vkh::VkSemaphoreCreateInfo{}, nullptr, &swapchainBuffers[i].presentSemaphore);
-                this->deviceDispatch->CreateFence(vkh::VkFenceCreateInfo{ .flags{1} }, nullptr, &swapchainBuffers[i].waitFence);
+                vkh::handleVk(this->deviceDispatch->CreateSemaphore(vkh::VkSemaphoreCreateInfo{}, nullptr, &swapchainBuffers[i].drawSemaphore));
+                vkh::handleVk(this->deviceDispatch->CreateSemaphore(vkh::VkSemaphoreCreateInfo{}, nullptr, &swapchainBuffers[i].computeSemaphore));
+                vkh::handleVk(this->deviceDispatch->CreateSemaphore(vkh::VkSemaphoreCreateInfo{}, nullptr, &swapchainBuffers[i].presentSemaphore));
+                vkh::handleVk(this->deviceDispatch->CreateFence(vkh::VkFenceCreateInfo{ .flags{1} }, nullptr, &swapchainBuffers[i].waitFence));
             };
             return swapchainBuffers;
         }
@@ -924,7 +927,7 @@ namespace vkt
 
             // create swapchain
             VkSwapchainKHR swapchain = {};
-            this->deviceDispatch->CreateSwapchainKHR(swapchainCreateInfo, nullptr, &swapchain);
+            vkh::handleVk(this->deviceDispatch->CreateSwapchainKHR(swapchainCreateInfo, nullptr, &swapchain));
             return swapchain;
         }
 #endif

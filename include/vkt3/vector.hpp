@@ -56,12 +56,12 @@ namespace vkt {
             };
 
             //this->buffer = this->info.device.createBuffer(*createInfo);
-            this->info.deviceDispatch->CreateBuffer(*createInfo, nullptr, &this->buffer);
+            vkh::handleVk(this->info.deviceDispatch->CreateBuffer(*createInfo, nullptr, &this->buffer));
             this->usage = createInfo->usage;
 
             // 
             VkMemoryRequirements memReqs = {};
-            this->info.deviceDispatch->GetBufferMemoryRequirements(buffer, &memReqs);
+            (this->info.deviceDispatch->GetBufferMemoryRequirements(buffer, &memReqs));
             //allocationInfo->device.getBufferMemoryRequirements(buffer);
             vkh::VkExportMemoryAllocateInfo exportAllocInfo {
                 .handleTypes = { .eOpaqueWin32 = 1 }
@@ -78,11 +78,12 @@ namespace vkt {
             // 
             //this->info.device.bindBufferMemory(buffer, info.memory = info.device.allocateMemory(memAllocInfo), 0);
             VkDeviceMemory memory = {};
-            this->info.deviceDispatch->AllocateMemory(memAllocInfo, nullptr, &memory);
-            this->info.deviceDispatch->BindBufferMemory(buffer, memory, 0u);
+            vkh::handleVk(this->info.deviceDispatch->AllocateMemory(memAllocInfo, nullptr, &memory));
+            vkh::handleVk(this->info.deviceDispatch->BindBufferMemory(buffer, memory, 0u));
 
+            // TODO: FIX BROKEN!
 #if defined(ENABLE_OPENGL_INTEROP) && defined(VK_USE_PLATFORM_WIN32_KHR)
-            this->info.handle = info.device.getMemoryWin32HandleKHR({ info.memory, VkExternalMemoryHandleTypeFlagBits::eOpaqueWin32 }, this->info.dispatch);
+            //this->info.handle = info.device.getMemoryWin32HandleKHR({ info.memory, VkExternalMemoryHandleTypeFlagBits::eOpaqueWin32 }, this->info.dispatch);
 #endif
 
             // 
@@ -209,10 +210,10 @@ namespace vkt {
         // 
         VmaBufferAllocation(const std::shared_ptr<VmaBufferAllocation>& allocation) : allocation(allocation->allocation), allocationInfo(allocation->allocationInfo), allocator(allocation->allocator) { this->assign(vkt::uni_ptr<VmaBufferAllocation>(allocation)); };
         VmaBufferAllocation(const std::shared_ptr<BufferAllocation>& allocation) { this->assign(vkt::uni_ptr<VmaBufferAllocation>(std::dynamic_pointer_cast<VmaBufferAllocation>(allocation))); };
-             
+        
         // 
         ~VmaBufferAllocation() {
-            vkDeviceWaitIdle(this->info.device);
+            //vkDeviceWaitIdle(this->info.device);
             vmaDestroyBuffer(allocator, buffer, allocation);
         };
         
@@ -227,7 +228,7 @@ namespace vkt {
             if (memInfo->memUsage == VMA_MEMORY_USAGE_GPU_ONLY) { createInfo->usage.eSharedDeviceAddress = 1; }; // NEEDS SHARED BIT!
 
             // 
-            auto result = vmaCreateBuffer(this->allocator = allocator.ref(), *createInfo, &vmaInfo, &reinterpret_cast<VkBuffer&>(this->buffer), &this->allocation, &this->allocationInfo); //assert(result == VK_SUCCESS);
+            vkh::handleVk(vmaCreateBuffer(this->allocator = allocator.ref(), *createInfo, &vmaInfo, &reinterpret_cast<VkBuffer&>(this->buffer), &this->allocation, &this->allocationInfo));
             this->info.range = createInfo->size;
             this->info.memUsage = memInfo->memUsage;
             this->info.memory = allocationInfo.deviceMemory;
@@ -290,8 +291,8 @@ namespace vkt {
         };
          
         // Get mapped memory
-        virtual void* map() { void* ptr = nullptr; vmaMapMemory(allocator, allocation, &ptr); return ptr; };
-        virtual void* mapped() { if (!allocationInfo.pMappedData) { vmaMapMemory(allocator, allocation, &allocationInfo.pMappedData); }; return allocationInfo.pMappedData; };
+        virtual void* map() { void* ptr = nullptr; vkh::handleVk(vmaMapMemory(allocator, allocation, &ptr)); return ptr; };
+        virtual void* mapped() { if (!allocationInfo.pMappedData) { vkh::handleVk(vmaMapMemory(allocator, allocation, &allocationInfo.pMappedData)); }; return allocationInfo.pMappedData; };
         virtual void  unmap() { vmaUnmapMemory(allocator, allocation); allocationInfo.pMappedData = nullptr; };
         
         // Allocation
@@ -371,24 +372,12 @@ namespace vkt {
 
         // 
         virtual VkBufferView& createBufferView(const VkFormat& format = VkFormat::eUndefined) {
-            this->allocation->info.deviceDispatch->CreateBufferView(vkh::VkBufferViewCreateInfo{
+            vkh::handleVk(this->allocation->info.deviceDispatch->CreateBufferView(vkh::VkBufferViewCreateInfo{
                 .buffer = static_cast<VkBuffer>(this->bufRegion.buffer),
                 .format = static_cast<VkFormat>(format),
                 .offset = this->bufRegion.offset,
                 .range = this->bufInfo.range
-                }, nullptr, & view);
-            return view;
-        };
-
-        // 
-        virtual VkBufferView createBufferView(const VkFormat& format = VkFormat::eUndefined) const {
-            VkBufferView view = {};
-            const_cast<vkt::MemoryAllocationInfo&>(this->allocation->info).deviceDispatch->CreateBufferView(vkh::VkBufferViewCreateInfo{
-                .buffer = static_cast<VkBuffer>(this->bufRegion.buffer),
-                .format = static_cast<VkFormat>(format),
-                .offset = this->bufRegion.offset,
-                .range = this->bufInfo.range
-            }, nullptr, &view);
+            }, nullptr, &view));
             return view;
         };
 
@@ -558,11 +547,10 @@ namespace vkt {
         virtual const unsigned& getGLBuffer() const { return this->allocation->getGLBuffer(); };
         virtual const unsigned& getGLMemory() const { return this->allocation->getGLMemory(); };
 
-        //
+        // 
         protected: friend Vector<T>; // 
         protected: vkh::VkDescriptorBufferInfo bufInfo = { {}, 0u, VK_WHOLE_SIZE }; // Cached Feature
         protected: vkh::VkStridedBufferRegionKHR bufRegion = { {}, 0u, sizeof(T), VK_WHOLE_SIZE };
-        //public   : VkDeviceSize stride = sizeof(T);
         protected: VkBufferView view = {};
         protected: vkt::uni_ptr<BufferAllocation> allocation = {};
     };

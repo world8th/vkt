@@ -60,7 +60,7 @@ namespace vkt {
             //this->image = this->info.device.createImage(createInfo->hpp().setUsage(usage));
             createInfo->usage = usage;
             //vkCreateImage(this->info.device, *createInfo, nullptr, &this->image);
-            this->info.deviceDispatch->CreateImage(*createInfo, nullptr, &this->image);
+            vkh::handleVk(this->info.deviceDispatch->CreateImage(*createInfo, nullptr, &this->image));
 
             // 
             VkMemoryRequirements memReqs = {};
@@ -79,12 +79,13 @@ namespace vkt {
             VkDeviceMemory memory = {};
             //vkAllocateMemory(info.device, memAllocInfo, nullptr, &memory);
             //vkBindImageMemory(this->info.device, this->image, memory, 0u);
-            this->info.deviceDispatch->AllocateMemory(memAllocInfo, nullptr, &memory);
-            this->info.deviceDispatch->BindImageMemory(this->image, memory, 0u);
+            vkh::handleVk(this->info.deviceDispatch->AllocateMemory(memAllocInfo, nullptr, &memory));
+            vkh::handleVk(this->info.deviceDispatch->BindImageMemory(this->image, memory, 0u));
             this->info.initialLayout = createInfo->initialLayout;
 
+            // TODO: FIX BROKEN!
 #if defined(ENABLE_OPENGL_INTEROP) && defined(VK_USE_PLATFORM_WIN32_KHR)
-            this->info.handle = info.device.getMemoryWin32HandleKHR({ info.memory, VkExternalMemoryHandleTypeFlagBits::eOpaqueWin32 }, this->info.dispatch);
+            //this->info.handle = info.device.getMemoryWin32HandleKHR({ info.memory, VkExternalMemoryHandleTypeFlagBits::eOpaqueWin32 }, this->info.dispatch);
 #endif
             this->info.range = memReqs.size;
             this->info.reqSize = memReqs.size;
@@ -203,7 +204,7 @@ namespace vkt {
 
         //
         ~VmaImageAllocation() {
-            vkDeviceWaitIdle(this->info.device);
+            //vkDeviceWaitIdle(this->info.device);
             vmaDestroyImage(allocator, image, allocation);
         };
 
@@ -215,7 +216,7 @@ namespace vkt {
         ) {
             VmaAllocationCreateInfo vmaInfo = {}; vmaInfo.usage = memInfo->memUsage;
             if (memInfo->memUsage == VMA_MEMORY_USAGE_CPU_TO_GPU || memInfo->memUsage == VMA_MEMORY_USAGE_GPU_TO_CPU) { vmaInfo.flags = VMA_ALLOCATION_CREATE_MAPPED_BIT; };
-            auto result = vmaCreateImage(this->allocator = allocator.ref(), *createInfo, &vmaInfo, &reinterpret_cast<VkImage&>(image), &this->allocation, &this->allocationInfo);  assert(result == VK_SUCCESS);
+            vkh::handleVk(vmaCreateImage(this->allocator = allocator.ref(), *createInfo, &vmaInfo, &reinterpret_cast<VkImage&>(image), &this->allocation, &this->allocationInfo));
             this->info.initialLayout = VkImageLayout(createInfo->initialLayout);
             this->info.range = allocationInfo.size;
             this->info.memory = allocationInfo.deviceMemory;
@@ -328,7 +329,7 @@ namespace vkt {
             this->imgInfo.imageLayout = VkImageLayout(*layout);
 
             // 
-            this->allocation->info.deviceDispatch->CreateImageView(*info, nullptr, &this->imgInfo.imageView);
+            vkh::handleVk(this->allocation->info.deviceDispatch->CreateImageView(*info, nullptr, &this->imgInfo.imageView));
 
             // 
 #ifdef ENABLE_OPENGL_INTEROP

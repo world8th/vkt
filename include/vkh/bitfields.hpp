@@ -195,13 +195,13 @@ namespace vkh {
         eConditionalRendering:1,
         eTaskShader:1,
         eMeshShader:1,
+#define eRayTracing eRayTracingShader // Alias
         eRayTracingShader:1,
+#undef  eRayTracing // Do not conflict!
         eShadingRateImage:1,
         eFragmentDensityProcess:1,
         eTransformFeedback:1,
         eAccelerationStructureBuild:1;
-
-//#define eRayTracing eRayTracingShader
 
         OPERATORS(VkPipelineStageFlags,::VkPipelineStageFlagBits,::VkFlags)
         VK_HPP_OPERATORS(VkPipelineStageFlags,vk::PipelineStageFlags,vk::PipelineStageFlagBits)
