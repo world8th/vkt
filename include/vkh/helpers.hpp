@@ -6,6 +6,11 @@
 #include <sstream>
 #include <iostream>
 
+#ifdef VKT_ENABLE_GLFW_SUPPORT
+#include <GLFW/glfw3.h>
+#include <GLFW/glfw3native.h>
+#endif
+
 namespace vkh {
 
     // TODO: Some Vookoo-like aggregators and helpers
@@ -57,10 +62,13 @@ namespace vkh {
     static inline decltype(auto) handleVk(vkt::uni_arg<VkResult> result) {
         if (result != VK_SUCCESS) {
             auto stream = std::stringstream("ERROR: VkResult Error Code: ") << std::to_string(result) << " (" << errorString(result) << ")...";
-            std::cerr << stream.str() << std::endl; throw (stream.str());
+            std::cerr << stream.str() << std::endl; throw (*result);
 
-            assert(result == VK_SUCCESS); exit(result);
-            //glfwTerminate(); exit(result);
+            assert(result == VK_SUCCESS);
+#ifdef VKT_ENABLE_GLFW_SUPPORT
+            glfwTerminate();
+#endif
+            exit(result);
         };
         return result;
     };
@@ -477,6 +485,10 @@ namespace vkh {
         // 
         inline operator std::vector<VkDescriptorUpdateTemplateEntry>& () { return entries; };
         inline operator const std::vector<VkDescriptorUpdateTemplateEntry>& () const { return entries; };
+
+        //
+        inline operator VkDescriptorPool& () { return allocate_info.descriptorPool; };
+        inline operator const VkDescriptorPool&() const { return allocate_info.descriptorPool; };
 
         // 
         inline operator ::VkDescriptorSetAllocateInfo& () { return allocate_info; };

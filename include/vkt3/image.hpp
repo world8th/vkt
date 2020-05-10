@@ -27,7 +27,7 @@ namespace vkt {
         ImageAllocation(const std::shared_ptr<ImageAllocation>& allocation) : image(allocation->image), info(allocation->info) { *this = vkt::uni_ptr<ImageAllocation>(allocation); };
         ~ImageAllocation() {
             if (this->image && this->info.device) {
-                //this->info.device.waitIdle();
+                this->info.deviceDispatch->DeviceWaitIdle();
                 //this->info.device.destroyImage(this->image);
                 //this->info.device.freeMemory(this->info.memory);
                 //this->image = VkImage{};
@@ -204,7 +204,7 @@ namespace vkt {
 
         //
         ~VmaImageAllocation() {
-            //vkDeviceWaitIdle(this->info.device);
+            this->info.deviceDispatch->DeviceWaitIdle();
             vmaDestroyImage(allocator, image, allocation);
         };
 

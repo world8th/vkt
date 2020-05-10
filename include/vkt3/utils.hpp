@@ -508,14 +508,22 @@ namespace vkt {
 
     // 
     VkResult AllocateDescriptorSetWithUpdate(vkt::uni_ptr<xvk::Device>& device, vkh::VsDescriptorSetCreateInfoHelper& helper, VkDescriptorSet& descriptorSet) {
-        if (!descriptorSet) {
-            vkh::handleVk(device->AllocateDescriptorSets(helper, &descriptorSet));
-                         (device->UpdateDescriptorSets(1u, helper.setDescriptorSet(descriptorSet).mapWriteDescriptorSet()[0], 0u, {}));
+        // Corrupt... 
+        //if (descriptorSet) { vkh::handleVk(device->FreeDescriptorSets(helper, 1u, &descriptorSet)); descriptorSet = {}; };
+
+        // 
+        bool created = false;
+        if (!descriptorSet) { vkh::handleVk(device->AllocateDescriptorSets(helper, &descriptorSet)); created = true; };
+
+        //
+        if (descriptorSet && created) {
+            const auto writes = helper.setDescriptorSet(descriptorSet).mapWriteDescriptorSet();
+            device->UpdateDescriptorSets(writes.size(), reinterpret_cast<const VkWriteDescriptorSet*>(writes.data()), 0u, nullptr);
         };
+
+        // 
         return VK_SUCCESS;
     };
-
-
 
 
     #ifdef TBA_VULKAN_HPP_DEPRECATED
