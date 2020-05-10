@@ -76,7 +76,7 @@ namespace vkh {
         eProtected : 1,
         eDeviceAddressCaptureReplay : 1;
 
-        OPERATORS(VkBufferCreateFlags,::VkBufferCreateFlagBits,::VkFlags)
+        OPERATORS(VkBufferCreateFlags, ::VkBufferCreateFlagBits,::VkFlags)
         VK_HPP_OPERATORS(VkBufferCreateFlags,vk::BufferCreateFlags,vk::BufferCreateFlagBits)
     };
 
@@ -98,7 +98,7 @@ namespace vkh {
         eUnknown:4,
         eSharedDeviceAddress : 1;
 
-        OPERATORS(VkBufferUsageFlags,::VkBufferUsageFlagBits,::VkFlags)
+        OPERATORS(VkBufferUsageFlags, ::VkBufferUsageFlagBits,::VkFlags)
         VK_HPP_OPERATORS(VkBufferUsageFlags,vk::BufferUsageFlags,vk::BufferUsageFlagBits)
     };
 
@@ -115,7 +115,7 @@ namespace vkh {
         eMemoryPlane1 : 1,
         eMemoryPlane2 : 1;
 
-        OPERATORS(VkImageAspectFlags,::VkImageAspectFlagBits,::VkFlags)
+        OPERATORS(VkImageAspectFlags, ::VkImageAspectFlagBits,::VkFlags)
         VK_HPP_OPERATORS(VkImageAspectFlags,vk::ImageAspectFlags,vk::ImageAspectFlagBits)
     };
 
@@ -151,7 +151,7 @@ namespace vkh {
         eCornerSampled:1,
         eSubsampled:1;
         
-        OPERATORS(VkImageCreateFlags,::VkImageCreateFlagBits,::VkFlags)
+        OPERATORS(VkImageCreateFlags, ::VkImageCreateFlagBits,::VkFlags)
         VK_HPP_OPERATORS(VkImageCreateFlags,vk::ImageCreateFlags,vk::ImageCreateFlagBits)
     };
 
@@ -168,7 +168,7 @@ namespace vkh {
         eShadingRateImage:1,
         eFragmentDensityMap:1;
 
-        OPERATORS(VkImageUsageFlags,::VkImageUsageFlagBits,::VkFlags)
+        OPERATORS(VkImageUsageFlags, ::VkImageUsageFlagBits,::VkFlags)
         VK_HPP_OPERATORS(VkImageUsageFlags,vk::ImageUsageFlags,vk::ImageUsageFlagBits)
     };
 
@@ -233,7 +233,7 @@ namespace vkh {
         eFront:1,
         eBack:1;
 
-        OPERATORS(VkCullModeFlags,::VkCullModeFlagBits,::VkFlags)
+        OPERATORS(VkCullModeFlags, ::VkCullModeFlagBits,::VkFlags)
         VK_HPP_OPERATORS(VkCullModeFlags,vk::CullModeFlags,vk::CullModeFlagBits)
     };
 
@@ -265,7 +265,7 @@ namespace vkh {
         eCositedChromaSamples:1,
         eFragmentDensityMap:1;
 
-        OPERATORS(VkFormatFeatureFlags,::VkFormatFeatureFlagBits,::VkFlags)
+        OPERATORS(VkFormatFeatureFlags, ::VkFormatFeatureFlagBits,::VkFlags)
         VK_HPP_OPERATORS(VkFormatFeatureFlags,vk::FormatFeatureFlags,vk::FormatFeatureFlagBits)
     };
 
@@ -276,7 +276,7 @@ namespace vkh {
         eB:1,
         eA:1;
         
-        OPERATORS(VkColorComponentFlags,::VkColorComponentFlagBits,::VkFlags)
+        OPERATORS(VkColorComponentFlags, ::VkColorComponentFlagBits,::VkFlags)
         VK_HPP_OPERATORS(VkColorComponentFlags,vk::ColorComponentFlags,vk::ColorComponentFlagBits)
     };
 
@@ -287,7 +287,7 @@ namespace vkh {
         ePartiallyBound:1,
         eVariableDescriptorCount:1;
 
-        OPERATORS(VkDescriptorBindingFlags,::VkDescriptorBindingFlagBits,::VkFlags)
+        OPERATORS(VkDescriptorBindingFlags, ::VkDescriptorBindingFlagBits,::VkFlags)
         VK_HPP_OPERATORS(VkDescriptorBindingFlags,vk::DescriptorBindingFlags,vk::DescriptorBindingFlagBits)
     };
 
@@ -299,7 +299,7 @@ namespace vkh {
         ePreferFastBuild:1,
         eLowMemory:1;
         
-        OPERATORS(VkBuildAccelerationStructureFlagsKHR,::VkBuildAccelerationStructureFlagBitsKHR,::VkFlags)
+        OPERATORS(VkBuildAccelerationStructureFlagsKHR, ::VkBuildAccelerationStructureFlagBitsKHR,::VkFlags)
         VK_HPP_OPERATORS(VkBuildAccelerationStructureFlagsKHR,vk::BuildAccelerationStructureFlagsKHR,vk::BuildAccelerationStructureFlagBitsKHR)
     };
 
@@ -311,7 +311,7 @@ namespace vkh {
         eOpaque:1,
         eNoDuplicateAnyHitInvocation:1;
         
-        OPERATORS(VkGeometryFlagsKHR,::VkGeometryFlagBitsKHR,::VkFlags)
+        OPERATORS(VkGeometryFlagsKHR, ::VkGeometryFlagBitsKHR, ::VkFlags)
         VK_HPP_OPERATORS(VkGeometryFlagsKHR,vk::GeometryFlagsKHR,vk::GeometryFlagBitsKHR)
     };
 
@@ -326,7 +326,7 @@ namespace vkh {
         eSparseBinding:1,
         eProtected:1;
         
-        OPERATORS(VkQueueFlags,::VkQueueFlagBits,::VkFlags)
+        OPERATORS(VkQueueFlags, ::VkQueueFlagBits, ::VkFlags)
         VK_HPP_OPERATORS(VkQueueFlags,vk::QueueFlags,vk::QueueFlagBits)
     };
 
@@ -342,7 +342,7 @@ namespace vkh {
         eHorizontalMirrorRotate270:1,
         eInherit:1;
 
-        OPERATORS(VkSurfaceTransformFlagsKHR,::VkSurfaceTransformFlagBitsKHR,::VkFlags)
+        OPERATORS(VkSurfaceTransformFlagsKHR, ::VkSurfaceTransformFlagBitsKHR, ::VkFlags)
         VK_HPP_OPERATORS(VkSurfaceTransformFlagsKHR,vk::SurfaceTransformFlagsKHR,vk::SurfaceTransformFlagBitsKHR)
     };
 
@@ -353,7 +353,7 @@ namespace vkh {
         ePostMultiplied:1,
         eInherit:1;
 
-        OPERATORS(VkCompositeAlphaFlagsKHR,::VkCompositeAlphaFlagBitsKHR,::VkFlags)
+        OPERATORS(VkCompositeAlphaFlagsKHR, ::VkCompositeAlphaFlagBitsKHR, ::VkFlags)
         VK_HPP_OPERATORS(VkCompositeAlphaFlagsKHR,vk::CompositeAlphaFlagsKHR,vk::CompositeAlphaFlagBitsKHR)
     };
 
@@ -362,7 +362,7 @@ namespace vkh {
         ePushDescriptor:1,
         eUpdateAfterBindPool:1;
         
-        OPERATORS(VkDescriptorSetLayoutCreateFlags,::VkDescriptorSetLayoutCreateFlagBits,::VkFlags)
+        OPERATORS(VkDescriptorSetLayoutCreateFlags, ::VkDescriptorSetLayoutCreateFlagBits,::VkFlags)
         VK_HPP_OPERATORS(VkDescriptorSetLayoutCreateFlags,vk::DescriptorSetLayoutCreateFlags,vk::DescriptorSetLayoutCreateFlagBits)
     };
 
@@ -372,7 +372,7 @@ namespace vkh {
         eViewLocal:1,
         eDeviceGroup:1;
 
-        OPERATORS(VkDependencyFlags,::VkDependencyFlagBits,::VkFlags)
+        OPERATORS(VkDependencyFlags, ::VkDependencyFlagBits, ::VkFlags)
         VK_HPP_OPERATORS(VkDependencyFlags,vk::DependencyFlags,vk::DependencyFlagBits)
     };
 
@@ -388,7 +388,7 @@ namespace vkh {
         eQuad: 1,
         ePartitioned: 1;
 
-        OPERATORS(VkSubgroupFeatureFlags,::VkSubgroupFeatureFlagBits,::VkFlags)
+        OPERATORS(VkSubgroupFeatureFlags, ::VkSubgroupFeatureFlagBits, ::VkFlags)
         VK_HPP_OPERATORS(VkSubgroupFeatureFlags,vk::SubgroupFeatureFlags,vk::SubgroupFeatureFlagBits)
     };
 
@@ -397,7 +397,7 @@ namespace vkh {
         eAllowVaryingSubgroupSize: 1,
         eRequireFullSubgroups: 1;
 
-        OPERATORS(VkPipelineShaderStageCreateFlags,::VkPipelineShaderStageCreateFlagBits,::VkFlags)
+        OPERATORS(VkPipelineShaderStageCreateFlags, ::VkPipelineShaderStageCreateFlagBits, ::VkFlags)
         VK_HPP_OPERATORS(VkPipelineShaderStageCreateFlags,vk::PipelineShaderStageCreateFlags,vk::PipelineShaderStageCreateFlagBits)
     };
 
@@ -545,8 +545,8 @@ namespace vkh {
         eTriangleFrontCounterclockwise:1,
         eForceOpaque:1,
         eForceNoOpaque:1;
-        
-        OPERATORS(VkGeometryInstanceFlagsNV,::VkGeometryInstanceFlagBitsNV,::uint8_t)
+
+        OPERATORS(VkGeometryInstanceFlagsNV, ::VkGeometryInstanceFlagBitsNV, ::uint8_t)
         VK_HPP_OPERATORS(VkGeometryInstanceFlagsNV,vk::GeometryInstanceFlagsNV,vk::GeometryInstanceFlagBitsNV)
     };
 #pragma pack(pop)

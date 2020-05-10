@@ -9,7 +9,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
 
     // Structures should be packed accurately as Vulkan.H and Vulkan.HPP
     #pragma pack(push, 8) // BUT Vulkan Should PACK ONLY BY ONE BYTE
-    
+
     // 
     #define STRUCT_OPERATORS(NAME)\
         operator NAME*() { return this; };\
