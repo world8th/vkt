@@ -507,18 +507,22 @@ namespace vkt {
     };
 
     // 
-    VkResult AllocateDescriptorSetWithUpdate(vkt::uni_ptr<xvk::Device>& device, vkh::VsDescriptorSetCreateInfoHelper& helper, VkDescriptorSet& descriptorSet) {
-        // Corrupt... 
-        //if (descriptorSet) { vkh::handleVk(device->FreeDescriptorSets(helper, 1u, &descriptorSet)); descriptorSet = {}; };
+    VkResult AllocateDescriptorSetWithUpdate(vkt::uni_ptr<xvk::Device>& device, vkh::VsDescriptorSetCreateInfoHelper& helper, VkDescriptorSet& descriptorSet, bool& protection) {
+        if (!protection) {
+            // Corrupt... 
+            if (descriptorSet) { vkh::handleVk(device->FreeDescriptorSets(helper, 1u, &descriptorSet)); descriptorSet = {}; };
 
-        // 
-        bool created = false;
-        if (!descriptorSet) { vkh::handleVk(device->AllocateDescriptorSets(helper, &descriptorSet)); created = true; };
+            // 
+            bool created = false;
+            if (!descriptorSet) { vkh::handleVk(device->AllocateDescriptorSets(helper, &descriptorSet)); created = true; };
 
-        //
-        if (descriptorSet && created) {
-            const auto writes = helper.setDescriptorSet(descriptorSet).mapWriteDescriptorSet();
-            device->UpdateDescriptorSets(writes.size(), reinterpret_cast<const VkWriteDescriptorSet*>(writes.data()), 0u, nullptr);
+            //
+            if (descriptorSet && created) {
+                const auto writes = helper.setDescriptorSet(descriptorSet).mapWriteDescriptorSet();
+                device->UpdateDescriptorSets(writes.size(), reinterpret_cast<const VkWriteDescriptorSet*>(writes.data()), 0u, nullptr);
+            };
+
+            protection = true;
         };
 
         // 
