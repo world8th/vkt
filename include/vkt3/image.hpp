@@ -45,8 +45,8 @@ namespace vkt {
             if (allocationInfo->memUsage == VMA_MEMORY_USAGE_GPU_ONLY) { usage.eTransferDst = 1, usage.eTransferSrc = 1; };
 
             // 
-            VkMemoryAllocateFlagsInfo allocFlags = {};
-            allocFlags.flags = VK_MEMORY_ALLOCATE_DEVICE_MASK_BIT;
+            vkh::VkMemoryAllocateFlagsInfo allocFlags = {};
+            //allocFlags.flags.eMask = 1u;
 
             // reload device and instance
             if (!this->info.device) { this->info.device = this->info.deviceDispatch->handle; };
@@ -320,7 +320,7 @@ namespace vkt {
             this->imgInfo.imageLayout = VkImageLayout(*layout);
 
             // 
-            vkCreateImageView(this->getDevice(), *info, nullptr, &this->imgInfo.imageView);
+            this->allocation->info.deviceDispatch->CreateImageView(*info, nullptr, &this->imgInfo.imageView);
 
             // 
 #ifdef ENABLE_OPENGL_INTEROP
@@ -336,7 +336,7 @@ namespace vkt {
             // 
             return this;
         };
-         
+
         // 
         virtual ImageRegion* construct(
             vkt::uni_ptr<VmaImageAllocation> allocation,
@@ -380,23 +380,14 @@ namespace vkt {
 
         virtual ImageRegion& transfer(VkCommandBuffer& cmdBuf) {
             vkt::imageBarrier(cmdBuf, vkt::ImageBarrierInfo{
-                .device = this->allocation->info.deviceDispatch,
+                .deviceDispatch = this->allocation->info.deviceDispatch,
+                .instanceDispatch = this->allocation->info.instanceDispatch,
                 .image = this->allocation->getImage(),
                 .targetLayout = reinterpret_cast<const VkImageLayout&>(this->imgInfo.imageLayout),
                 .originLayout = this->allocation->info.initialLayout,
                 .subresourceRange = this->subresourceRange
             });
-            return *this;
-        };
-
-        virtual const ImageRegion& transfer(VkCommandBuffer& cmdBuf) const {
-            vkt::imageBarrier(cmdBuf, vkt::ImageBarrierInfo{
-                .device = this->allocation->info.deviceDispatch,
-                .image = this->allocation->getImage(),
-                .targetLayout = reinterpret_cast<const VkImageLayout&>(this->imgInfo.imageLayout),
-                .originLayout = this->allocation->info.initialLayout,
-                .subresourceRange = this->subresourceRange
-            });
+            this->allocation->info.initialLayout = reinterpret_cast<const VkImageLayout&>(this->imgInfo.imageLayout);
             return *this;
         };
 

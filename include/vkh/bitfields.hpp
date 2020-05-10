@@ -31,7 +31,6 @@ namespace vkh {
     #define OPERATORS(NAME,BITS,COMP) \
         NAME& operator=(const vkt::uni_arg<NAME>& F) { memcpy(this, F, sizeof(NAME)); return *this; };\
         NAME& operator=(const vkt::uni_arg<BITS>& F) { memcpy(this, F, sizeof(NAME)); return *this; };\
-        NAME& operator=(const vkt::uni_arg<COMP>& F) { memcpy(this, F, sizeof(NAME)); return *this; };\
         NAME operator|(const NAME& F) { auto f = COMP(F) | COMP(*this); return std::move(reinterpret_cast<NAME&>(f)); };\
         NAME operator&(const NAME& F) { auto f = COMP(F) & COMP(*this); return std::move(reinterpret_cast<NAME&>(f)); };\
         NAME operator^(const NAME& F) { auto f = COMP(F) ^ COMP(*this); return std::move(reinterpret_cast<NAME&>(f)); };\
@@ -45,6 +44,8 @@ namespace vkh {
         operator const BITS&() const {return reinterpret_cast<const BITS&>(*this);};\
         explicit operator COMP& () { return reinterpret_cast<COMP&>(*this); };\
         explicit operator const COMP& () const { return reinterpret_cast<const COMP&>(*this); };
+
+    //NAME& operator=(const vkt::uni_arg<COMP>& F) { memcpy(this, F, sizeof(NAME)); return *this; };\
 
     // 
 #ifdef VULKAN_HPP
@@ -521,6 +522,18 @@ namespace vkh {
         OPERATORS(VkCommandPoolCreateFlags, ::VkCommandPoolCreateFlagBits, ::VkFlags)
         VK_HPP_OPERATORS(VkCommandPoolCreateFlags, vk::CommandPoolCreateFlags, vk::CommandPoolCreateFlagBits)
     };
+
+    //
+    struct VkMemoryAllocateFlags { ::VkFlags
+        eMask : 1,
+        eAddress : 1,
+        eAddressCaptureReplay : 1;
+
+        OPERATORS(VkMemoryAllocateFlags, ::VkMemoryAllocateFlagBits, ::VkFlags)
+        VK_HPP_OPERATORS(VkMemoryAllocateFlags, vk::MemoryAllocateFlags, vk::MemoryAllocateFlagBits)
+    };
+
+    
 
 
 #pragma pack(pop)

@@ -93,23 +93,38 @@ namespace vkt {
     template <class T>
     static inline auto strided(const vkt::uni_arg<size_t>& sizeo) { return sizeof(T) * sizeo; }
 
+    // 
+    typedef uint8_t BYTE;
+
     // Read binary (for SPIR-V)
-    // Updated 03.12.2019 (add No Data error)
-    static inline auto readBinary(std::string filePath ) {
+    // Updated 10.05.2020
+    std::vector<BYTE> readBinaryU8(vkt::uni_arg<std::string> filePath) { // open the file:
+        std::vector<BYTE> vec{};
         std::ifstream file(filePath, std::ios::in | std::ios::binary | std::ios::ate);
-        std::vector<uint32_t> data = {};
-        if (file.is_open()) {
-            std::streampos size = file.tellg();
-            data.resize(tiled(uint64_t(size), uint64_t(sizeof(uint32_t))));
+        if (file.is_open()) { // Stop eating new lines in binary mode!!!
+            file.unsetf(std::ios::skipws);
+
+            // get its size:
+            std::streampos fileSize;
+            file.seekg(0, std::ios::end);
+            fileSize = file.tellg();
             file.seekg(0, std::ios::beg);
-            file.read((char *)data.data(), size);
-            file.close();
-        }
-        else {
-            std::cerr << "Failure to open " + filePath << std::endl;
+
+            // reserve capacity
+            vec.reserve(fileSize);
+            vec.insert(vec.begin(), std::istream_iterator<BYTE>(file), std::istream_iterator<BYTE>());
+        } else {
+            std::cerr << "Failure to open " + *filePath << std::endl;
         };
-        if (data.size() < 1u) { std::cerr << "NO DATA " + filePath << std::endl; };
-        return data;
+        if (vec.size() < 1u) { std::cerr << "NO DATA " + *filePath << std::endl; };
+        return vec;
+    };
+
+    // 
+    static inline auto readBinary(vkt::uni_arg<std::string> filePath) {
+        const auto vect8u = readBinaryU8(filePath);
+        auto vect32 = std::vector<uint32_t>(tiled(vect8u.size(),4ull));
+        memcpy(vect32.data(), vect8u.data(), vect8u.size()); return vect32;
     };
 
     // read source (unused)
@@ -118,36 +133,40 @@ namespace vkt {
         std::ifstream fileStream(filePath, std::ios::in);
         if (!fileStream.is_open()) {
             std::cerr << "Could not read file " << filePath << ". File does not exist." << std::endl; return content;
-        }
+        };
         std::string line = "";
         while (!fileStream.eof()) {
             std::getline(fileStream, line);
             if (lineDirective || line.find("#line") == std::string::npos) content.append(line + "\n");
-        }
+        };
         fileStream.close();
         return content;
     };
 
+    // Used for directly create shader from code! (Prevent Code LOST!)
+    std::vector<uint32_t> TempCode = {};
+
     // 
-    static inline auto makeShaderModuleInfo(std::vector<uint32_t> code) {
-        return vkh::VkShaderModuleCreateInfo{ .codeSize = code.size(), .pCode = code.data() };
+    static inline auto makeShaderModuleInfo(const std::vector<uint32_t>& code) {
+        return vkh::VkShaderModuleCreateInfo{ .codeSize = code.size() * 4ull, .pCode = code.data() };
     };
 
     // create shader module (BROKEN FOR XVK!)
-    static inline auto createShaderModuleIntrusive(vkt::uni_ptr<xvk::Device> device, std::vector<uint32_t> code, vkt::uni_ptr<VkShaderModule> hndl) {
+    static inline auto createShaderModuleIntrusive(vkt::uni_ptr<xvk::Device> device, const std::vector<uint32_t>& code, vkt::uni_ptr<VkShaderModule> hndl) {
         if (sizeof(vkh::VkShaderModuleCreateInfo) != sizeof(::VkShaderModuleCreateInfo)) {
             std::cerr << "BROKEN 'vkh::VkShaderModuleCreateInfo' STRUCTURE!" << std::endl; assert(-1);
         };
-        return device->CreateShaderModule(makeShaderModuleInfo(code), nullptr, hndl.get_ptr());
+        return device->CreateShaderModule(makeShaderModuleInfo(TempCode = code), nullptr, hndl.get_ptr());
     };
 
     // 
-    static inline auto createShaderModule(vkt::uni_ptr<xvk::Device> device, std::vector<uint32_t> code) {
+    static inline auto createShaderModule(vkt::uni_ptr<xvk::Device> device, const std::vector<uint32_t>& code) {
         vkt::uni_arg<VkShaderModule> sm = VkShaderModule{};
-        createShaderModuleIntrusive(device, code, sm);
+        createShaderModuleIntrusive(device, TempCode = code, sm);
         return sm;
-    }; 
+    };
 
+    // 
     struct FixConstruction {
         FixConstruction(vkh::VkPipelineShaderStageCreateInfo spi = {}, vkh::VkPipelineShaderStageRequiredSubgroupSizeCreateInfoEXT sgmp = {}) : spi(spi), sgmp(sgmp) {
         }
@@ -162,22 +181,31 @@ namespace vkt {
         operator const vkh::VkPipelineShaderStageRequiredSubgroupSizeCreateInfoEXT& () const { return sgmp; };
     };
 
-    // create shader module
-    static inline auto makePipelineStageInfo(vkt::uni_ptr<xvk::Device> device, std::vector<uint32_t> code, vkt::uni_arg<vkh::VkShaderStageFlags> stage = vkh::VkShaderStageFlags{.eCompute = 1u}, vkt::uni_arg<const char *> entry = "main") {
+    // create shader module 
+    static inline auto makePipelineStageInfo(vkt::uni_ptr<xvk::Device> device, const std::vector<uint32_t>& code, vkt::uni_arg<VkShaderStageFlagBits> stage = VK_SHADER_STAGE_COMPUTE_BIT, vkt::uni_arg<const char *> entry = "main") {
         vkh::VkPipelineShaderStageCreateInfo spi = {};
         createShaderModuleIntrusive(device, code, spi.module);
         spi.pName = entry;
-        spi.stage = stage->c();
+        spi.stage = stage;
+        spi.pSpecializationInfo = {};
+        return std::move(spi);
+    };
+
+    // create shader module 
+    static inline auto makePipelineStageInfoWithoutModule(vkt::uni_ptr<xvk::Device> device, vkt::uni_arg<VkShaderStageFlagBits> stage = VK_SHADER_STAGE_COMPUTE_BIT, vkt::uni_arg<const char*> entry = "main") {
+        vkh::VkPipelineShaderStageCreateInfo spi = {};
+        spi.pName = entry;
+        spi.stage = stage;
         spi.pSpecializationInfo = {};
         return std::move(spi);
     };
 
     // create shader module
-    static inline auto makeComputePipelineStageInfo(vkt::uni_ptr<xvk::Device> device, std::vector<uint32_t> code, vkt::uni_arg<const char *> entry = "main", vkt::uni_arg<uint32_t> subgroupSize = 0u) {
+    static inline auto makeComputePipelineStageInfo(vkt::uni_ptr<xvk::Device> device, const std::vector<uint32_t>& code, vkt::uni_arg<const char *> entry = "main", vkt::uni_arg<uint32_t> subgroupSize = 0u) {
         auto f = FixConstruction{};
-        f.spi = makePipelineStageInfo(device, code, vkh::VkShaderStageFlags{.eCompute = 1u}, entry);
+        f.spi = makePipelineStageInfoWithoutModule(device, VK_SHADER_STAGE_COMPUTE_BIT, entry);
         f.spi.flags = vkh::VkPipelineShaderStageCreateFlags{.eRequireFullSubgroups = 1u};
-        createShaderModuleIntrusive(device, code, (VkShaderModule&)(f.spi.module));
+        createShaderModuleIntrusive(device, TempCode = code, (VkShaderModule&)(f.spi.module));
         f.sgmp = vkh::VkPipelineShaderStageRequiredSubgroupSizeCreateInfoEXT{};
         f.sgmp.requiredSubgroupSize = subgroupSize;
         if (subgroupSize) f.spi.pNext = &f.sgmp;
@@ -197,8 +225,8 @@ namespace vkt {
     };
 
     // create compute pipelines
-    static inline auto createCompute(vkt::uni_ptr<xvk::Device> device, std::vector<uint32_t> code, vkt::uni_arg<VkPipelineLayout> layout, vkt::uni_arg<VkPipelineCache> cache = VkPipelineCache{}, vkt::uni_arg<uint32_t> subgroupSize = 0u) {
-        auto f = makeComputePipelineStageInfo(device, code, "main", subgroupSize);
+    static inline auto createCompute(vkt::uni_ptr<xvk::Device> device, const std::vector<uint32_t>& code, vkt::uni_arg<VkPipelineLayout> layout, vkt::uni_arg<VkPipelineCache> cache = VkPipelineCache{}, vkt::uni_arg<uint32_t> subgroupSize = 0u) {
+        auto f = makeComputePipelineStageInfo(device, TempCode = code, "main", subgroupSize);
         if (subgroupSize && *subgroupSize) f.spi.pNext = &f.sgmp; // fix link
         return createCompute(device, f, layout, cache, subgroupSize);
     };
@@ -234,7 +262,8 @@ namespace vkt {
 
     // TODO: native image barrier in library
     struct ImageBarrierInfo {
-        vkt::uni_ptr<xvk::Device> device = {};
+        vkt::uni_ptr<xvk::Device> deviceDispatch = {};
+        vkt::uni_ptr<xvk::Instance> instanceDispatch = {};
         vkt::uni_arg<VkImage> image = {};
         vkt::uni_arg<VkImageLayout> targetLayout = VK_IMAGE_LAYOUT_GENERAL;
         vkt::uni_arg<VkImageLayout> originLayout = VK_IMAGE_LAYOUT_UNDEFINED;
@@ -245,10 +274,10 @@ namespace vkt {
     static inline auto imageBarrier(
         const vkt::uni_arg<VkCommandBuffer>& cmd = VkCommandBuffer{},
         const vkt::uni_arg<ImageBarrierInfo>& info = ImageBarrierInfo{}) {
-        VkResult result = VK_SUCCESS;  // planned to complete
-        if (*info->originLayout == *info->targetLayout)
-            return result;  // no need transfering more
+        VkResult result = VK_SUCCESS; // planned to complete
+        if (*info->originLayout == *info->targetLayout) { return result; }; // no need transfering more
 
+        // 
         vkh::VkImageMemoryBarrier imageMemoryBarriers = {};
         imageMemoryBarriers.srcQueueFamilyIndex = ~0U;
         imageMemoryBarriers.dstQueueFamilyIndex = ~0U;
@@ -263,6 +292,7 @@ namespace vkt {
         const auto dependencyFlags = vkh::VkDependencyFlags{};
         auto srcMask = vkh::VkAccessFlags{}, dstMask = vkh::VkAccessFlags{};
 
+        // 
         typedef VkImageLayout il;
         typedef VkAccessFlagBits afb;
 
@@ -299,12 +329,13 @@ namespace vkt {
         imageMemoryBarriers.dstAccessMask = dstMask;
 
         // 
-        info->device->vkCmdPipelineBarrier(cmd, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,
+        info->deviceDispatch->vkCmdPipelineBarrier(cmd, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,
                              VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, {}, 
                              0u, nullptr, 
                              0u, nullptr, 
                              1u, imageMemoryBarriers);
 
+        // 
         return result;
     };
 

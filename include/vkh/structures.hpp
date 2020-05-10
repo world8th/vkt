@@ -1421,7 +1421,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         size_t                       codeSize   = 0ull;
         const uint32_t*              pCode      = nullptr;
 
-        VkShaderModuleCreateInfo& setCode(const std::vector<uint32_t>& V = {}) { pCode = V.data(); codeSize = V.size(); return *this; };
+        VkShaderModuleCreateInfo& setCode(const std::vector<uint32_t>& V = {}) { pCode = V.data(); codeSize = V.size() * 4ull; return *this; };
 
         STRUCT_OPERATORS(VkShaderModuleCreateInfo)
         VK_HPP_STRUCT_OPERATORS(VkShaderModuleCreateInfo, vk::ShaderModuleCreateInfo)
@@ -1851,6 +1851,21 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         STRUCT_OPERATORS(VkSwapchainCreateInfoKHR)
         VK_HPP_STRUCT_OPERATORS(VkSwapchainCreateInfoKHR, vk::SwapchainCreateInfoKHR)
     } VkSwapchainCreateInfoKHR;
+
+    //
+    typedef struct VkMemoryAllocateFlagsInfo {
+        VkStructureType          sType      = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_FLAGS_INFO;
+        const void*              pNext      = nullptr;
+        VkMemoryAllocateFlags    flags      = {};
+        uint32_t                 deviceMask = 0u;
+
+        operator VkMemoryAllocateFlags& () { return flags; };
+        operator const VkMemoryAllocateFlags& () const { return flags; };
+        VkMemoryAllocateFlagsInfo& operator=(const VkMemoryAllocateFlags& flags) { this->flags = flags; };
+
+        STRUCT_OPERATORS(VkMemoryAllocateFlagsInfo)
+        VK_HPP_STRUCT_OPERATORS(VkMemoryAllocateFlagsInfo, vk::MemoryAllocateFlagsInfo)
+    } VkMemoryAllocateFlagsInfo;
 
 
 #pragma pack(pop)

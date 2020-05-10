@@ -37,13 +37,19 @@ namespace vkt {
             vkt::uni_arg<MemoryAllocationInfo> allocationInfo,
             vkt::uni_arg<vkh::VkBufferCreateInfo> createInfo = vkh::VkBufferCreateInfo{}
         ) { // 
-            VkMemoryAllocateFlagsInfo allocFlags = {};
-            allocFlags.flags = VK_MEMORY_ALLOCATE_DEVICE_MASK_BIT;
+            vkh::VkMemoryAllocateFlagsInfo allocFlags = {};
+            //allocFlags.flags.eMask = 1u;
 
             // reload device and instance
             //this->info = allocationInfo;
             if (!this->info.device) { this->info.device = this->info.deviceDispatch->handle; };
             if (!this->info.instance) { this->info.instance = this->info.instanceDispatch->handle; };
+
+            // 
+            if (allocationInfo->memUsage == VMA_MEMORY_USAGE_GPU_ONLY) {
+                createInfo->usage.eSharedDeviceAddress = 1; // NEEDS SHARED BIT!
+                allocFlags.flags.eAddress = 1;
+            };
 
             //this->buffer = this->info.device.createBuffer(*createInfo);
             this->info.deviceDispatch->CreateBuffer(*createInfo, nullptr, &this->buffer);
@@ -63,6 +69,7 @@ namespace vkt {
             memAllocInfo.pNext = &exportAllocInfo;
             memAllocInfo.allocationSize = memReqs.size;
             memAllocInfo.memoryTypeIndex = uint32_t(allocationInfo->getMemoryType(memReqs.memoryTypeBits, { .eDeviceLocal = 1 }));
+
 
             // 
             //this->info.device.bindBufferMemory(buffer, info.memory = info.device.allocateMemory(memAllocInfo), 0);
@@ -213,6 +220,7 @@ namespace vkt {
         ) {
             VmaAllocationCreateInfo vmaInfo = {}; vmaInfo.usage = memInfo->memUsage;
             if (memInfo->memUsage == VMA_MEMORY_USAGE_CPU_TO_GPU || memInfo->memUsage == VMA_MEMORY_USAGE_GPU_TO_CPU) { vmaInfo.flags = VMA_ALLOCATION_CREATE_MAPPED_BIT; };
+            if (memInfo->memUsage == VMA_MEMORY_USAGE_GPU_ONLY) { createInfo->usage.eSharedDeviceAddress = 1; }; // NEEDS SHARED BIT!
 
             // 
             auto result = vmaCreateBuffer(this->allocator = allocator.ref(), *createInfo, &vmaInfo, &reinterpret_cast<VkBuffer&>(this->buffer), &this->allocation, &this->allocationInfo); //assert(result == VK_SUCCESS);
