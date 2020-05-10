@@ -40,6 +40,10 @@ namespace vkt {
             vkh::VkMemoryAllocateFlagsInfo allocFlags = {};
             //allocFlags.flags.eMask = 1u;
 
+            //
+            if (!this->info.deviceDispatch) { this->info.deviceDispatch = vkGlobal::device; };
+            if (!this->info.instanceDispatch) { this->info.instanceDispatch = vkGlobal::instance; };
+
             // reload device and instance
             //this->info = allocationInfo;
             if (!this->info.device) { this->info.device = this->info.deviceDispatch->handle; };
@@ -239,13 +243,17 @@ namespace vkt {
             vmaGetAllocatorInfo(this->allocator = allocator.ref(), &info);
 
             // 
-            this->info.instanceDispatch = memInfo->instanceDispatch;
             this->info.deviceDispatch = memInfo->deviceDispatch;
+            this->info.instanceDispatch = memInfo->instanceDispatch;
+
+            //
+            if (!this->info.deviceDispatch) { this->info.deviceDispatch = vkGlobal::device; };
+            if (!this->info.instanceDispatch) { this->info.instanceDispatch = vkGlobal::instance; };
 
             // when loader initialized
             if (vkt::vkGlobal::initialized) {
-                if (!this->info.instanceDispatch) this->info.instanceDispatch = std::make_shared<xvk::Instance>(vkt::vkGlobal::loader, info.instance);
                 if (!this->info.deviceDispatch) this->info.deviceDispatch = std::make_shared<xvk::Device>(this->info.instanceDispatch, info.device);
+                if (!this->info.instanceDispatch) this->info.instanceDispatch = std::make_shared<xvk::Instance>(vkt::vkGlobal::loader, info.instance);
             };
 
             // reload device and instance
@@ -335,7 +343,6 @@ namespace vkt {
         // 
         ~Vector() {
             if (this->view) {
-                //this->getDevice().destroyBufferView(this->view);
                 this->allocation->info.deviceDispatch->DestroyBufferView(this->view, nullptr);
                 this->view = VkBufferView{};
             };

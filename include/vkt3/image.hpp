@@ -48,6 +48,10 @@ namespace vkt {
             vkh::VkMemoryAllocateFlagsInfo allocFlags = {};
             //allocFlags.flags.eMask = 1u;
 
+            //
+            if (!this->info.deviceDispatch) { this->info.deviceDispatch = vkGlobal::device; };
+            if (!this->info.instanceDispatch) { this->info.instanceDispatch = vkGlobal::instance; };
+
             // reload device and instance
             if (!this->info.device) { this->info.device = this->info.deviceDispatch->handle; };
             if (!this->info.instance) { this->info.instance = this->info.instanceDispatch->handle; };
@@ -225,6 +229,10 @@ namespace vkt {
             // 
             this->info.instanceDispatch = memInfo->instanceDispatch;
             this->info.deviceDispatch = memInfo->deviceDispatch;
+
+            //
+            if (!this->info.deviceDispatch) { this->info.deviceDispatch = vkGlobal::device; };
+            if (!this->info.instanceDispatch) { this->info.instanceDispatch = vkGlobal::instance; };
 
             // when loader initialized
             if (vkt::vkGlobal::initialized) {

@@ -443,6 +443,8 @@ namespace vkt {
     class vkGlobal { public: // Currently, only Vulkan Loader
         static inline bool initialized = false;
         static inline vkt::uni_ptr<xvk::Loader> loader = {};
+        static inline vkt::uni_ptr<xvk::Device> device = {};
+        static inline vkt::uni_ptr<xvk::Instance> instance = {};
         vkGlobal() { 
             if (!initialized) {
                 loader = std::make_shared<xvk::Loader>();
@@ -502,8 +504,10 @@ namespace vkt {
 
     // 
     VkResult AllocateDescriptorSetWithUpdate(vkt::uni_ptr<xvk::Device>& device, vkh::VsDescriptorSetCreateInfoHelper& helper, VkDescriptorSet& descriptorSet) {
-        if (!descriptorSet) { device->AllocateDescriptorSets(helper, &descriptorSet); };
-        device->UpdateDescriptorSets(1u, helper.setDescriptorSet(descriptorSet).mapWriteDescriptorSet()[0], 0u, {});
+        if (!descriptorSet) {
+            device->AllocateDescriptorSets(helper, &descriptorSet);
+            device->UpdateDescriptorSets(1u, helper.setDescriptorSet(descriptorSet).mapWriteDescriptorSet()[0], 0u, {});
+        };
         return VK_SUCCESS;
     };
 

@@ -486,7 +486,8 @@ namespace vkt
 
             // Dynamically Load the Vulkan library
             this->instanceDispatch = std::make_shared<xvk::Instance>(vkt::vkGlobal::loader, (this->instanceCreate = cinstanceinfo));
-            this->instance = instanceDispatch->handle;
+            this->instance = this->instanceDispatch->handle;
+            vkt::vkGlobal::instance = this->instanceDispatch;
 
             // get physical device for application
             physicalDevices = vkh::vsEnumeratePhysicalDevices(this->instanceDispatch);
@@ -602,6 +603,7 @@ namespace vkt
                 }));
                 this->deviceDispatch->CreatePipelineCache(vkh::VkPipelineCacheCreateInfo(), nullptr, &this->pipelineCache);
                 this->device = this->deviceDispatch->handle;
+                vkt::vkGlobal::device = this->deviceDispatch;
             };
 
             // 
