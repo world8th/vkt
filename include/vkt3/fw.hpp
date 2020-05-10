@@ -875,7 +875,7 @@ namespace vkt
                 this->deviceDispatch->CreateSemaphore(vkh::VkSemaphoreCreateInfo{}, nullptr, &swapchainBuffers[i].drawSemaphore);
                 this->deviceDispatch->CreateSemaphore(vkh::VkSemaphoreCreateInfo{}, nullptr, &swapchainBuffers[i].computeSemaphore);
                 this->deviceDispatch->CreateSemaphore(vkh::VkSemaphoreCreateInfo{}, nullptr, &swapchainBuffers[i].presentSemaphore);
-                this->deviceDispatch->CreateFence(vkh::VkFenceCreateInfo{ .flags{} }, nullptr, &swapchainBuffers[i].waitFence);
+                this->deviceDispatch->CreateFence(vkh::VkFenceCreateInfo{ .flags{1} }, nullptr, &swapchainBuffers[i].waitFence);
             };
             return swapchainBuffers;
         }

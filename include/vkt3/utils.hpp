@@ -283,7 +283,7 @@ namespace vkt {
         imageMemoryBarriers.dstQueueFamilyIndex = ~0U;
         imageMemoryBarriers.oldLayout = info->originLayout;
         imageMemoryBarriers.newLayout = info->targetLayout;
-        imageMemoryBarriers.subresourceRange = reinterpret_cast<const VkImageSubresourceRange&>(*info->subresourceRange);
+        imageMemoryBarriers.subresourceRange = info->subresourceRange;
         imageMemoryBarriers.image = info->image;
 
         // Put barrier on top
@@ -329,11 +329,10 @@ namespace vkt {
         imageMemoryBarriers.dstAccessMask = dstMask;
 
         // 
-        info->deviceDispatch->vkCmdPipelineBarrier(cmd, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,
-                             VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, {}, 
-                             0u, nullptr, 
-                             0u, nullptr, 
-                             1u, imageMemoryBarriers);
+        info->deviceDispatch->vkCmdPipelineBarrier(cmd, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, {}, 
+            0u, nullptr, 
+            0u, nullptr, 
+            1u, imageMemoryBarriers);
 
         // 
         return result;
@@ -346,23 +345,42 @@ namespace vkt {
         std::vector<T> V{}; for (auto& v : Vy) { V.push_back(reinterpret_cast<const T&>(v)); }; return std::move(V);
     };
 
+    /* // general command buffer pipeline barrier (updated 26.04.2020)
+    static inline void commandBarrier(const vkt::uni_arg<vk::CommandBuffer>& cmdBuffer) {
+        vk::MemoryBarrier memoryBarrier = {};
+        memoryBarrier.srcAccessMask = (vk::AccessFlagBits::eHostWrite | vk::AccessFlagBits::eColorAttachmentWrite | vk::AccessFlagBits::eAccelerationStructureWriteNV | vk::AccessFlagBits::eShaderWrite | vk::AccessFlagBits::eTransferWrite | vk::AccessFlagBits::eTransformFeedbackCounterWriteEXT | vk::AccessFlagBits::eMemoryWrite | vk::AccessFlagBits::eTransformFeedbackWriteEXT);
+        memoryBarrier.dstAccessMask = (vk::AccessFlagBits::eHostRead  | vk::AccessFlagBits::eColorAttachmentRead  | vk::AccessFlagBits::eAccelerationStructureReadNV  | vk::AccessFlagBits::eShaderRead  | vk::AccessFlagBits::eTransferRead  | vk::AccessFlagBits::eTransformFeedbackCounterReadEXT  | vk::AccessFlagBits::eMemoryRead  | vk::AccessFlagBits::eUniformRead);
+        const auto srcStageMask = vk::PipelineStageFlagBits::eTransformFeedbackEXT | vk::PipelineStageFlagBits::eTransfer | vk::PipelineStageFlagBits::eComputeShader | vk::PipelineStageFlagBits::eRayTracingShaderNV | vk::PipelineStageFlagBits::eAccelerationStructureBuildNV | vk::PipelineStageFlagBits::eHost | vk::PipelineStageFlagBits::eAllGraphics | vk::PipelineStageFlagBits::eColorAttachmentOutput;// | vk::PipelineStageFlagBits::eBottomOfPipe;
+        const auto dstStageMask = vk::PipelineStageFlagBits::eTransformFeedbackEXT | vk::PipelineStageFlagBits::eTransfer | vk::PipelineStageFlagBits::eComputeShader | vk::PipelineStageFlagBits::eRayTracingShaderNV | vk::PipelineStageFlagBits::eAccelerationStructureBuildNV | vk::PipelineStageFlagBits::eHost | vk::PipelineStageFlagBits::eAllGraphics | vk::PipelineStageFlagBits::eColorAttachmentOutput;// | vk::PipelineStageFlagBits::eTopOfPipe;
+        cmdBuffer->pipelineBarrier(srcStageMask, dstStageMask, {}, { memoryBarrier }, {}, {});
+    };
+    */
+
     // general command buffer pipeline barrier (updated 26.04.2020)
     static inline void commandBarrier(vkt::uni_ptr<xvk::Device> device, vkt::uni_arg<VkCommandBuffer> cmdBuffer) {
         vkh::VkMemoryBarrier memoryBarrier = {};
-        memoryBarrier.srcAccessMask = { .eShaderWrite = 1,                   .eColorAttachmentWrite = 1, .eDepthStencilAttachmentWrite = 1, .eTransferWrite = 1, .eHostWrite = 1, .eMemoryWrite = 1, .eCommandProcessWrite = 1, .eAccelerationStructureWrite = 1, .eTransformFeedbackWrite = 1, .eTransformFeedbackCounterWrite = 1 };
-        memoryBarrier.dstAccessMask = { .eUniformRead = 1, .eShaderRead = 1, .eColorAttachmentRead  = 1, .eDepthStencilAttachmentRead  = 1, .eTransferRead  = 1, .eHostRead  = 1, .eMemoryRead  = 1, .eCommandProcessRead  = 1, .eAccelerationStructureRead  = 1,                               .eTransformFeedbackCounterRead  = 1 };
-        const vkh::VkPipelineStageFlags srcStageMask = { .eVertexShader = 1, .eTessellationEvaluationShader = 1, .eGeometryShader = 1, .eFragmentShader = 1, .eColorAttachmentOutput = 1, .eComputeShader = 1, .eTransfer = 1, .eHost = 1, .eRayTracingShader = 1, .eTransformFeedback = 1, .eAccelerationStructureBuild = 1 };
-        const vkh::VkPipelineStageFlags dstStageMask = { .eVertexInput  = 1, .eTessellationControlShader    = 1, .eGeometryShader = 1, .eFragmentShader = 1,                              .eComputeShader = 1, .eTransfer = 1, .eHost = 1, .eRayTracingShader = 1, .eTransformFeedback = 1, .eAccelerationStructureBuild = 1 };
+        vkh::VkPipelineStageFlags srcStageMask = {};
+        vkh::VkPipelineStageFlags dstStageMask = {};
+
+        //memoryBarrier.srcAccessMask = { .eShaderWrite = 1,                   .eColorAttachmentWrite = 1, .eDepthStencilAttachmentWrite = 1, .eTransferWrite = 1, .eHostWrite = 1, .eMemoryWrite = 1, .eCommandProcessWrite = 1, .eAccelerationStructureWrite = 1, .eTransformFeedbackWrite = 1, .eTransformFeedbackCounterWrite = 1 };
+        //memoryBarrier.dstAccessMask = { .eUniformRead = 1, .eShaderRead = 1, .eColorAttachmentRead  = 1, .eDepthStencilAttachmentRead  = 1, .eTransferRead  = 1, .eHostRead  = 1, .eMemoryRead  = 1, .eCommandProcessRead  = 1, .eAccelerationStructureRead  = 1,                               .eTransformFeedbackCounterRead  = 1 };
+        //const vkh::VkPipelineStageFlags srcStageMask = { .eVertexInput = 1, .eVertexShader = 1, .eGeometryShader = 1, .eFragmentShader = 1, .eColorAttachmentOutput = 1, .eComputeShader = 1, .eTransfer = 1, .eHost = 1, .eAllGraphics = 1, .eRayTracingShader = 1, .eTransformFeedback = 1, .eAccelerationStructureBuild = 1 };
+        //const vkh::VkPipelineStageFlags dstStageMask = { .eVertexInput = 1, .eVertexShader = 1, .eGeometryShader = 1, .eFragmentShader = 1, .eColorAttachmentOutput = 1, .eComputeShader = 1, .eTransfer = 1, .eHost = 1, .eAllGraphics = 1, .eRayTracingShader = 1, .eTransformFeedback = 1, .eAccelerationStructureBuild = 1 };
+
+        // 
+        srcStageMask = VkPipelineStageFlagBits(VK_PIPELINE_STAGE_TRANSFORM_FEEDBACK_BIT_EXT | VK_PIPELINE_STAGE_HOST_BIT | VK_PIPELINE_STAGE_TRANSFER_BIT | VK_PIPELINE_STAGE_VERTEX_INPUT_BIT | VK_PIPELINE_STAGE_VERTEX_SHADER_BIT | VK_PIPELINE_STAGE_RAY_TRACING_SHADER_BIT_KHR | VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT | VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT | VK_PIPELINE_STAGE_GEOMETRY_SHADER_BIT | VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_RAY_TRACING_SHADER_BIT_KHR | VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_KHR);
+        dstStageMask = srcStageMask;
+
+        // 
+        memoryBarrier.srcAccessMask = VkAccessFlagBits(VK_ACCESS_SHADER_WRITE_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_TRANSFER_WRITE_BIT | VK_ACCESS_MEMORY_WRITE_BIT   | VK_ACCESS_TRANSFORM_FEEDBACK_COUNTER_WRITE_BIT_EXT  | VK_ACCESS_ACCELERATION_STRUCTURE_WRITE_BIT_KHR | VK_ACCESS_TRANSFORM_FEEDBACK_WRITE_BIT_EXT);
+        memoryBarrier.dstAccessMask = VkAccessFlagBits(VK_ACCESS_SHADER_READ_BIT  | VK_ACCESS_COLOR_ATTACHMENT_READ_BIT  | VK_ACCESS_TRANSFER_READ_BIT  | VK_ACCESS_MEMORY_READ_BIT  /*| VK_ACCESS_TRANSFORM_FEEDBACK_COUNTER_READ_BIT_EXT*/ | VK_ACCESS_ACCELERATION_STRUCTURE_READ_BIT_KHR  | VK_ACCESS_INPUT_ATTACHMENT_READ_BIT | VK_ACCESS_INDEX_READ_BIT | VK_ACCESS_UNIFORM_READ_BIT);
+
+        // 
         device->vkCmdPipelineBarrier(cmdBuffer, srcStageMask, dstStageMask, {},
                 1u, memoryBarrier,
                 0u, nullptr,
                 0u, nullptr);
-        //vkCmdPipelineBarrier(cmdBuffer, srcStageMask, dstStageMask, {},
-        //    1u, memoryBarrier,
-        //    0u, nullptr,
-        //    0u, nullptr);
     };
-
 
     // create fence function
     static inline auto createFence(vkt::uni_ptr<xvk::Device> device, const vkt::uni_arg<bool>& signaled = true) {
