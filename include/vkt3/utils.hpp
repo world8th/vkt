@@ -530,6 +530,7 @@ namespace vkt {
     };
 
 
+
     #ifdef TBA_VULKAN_HPP_DEPRECATED
     // add dispatch in command buffer (with default pipeline barrier)
     static inline auto cmdDispatch(const vkt::uni_arg<VkCommandBuffer>& cmd, const vkt::uni_arg<VkPipeline>& pipeline, const vkt::uni_arg<uint32_t>& x = 1u, const vkt::uni_arg<uint32_t>& y = 1u, const vkt::uni_arg<uint32_t>& z = 1u, const vkt::uni_arg<bool>& barrier = true) {

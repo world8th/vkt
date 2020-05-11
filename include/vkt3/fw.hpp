@@ -86,6 +86,27 @@ namespace vkt
     }
 
 
+
+    // Новый, инновационный, педиковатый интерфейс... 
+    //using Tm = uint8_t;
+    template<class Tm = uint8_t>
+    static inline std::vector<Tm> DebugBufferData(vkt::uni_arg<VmaAllocator> allocator, vkt::uni_arg<VkQueue> queue, vkt::uni_arg<VkCommandPool> commandPool, vkt::Vector<Tm> mVector) {
+        auto gVector = vkt::Vector<Tm>(std::make_shared<vkt::VmaBufferAllocation>(allocator, vkh::VkBufferCreateInfo{
+            .size = mVector.range(),
+            .usage = {.eTransferSrc = 1, .eStorageTexelBuffer = 1, .eStorageBuffer = 1, .eIndexBuffer = 1, .eVertexBuffer = 1, .eTransformFeedbackBuffer = 1 },
+        }, vkt::VmaMemoryInfo{ .memUsage = VMA_MEMORY_USAGE_GPU_TO_CPU, .deviceDispatch = vkt::vkGlobal::device, .instanceDispatch = vkt::vkGlobal::instance }));
+
+        vkt::submitOnce(vkt::vkGlobal::device, queue, commandPool, [&](const VkCommandBuffer& cmd) {
+            (vkt::vkGlobal::device)->CmdCopyBuffer(cmd, mVector.buffer(), gVector.buffer(), 1u, vkh::VkBufferCopy{ .srcOffset = mVector.offset(), .dstOffset = gVector.offset(), .size = mVector.range() });
+        });
+
+        auto vect = std::vector<Tm>(mVector.size());
+        memcpy(vect.data(), gVector.data(), gVector.range());
+        return vect;
+    };
+
+
+
     // CRITICAL: NEEDS SUPPORT FOR JAVACPP!!! 
     class GPUFramework : std::enable_shared_from_this<GPUFramework> {
     protected:
@@ -228,7 +249,7 @@ namespace vkt
 
         // instance layers
         std::vector<const char*> wantedLayers = {
-            "VK_LAYER_KHRONOS_validation", // Still Validation SPAM by LancER
+            //"VK_LAYER_KHRONOS_validation", // Still Validation SPAM by LancER
 
             //"VK_LAYER_LUNARG_assistant_layer",
             //"VK_LAYER_LUNARG_standard_validation",
