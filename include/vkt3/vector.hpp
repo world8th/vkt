@@ -81,6 +81,8 @@ namespace vkt {
             // TODO: FIX BROKEN!
 #if defined(ENABLE_OPENGL_INTEROP) && defined(VK_USE_PLATFORM_WIN32_KHR)
             //this->info.handle = info.device.getMemoryWin32HandleKHR({ info.memory, VkExternalMemoryHandleTypeFlagBits::eOpaqueWin32 }, this->info.dispatch);
+            const auto handleInfo = VkMemoryGetWin32HandleInfoKHR{ VK_STRUCTURE_TYPE_MEMORY_GET_WIN32_HANDLE_INFO_KHR, nullptr, info.memory, VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_WIN32_BIT };
+            this->info.deviceDispatch->GetMemoryWin32HandleKHR(&handleInfo, &this->info.handle);
 #endif
 
             // 
@@ -164,7 +166,7 @@ namespace vkt {
         // Queue Family Indices
         virtual std::vector<uint32_t>& getQueueFamilyIndices() { return this->info.queueFamilyIndices; };
         virtual const std::vector<uint32_t>& getQueueFamilyIndices() const { return this->info.queueFamilyIndices; };
-              
+
         // 
         virtual vkh::VkDeviceOrHostAddressKHR deviceAddress() {
             if (!this->usage.eSharedDeviceAddress) {
@@ -173,7 +175,7 @@ namespace vkt {
             };
             return vkh::VkDeviceOrHostAddressKHR{ .deviceAddress = this->usage.eSharedDeviceAddress ? this->info.deviceDispatch->GetBufferDeviceAddress(vkh::VkBufferDeviceAddressInfo{.buffer = this->buffer}) : 0ull };
         };
-                   
+
         // 
         virtual vkh::VkDeviceOrHostAddressConstKHR deviceAddress() const {
             if (!this->usage.eSharedDeviceAddress) {

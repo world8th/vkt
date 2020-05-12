@@ -83,6 +83,8 @@ namespace vkt {
             // TODO: FIX BROKEN!
 #if defined(ENABLE_OPENGL_INTEROP) && defined(VK_USE_PLATFORM_WIN32_KHR)
             //this->info.handle = info.device.getMemoryWin32HandleKHR({ info.memory, VkExternalMemoryHandleTypeFlagBits::eOpaqueWin32 }, this->info.dispatch);
+            const auto handleInfo = VkMemoryGetWin32HandleInfoKHR{ VK_STRUCTURE_TYPE_MEMORY_GET_WIN32_HANDLE_INFO_KHR, nullptr, info.memory, VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_WIN32_BIT };
+            this->info.deviceDispatch->GetMemoryWin32HandleKHR(&handleInfo, &this->info.handle);
 #endif
             this->info.range = memReqs.size;
             this->info.reqSize = memReqs.size;
@@ -332,10 +334,12 @@ namespace vkt {
 #ifdef ENABLE_OPENGL_INTEROP
             if (!this->allocation->info.glID) {
                 VkImageViewHandleInfoNVX handleInfo = {};
+                handleInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_HANDLE_INFO_NVX;
+                handleInfo.pNext = nullptr;
                 handleInfo.imageView = this->imgInfo.imageView;
                 handleInfo.sampler = this->imgInfo.sampler;
-                handleInfo.descriptorType = this->imgInfo.sampler ? VkDescriptorType::eCombinedImageSampler : VkDescriptorType::eSampledImage;
-                this->allocation->info.glID = this->allocation->getDevice().getImageViewHandleNVX(&handleInfo, this->allocation->dispatchLoaderDynamic());
+                handleInfo.descriptorType = this->imgInfo.sampler ? VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER : VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
+                this->allocation->info.glID = this->allocation->info.deviceDispatch->GetImageViewHandleNVX(&handleInfo);
             };
 #endif
 
@@ -432,20 +436,23 @@ namespace vkt {
         // 
         virtual operator const VkImageSubresourceLayers() const { return VkImageSubresourceLayers{ reinterpret_cast<const VkImageAspectFlags&>(subresourceRange.aspectMask), subresourceRange.baseMipLevel, subresourceRange.baseArrayLayer, subresourceRange.layerCount }; };
 
-#ifdef ENABLE_OPENGL_INTEROP
-        // Bindless Textures Directly
+#ifdef ENABLE_OPENGL_INTEROP // Bindless Textures Directly
         virtual uint64_t deviceAddress () { 
             if (this->getGL()) {
                 return glGetTextureHandleARB(this->getGL());
             } else {
-                return this->allocation->getDevice().getImageViewAddressNVX(this->getImageView(), this->allocation->dispatchLoaderDynamic()).deviceAddress;
+                VkImageViewAddressPropertiesNVX address = { VK_STRUCTURE_TYPE_IMAGE_VIEW_ADDRESS_PROPERTIES_NVX, nullptr };
+                this->allocation->info.deviceDispatch->GetImageViewAddressNVX(this->getImageView(), &address);
+                return address.deviceAddress;
             };
         };
         virtual const uint64_t deviceAddress() const { 
             if (this->getGL()) {
                 return glGetTextureHandleARB(this->getGL());
             } else {
-                return this->allocation->getDevice().getImageViewAddressNVX(this->getImageView(), this->allocation->dispatchLoaderDynamic()).deviceAddress;
+                VkImageViewAddressPropertiesNVX address = { VK_STRUCTURE_TYPE_IMAGE_VIEW_ADDRESS_PROPERTIES_NVX, nullptr };
+                const_cast<MemoryAllocationInfo&>(this->allocation->info).deviceDispatch->GetImageViewAddressNVX(this->getImageView(), &address);
+                return address.deviceAddress;
             };
         };
         virtual uint64_t deviceAddress(GLuint sampler) { 
