@@ -60,8 +60,8 @@ namespace vkt {
             VkMemoryRequirements memReqs = {};
             (this->info.deviceDispatch->GetBufferMemoryRequirements(buffer, &memReqs));
             //allocationInfo->device.getBufferMemoryRequirements(buffer);
-            vkh::VkExportMemoryAllocateInfo exportAllocInfo {
-                .handleTypes = { .eOpaqueWin32 = 1 }
+            vkh::VkExportMemoryAllocateInfo exportAllocInfo{
+                .handleTypes = {.eOpaqueWin32 = 1 }
             };
 
             // 
@@ -99,10 +99,12 @@ namespace vkt {
 
             // 
 #ifdef ENABLE_OPENGL_INTEROP
-            glCreateBuffers(1u, &this->info.glID);
-            glCreateMemoryObjectsEXT(1u, &this->info.glMemory);
-            glImportMemoryWin32HandleEXT(this->info.glMemory, this->info.reqSize, GL_HANDLE_TYPE_OPAQUE_WIN32_EXT, this->info.handle);
-            glNamedBufferStorageMemEXT(this->info.glID, this->info.range, this->info.glMemory, 0u);
+            if (this->info.handle) {
+                glCreateBuffers(1u, &this->info.glID);
+                glCreateMemoryObjectsEXT(1u, &this->info.glMemory);
+                glImportMemoryWin32HandleEXT(this->info.glMemory, this->info.reqSize, GL_HANDLE_TYPE_OPAQUE_WIN32_EXT, this->info.handle);
+                glNamedBufferStorageMemEXT(this->info.glID, this->info.range, this->info.glMemory, 0u);
+            };
 #endif
 
             return this;

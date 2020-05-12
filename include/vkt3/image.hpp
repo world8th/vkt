@@ -20,9 +20,10 @@ namespace vkt {
     // 
     class ImageRegion;
     class VmaImageAllocation;
-    class ImageAllocation : public std::enable_shared_from_this<ImageAllocation> { public: 
+    class ImageAllocation : public std::enable_shared_from_this<ImageAllocation> {
+    public:
         ImageAllocation() {};
-        ImageAllocation(vkt::uni_arg<MemoryAllocationInfo> allocationInfo, vkt::uni_arg<vkh::VkImageCreateInfo> createInfo = vkh::VkImageCreateInfo{}) : info( allocationInfo) { this->construct( allocationInfo,  createInfo); }
+        ImageAllocation(vkt::uni_arg<MemoryAllocationInfo> allocationInfo, vkt::uni_arg<vkh::VkImageCreateInfo> createInfo = vkh::VkImageCreateInfo{}) : info(allocationInfo) { this->construct(allocationInfo, createInfo); }
         ImageAllocation(const vkt::uni_ptr<ImageAllocation>& allocation) : image(allocation->image), info(allocation->info) { *this = allocation; };
         ImageAllocation(const std::shared_ptr<ImageAllocation>& allocation) : image(allocation->image), info(allocation->info) { *this = vkt::uni_ptr<ImageAllocation>(allocation); };
         ~ImageAllocation() {
@@ -43,6 +44,9 @@ namespace vkt {
 
             // 
             vkh::VkMemoryAllocateFlagsInfo allocFlags = {};
+            if (allocationInfo->memUsage == VMA_MEMORY_USAGE_GPU_ONLY) {
+                allocFlags.flags.eAddress = 1u;
+            };
             //allocFlags.flags.eMask = 1u;
 
             //
@@ -63,14 +67,14 @@ namespace vkt {
             VkMemoryRequirements memReqs = {};
             //vkGetImageMemoryRequirements(this->info.device, this->image, &memReqs);
             this->info.deviceDispatch->GetImageMemoryRequirements(this->image, &memReqs);
-            vkh::VkExportMemoryAllocateInfo exportAllocInfo{.handleTypes = {.eOpaqueWin32 = 1}};
+            vkh::VkExportMemoryAllocateInfo exportAllocInfo{ .handleTypes = {.eOpaqueWin32 = 1} };
 
             //
             vkh::VkMemoryAllocateInfo memAllocInfo = {};
             exportAllocInfo.pNext = &allocFlags;
             memAllocInfo.pNext = &exportAllocInfo;
             memAllocInfo.allocationSize = memReqs.size;
-            memAllocInfo.memoryTypeIndex = uint32_t( allocationInfo->getMemoryType(memReqs.memoryTypeBits, {.eDeviceLocal = 1}));
+            memAllocInfo.memoryTypeIndex = uint32_t(allocationInfo->getMemoryType(memReqs.memoryTypeBits, { .eDeviceLocal = 1 }));
 
             // 
             VkDeviceMemory memory = {};
@@ -86,9 +90,10 @@ namespace vkt {
             const auto handleInfo = VkMemoryGetWin32HandleInfoKHR{ VK_STRUCTURE_TYPE_MEMORY_GET_WIN32_HANDLE_INFO_KHR, nullptr, info.memory, VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_WIN32_BIT };
             this->info.deviceDispatch->GetMemoryWin32HandleKHR(&handleInfo, &this->info.handle);
 #endif
+
             this->info.range = memReqs.size;
             this->info.reqSize = memReqs.size;
-            
+
             // 
             if (createInfo->queueFamilyIndexCount) {
                 this->info.queueFamilyIndices = std::vector<uint32_t>(createInfo->queueFamilyIndexCount);
@@ -107,22 +112,22 @@ namespace vkt {
             if (createInfo->format == VK_FORMAT_R16G16_SFLOAT) { format = GL_RG16F; };
 
             // Import Memory
-            glCreateTextures(GL_TEXTURE_2D, 1, &this->info.glID);
-            glCreateMemoryObjectsEXT(1, &this->info.glMemory);
-            glImportMemoryWin32HandleEXT(this->info.glMemory, this->info.reqSize, GL_HANDLE_TYPE_OPAQUE_WIN32_EXT, this->info.handle);
+            if (this->info.handle) {
+                glCreateTextures(GL_TEXTURE_2D, 1, &this->info.glID);
+                glCreateMemoryObjectsEXT(1, &this->info.glMemory);
+                glImportMemoryWin32HandleEXT(this->info.glMemory, this->info.reqSize, GL_HANDLE_TYPE_OPAQUE_WIN32_EXT, this->info.handle);
 
-            // Create GL Image
-            if (createInfo->imageType == VK_IMAGE_TYPE_1D) {
-                glTextureStorageMem1DEXT(this->info.glID, createInfo->mipLevels, format, createInfo->extent.width, this->info.glMemory, 0);
-            }
-            else
-            if (createInfo->imageType == VK_IMAGE_TYPE_2D) {
-                glTextureStorageMem2DEXT(this->info.glID, createInfo->mipLevels, format, createInfo->extent.width, createInfo->extent.height, this->info.glMemory, 0);
-            }
-            else
-            if (createInfo->imageType == VK_IMAGE_TYPE_3D) {
-                glTextureStorageMem3DEXT(this->info.glID, createInfo->mipLevels, format, createInfo->extent.width, createInfo->extent.height, createInfo->extent.depth, this->info.glMemory, 0);
-            }
+                // Create GL Image
+                if (createInfo->imageType == VK_IMAGE_TYPE_1D) {
+                    glTextureStorageMem1DEXT(this->info.glID, createInfo->mipLevels, format, createInfo->extent.width, this->info.glMemory, 0);
+                } else
+                if (createInfo->imageType == VK_IMAGE_TYPE_2D) {
+                    glTextureStorageMem2DEXT(this->info.glID, createInfo->mipLevels, format, createInfo->extent.width, createInfo->extent.height, this->info.glMemory, 0);
+                } else
+                if (createInfo->imageType == VK_IMAGE_TYPE_3D) {
+                    glTextureStorageMem3DEXT(this->info.glID, createInfo->mipLevels, format, createInfo->extent.width, createInfo->extent.height, createInfo->extent.depth, this->info.glMemory, 0);
+                }
+            };
 #endif
             return this;
         };
