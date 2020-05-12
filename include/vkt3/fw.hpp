@@ -13,15 +13,11 @@
 #endif
 
 // 
+#define ENABLE_VULKAN_HPP
 #define ENABLE_EXTENSION_GLM
 #define ENABLE_EXTENSION_VMA
 #define ENABLE_EXTENSION_RTX
 #define GLFW_INCLUDE_VULKAN
-
-// 
-#include <vulkan/vulkan.h>
-#include <vulkan/vulkan.hpp>
-#include <xvk/xvk.hpp>
 
 // 
 #if defined(VKT_ENABLE_GLFW_SUPPORT) || defined(ENABLE_OPENGL_INTEROP)
@@ -32,80 +28,17 @@
 // Force include for avoid GLAD problem...
 #include <vkh/structures.hpp>
 #include <vkh/helpers.hpp>
-#include <vkt3/utils.hpp>
-#include <vkt3/structs.hpp>
-#include <vkt3/core.hpp>
-#include <vkt3/vector.hpp>
-#include <vkt3/image.hpp>
+#include "utils.hpp"
+#include "structs.hpp"
+#include "core.hpp"
+#include "vector.hpp"
+#include "image.hpp"
 
 //#define VKT_ENABLE_DEBUG
 
 // TODO: FULL REWRITE OF THAT "PROJECT"!!!
 namespace vkt
 {
-
-    VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(
-        VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
-        VkDebugUtilsMessageTypeFlagsEXT messageType,
-        const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
-        void* pUserData) {
-
-        std::cerr << "validation layer: " << pCallbackData->pMessage << std::endl;
-        return VK_FALSE;
-    }
-
-    VkResult CreateDebugUtilsMessengerEXT(
-        VkInstance instance,
-        const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo,
-        const VkAllocationCallbacks* pAllocator,
-        VkDebugUtilsMessengerEXT* pCallback) {
-
-        // Note: It seems that static_cast<...> doesn't work. Use the C-style forced cast.
-        auto func = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");
-        if (func != nullptr) {
-            return func(instance, pCreateInfo, pAllocator, pCallback);
-        }
-        else {
-            return VK_ERROR_EXTENSION_NOT_PRESENT;
-        }
-    }
-
-    std::vector<const char*> GetRequiredExtensions() {
-#ifdef VKT_ENABLE_GLFW_SUPPORT
-        uint32_t glfwExtensionCount = 0;
-        const char** glfwExtensions = nullptr;
-        glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
-        std::vector<const char*> extensions(glfwExtensions, glfwExtensions + glfwExtensionCount);
-#else
-        std::vector<const char*> extensions{};
-#endif
-
-        // also want the "debug utils"
-        extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
-        return extensions;
-    }
-
-
-
-    // Новый, инновационный, педиковатый интерфейс... 
-    //using Tm = uint8_t;
-    template<class Tm = uint8_t>
-    static inline std::vector<Tm> DebugBufferData(vkt::uni_arg<VmaAllocator> allocator, vkt::uni_arg<VkQueue> queue, vkt::uni_arg<VkCommandPool> commandPool, vkt::Vector<Tm> mVector) {
-        auto gVector = vkt::Vector<Tm>(std::make_shared<vkt::VmaBufferAllocation>(allocator, vkh::VkBufferCreateInfo{
-            .size = mVector.range(),
-            .usage = {.eTransferSrc = 1, .eStorageTexelBuffer = 1, .eStorageBuffer = 1, .eIndexBuffer = 1, .eVertexBuffer = 1, .eTransformFeedbackBuffer = 1 },
-        }, vkt::VmaMemoryInfo{ .memUsage = VMA_MEMORY_USAGE_GPU_TO_CPU, .deviceDispatch = vkt::vkGlobal::device, .instanceDispatch = vkt::vkGlobal::instance }));
-
-        vkt::submitOnce(vkt::vkGlobal::device, queue, commandPool, [&](const VkCommandBuffer& cmd) {
-            (vkt::vkGlobal::device)->CmdCopyBuffer(cmd, mVector.buffer(), gVector.buffer(), 1u, vkh::VkBufferCopy{ .srcOffset = mVector.offset(), .dstOffset = gVector.offset(), .size = mVector.range() });
-        });
-
-        auto vect = std::vector<Tm>(mVector.size());
-        memcpy(vect.data(), gVector.data(), gVector.range());
-        return vect;
-    };
-
-
 
     // CRITICAL: NEEDS SUPPORT FOR JAVACPP!!! 
     class GPUFramework : std::enable_shared_from_this<GPUFramework> {

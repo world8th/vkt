@@ -5,6 +5,7 @@
 #include <vector>
 #include <glm/glm.hpp>
 
+/*
 // Enable Vulkan-HPP when defined
 #ifdef VULKAN_HPP
 #define ENABLE_VULKAN_HPP
@@ -20,6 +21,8 @@
 
 // 
 #include <xvk/xvk.hpp>
+*/
+
 #include "core.hpp"
 
 // 

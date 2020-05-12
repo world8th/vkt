@@ -10,6 +10,48 @@
 #include <optional>
 #include <iostream>
 
+// 
+#ifndef NSM
+#define NSM api
+#endif
+
+// Currently Windows Only Supported
+#if (defined(_WIN32) || defined(__MINGW32__) || defined(_MSC_VER_) || defined(__MINGW64__)) 
+#include <windows.h> // Fix HMODULE Type Error
+#endif
+
+// Default Backend
+#if !defined(USE_D3D12) && !defined(USE_VULKAN)
+#define USE_VULKAN
+#endif
+
+// 
+#ifdef ENABLE_OPENGL_INTEROP
+#include <glbinding/glbinding.h>
+#include <glbinding/gl/gl.h>
+#endif
+
+// 
+#include <vma/vk_mem_alloc.h>
+
+// Enable Vulkan-HPP when defined
+#ifdef VULKAN_HPP
+#define ENABLE_VULKAN_HPP
+#endif
+
+//
+#include <vulkan/vulkan.h>
+
+// When enabled, use Vulkan-HPP support...
+#ifdef ENABLE_VULKAN_HPP
+#include <vulkan/vulkan.hpp>
+#endif
+
+// 
+#include <xvk/xvk.hpp>
+
+
+
 namespace vkt {
 
     //
