@@ -26,11 +26,11 @@
 #endif
 
 // Force include for avoid GLAD problem...
+#include "core.hpp"
 #include <vkh/structures.hpp>
 #include <vkh/helpers.hpp>
 #include "utils.hpp"
 #include "structs.hpp"
-#include "core.hpp"
 #include "vector.hpp"
 #include "image.hpp"
 
