@@ -28,9 +28,6 @@ namespace vkt {
         ~ImageAllocation() {
             if (this->image && this->info.device) {
                 this->info.deviceDispatch->DeviceWaitIdle();
-                //this->info.device.destroyImage(this->image);
-                //this->info.device.freeMemory(this->info.memory);
-                //this->image = VkImage{};
             };
         };
 
