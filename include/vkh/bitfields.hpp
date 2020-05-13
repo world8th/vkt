@@ -516,6 +516,18 @@ namespace vkh {
         VK_HPP_OPERATORS(VkExternalMemoryHandleTypeFlags, vk::ExternalMemoryHandleTypeFlags, vk::ExternalMemoryHandleTypeFlagBits)
     };
 
+    // 
+    struct VkExternalSemaphoreHandleTypeFlags { ::VkFlags
+        eOpaqueFd : 1,
+        eOpaqueWin32 : 1,
+        eOpaqueWin32Kmt : 1,
+        eD3D12Fence : 1,
+        eSyncFd : 1;
+
+        OPERATORS(VkExternalSemaphoreHandleTypeFlags, ::VkExternalSemaphoreHandleTypeFlagBits, ::VkFlags)
+        VK_HPP_OPERATORS(VkExternalSemaphoreHandleTypeFlags, vk::ExternalSemaphoreHandleTypeFlags, vk::ExternalSemaphoreHandleTypeFlagBits)
+    };
+
     //
     struct VkCommandPoolCreateFlags { ::VkFlags
         eTransient : 1,

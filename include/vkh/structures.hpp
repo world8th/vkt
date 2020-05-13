@@ -1862,11 +1862,44 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
 
         operator VkMemoryAllocateFlags& () { return flags; };
         operator const VkMemoryAllocateFlags& () const { return flags; };
-        VkMemoryAllocateFlagsInfo& operator=(const VkMemoryAllocateFlags& flags) { this->flags = flags; };
+        VkMemoryAllocateFlagsInfo& operator=(const VkMemoryAllocateFlags& flags) { this->flags = flags; return *this; };
 
         STRUCT_OPERATORS(VkMemoryAllocateFlagsInfo)
         VK_HPP_STRUCT_OPERATORS(VkMemoryAllocateFlagsInfo, vk::MemoryAllocateFlagsInfo)
     } VkMemoryAllocateFlagsInfo;
+
+    // 
+    typedef struct VkSemaphoreGetWin32HandleInfoKHR {
+        VkStructureType                          sType      = VK_STRUCTURE_TYPE_SEMAPHORE_GET_WIN32_HANDLE_INFO_KHR;
+        const void*                              pNext      = nullptr;
+        VkSemaphore                              semaphore  = {};
+        VkExternalSemaphoreHandleTypeFlagBits    handleType = {};
+
+        operator VkSemaphore& () { return semaphore; };
+        operator const VkSemaphore& () const { return semaphore; };
+        VkSemaphoreGetWin32HandleInfoKHR& operator=(const VkSemaphore& semaphore) { this->semaphore = semaphore; return *this; };
+
+        operator VkExternalSemaphoreHandleTypeFlagBits& () { return handleType; };
+        operator const VkExternalSemaphoreHandleTypeFlagBits& () const { return handleType; };
+        VkSemaphoreGetWin32HandleInfoKHR& operator=(const VkExternalSemaphoreHandleTypeFlagBits& handleType) { this->handleType = handleType; return *this; };
+
+        STRUCT_OPERATORS(VkSemaphoreGetWin32HandleInfoKHR)
+        VK_HPP_STRUCT_OPERATORS(VkSemaphoreGetWin32HandleInfoKHR, vk::SemaphoreGetWin32HandleInfoKHR)
+    } VkSemaphoreGetWin32HandleInfoKHR;
+
+    // 
+    typedef struct VkExportSemaphoreCreateInfo {
+        VkStructureType                     sType       = VK_STRUCTURE_TYPE_EXPORT_SEMAPHORE_CREATE_INFO;
+        const void*                         pNext       = nullptr;
+        VkExternalSemaphoreHandleTypeFlags  handleTypes = {};
+
+        operator VkExternalSemaphoreHandleTypeFlags&() { return handleTypes; };
+        operator const VkExternalSemaphoreHandleTypeFlags&() const { return handleTypes; };
+        VkExportSemaphoreCreateInfo& operator=(const VkExternalSemaphoreHandleTypeFlags& handleType) { this->handleTypes = handleTypes; return *this; };
+
+        STRUCT_OPERATORS(VkExportSemaphoreCreateInfo)
+        VK_HPP_STRUCT_OPERATORS(VkExportSemaphoreCreateInfo, vk::ExportSemaphoreCreateInfo)
+    } VkExportSemaphoreCreateInfo;
 
 
 #pragma pack(pop)

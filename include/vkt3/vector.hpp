@@ -59,7 +59,8 @@ namespace vkt {
             // 
             VkMemoryRequirements memReqs = {};
             (this->info.deviceDispatch->GetBufferMemoryRequirements(buffer, &memReqs));
-            //allocationInfo->device.getBufferMemoryRequirements(buffer);
+
+            // 
             vkh::VkExportMemoryAllocateInfo exportAllocInfo{
                 .handleTypes = {.eOpaqueWin32 = 1 }
             };
@@ -74,14 +75,13 @@ namespace vkt {
 
             // 
             //this->info.device.bindBufferMemory(buffer, info.memory = info.device.allocateMemory(memAllocInfo), 0);
-            VkDeviceMemory memory = {};
-            vkh::handleVk(this->info.deviceDispatch->AllocateMemory(memAllocInfo, nullptr, &memory));
-            vkh::handleVk(this->info.deviceDispatch->BindBufferMemory(buffer, memory, 0u));
+            vkh::handleVk(this->info.deviceDispatch->AllocateMemory(memAllocInfo, nullptr, &this->info.memory));
+            vkh::handleVk(this->info.deviceDispatch->BindBufferMemory(buffer, this->info.memory, 0u));
 
             // TODO: FIX BROKEN!
 #if defined(ENABLE_OPENGL_INTEROP) && defined(VK_USE_PLATFORM_WIN32_KHR)
             //this->info.handle = info.device.getMemoryWin32HandleKHR({ info.memory, VkExternalMemoryHandleTypeFlagBits::eOpaqueWin32 }, this->info.dispatch);
-            const auto handleInfo = VkMemoryGetWin32HandleInfoKHR{ VK_STRUCTURE_TYPE_MEMORY_GET_WIN32_HANDLE_INFO_KHR, nullptr, info.memory, VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_WIN32_BIT };
+            const auto handleInfo = VkMemoryGetWin32HandleInfoKHR{ VK_STRUCTURE_TYPE_MEMORY_GET_WIN32_HANDLE_INFO_KHR, nullptr, this->info.memory, VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_WIN32_BIT };
             this->info.deviceDispatch->GetMemoryWin32HandleKHR(&handleInfo, &this->info.handle);
 #endif
 
