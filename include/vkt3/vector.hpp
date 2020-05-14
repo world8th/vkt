@@ -54,6 +54,7 @@ namespace vkt {
 
             //this->buffer = this->info.device.createBuffer(*createInfo);
             vkh::handleVk(this->info.deviceDispatch->CreateBuffer(*createInfo, nullptr, &this->buffer));
+            this->info.range = createInfo->size;
             this->usage = createInfo->usage;
 
             // 
@@ -69,7 +70,7 @@ namespace vkt {
             vkh::VkMemoryAllocateInfo memAllocInfo = {};
             exportAllocInfo.pNext = &allocFlags;
             memAllocInfo.pNext = &exportAllocInfo;
-            memAllocInfo.allocationSize = memReqs.size;
+            memAllocInfo.allocationSize = this->info.reqSize = memReqs.size;
             memAllocInfo.memoryTypeIndex = uint32_t(allocationInfo->getMemoryType(memReqs.memoryTypeBits, { .eDeviceLocal = 1 }));
 
 
@@ -86,7 +87,6 @@ namespace vkt {
 #endif
 
             // 
-            this->info.reqSize = memReqs.size;
             if (this->info.range == 0 || this->info.range == VK_WHOLE_SIZE) {
                 this->info.range = createInfo->size;
             };
@@ -102,8 +102,8 @@ namespace vkt {
             if (this->info.handle) {
                 glCreateBuffers(1u, &this->info.glID);
                 glCreateMemoryObjectsEXT(1u, &this->info.glMemory);
-                glImportMemoryWin32HandleEXT(this->info.glMemory, this->info.reqSize, GL_HANDLE_TYPE_OPAQUE_WIN32_EXT, this->info.handle);
-                glNamedBufferStorageMemEXT(this->info.glID, this->info.range, this->info.glMemory, 0u);
+                glImportMemoryWin32HandleEXT(this->info.glMemory, std::min(this->info.reqSize, this->info.range), GL_HANDLE_TYPE_OPAQUE_WIN32_EXT, this->info.handle);
+                glNamedBufferStorageMemEXT(this->info.glID, std::min(this->info.reqSize, this->info.range), this->info.glMemory, 0u);
             };
 #endif
 
