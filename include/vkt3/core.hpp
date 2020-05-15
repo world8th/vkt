@@ -26,9 +26,15 @@
 #endif
 
 // 
+#include <cstdint>
 #ifdef ENABLE_OPENGL_INTEROP
-#include <glbinding/glbinding.h>
+#ifdef VKT_USE_GLAD
+#include <glad/glad.h>
+#else
 #include <glbinding/gl/gl.h>
+#include <glbinding/gl/extension.h>
+#include <glbinding/glbinding.h>
+#endif
 #endif
 
 // 
@@ -243,12 +249,26 @@ namespace vkt {
 #ifdef ENABLE_OPENGL_INTEROP
     // FOR LWJGL-3 Request!
     void initializeGL(GLFWglproc(*glfwGetProcAddress)(const char*)) {
+#ifdef VKT_USE_GLAD
+        if (!gladLoadGLLoader(glfwGetProcAddress)) {
+            printf("Something went wrong!\n"); exit(-1);
+        }
+        printf("OpenGL %d.%d\n", GLVersion.major, GLVersion.minor);
+#else
         glbinding::initialize(glfwGetProcAddress);
+#endif
     };
 
     // FOR LWJGL-3 Request!
     void initializeGL() {
+#ifdef VKT_USE_GLAD
+        if (!gladLoadGLLoader(glfwGetProcAddress)) {
+            printf("Something went wrong!\n"); exit(-1);
+        }
+        printf("OpenGL %d.%d\n", GLVersion.major, GLVersion.minor);
+#else
         glbinding::initialize(glfwGetProcAddress);
+#endif
     };
 #endif
 

@@ -13,7 +13,7 @@
 
 namespace vkt {
 
-#ifdef ENABLE_OPENGL_INTEROP
+#if defined(ENABLE_OPENGL_INTEROP) && !defined(VKT_USE_GLAD)
     using namespace gl;
 #endif
 
