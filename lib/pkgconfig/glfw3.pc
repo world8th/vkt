@@ -1,12 +1,12 @@
-prefix=C:/Data/Development/VulkanDev/GLFW
+prefix=H:/Data/Projects/vkt
 exec_prefix=${prefix}
-includedir=${prefix}/include
-libdir=${exec_prefix}/lib
+includedir=H:/Data/Projects/vkt/include
+libdir=H:/Data/Projects/vkt/lib
 
 Name: GLFW
 Description: A multi-platform library for OpenGL, window and input
-Version: 3.3.0
-URL: http://www.glfw.org/
+Version: 3.4.0
+URL: https://www.glfw.org/
 Requires.private: 
 Libs: -L${libdir} -lglfw3
 Libs.private:  -lgdi32

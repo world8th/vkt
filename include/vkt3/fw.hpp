@@ -21,6 +21,7 @@
 
 // 
 #if defined(VKT_ENABLE_GLFW_SUPPORT) || defined(ENABLE_OPENGL_INTEROP)
+#include <vulkan/vulkan.h>
 #include <GLFW/glfw3.h>
 #include <GLFW/glfw3native.h>
 #endif
@@ -198,17 +199,17 @@ namespace vkt
         std::vector<const char*> wantedLayers = {
             //"VK_LAYER_KHRONOS_validation", // Still Validation SPAM by LancER
 
-            //"VK_LAYER_LUNARG_assistant_layer",
-            //"VK_LAYER_LUNARG_standard_validation",
-            //"VK_LAYER_LUNARG_parameter_validation",
-            //"VK_LAYER_LUNARG_core_validation",
+            "VK_LAYER_LUNARG_assistant_layer",
+            "VK_LAYER_LUNARG_standard_validation",
+            "VK_LAYER_LUNARG_parameter_validation",
+            "VK_LAYER_LUNARG_core_validation",
 
             //"VK_LAYER_LUNARG_api_dump",
             //"VK_LAYER_LUNARG_object_tracker",
             //"VK_LAYER_LUNARG_device_simulation",
-            //"VK_LAYER_GOOGLE_threading",
-            //"VK_LAYER_GOOGLE_unique_objects"
-            //"VK_LAYER_RENDERDOC_Capture"
+            "VK_LAYER_GOOGLE_threading",
+            "VK_LAYER_GOOGLE_unique_objects"
+            "VK_LAYER_RENDERDOC_Capture"
         };
 
         // default device layers
@@ -539,8 +540,12 @@ namespace vkt
                 graphicsFamilyIndex++;
 
                 VkBool32 support = false;
-                vkh::handleVk(vkGetPhysicalDeviceSurfaceSupportKHR(physicalDevice, graphicsFamilyIndex, surface(), &support));
-                if (queuefamily.queueFlags.eCompute && queuefamily.queueFlags.eGraphics && support) {
+                //vkh::handleVk(vkGetPhysicalDeviceSurfaceSupportKHR(physicalDevice, graphicsFamilyIndex, surface(), &support));
+                const auto& surface = this->surface();
+                if (surface) {
+                    vkh::handleVk(this->instanceDispatch->GetPhysicalDeviceSurfaceSupportKHR(physicalDevice, graphicsFamilyIndex, surface, &support));
+                };
+                if (queuefamily.queueFlags.eCompute && queuefamily.queueFlags.eGraphics && (support || !surface)) {
                     queueCreateInfos.push_back(vkh::VkDeviceQueueCreateInfo{ .queueFamilyIndex = uint32_t(computeFamilyIndex), .queueCount = 1, .pQueuePriorities = &priority });
                     queueFamilyIndices.push_back(uint32_t(graphicsFamilyIndex));
                     queueCreateInfos.back().queueFamilyIndex = uint32_t(graphicsFamilyIndex);
