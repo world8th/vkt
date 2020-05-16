@@ -233,6 +233,10 @@ namespace vkt {
         virtual T* ptr() { handle(has()); return &(*storage); };
         virtual const T* ptr() const { handle(has()); return &(*storage); };
 
+        //
+        template<class M = T> inline M* ptr() { handle(has()); return &reinterpret_cast<M&>(this->ref()); };
+        template<class M = T> inline const M* ptr() const { handle(has()); return &reinterpret_cast<const M&>(this->ref()); };
+
         // 
         virtual T& ref() { handle(has()); return *storage; };
         virtual const T& ref() const { handle(has()); return *storage; };
@@ -255,7 +259,7 @@ namespace vkt {
         }
         printf("OpenGL %d.%d\n", GLVersion.major, GLVersion.minor);
 #else
-        glbinding::initialize(glfwGetProcAddress);
+        glbinding::initialize(glfwGetProcAddress, false);
 #endif
     };
 
@@ -267,7 +271,7 @@ namespace vkt {
         }
         printf("OpenGL %d.%d\n", GLVersion.major, GLVersion.minor);
 #else
-        glbinding::initialize(glfwGetProcAddress);
+        glbinding::initialize(glfwGetProcAddress, false);
 #endif
     };
 #endif

@@ -31,6 +31,7 @@
 #include <vkh/helpers.hpp>
 #include "utils.hpp"
 #include "structs.hpp"
+#include "essential.hpp"
 #include "vector.hpp"
 #include "image.hpp"
 
@@ -155,15 +156,28 @@ namespace vkt
             "VK_NV_shader_sm_builtins",
             "VK_NV_ray_tracing",
 
+            //
+            "VK_KHR_external_fence",
+            "VK_KHR_external_fence_capabilities",
+            "VK_KHR_external_fence_win32",
+            //"VK_KHR_external_fence_fd",
+
             // 
             "VK_KHR_external_memory",
             "VK_KHR_external_memory_capabilities",
             "VK_KHR_external_memory_win32",
+            //"VK_KHR_external_memory_fd",
 
             // 
             "VK_KHR_external_semaphore",
             "VK_KHR_external_semaphore_capabilities",
             "VK_KHR_external_semaphore_win32",
+            //"VK_KHR_external_semaphore_fd",
+
+            "VK_NV_external_memory",
+            "VK_NV_external_memory_capabilities",
+            "VK_NV_external_memory_capabilities",
+            "VK_NV_external_memory_win32",
 
             // 
             "VK_NVX_image_view_handle",
@@ -358,6 +372,7 @@ namespace vkt
             VkExtent2D surfaceSize = VkExtent2D{ 0u, 0u };
             VkSurfaceKHR surface = {};
             GLFWwindow* window = nullptr;
+            GLFWwindow* opengl = nullptr;
         } applicationWindow = {};
 #endif
 
@@ -625,22 +640,48 @@ namespace vkt
 
 #ifdef VKT_ENABLE_GLFW_SUPPORT
         // create window and surface for this application (multi-window not supported)
-        inline SurfaceWindow& createWindowSurface(GLFWwindow * window, uint32_t WIDTH, uint32_t HEIGHT, std::string title = "TestApp") {
+        inline SurfaceWindow& createWindowSurface(GLFWwindow* window, uint32_t WIDTH, uint32_t HEIGHT) {
             applicationWindow.window = window;
             applicationWindow.surfaceSize = VkExtent2D{ WIDTH, HEIGHT };
-            auto result = glfwCreateWindowSurface((VkInstance&)(instance), applicationWindow.window, nullptr, (VkSurfaceKHR*)& applicationWindow.surface);
-            if (result != VK_SUCCESS) { glfwTerminate(); exit(result); };
+            glfwMakeContextCurrent(nullptr); // CONTEXT-REQUIRED!
+            vkh::handleVk(glfwCreateWindowSurface((VkInstance&)(instance), applicationWindow.window, nullptr, (VkSurfaceKHR*)&applicationWindow.surface));
+            glfwMakeContextCurrent(window); // CONTEXT-REQUIRED!
             return applicationWindow;
-        }
+        };
+
+        // create window and surface for this application (multi-window not supported)
+        inline SurfaceWindow& createWindowSurface(SurfaceWindow& applicationWindow) {
+            applicationWindow.surfaceSize = VkExtent2D{ applicationWindow.surfaceSize.width, applicationWindow.surfaceSize.height };
+            glfwMakeContextCurrent(nullptr); // CONTEXT-REQUIRED!
+            vkh::handleVk(glfwCreateWindowSurface((VkInstance&)(instance), applicationWindow.window, nullptr, (VkSurfaceKHR*)&applicationWindow.surface));
+            glfwMakeContextCurrent(applicationWindow.window); // CONTEXT-REQUIRED!
+            return applicationWindow;
+        };
+
+        // 
+        inline SurfaceWindow& getAppObject() {
+            return applicationWindow;
+        };
 
         // create window and surface for this application (multi-window not supported)
         inline SurfaceWindow& createWindowSurface(uint32_t WIDTH, uint32_t HEIGHT, std::string title = "TestApp") {
+            glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
+            //applicationWindow.opengl = glfwCreateWindow(WIDTH, HEIGHT, title.c_str(), nullptr, nullptr);
+            glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
             applicationWindow.window = glfwCreateWindow(WIDTH, HEIGHT, title.c_str(), nullptr, nullptr);
-            applicationWindow.surfaceSize = VkExtent2D{ WIDTH, HEIGHT };
-            auto result = glfwCreateWindowSurface((VkInstance&)(instance), applicationWindow.window, nullptr, (VkSurfaceKHR*)& applicationWindow.surface);
-            if (result != VK_SUCCESS) { glfwTerminate(); exit(result); };
+            glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
+
+            // Make Surface
+            return this->createWindowSurface(applicationWindow.window, WIDTH, HEIGHT);
+        };
+
+        //
+        inline SurfaceWindow& createWindowOnly(uint32_t WIDTH, uint32_t HEIGHT, std::string title = "TestApp") {
+            glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+            applicationWindow.window = glfwCreateWindow(WIDTH, HEIGHT, title.c_str(), nullptr, nullptr);
+            glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
             return applicationWindow;
-        }
+        };
 
         // getters
         inline VkSurfaceKHR surface() const { return applicationWindow.surface; }

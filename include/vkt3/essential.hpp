@@ -53,7 +53,7 @@
 
 // 
 namespace vkt {
-//#ifdef USE_VULKAN
+    //#ifdef USE_VULKAN
     template <typename T>
     static inline auto sgn(const T& val) { return (T(0) < val) - (val < T(0)); }
 
@@ -86,7 +86,8 @@ namespace vkt {
             // reserve capacity
             vec.reserve(fileSize);
             vec.insert(vec.begin(), std::istream_iterator<BYTE>(file), std::istream_iterator<BYTE>());
-        } else {
+        }
+        else {
             std::cerr << "Failure to open " + *filePath << std::endl;
         };
         if (vec.size() < 1u) { std::cerr << "NO DATA " + *filePath << std::endl; };
@@ -96,12 +97,12 @@ namespace vkt {
     // 
     static inline auto readBinary(vkt::uni_arg<std::string> filePath) {
         const auto vect8u = readBinaryU8(filePath);
-        auto vect32 = std::vector<uint32_t>(tiled(vect8u.size(),4ull));
+        auto vect32 = std::vector<uint32_t>(tiled(vect8u.size(), 4ull));
         memcpy(vect32.data(), vect8u.data(), vect8u.size()); return vect32;
     };
 
     // read source (unused)
-    static inline auto readSource(vkt::uni_arg<std::string> filePath, bool lineDirective = false ) {
+    static inline auto readSource(vkt::uni_arg<std::string> filePath, bool lineDirective = false) {
         std::string content = "";
         std::ifstream fileStream(filePath, std::ios::in);
         if (!fileStream.is_open()) {
@@ -159,7 +160,7 @@ namespace vkt {
     };
 
     // create shader module 
-    static inline auto makePipelineStageInfo(vkt::uni_ptr<xvk::Device> device, const std::vector<uint32_t>& code, vkt::uni_arg<VkShaderStageFlagBits> stage = VK_SHADER_STAGE_COMPUTE_BIT, vkt::uni_arg<const char *> entry = "main") {
+    static inline auto makePipelineStageInfo(vkt::uni_ptr<xvk::Device> device, const std::vector<uint32_t>& code, vkt::uni_arg<VkShaderStageFlagBits> stage = VK_SHADER_STAGE_COMPUTE_BIT, vkt::uni_arg<const char*> entry = "main") {
         vkh::VkPipelineShaderStageCreateInfo spi = {};
         createShaderModuleIntrusive(device, code, spi.module);
         spi.pName = entry;
@@ -178,10 +179,10 @@ namespace vkt {
     };
 
     // create shader module
-    static inline auto makeComputePipelineStageInfo(vkt::uni_ptr<xvk::Device> device, const std::vector<uint32_t>& code, vkt::uni_arg<const char *> entry = "main", vkt::uni_arg<uint32_t> subgroupSize = 0u) {
+    static inline auto makeComputePipelineStageInfo(vkt::uni_ptr<xvk::Device> device, const std::vector<uint32_t>& code, vkt::uni_arg<const char*> entry = "main", vkt::uni_arg<uint32_t> subgroupSize = 0u) {
         auto f = FixConstruction{};
         f.spi = makePipelineStageInfoWithoutModule(device, VK_SHADER_STAGE_COMPUTE_BIT, entry);
-        f.spi.flags = vkh::VkPipelineShaderStageCreateFlags{.eRequireFullSubgroups = 1u};
+        f.spi.flags = vkh::VkPipelineShaderStageCreateFlags{ .eRequireFullSubgroups = 1u };
         createShaderModuleIntrusive(device, TempCode = code, (VkShaderModule&)(f.spi.module));
         f.sgmp = vkh::VkPipelineShaderStageRequiredSubgroupSizeCreateInfoEXT{};
         f.sgmp.requiredSubgroupSize = subgroupSize;
@@ -244,7 +245,7 @@ namespace vkt {
         vkt::uni_arg<VkImage> image = {};
         vkt::uni_arg<VkImageLayout> targetLayout = VK_IMAGE_LAYOUT_GENERAL;
         vkt::uni_arg<VkImageLayout> originLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-        vkt::uni_arg<vkh::VkImageSubresourceRange> subresourceRange = vkh::VkImageSubresourceRange{{}, 0u, 1u, 0u, 1u};
+        vkt::uni_arg<vkh::VkImageSubresourceRange> subresourceRange = vkh::VkImageSubresourceRange{ {}, 0u, 1u, 0u, 1u };
     };
 
     //
@@ -264,8 +265,8 @@ namespace vkt {
         imageMemoryBarriers.image = info->image;
 
         // Put barrier on top
-        const auto srcStageMask = vkh::VkPipelineStageFlags{.eBottomOfPipe = 1};
-        const auto dstStageMask = vkh::VkPipelineStageFlags{.eTopOfPipe = 1};
+        const auto srcStageMask = vkh::VkPipelineStageFlags{ .eBottomOfPipe = 1 };
+        const auto dstStageMask = vkh::VkPipelineStageFlags{ .eTopOfPipe = 1 };
         const auto dependencyFlags = vkh::VkDependencyFlags{};
         auto srcMask = vkh::VkAccessFlags{}, dstMask = vkh::VkAccessFlags{};
 
@@ -275,30 +276,30 @@ namespace vkt {
 
         // Is it me, or are these the same?
         switch (info->originLayout) {
-            case VK_IMAGE_LAYOUT_UNDEFINED:                         break;
-            case VK_IMAGE_LAYOUT_GENERAL:                           srcMask.eTransferWrite = 1u; break;
-            case VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL:          srcMask.eColorAttachmentWrite = 1u; break;
-            case VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL:  srcMask.eDepthStencilAttachmentWrite = 1u; break;
-            case VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL:   srcMask.eDepthStencilAttachmentRead = 1u; break;
-            case VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL:          srcMask.eShaderRead = 1u; break;
-            case VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL:              srcMask.eTransferRead = 1u; break;
-            case VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL:              srcMask.eTransferWrite = 1u; break;
-            case VK_IMAGE_LAYOUT_PREINITIALIZED:                    srcMask.eTransferWrite = 1u, srcMask.eHostWrite = 1u; break; srcMask.eMemoryRead = 1u; break;
-            case VK_IMAGE_LAYOUT_PRESENT_SRC_KHR:                   srcMask.eMemoryRead = 1u; break;
+        case VK_IMAGE_LAYOUT_UNDEFINED:                         break;
+        case VK_IMAGE_LAYOUT_GENERAL:                           srcMask.eTransferWrite = 1u; break;
+        case VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL:          srcMask.eColorAttachmentWrite = 1u; break;
+        case VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL:  srcMask.eDepthStencilAttachmentWrite = 1u; break;
+        case VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL:   srcMask.eDepthStencilAttachmentRead = 1u; break;
+        case VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL:          srcMask.eShaderRead = 1u; break;
+        case VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL:              srcMask.eTransferRead = 1u; break;
+        case VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL:              srcMask.eTransferWrite = 1u; break;
+        case VK_IMAGE_LAYOUT_PREINITIALIZED:                    srcMask.eTransferWrite = 1u, srcMask.eHostWrite = 1u; break; srcMask.eMemoryRead = 1u; break;
+        case VK_IMAGE_LAYOUT_PRESENT_SRC_KHR:                   srcMask.eMemoryRead = 1u; break;
         };
 
         // 
         switch (info->targetLayout) {
-            case VK_IMAGE_LAYOUT_UNDEFINED:                         break;
-            case VK_IMAGE_LAYOUT_GENERAL:                           dstMask.eTransferWrite = 1u; break;
-            case VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL:          dstMask.eColorAttachmentWrite = 1u; break;
-            case VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL:  dstMask.eDepthStencilAttachmentWrite = 1u; break;
-            case VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL:   dstMask.eDepthStencilAttachmentRead = 1u; break;
-            case VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL:          dstMask.eShaderRead = 1u; break;
-            case VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL:              dstMask.eTransferRead = 1u; break;
-            case VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL:              dstMask.eTransferWrite = 1u; break;
-            case VK_IMAGE_LAYOUT_PREINITIALIZED:                    dstMask.eTransferWrite = 1u; break;
-            case VK_IMAGE_LAYOUT_PRESENT_SRC_KHR:                   dstMask.eMemoryRead = 1u; break;
+        case VK_IMAGE_LAYOUT_UNDEFINED:                         break;
+        case VK_IMAGE_LAYOUT_GENERAL:                           dstMask.eTransferWrite = 1u; break;
+        case VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL:          dstMask.eColorAttachmentWrite = 1u; break;
+        case VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL:  dstMask.eDepthStencilAttachmentWrite = 1u; break;
+        case VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL:   dstMask.eDepthStencilAttachmentRead = 1u; break;
+        case VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL:          dstMask.eShaderRead = 1u; break;
+        case VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL:              dstMask.eTransferRead = 1u; break;
+        case VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL:              dstMask.eTransferWrite = 1u; break;
+        case VK_IMAGE_LAYOUT_PREINITIALIZED:                    dstMask.eTransferWrite = 1u; break;
+        case VK_IMAGE_LAYOUT_PRESENT_SRC_KHR:                   dstMask.eMemoryRead = 1u; break;
         };
 
         // assign access masks
@@ -307,8 +308,8 @@ namespace vkt {
 
         // 
         (info->deviceDispatch->vkCmdPipelineBarrier(cmd, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, {},
-            0u, nullptr, 
-            0u, nullptr, 
+            0u, nullptr,
+            0u, nullptr,
             1u, imageMemoryBarriers));
 
         // 
@@ -349,14 +350,14 @@ namespace vkt {
         dstStageMask = srcStageMask;
 
         // 
-        memoryBarrier.srcAccessMask = VkAccessFlagBits(VK_ACCESS_SHADER_WRITE_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_TRANSFER_WRITE_BIT | VK_ACCESS_MEMORY_WRITE_BIT   | VK_ACCESS_TRANSFORM_FEEDBACK_COUNTER_WRITE_BIT_EXT  | VK_ACCESS_ACCELERATION_STRUCTURE_WRITE_BIT_KHR | VK_ACCESS_TRANSFORM_FEEDBACK_WRITE_BIT_EXT);
-        memoryBarrier.dstAccessMask = VkAccessFlagBits(VK_ACCESS_SHADER_READ_BIT  | VK_ACCESS_COLOR_ATTACHMENT_READ_BIT  | VK_ACCESS_TRANSFER_READ_BIT  | VK_ACCESS_MEMORY_READ_BIT  /*| VK_ACCESS_TRANSFORM_FEEDBACK_COUNTER_READ_BIT_EXT*/ | VK_ACCESS_ACCELERATION_STRUCTURE_READ_BIT_KHR  | VK_ACCESS_INPUT_ATTACHMENT_READ_BIT | VK_ACCESS_INDEX_READ_BIT | VK_ACCESS_UNIFORM_READ_BIT);
+        memoryBarrier.srcAccessMask = VkAccessFlagBits(VK_ACCESS_SHADER_WRITE_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_TRANSFER_WRITE_BIT | VK_ACCESS_MEMORY_WRITE_BIT | VK_ACCESS_TRANSFORM_FEEDBACK_COUNTER_WRITE_BIT_EXT | VK_ACCESS_ACCELERATION_STRUCTURE_WRITE_BIT_KHR | VK_ACCESS_TRANSFORM_FEEDBACK_WRITE_BIT_EXT);
+        memoryBarrier.dstAccessMask = VkAccessFlagBits(VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_TRANSFER_READ_BIT | VK_ACCESS_MEMORY_READ_BIT  /*| VK_ACCESS_TRANSFORM_FEEDBACK_COUNTER_READ_BIT_EXT*/ | VK_ACCESS_ACCELERATION_STRUCTURE_READ_BIT_KHR | VK_ACCESS_INPUT_ATTACHMENT_READ_BIT | VK_ACCESS_INDEX_READ_BIT | VK_ACCESS_UNIFORM_READ_BIT);
 
         // 
         (device->vkCmdPipelineBarrier(cmdBuffer, srcStageMask, dstStageMask, {},
-                1u, memoryBarrier,
-                0u, nullptr,
-                0u, nullptr));
+            1u, memoryBarrier,
+            0u, nullptr,
+            0u, nullptr));
     };
 
     // create fence function
@@ -377,7 +378,7 @@ namespace vkt {
         VkFence fence = createFence(device, false);
         vkh::handleVk(device->QueueSubmit(queue, 1u, *smbi, fence));
         vkh::handleVk(device->WaitForFences(1u, &fence, true, 30ull * 1000ull * 1000ull * 1000ull));
-                     (device->DestroyFence(fence, nullptr));
+        (device->DestroyFence(fence, nullptr));
 
         return;
     };
@@ -394,7 +395,7 @@ namespace vkt {
     static inline auto submitCmdAsync(vkt::uni_ptr<xvk::Device> device, vkt::uni_arg<VkQueue> queue, const std::vector<VkCommandBuffer>& cmds, const vkt::uni_arg<vkh::VkSubmitInfo>& smbi = vkh::VkSubmitInfo{}) {
         return std::async(std::launch::async | std::launch::deferred, [=]() {
             return submitCmd(device, queue, cmds, smbi);
-        });
+            });
     };
 
     // once submit command buffer
@@ -404,7 +405,7 @@ namespace vkt {
         return std::async(std::launch::async | std::launch::deferred, [&]() {
             submitCmdAsync(device, queue, { cmdBuf }, smbi).get();
             device->FreeCommandBuffers(cmdPool, 1u, &cmdBuf);
-        });
+            });
     };
 
     // 
@@ -480,12 +481,28 @@ namespace vkt {
         static inline vkt::uni_ptr<xvk::Loader> loader = {};
         static inline vkt::uni_ptr<xvk::Device> device = {};
         static inline vkt::uni_ptr<xvk::Instance> instance = {};
+
+    #ifdef VKT_ENABLE_GLFW_SUPPORT
+        vkGlobal(GLFWglproc(*glfwGetProcAddress)(const char*) = ::glfwGetProcAddress) {
+            if (!initialized) {
+                loader = std::make_shared<xvk::Loader>();
+                if (!(initialized = (*loader)())) { std::cerr << "vulkan load failed..." << std::endl; };
+    #ifdef ENABLE_OPENGL_INTEROP
+                vkt::initializeGL(glfwGetProcAddress);
+    #endif
+            };
+        };
+    #else
         vkGlobal() {
             if (!initialized) {
                 loader = std::make_shared<xvk::Loader>();
                 if (!(initialized = (*loader)())) { std::cerr << "vulkan load failed..." << std::endl; };
+    #ifdef ENABLE_OPENGL_INTEROP
+                vkt::initializeGL();
+    #endif
             };
         };
+    #endif
     };
 
 
