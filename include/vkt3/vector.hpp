@@ -550,11 +550,12 @@ namespace vkt {
 
         // 
         protected: friend Vector<T>; // 
+        protected: VkBufferView view = {};
         protected: vkh::VkDescriptorBufferInfo bufInfo = { {}, 0u, VK_WHOLE_SIZE }; // Cached Feature
         protected: vkh::VkStridedBufferRegionKHR bufRegion = { {}, 0u, sizeof(T), VK_WHOLE_SIZE };
-        protected: VkBufferView view = {};
         protected: vkt::uni_ptr<BufferAllocation> allocation = {};
         protected: T* pMapped = nullptr;
+        //protected: T pMapped[8] = nullptr;
     };
 
     template<class T = uint8_t>
