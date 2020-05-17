@@ -285,17 +285,17 @@ namespace vkt {
             this->allocator = allocation->allocator;
             return *this;
         }
-          
+
         // 
         virtual VmaBufferAllocation& operator=(const vkt::uni_ptr<VmaBufferAllocation>& allocation) {
             return this->assign(allocation);
         };
-         
+
         // Get mapped memory
-        virtual void* map() { void* ptr = nullptr; vkh::handleVk(vmaMapMemory(allocator, allocation, &ptr)); return ptr; };
-        virtual void* mapped() { if (!allocationInfo.pMappedData) { vkh::handleVk(vmaMapMemory(allocator, allocation, &allocationInfo.pMappedData)); }; return allocationInfo.pMappedData; };
-        virtual void  unmap() { vmaUnmapMemory(allocator, allocation); allocationInfo.pMappedData = nullptr; };
-        
+        virtual void* map() { vkh::handleVk(vmaMapMemory(this->allocator, this->allocation, &this->allocationInfo.pMappedData)); return (this->info.pMapped = this->allocationInfo.pMappedData); };
+        virtual void* mapped() { if (!this->allocationInfo.pMappedData) { vkh::handleVk(vmaMapMemory(this->allocator, this->allocation, &this->allocationInfo.pMappedData)); }; return (this->info.pMapped = this->allocationInfo.pMappedData); };
+        virtual void  unmap() { vmaUnmapMemory(this->allocator, this->allocation);  this->info.pMapped = this->allocationInfo.pMappedData = nullptr; };
+
         // Allocation
         virtual operator const VmaAllocation& () const { return allocation; };
         virtual operator const VmaAllocationInfo& () const { return allocationInfo; };
@@ -303,7 +303,7 @@ namespace vkt {
         // 
         virtual VmaBufferAllocation* address() { return this; };
         virtual const VmaBufferAllocation* address() const { return this; };
-        
+
         //
         virtual vkh::VkDeviceOrHostAddressKHR deviceAddress() {
             if (!this->usage.eSharedDeviceAddress) {
@@ -512,13 +512,13 @@ namespace vkt {
         virtual operator vkh::VkDeviceOrHostAddressConstKHR() const { return this->deviceAddress(); };
 
         // 
-        virtual void unmap() { allocation->unmap(); };
-        virtual const T* map(const uintptr_t& i = 0u) const { auto mapc = reinterpret_cast<const uint8_t*>(allocation->map()) + offset(); return &(reinterpret_cast<const T*>(mapc))[i]; };
-        virtual T* const map(const uintptr_t& i = 0u) { auto mapc = reinterpret_cast<uint8_t*>(allocation->map()) + offset(); return &(reinterpret_cast<T*>(mapc))[i]; };
+        virtual void unmap() { allocation->unmap(); this->pMapped = nullptr; };
+        virtual const T* map(const uintptr_t& i = 0u) const { const_cast<Vector<T>*>(this)->pMapped = const_cast<T*>(reinterpret_cast<const T*>(reinterpret_cast<const uint8_t*>(allocation->map()) + offset())); return &(reinterpret_cast<const T*>(pMapped))[i]; };
+        virtual T* const map(const uintptr_t& i = 0u) { this->pMapped = reinterpret_cast<T*>(reinterpret_cast<uint8_t*>(allocation->map()) + offset()); return &(reinterpret_cast<T*>(pMapped))[i]; };
 
         // 
-        virtual const T* mapped(const uintptr_t& i = 0u) const { auto mapc = reinterpret_cast<const uint8_t*>(allocation->mapped()) + offset(); return &(reinterpret_cast<const T*>(mapc))[i]; };
-        virtual T* const mapped(const uintptr_t& i = 0u) { auto mapc = reinterpret_cast<uint8_t*>(allocation->mapped()) + offset(); return &(reinterpret_cast<T*>(mapc))[i]; };
+        virtual const T* mapped(const uintptr_t& i = 0u) const { const_cast<Vector<T>*>(this)->pMapped = const_cast<T*>(reinterpret_cast<const T*>(reinterpret_cast<const uint8_t*>(allocation->mapped()) + offset())); return &this->pMapped[i]; };
+        virtual T* const mapped(const uintptr_t& i = 0u) { this->pMapped = reinterpret_cast<T*>(reinterpret_cast<uint8_t*>(allocation->mapped()) + offset()); return &this->pMapped[i]; };
 
         // 
         virtual T* const data() { return mapped(); };
@@ -554,6 +554,7 @@ namespace vkt {
         protected: vkh::VkStridedBufferRegionKHR bufRegion = { {}, 0u, sizeof(T), VK_WHOLE_SIZE };
         protected: VkBufferView view = {};
         protected: vkt::uni_ptr<BufferAllocation> allocation = {};
+        protected: T* pMapped = nullptr;
     };
 
     template<class T = uint8_t>
