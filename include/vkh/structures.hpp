@@ -156,8 +156,8 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
     typedef struct VkStridedBufferRegionKHR {
         VkBuffer        buffer  = VK_NULL_HANDLE;
         VkDeviceSize    offset  = 0u;
-        VkDeviceSize    stride  = 16u;
-        VkDeviceSize    size    = 1u;
+        VkDeviceSize    stride  = 0u;//16u;
+        VkDeviceSize    size    = 0u;//1u;
 
         // Beta
 #ifdef VK_ENABLE_BETA_EXTENSIONS
