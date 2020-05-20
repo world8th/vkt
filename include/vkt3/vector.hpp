@@ -329,90 +329,74 @@ namespace vkt {
         VmaAllocator allocator = {};
     };
 
-    // Wrapper Class
-    template<class T = uint8_t>
-    class Vector : public std::enable_shared_from_this<Vector<T>> { public: //
-        Vector() {};
+
+    template<class T = uint8_t> class Vector;
+
+    class VectorBase : public std::enable_shared_from_this<VectorBase> {
+    public: using T = uint8_t;
+        VectorBase() {};
 
         // 
-        Vector(const vkt::uni_ptr<BufferAllocation>& allocation, vkt::uni_arg<VkDeviceSize> offset = 0ull, vkt::uni_arg<VkDeviceSize> size = VK_WHOLE_SIZE, vkt::uni_arg<VkDeviceSize> stride = sizeof(T)) : allocation(allocation), bufInfo({ allocation->buffer, offset, size }) { this->construct(allocation, offset, size, stride); };
-        Vector(const vkt::uni_ptr<VmaBufferAllocation>& allocation, vkt::uni_arg<VkDeviceSize> offset = 0ull, vkt::uni_arg<VkDeviceSize> size = VK_WHOLE_SIZE, vkt::uni_arg<VkDeviceSize> stride = sizeof(T)) : allocation(allocation.dyn_cast<BufferAllocation>()), bufInfo({ allocation->buffer, offset, size }) { this->construct(allocation.dyn_cast<BufferAllocation>(), offset, size, stride); };
+        VectorBase(const vkt::uni_ptr<BufferAllocation>& allocation, vkt::uni_arg<VkDeviceSize> offset = 0ull, vkt::uni_arg<VkDeviceSize> size = VK_WHOLE_SIZE, vkt::uni_arg<VkDeviceSize> stride = 1u) : allocation(allocation), bufInfo({ allocation->buffer, offset, size }) { this->construct(allocation, offset, size, stride); };
+        VectorBase(const vkt::uni_ptr<VmaBufferAllocation>& allocation, vkt::uni_arg<VkDeviceSize> offset = 0ull, vkt::uni_arg<VkDeviceSize> size = VK_WHOLE_SIZE, vkt::uni_arg<VkDeviceSize> stride = 1u) : allocation(allocation.dyn_cast<BufferAllocation>()), bufInfo({ allocation->buffer, offset, size }) { this->construct(allocation.dyn_cast<BufferAllocation>(), offset, size, stride); };
 
         // 
-        Vector(const std::shared_ptr<BufferAllocation>& allocation, vkt::uni_arg<VkDeviceSize> offset = 0ull, vkt::uni_arg<VkDeviceSize> size = VK_WHOLE_SIZE, vkt::uni_arg<VkDeviceSize> stride = sizeof(T)) : allocation(allocation), bufInfo({ allocation->buffer, offset, size }) { this->construct(allocation, offset, size, stride); };
-        Vector(const std::shared_ptr<VmaBufferAllocation>& allocation, vkt::uni_arg<VkDeviceSize> offset = 0ull, vkt::uni_arg<VkDeviceSize> size = VK_WHOLE_SIZE, vkt::uni_arg<VkDeviceSize> stride = sizeof(T)) : allocation(std::dynamic_pointer_cast<BufferAllocation>(allocation)), bufInfo({ allocation->buffer, offset, size }) { this->construct(std::dynamic_pointer_cast<BufferAllocation>(allocation), offset, size, stride); };
+        VectorBase(const std::shared_ptr<BufferAllocation>& allocation, vkt::uni_arg<VkDeviceSize> offset = 0ull, vkt::uni_arg<VkDeviceSize> size = VK_WHOLE_SIZE, vkt::uni_arg<VkDeviceSize> stride = 1u) : allocation(allocation), bufInfo({ allocation->buffer, offset, size }) { this->construct(allocation, offset, size, stride); };
+        VectorBase(const std::shared_ptr<VmaBufferAllocation>& allocation, vkt::uni_arg<VkDeviceSize> offset = 0ull, vkt::uni_arg<VkDeviceSize> size = VK_WHOLE_SIZE, vkt::uni_arg<VkDeviceSize> stride = 1u) : allocation(std::dynamic_pointer_cast<BufferAllocation>(allocation)), bufInfo({ allocation->buffer, offset, size }) { this->construct(std::dynamic_pointer_cast<BufferAllocation>(allocation), offset, size, stride); };
 
-        // 
-        ~Vector() {
-            if (this->view) {
-                this->allocation->info.deviceDispatch->DestroyBufferView(this->view, nullptr);
-                this->view = VkBufferView{};
-            };
-        };
-
-        // 
-        template<class Tm = T> Vector(const Vector<Tm>& V) : allocation(V), bufInfo({ V.buffer(), V.offset(), V.range() }) { *this = V; };
-        template<class Tm = T> inline Vector<T>& operator=(const Vector<Tm>& V) { 
-            this->allocation = V.uniPtr();
-            this->bufInfo = vkh::VkDescriptorBufferInfo{ static_cast<VkBuffer>(V.buffer()), V.offset(), V.range() };
-            this->bufRegion = vkh::VkStridedBufferRegionKHR{ static_cast<VkBuffer>(V.buffer()), V.offset(), sizeof(T), V.ranged() / sizeof(T) };
-            return *this;
-        };
-         
-        // 
-        //template<class Tm = T> Vector<Tm> cast() { return *this; };
-        //template<class Tm = T> const vkt::uni_arg<Vector<Tm>>& cast() const { return Vector<Tm>(reinterpret_cast<Vector<T>&>(*this)); };
-         
         //
-        virtual Vector<T>* construct(vkt::uni_ptr<BufferAllocation> allocation, vkt::uni_arg<VkDeviceSize> offset = 0ull, vkt::uni_arg<VkDeviceSize> size = VK_WHOLE_SIZE, vkt::uni_arg<VkDeviceSize> stride = sizeof(T)) {
+        virtual VectorBase* construct(vkt::uni_ptr<BufferAllocation> allocation, vkt::uni_arg<VkDeviceSize> offset = 0ull, vkt::uni_arg<VkDeviceSize> size = VK_WHOLE_SIZE, vkt::uni_arg<VkDeviceSize> stride = 1u) {
             this->allocation = allocation;
             this->bufInfo = vkh::VkDescriptorBufferInfo{ static_cast<VkBuffer>(allocation->buffer),offset,size };
-            this->bufRegion = vkh::VkStridedBufferRegionKHR{ static_cast<VkBuffer>(allocation->buffer),offset,stride,this->ranged()/stride };
+            this->bufRegion = vkh::VkStridedBufferRegionKHR{ static_cast<VkBuffer>(allocation->buffer),offset,stride, this->ranged() / stride };
             return this;
         };
 
         // 
-        virtual VkBufferView& createBufferView(const VkFormat& format = VkFormat::eUndefined) {
+        virtual VkBufferView& createBufferView(const VkFormat& format = VK_FORMAT_UNDEFINED) {
             vkh::handleVk(this->allocation->info.deviceDispatch->CreateBufferView(vkh::VkBufferViewCreateInfo{
                 .buffer = static_cast<VkBuffer>(this->bufRegion.buffer),
                 .format = static_cast<VkFormat>(format),
                 .offset = this->bufRegion.offset,
                 .range = this->bufInfo.range
-            }, nullptr, &view));
+                }, nullptr, &view));
             return view;
         };
 
         // alias Of getAllocation
         virtual vkt::uni_ptr<BufferAllocation>& uniPtr() { return allocation; };
         virtual vkt::uni_ptr<BufferAllocation> uniPtr() const { return allocation; };
-         
+
         // 
         virtual operator    ::VkDescriptorBufferInfo& () { this->bufInfo.buffer = this->bufRegion.buffer = allocation->buffer; return bufInfo; };
         virtual operator vkh::VkDescriptorBufferInfo& () { this->bufInfo.buffer = this->bufRegion.buffer = allocation->buffer; return bufInfo; };
         virtual operator vkt::uni_ptr<BufferAllocation>& () { return allocation; };
         virtual operator std::shared_ptr<BufferAllocation>& () { return allocation; };
-              
+
         //
-        virtual operator const ::VkDescriptorBufferInfo &() const { return bufInfo; };
-        virtual operator const vkh::VkDescriptorBufferInfo&() const { return bufInfo; };
-        virtual operator const vkt::uni_ptr<BufferAllocation>&() const { return allocation; };
-        virtual operator const std::shared_ptr<BufferAllocation>&() const { return allocation; };
-        
+        virtual operator const ::VkDescriptorBufferInfo& () const { return bufInfo; };
+        virtual operator const vkh::VkDescriptorBufferInfo& () const { return bufInfo; };
+        virtual operator const vkt::uni_ptr<BufferAllocation>& () const { return allocation; };
+        virtual operator const std::shared_ptr<BufferAllocation>& () const { return allocation; };
+
         // 
-        virtual operator BufferAllocation*() { return allocation; };
-        virtual operator const BufferAllocation*() const { return allocation; };
-           
+        virtual operator BufferAllocation* () { return allocation; };
+        virtual operator const BufferAllocation* () const { return allocation; };
+
         // 
-        virtual operator VkBufferView&() { return view; };
+        virtual operator VkBufferView& () { return view; };
         virtual operator VkDevice& () { return *allocation; };
-        virtual operator VkBuffer&() { return *allocation; };
-           
+        virtual operator VkBuffer& () { return *allocation; };
+
         // 
         virtual operator const VkBuffer& () const { return *allocation; };
         virtual operator const VkDevice& () const { return *allocation; };
         virtual operator const VkBufferView& () const { return view; };
-         
-         
+
+        // typed casting 
+        template<class Tm = T> inline Vector<Tm>& cast() { return dynamic_cast<Vector<Tm>&>(*this); };
+        template<class Tm = T> inline const Vector<Tm>& cast() const { return dynamic_cast<const Vector<Tm>&>(*this); };
+
         // 
         virtual VkDeviceSize& offset() { return this->bufRegion.offset; };
         virtual const VkDeviceSize& offset() const { return this->bufRegion.offset; };
@@ -452,9 +436,6 @@ namespace vkt {
         virtual const VkDevice& handleDevice() const { return reinterpret_cast<const VkDevice&>(this->getDevice()); };
         virtual const VkBuffer& handleBuffer() const { return reinterpret_cast<const VkBuffer&>(this->getBuffer()); };
 
-        // typed casting 
-        template<class Tm = T> inline Vector<Tm>& cast() { return reinterpret_cast<Vector<Tm>&>(*this); };
-        template<class Tm = T> inline const Vector<Tm>& cast() const { return reinterpret_cast<const Vector<Tm>&>(*this); };
 
         virtual unsigned& getGL() { return this->allocation->info.glID; };
         virtual const unsigned& getGL() const { return this->allocation->info.glID; };
@@ -474,8 +455,8 @@ namespace vkt {
         virtual const VkDeviceSize& rangeInfo() const { return bufInfo.range; };
 
         // 
-        virtual Vector<T>* address() { return this; };
-        virtual const Vector<T>* address() const { return this; };
+        virtual VectorBase* address() { return this; };
+        virtual const VectorBase* address() const { return this; };
 
         // 
         virtual vkh::VkDescriptorBufferInfo& getDescriptor() { return bufInfo; };
@@ -488,7 +469,7 @@ namespace vkt {
         // for JavaCPP
         virtual BufferAllocation* getAllocationPtr() { return allocation.ptr(); };
         virtual const BufferAllocation* getAllocationPtr() const { return allocation.ptr(); };
-        
+
         // get deviceAddress with offset (currently, prefer unshifted)
         virtual vkh::VkDeviceOrHostAddressKHR deviceAddress() {
             return this->allocation->deviceAddress();
@@ -513,16 +494,68 @@ namespace vkt {
 
         // 
         virtual void unmap() { allocation->unmap(); this->pMapped = nullptr; };
-        virtual const T* map(const uintptr_t& i = 0u) const { const_cast<Vector<T>*>(this)->pMapped = const_cast<T*>(reinterpret_cast<const T*>(reinterpret_cast<const uint8_t*>(allocation->map()) + offset())); return &(reinterpret_cast<const T*>(pMapped))[i]; };
-        virtual T* const map(const uintptr_t& i = 0u) { this->pMapped = reinterpret_cast<T*>(reinterpret_cast<uint8_t*>(allocation->map()) + offset()); return &(reinterpret_cast<T*>(pMapped))[i]; };
 
         // 
-        virtual const T* mapped(const uintptr_t& i = 0u) const { const_cast<Vector<T>*>(this)->pMapped = const_cast<T*>(reinterpret_cast<const T*>(reinterpret_cast<const uint8_t*>(allocation->mapped()) + offset())); return &this->pMapped[i]; };
-        virtual T* const mapped(const uintptr_t& i = 0u) { this->pMapped = reinterpret_cast<T*>(reinterpret_cast<uint8_t*>(allocation->mapped()) + offset()); return &this->pMapped[i]; };
+        virtual unsigned& getGLBuffer() { return this->allocation->getGLBuffer(); };
+        virtual unsigned& getGLMemory() { return this->allocation->getGLMemory(); };
 
         // 
-        virtual T* const data() { return mapped(); };
-        virtual const T* data() const { return mapped(); };
+        virtual const unsigned& getGLBuffer() const { return this->allocation->getGLBuffer(); };
+        virtual const unsigned& getGLMemory() const { return this->allocation->getGLMemory(); };
+
+        // 
+        //protected: friend Vector<T>; // 
+        protected: VkBufferView view = {};
+        protected: vkh::VkDescriptorBufferInfo bufInfo = { {}, 0u, VK_WHOLE_SIZE }; // Cached Feature
+        protected: vkh::VkStridedBufferRegionKHR bufRegion = { {}, 0u, 1u, VK_WHOLE_SIZE };
+        protected: vkt::uni_ptr<BufferAllocation> allocation = {};
+        protected: uint8_t* pMapped = nullptr;
+        //protected: T pMapped[8] = nullptr;
+    };
+
+
+    // Wrapper Class
+    template<class M = uint8_t>
+    class Vector : public VectorBase //: public std::enable_shared_from_this<Vector<T>> 
+    { public: using T = M; //
+        Vector(): VectorBase() {};
+
+        // 
+        Vector(const vkt::uni_ptr<BufferAllocation>& allocation, vkt::uni_arg<VkDeviceSize> offset = 0ull, vkt::uni_arg<VkDeviceSize> size = VK_WHOLE_SIZE, vkt::uni_arg<VkDeviceSize> stride = sizeof(T)) : VectorBase(allocation, offset, size, stride) {};
+        Vector(const vkt::uni_ptr<VmaBufferAllocation>& allocation, vkt::uni_arg<VkDeviceSize> offset = 0ull, vkt::uni_arg<VkDeviceSize> size = VK_WHOLE_SIZE, vkt::uni_arg<VkDeviceSize> stride = sizeof(T)) : VectorBase(allocation, offset, size, stride) {};
+
+        // 
+        Vector(const std::shared_ptr<BufferAllocation>& allocation, vkt::uni_arg<VkDeviceSize> offset = 0ull, vkt::uni_arg<VkDeviceSize> size = VK_WHOLE_SIZE, vkt::uni_arg<VkDeviceSize> stride = sizeof(T)) : VectorBase(allocation, offset, size, stride) {};
+        Vector(const std::shared_ptr<VmaBufferAllocation>& allocation, vkt::uni_arg<VkDeviceSize> offset = 0ull, vkt::uni_arg<VkDeviceSize> size = VK_WHOLE_SIZE, vkt::uni_arg<VkDeviceSize> stride = sizeof(T)) : VectorBase(allocation, offset, size, stride) {};
+
+        // 
+        ~Vector() {
+            if (this->view) {
+                this->allocation->info.deviceDispatch->DestroyBufferView(this->view, nullptr);
+                this->view = VkBufferView{};
+            };
+        };
+
+        // 
+        template<class Tm = T> Vector(const Vector<Tm>& V) : allocation(V), bufInfo({ V.buffer(), V.offset(), V.range() }) { *this = V; };
+        template<class Tm = T> inline Vector<T>& operator=(const Vector<Tm>& V) { 
+            this->allocation = V.uniPtr();
+            this->bufInfo = vkh::VkDescriptorBufferInfo{ static_cast<VkBuffer>(V.buffer()), V.offset(), V.range() };
+            this->bufRegion = vkh::VkStridedBufferRegionKHR{ static_cast<VkBuffer>(V.buffer()), V.offset(), sizeof(T), V.ranged() / sizeof(T) };
+            return *this;
+        };
+
+        // typed casting 
+        template<class Tm = T> inline Vector<Tm>& cast() { return reinterpret_cast<Vector<Tm>&>(*this); };
+        template<class Tm = T> inline const Vector<Tm>& cast() const { return reinterpret_cast<const Vector<Tm>&>(*this); };
+
+        // 
+        //template<class Tm = T> Vector<Tm> cast() { return *this; };
+        //template<class Tm = T> const vkt::uni_arg<Vector<Tm>>& cast() const { return Vector<Tm>(reinterpret_cast<Vector<T>&>(*this)); };
+
+        // 
+        virtual Vector<T>* address() { return this; };
+        virtual const Vector<T>* address() const { return this; };
 
         // at function 
         virtual const T& at(const uintptr_t& i = 0u) const { return *mapped(i); };
@@ -541,21 +574,16 @@ namespace vkt {
         virtual T* const end() { return &at(size() - 1ul); };
 
         // 
-        virtual unsigned& getGLBuffer() { return this->allocation->getGLBuffer(); };
-        virtual unsigned& getGLMemory() { return this->allocation->getGLMemory(); };
+        virtual const T* map(const uintptr_t& i = 0u) const { const_cast<Vector<T>*>(this)->pMapped = const_cast<uint8_t*>(reinterpret_cast<const uint8_t*>(allocation->map()) + offset()); return &(reinterpret_cast<const T*>(pMapped))[i]; };
+        virtual T* const map(const uintptr_t& i = 0u) { this->pMapped = reinterpret_cast<uint8_t*>(allocation->map()) + offset(); return &(reinterpret_cast<T*>(pMapped))[i]; };
 
         // 
-        virtual const unsigned& getGLBuffer() const { return this->allocation->getGLBuffer(); };
-        virtual const unsigned& getGLMemory() const { return this->allocation->getGLMemory(); };
+        virtual const T* mapped(const uintptr_t& i = 0u) const { const_cast<Vector<T>*>(this)->pMapped = const_cast<uint8_t*>(reinterpret_cast<const uint8_t*>(allocation->mapped()) + offset()); return &(reinterpret_cast<const T*>(pMapped))[i]; };
+        virtual T* const mapped(const uintptr_t& i = 0u) { this->pMapped = reinterpret_cast<uint8_t*>(allocation->mapped()) + offset(); return &reinterpret_cast<T*>(this->pMapped)[i]; };
 
         // 
-        protected: friend Vector<T>; // 
-        protected: VkBufferView view = {};
-        protected: vkh::VkDescriptorBufferInfo bufInfo = { {}, 0u, VK_WHOLE_SIZE }; // Cached Feature
-        protected: vkh::VkStridedBufferRegionKHR bufRegion = { {}, 0u, sizeof(T), VK_WHOLE_SIZE };
-        protected: vkt::uni_ptr<BufferAllocation> allocation = {};
-        protected: T* pMapped = nullptr;
-        //protected: T pMapped[8] = nullptr;
+        virtual T* const data() { return mapped(); };
+        virtual const T* data() const { return mapped(); };
     };
 
     template<class T = uint8_t>
