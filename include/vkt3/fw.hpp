@@ -97,6 +97,10 @@ namespace vkt
             "VK_AMD_shader_trinary_minmax",
             "VK_AMD_draw_indirect_count",
 
+            // Would To Be Have Multi-Vector Solution
+            "VK_AMD_shader_explicit_vertex_parameter",
+            "VK_NV_fragment_shader_barycentric",
+
             // 
             "VK_EXT_sampler_filter_minmax",
             "VK_KHR_sampler_ycbcr_conversion",

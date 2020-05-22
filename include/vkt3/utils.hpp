@@ -1,53 +1,6 @@
 ﻿#pragma once // #
 
 // 
-#ifdef USE_CIMG
-#include "tinyexr.h"
-#define cimg_plugin "CImg/tinyexr_plugin.hpp"
-//#define cimg_use_png
-//#define cimg_use_jpeg
-#include "CImg.h"
-#endif
-
-// 
-#include <misc/args.hxx>
-#include <misc/half.hpp>
-#include <misc/pcg_random.hpp>
-
-// 
-#include <glm/glm.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include <glm/gtx/vec_swizzle.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/quaternion.hpp>
-#include <glm/gtc/random.hpp>
-#include <glm/gtx/component_wise.hpp>
-#include <glm/gtx/rotate_vector.hpp>
-#include <glm/gtx/transform.hpp>
-
-// 
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
-
-// 
-#include <iomanip>
-#include <cmath>
-#include <cfenv>
-#include <ios>
-#include <sstream>
-#include <chrono>
-#include <algorithm>
-#include <fstream>
-#include <iostream>
-#include <functional>
-#include <memory>
-#include <vector>
-#include <thread>
-#include <atomic>
-#include <future>
-
-// 
 #include "essential.hpp"
 #include "vector.hpp"
 #include "image.hpp"
