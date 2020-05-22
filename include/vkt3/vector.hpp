@@ -368,6 +368,15 @@ namespace vkt {
         virtual vkt::uni_ptr<BufferAllocation> uniPtr() const { return allocation; };
 
         // 
+        template<class Tm = T> VectorBase(const vkt::uni_arg<Vector<Tm>>& V) : allocation(V), bufInfo({ V.buffer(), V.offset(), V.range() }) { *this = V; };
+        template<class Tm = T> inline VectorBase& operator=(const vkt::uni_arg<Vector<Tm>>& V) {
+            this->allocation = V.uniPtr();
+            this->bufInfo = vkh::VkDescriptorBufferInfo{ static_cast<VkBuffer>(V.buffer()), V.offset(), V.range() };
+            this->bufRegion = vkh::VkStridedBufferRegionKHR{ static_cast<VkBuffer>(V.buffer()), V.offset(), sizeof(T), V.ranged() / sizeof(T) };
+            return *this;
+        };
+
+        // 
         virtual operator    ::VkDescriptorBufferInfo& () { this->bufInfo.buffer = this->bufRegion.buffer = allocation->buffer; return bufInfo; };
         virtual operator vkh::VkDescriptorBufferInfo& () { this->bufInfo.buffer = this->bufRegion.buffer = allocation->buffer; return bufInfo; };
         virtual operator vkt::uni_ptr<BufferAllocation>& () { return allocation; };
@@ -537,8 +546,8 @@ namespace vkt {
         };
 
         // 
-        template<class Tm = T> Vector(const Vector<Tm>& V) : allocation(V), bufInfo({ V.buffer(), V.offset(), V.range() }) { *this = V; };
-        template<class Tm = T> inline Vector<T>& operator=(const Vector<Tm>& V) { 
+        template<class Tm = T> Vector(const vkt::uni_arg<Vector<Tm>>& V) : allocation(V), bufInfo({ V.buffer(), V.offset(), V.range() }) { *this = V; };
+        template<class Tm = T> inline Vector<T>& operator=(const vkt::uni_arg<Vector<Tm>>& V) {
             this->allocation = V.uniPtr();
             this->bufInfo = vkh::VkDescriptorBufferInfo{ static_cast<VkBuffer>(V.buffer()), V.offset(), V.range() };
             this->bufRegion = vkh::VkStridedBufferRegionKHR{ static_cast<VkBuffer>(V.buffer()), V.offset(), sizeof(T), V.ranged() / sizeof(T) };
