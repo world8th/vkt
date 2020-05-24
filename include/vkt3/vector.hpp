@@ -293,7 +293,7 @@ namespace vkt {
 
         // Get mapped memory
         virtual void* map() { vkh::handleVk(vmaMapMemory(this->allocator, this->allocation, &this->allocationInfo.pMappedData)); return (this->info.pMapped = this->allocationInfo.pMappedData); };
-        virtual void* mapped() { if (!this->allocationInfo.pMappedData) { vkh::handleVk(vmaMapMemory(this->allocator, this->allocation, &this->allocationInfo.pMappedData)); }; return (this->info.pMapped = this->allocationInfo.pMappedData); };
+        virtual void* mapped() { if (!this->allocationInfo.pMappedData) { map(); }; return (this->info.pMapped = this->allocationInfo.pMappedData); };
         virtual void  unmap() { vmaUnmapMemory(this->allocator, this->allocation);  this->info.pMapped = this->allocationInfo.pMappedData = nullptr; };
 
         // Allocation
@@ -343,6 +343,14 @@ namespace vkt {
         // 
         VectorBase(const std::shared_ptr<BufferAllocation>& allocation, vkt::uni_arg<VkDeviceSize> offset = 0ull, vkt::uni_arg<VkDeviceSize> size = VK_WHOLE_SIZE, vkt::uni_arg<VkDeviceSize> stride = 1u) : allocation(allocation), bufInfo({ allocation->buffer, offset, size }) { this->construct(allocation, offset, size, stride); };
         VectorBase(const std::shared_ptr<VmaBufferAllocation>& allocation, vkt::uni_arg<VkDeviceSize> offset = 0ull, vkt::uni_arg<VkDeviceSize> size = VK_WHOLE_SIZE, vkt::uni_arg<VkDeviceSize> stride = 1u) : allocation(std::dynamic_pointer_cast<BufferAllocation>(allocation)), bufInfo({ allocation->buffer, offset, size }) { this->construct(std::dynamic_pointer_cast<BufferAllocation>(allocation), offset, size, stride); };
+
+        // 
+        virtual const uint8_t* mapv(const uintptr_t& i = 0u) const { const_cast<VectorBase*>(this)->pMapped = const_cast<uint8_t*>(reinterpret_cast<const uint8_t*>(allocation->mapped()) + offset()); return &pMapped[i]; };
+        virtual uint8_t* const mapv(const uintptr_t& i = 0u) { this->pMapped = reinterpret_cast<uint8_t*>(allocation->mapped()) + offset(); return &pMapped[i]; };
+
+        // 
+        virtual const uint8_t* mappedv(const uintptr_t& i = 0u) const { const_cast<VectorBase*>(this)->pMapped = const_cast<uint8_t*>(reinterpret_cast<const uint8_t*>(allocation->mapped()) + offset()); return &pMapped[i]; };
+        virtual uint8_t* const mappedv(const uintptr_t& i = 0u) { this->pMapped = reinterpret_cast<uint8_t*>(allocation->mapped()) + offset(); return &pMapped[i]; };
 
         //
         virtual VectorBase* construct(vkt::uni_ptr<BufferAllocation> allocation, vkt::uni_arg<VkDeviceSize> offset = 0ull, vkt::uni_arg<VkDeviceSize> size = VK_WHOLE_SIZE, vkt::uni_arg<VkDeviceSize> stride = 1u) {
@@ -583,8 +591,8 @@ namespace vkt {
         virtual T* const end() { return &at(size() - 1ul); };
 
         // 
-        virtual const T* map(const uintptr_t& i = 0u) const { const_cast<Vector<T>*>(this)->pMapped = const_cast<uint8_t*>(reinterpret_cast<const uint8_t*>(allocation->map()) + offset()); return &(reinterpret_cast<const T*>(pMapped))[i]; };
-        virtual T* const map(const uintptr_t& i = 0u) { this->pMapped = reinterpret_cast<uint8_t*>(allocation->map()) + offset(); return &(reinterpret_cast<T*>(pMapped))[i]; };
+        virtual const T* map(const uintptr_t& i = 0u) const { const_cast<Vector<T>*>(this)->pMapped = const_cast<uint8_t*>(reinterpret_cast<const uint8_t*>(allocation->mapped()) + offset()); return &(reinterpret_cast<const T*>(pMapped))[i]; };
+        virtual T* const map(const uintptr_t& i = 0u) { this->pMapped = reinterpret_cast<uint8_t*>(allocation->mapped()) + offset(); return &(reinterpret_cast<T*>(pMapped))[i]; };
 
         // 
         virtual const T* mapped(const uintptr_t& i = 0u) const { const_cast<Vector<T>*>(this)->pMapped = const_cast<uint8_t*>(reinterpret_cast<const uint8_t*>(allocation->mapped()) + offset()); return &(reinterpret_cast<const T*>(pMapped))[i]; };
