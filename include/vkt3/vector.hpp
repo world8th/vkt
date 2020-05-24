@@ -599,8 +599,8 @@ namespace vkt {
         virtual T* const mapped(const uintptr_t& i = 0u) { this->pMapped = reinterpret_cast<uint8_t*>(allocation->mapped()) + offset(); return &reinterpret_cast<T*>(this->pMapped)[i]; };
 
         // 
-        virtual T* const data() { return mapped(); };
-        virtual const T* data() const { return mapped(); };
+        virtual T* const data(const uintptr_t& i = 0u) { return mapped(i); };
+        virtual const T* data(const uintptr_t& i = 0u) const { return mapped(i); };
     };
 
     template<class T = uint8_t>
