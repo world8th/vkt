@@ -23,7 +23,7 @@
 #include <xvk/xvk.hpp>
 */
 
-#include "core.hpp"
+#include <vkh/core.hpp>
 
 // 
 namespace vkh {

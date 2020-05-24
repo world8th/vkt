@@ -1,6 +1,6 @@
 #pragma once // #
 
-#include "./utils.hpp"
+#include <vkh/core.hpp>
 
 namespace vkt {
 
@@ -37,8 +37,5 @@ namespace vkt {
         uint64_t accelerationStructureHandle;
     };
 #pragma pack(pop)
-
-    
-
 
 };

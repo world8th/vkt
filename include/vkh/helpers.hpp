@@ -1,7 +1,7 @@
 #pragma once // #
 
-#include "core.hpp"
-#include "structures.hpp"
+#include <vkh/core.hpp>
+#include <vkh/structures.hpp>
 #include <string_view>
 #include <string>
 #include <sstream>

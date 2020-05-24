@@ -19,22 +19,18 @@
 #define ENABLE_EXTENSION_RTX
 #define GLFW_INCLUDE_VULKAN
 
-// 
-#if defined(VKT_ENABLE_GLFW_SUPPORT) || defined(ENABLE_OPENGL_INTEROP)
-#include <vulkan/vulkan.h>
-#include <GLFW/glfw3.h>
-#include <GLFW/glfw3native.h>
-#endif
-
 // Force include for avoid GLAD problem...
-#include "core.hpp"
-#include <vkh/structures.hpp>
-#include <vkh/helpers.hpp>
-#include "utils.hpp"
-#include "structs.hpp"
 #include "essential.hpp"
 #include "vector.hpp"
 #include "image.hpp"
+#include "utils.hpp"
+#include "structs.hpp"
+
+// 
+#if defined(VKT_ENABLE_GLFW_SUPPORT) || defined(ENABLE_OPENGL_INTEROP)
+#include <GLFW/glfw3.h>
+#include <GLFW/glfw3native.h>
+#endif
 
 //#define VKT_ENABLE_DEBUG
 

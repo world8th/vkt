@@ -18,6 +18,9 @@
 // Currently Windows Only Supported
 #if (defined(_WIN32) || defined(__MINGW32__) || defined(_MSC_VER_) || defined(__MINGW64__)) 
 #include <windows.h> // Fix HMODULE Type Error
+#define GLFW_EXPOSE_NATIVE_WIN32
+#define GLFW_EXPOSE_NATIVE_WGL
+#define VK_USE_PLATFORM_WIN32_KHR
 #endif
 
 // Default Backend
@@ -27,12 +30,16 @@
 
 // 
 #include <cstdint>
+
+// 
 #ifdef ENABLE_OPENGL_INTEROP
 #ifdef VKT_USE_GLAD
 #include <glad/glad.h>
 #else
 #include <glbinding/gl/gl.h>
 #include <glbinding/gl/extension.h>
+#include <glbinding/gl/functions.h>
+#include <glbinding/gl/enum.h>
 #include <glbinding/glbinding.h>
 #endif
 #endif

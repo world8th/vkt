@@ -6,9 +6,7 @@
 #endif
 #endif
 
-#include "utils.hpp"
-#include "structs.hpp"
-#include "core.hpp"
+#include "essential.hpp"
 #include <memory>
 
 namespace vkt {
