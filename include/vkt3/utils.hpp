@@ -94,4 +94,19 @@ namespace vkt {
         return VK_SUCCESS;
     };
 
+    // Dedicated Semaphore Creator
+    void createSemaphore(vkt::uni_ptr<xvk::Device> device, VkSemaphore* vkSemaphore, unsigned* glSemaphore = nullptr, const void* pNext = nullptr) {
+        const auto exportable = vkh::VkExportSemaphoreCreateInfo{ .pNext = pNext, .handleTypes = {.eOpaqueWin32 = 1} };
+        HANDLE handle{ INVALID_HANDLE_VALUE };
+        vkh::handleVk(device->CreateSemaphoreA(vkh::VkSemaphoreCreateInfo{ .pNext = &exportable }, nullptr, vkSemaphore));
+        vkh::handleVk(device->GetSemaphoreWin32HandleKHR(vkh::VkSemaphoreGetWin32HandleInfoKHR{ .semaphore = *vkSemaphore, .handleType = VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_WIN32_BIT }, &handle));
+#ifdef ENABLE_OPENGL_INTEROP
+        if (glSemaphore) {
+            glGenSemaphoresEXT(1, glSemaphore);
+            glImportSemaphoreWin32HandleEXT(*glSemaphore, GL_HANDLE_TYPE_OPAQUE_WIN32_EXT, handle);
+        };
+#endif
+        //glCheckError();
+    };
+
 };
