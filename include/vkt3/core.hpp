@@ -32,14 +32,18 @@
 #include <cstdint>
 
 // 
+#if defined(VKT_ENABLE_GLFW_SUPPORT) || defined(ENABLE_OPENGL_INTEROP)
+#include <GLFW/glfw3.h>
+#include <GLFW/glfw3native.h>
+#endif
+
+// 
 #ifdef ENABLE_OPENGL_INTEROP
 #ifdef VKT_USE_GLAD
 #include <glad/glad.h>
 #else
 #include <glbinding/gl/gl.h>
 #include <glbinding/gl/extension.h>
-#include <glbinding/gl/functions.h>
-#include <glbinding/gl/enum.h>
 #include <glbinding/glbinding.h>
 #endif
 #endif

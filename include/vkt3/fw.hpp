@@ -26,12 +26,6 @@
 #include "utils.hpp"
 #include "structs.hpp"
 
-// 
-#if defined(VKT_ENABLE_GLFW_SUPPORT) || defined(ENABLE_OPENGL_INTEROP)
-#include <GLFW/glfw3.h>
-#include <GLFW/glfw3native.h>
-#endif
-
 //#define VKT_ENABLE_DEBUG
 
 // TODO: FULL REWRITE OF THAT "PROJECT"!!!

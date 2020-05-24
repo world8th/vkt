@@ -54,6 +54,10 @@
 
 // 
 namespace vkt {
+#ifdef ENABLE_OPENGL_INTEROP
+    using namespace gl;
+#endif
+
     //#ifdef USE_VULKAN
     template <typename T>
     static inline auto sgn(const T& val) { return (T(0) < val) - (val < T(0)); }
@@ -422,8 +426,8 @@ namespace vkt {
         vkh::handleVk(device->GetSemaphoreWin32HandleKHR(vkh::VkSemaphoreGetWin32HandleInfoKHR{ .semaphore = *vkSemaphore, .handleType = VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_WIN32_BIT }, &handle));
 #ifdef ENABLE_OPENGL_INTEROP
         if (glSemaphore) { // Gl-Bindings BROKEN!
-            //glGenSemaphoresEXT(1, glSemaphore);
-            //glImportSemaphoreWin32HandleEXT(*glSemaphore, GL_HANDLE_TYPE_OPAQUE_WIN32_EXT, handle);
+            glGenSemaphoresEXT(1, glSemaphore);
+            glImportSemaphoreWin32HandleEXT(*glSemaphore, GL_HANDLE_TYPE_OPAQUE_WIN32_EXT, handle);
         };
 #endif
         //glCheckError();
