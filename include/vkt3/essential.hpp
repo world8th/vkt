@@ -522,9 +522,9 @@ namespace vkt {
             if (!initialized) {
                 loader = std::make_shared<xvk::Loader>();
                 if (!(initialized = (*loader)())) { std::cerr << "vulkan load failed..." << std::endl; };
-    #ifdef ENABLE_OPENGL_INTEROP
-                vkt::initializeGL();
-    #endif
+    //#ifdef ENABLE_OPENGL_INTEROP
+    //            vkt::initializeGL();
+    //#endif
             };
         };
     #endif

@@ -274,7 +274,9 @@ namespace vkt {
 #endif
     };
 
+
     // FOR LWJGL-3 Request!
+#ifdef VKT_LINKED_GLFW3
     void initializeGL() {
 #ifdef VKT_USE_GLAD
         if (!gladLoadGLLoader(glfwGetProcAddress)) {
@@ -286,6 +288,8 @@ namespace vkt {
 #endif
     };
 #endif
+#endif
+
 
 };
 
