@@ -21,7 +21,7 @@ namespace vkt {
     class ImageAllocation : public std::enable_shared_from_this<ImageAllocation> {
     public:
         ImageAllocation() {};
-        ImageAllocation(vkt::uni_arg<MemoryAllocationInfo> allocationInfo, vkt::uni_arg<vkh::VkImageCreateInfo> createInfo = vkh::VkImageCreateInfo{}) : info(allocationInfo) { this->construct(allocationInfo, createInfo); }
+        ImageAllocation(vkt::uni_arg<vkh::VkImageCreateInfo> createInfo, vkt::uni_arg<MemoryAllocationInfo> allocationInfo = MemoryAllocationInfo{}) : info(allocationInfo) { this->construct(allocationInfo, createInfo); }
         ImageAllocation(const vkt::uni_ptr<ImageAllocation>& allocation) : image(allocation->image), info(allocation->info) { *this = allocation; };
         ImageAllocation(const std::shared_ptr<ImageAllocation>& allocation) : image(allocation->image), info(allocation->info) { *this = vkt::uni_ptr<ImageAllocation>(allocation); };
         ~ImageAllocation() {

@@ -457,14 +457,47 @@ namespace vkt {
         std::shared_ptr<xvk::Instance>& getInstanceDispatch() { return instanceDispatch; };
     };
 
+
+
+    // Global initials
+    class vkGlobal {
+    public: // Currently, only Vulkan Loader
+        static inline bool initialized = false;
+        static inline vkt::uni_ptr<xvk::Loader> loader = {};
+        static inline vkt::uni_ptr<xvk::Device> device = {};
+        static inline vkt::uni_ptr<xvk::Instance> instance = {};
+
+    #ifdef VKT_ENABLE_GLFW_SUPPORT
+        vkGlobal(GLFWglproc(*glfwGetProcAddress)(const char*) = ::glfwGetProcAddress) {
+            if (!initialized) {
+                loader = std::make_shared<xvk::Loader>();
+                if (!(initialized = (*loader)())) { std::cerr << "vulkan load failed..." << std::endl; };
+    #ifdef ENABLE_OPENGL_INTEROP
+                vkt::initializeGL(glfwGetProcAddress);
+    #endif
+            };
+        };
+    #else
+        vkGlobal() {
+            if (!initialized) {
+                loader = std::make_shared<xvk::Loader>();
+                if (!(initialized = (*loader)())) { std::cerr << "vulkan load failed..." << std::endl; };
+    //#ifdef ENABLE_OPENGL_INTEROP
+    //            vkt::initializeGL();
+    //#endif
+            };
+        };
+    #endif
+    };
+
     // TODO: Add XVK support
     struct MemoryAllocationInfo { // 
         uint32_t glMemory = 0u, glID = 0u;
         std::vector<uint32_t> queueFamilyIndices = {};
 
         // 
-        vkt::uni_ptr<xvk::Instance> instanceDispatch = {};
-        vkt::uni_ptr<xvk::Device> deviceDispatch = {};
+        vkt::uni_ptr<xvk::Instance> instanceDispatch = vkGlobal::instance;
+        vkt::uni_ptr<xvk::Device> deviceDispatch = vkGlobal::device;
         //vkt::uni_ptr<xvk::Loader> loader = {};
 
         // Required for dispatch load (and for XVK)
@@ -497,37 +530,6 @@ namespace vkt {
             }
             return -1;
         }
-    };
-
-    // Global initials
-    class vkGlobal {
-    public: // Currently, only Vulkan Loader
-        static inline bool initialized = false;
-        static inline vkt::uni_ptr<xvk::Loader> loader = {};
-        static inline vkt::uni_ptr<xvk::Device> device = {};
-        static inline vkt::uni_ptr<xvk::Instance> instance = {};
-
-    #ifdef VKT_ENABLE_GLFW_SUPPORT
-        vkGlobal(GLFWglproc(*glfwGetProcAddress)(const char*) = ::glfwGetProcAddress) {
-            if (!initialized) {
-                loader = std::make_shared<xvk::Loader>();
-                if (!(initialized = (*loader)())) { std::cerr << "vulkan load failed..." << std::endl; };
-    #ifdef ENABLE_OPENGL_INTEROP
-                vkt::initializeGL(glfwGetProcAddress);
-    #endif
-            };
-        };
-    #else
-        vkGlobal() {
-            if (!initialized) {
-                loader = std::make_shared<xvk::Loader>();
-                if (!(initialized = (*loader)())) { std::cerr << "vulkan load failed..." << std::endl; };
-    //#ifdef ENABLE_OPENGL_INTEROP
-    //            vkt::initializeGL();
-    //#endif
-            };
-        };
-    #endif
     };
 
 
