@@ -442,20 +442,7 @@ namespace vkt {
     };
 #endif
 
-    // 
-    struct VmaMemoryInfo {
-        VmaMemoryUsage memUsage = VMA_MEMORY_USAGE_GPU_ONLY;
-        vkt::uni_ptr<xvk::Device> deviceDispatch = {};
-        vkt::uni_ptr<xvk::Instance> instanceDispatch = {};
 
-        // Resolve JavaCPP Problem...
-        VmaMemoryInfo& setDeviceDispatch(std::shared_ptr<xvk::Device> ptr) { deviceDispatch = ptr; return *this; };
-        VmaMemoryInfo& setInstanceDispatch(std::shared_ptr<xvk::Instance> ptr) { instanceDispatch = ptr; return *this; };
-
-        // Resolve JavaCPP Problem...
-        std::shared_ptr<xvk::Device>& getDeviceDispatch() { return deviceDispatch; };
-        std::shared_ptr<xvk::Instance>& getInstanceDispatch() { return instanceDispatch; };
-    };
 
 
 
@@ -488,6 +475,21 @@ namespace vkt {
             };
         };
     #endif
+    };
+
+    // 
+    struct VmaMemoryInfo {
+        VmaMemoryUsage memUsage = VMA_MEMORY_USAGE_GPU_ONLY;
+        vkt::uni_ptr<xvk::Instance> instanceDispatch = vkGlobal::instance;
+        vkt::uni_ptr<xvk::Device> deviceDispatch = vkGlobal::device;
+
+        // Resolve JavaCPP Problem...
+        VmaMemoryInfo& setDeviceDispatch(std::shared_ptr<xvk::Device> ptr) { deviceDispatch = ptr; return *this; };
+        VmaMemoryInfo& setInstanceDispatch(std::shared_ptr<xvk::Instance> ptr) { instanceDispatch = ptr; return *this; };
+
+        // Resolve JavaCPP Problem...
+        std::shared_ptr<xvk::Device>& getDeviceDispatch() { return deviceDispatch; };
+        std::shared_ptr<xvk::Instance>& getInstanceDispatch() { return instanceDispatch; };
     };
 
     // TODO: Add XVK support
