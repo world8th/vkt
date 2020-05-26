@@ -102,7 +102,9 @@ namespace vkt {
 
             // Import Memory
             if (this->info.handle) {
-                glCreateTextures(GL_TEXTURE_2D, 1, &this->info.glID);
+                if (!this->info.glID) {
+                    glCreateTextures(GL_TEXTURE_2D, 1, &this->info.glID);
+                };
                 glCreateMemoryObjectsEXT(1, &this->info.glMemory);
                 glImportMemoryWin32HandleEXT(this->info.glMemory, this->info.reqSize, GL_HANDLE_TYPE_OPAQUE_WIN32_EXT, this->info.handle);
 

@@ -98,7 +98,9 @@ namespace vkt {
             // 
 #ifdef ENABLE_OPENGL_INTEROP
             if (this->info.handle) {
-                glCreateBuffers(1u, &this->info.glID);
+                if (!this->info.glID) {
+                    glCreateBuffers(1u, &this->info.glID);
+                };
                 glCreateMemoryObjectsEXT(1u, &this->info.glMemory);
                 glImportMemoryWin32HandleEXT(this->info.glMemory, std::min(this->info.reqSize, this->info.range), GL_HANDLE_TYPE_OPAQUE_WIN32_EXT, this->info.handle);
                 glNamedBufferStorageMemEXT(this->info.glID, std::min(this->info.reqSize, this->info.range), this->info.glMemory, 0u);
