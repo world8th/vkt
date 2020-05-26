@@ -92,6 +92,8 @@ namespace vkt {
             // 
 #ifdef ENABLE_OPENGL_INTEROP
             GLenum format = GL_RGBA8;
+            if (createInfo->format == VK_FORMAT_R8G8B8_UNORM) { format = GL_RGB8; };
+            if (createInfo->format == VK_FORMAT_R16G16B16_UNORM) { format = GL_RGB16; };
             if (createInfo->format == VK_FORMAT_R16G16B16A16_UNORM) { format = GL_RGBA16; };
             if (createInfo->format == VK_FORMAT_R32G32B32A32_SFLOAT) { format = GL_RGBA32F; };
             if (createInfo->format == VK_FORMAT_R16G16B16A16_SFLOAT) { format = GL_RGBA16F; };

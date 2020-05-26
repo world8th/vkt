@@ -294,6 +294,8 @@ namespace vkt
         std::vector<VkPhysicalDevice> physicalDevices = {};
         std::vector<uint32_t> queueFamilyIndices = {};
 
+        vkt::MemoryAllocationInfo memoryAllocInfo = {};
+
         //VkDevice createDevice(bool isComputePrior = true, std::string shaderPath = "./", bool enableAdvancedAcceleration = true);
         inline VkPhysicalDevice& getPhysicalDevice(const uint32_t& gpuID) { physicalDevice = physicalDevices[gpuID]; return physicalDevice; };
         inline VkPhysicalDevice& getPhysicalDevice() { if (!physicalDevice) { physicalDevice = physicalDevices[0u]; }; return physicalDevice; };
@@ -372,6 +374,14 @@ namespace vkt
 #endif
 
     public:
+        inline vkt::MemoryAllocationInfo& memoryAllocationInfo() {
+            memoryAllocInfo.device = device;
+            memoryAllocInfo.memoryProperties = this->getMemoryProperties().memoryProperties;
+            memoryAllocInfo.instanceDispatch = this->getInstanceDispatch();
+            memoryAllocInfo.deviceDispatch = this->getDeviceDispatch();
+            return memoryAllocInfo;
+        };
+
         inline VkImageView getDepthImageView() const {
             return depthImageView;
         };
