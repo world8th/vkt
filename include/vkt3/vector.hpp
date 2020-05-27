@@ -32,6 +32,9 @@ namespace vkt {
             vkt::uni_arg<MemoryAllocationInfo> allocationInfo,
             vkt::uni_arg<vkh::VkBufferCreateInfo> createInfo = vkh::VkBufferCreateInfo{}
         ) { // 
+            this->info = allocationInfo;
+
+            // 
             vkh::VkMemoryAllocateFlagsInfo allocFlags = {};
             //allocFlags.flags.eMask = 1u;
 
@@ -45,7 +48,7 @@ namespace vkt {
             if (!this->info.instance) { this->info.instance = this->info.instanceDispatch->handle; };
 
             // 
-            if (allocationInfo->memUsage == VMA_MEMORY_USAGE_GPU_ONLY) {
+            if (this->info.memUsage == VMA_MEMORY_USAGE_GPU_ONLY) {
                 createInfo->usage.eSharedDeviceAddress = 1; // NEEDS SHARED BIT!
                 allocFlags.flags.eAddress = 1;
             };
@@ -69,7 +72,7 @@ namespace vkt {
             exportAllocInfo.pNext = &allocFlags;
             memAllocInfo.pNext = &exportAllocInfo;
             memAllocInfo.allocationSize = this->info.reqSize = memReqs.size;
-            memAllocInfo.memoryTypeIndex = uint32_t(allocationInfo->getMemoryType(memReqs.memoryTypeBits, { .eDeviceLocal = 1 }));
+            memAllocInfo.memoryTypeIndex = uint32_t(this->info.getMemoryType(memReqs.memoryTypeBits, { .eDeviceLocal = 1 }));
 
 
             // 

@@ -374,11 +374,24 @@ namespace vkt
 #endif
 
     public:
-        inline vkt::MemoryAllocationInfo& memoryAllocationInfo() {
+
+        inline uintptr_t memoryAllocationInfoPtr() {
             memoryAllocInfo.device = device;
             memoryAllocInfo.memoryProperties = this->getMemoryProperties().memoryProperties;
             memoryAllocInfo.instanceDispatch = this->getInstanceDispatch();
             memoryAllocInfo.deviceDispatch = this->getDeviceDispatch();
+            memoryAllocInfo.instance = this->getInstance();
+            memoryAllocInfo.device = this->getDevice();
+            return uintptr_t(&memoryAllocInfo);
+        };
+
+        inline MemoryAllocationInfo& memoryAllocationInfo() {
+            memoryAllocInfo.device = device;
+            memoryAllocInfo.memoryProperties = this->getMemoryProperties().memoryProperties;
+            memoryAllocInfo.instanceDispatch = this->getInstanceDispatch();
+            memoryAllocInfo.deviceDispatch = this->getDeviceDispatch();
+            memoryAllocInfo.instance = this->getInstance();
+            memoryAllocInfo.device = this->getDevice();
             return memoryAllocInfo;
         };
 

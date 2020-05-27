@@ -494,7 +494,7 @@ namespace vkt {
 
     // TODO: Add XVK support
     struct MemoryAllocationInfo { // 
-        uint32_t glMemory = 0u, glID = 0u;
+        uint32_t glID = 0u, glMemory = 0u;
         std::vector<uint32_t> queueFamilyIndices = {};
 
         // 

@@ -35,25 +35,27 @@ namespace vkt {
             vkt::uni_arg<MemoryAllocationInfo> allocationInfo,
             vkt::uni_arg<vkh::VkImageCreateInfo> createInfo = vkh::VkImageCreateInfo{}
         ) {
+            this->info = allocationInfo;
+
+            // 
             vkh::VkImageUsageFlags usage = createInfo->usage;
-            if (allocationInfo->memUsage == VMA_MEMORY_USAGE_CPU_TO_GPU) { usage.eTransferSrc = 1; };
-            if (allocationInfo->memUsage == VMA_MEMORY_USAGE_GPU_TO_CPU) { usage.eTransferDst = 1; };
-            if (allocationInfo->memUsage == VMA_MEMORY_USAGE_GPU_ONLY) { usage.eTransferDst = 1, usage.eTransferSrc = 1; };
+            if (this->info.memUsage == VMA_MEMORY_USAGE_CPU_TO_GPU) { usage.eTransferSrc = 1; };
+            if (this->info.memUsage == VMA_MEMORY_USAGE_GPU_TO_CPU) { usage.eTransferDst = 1; };
+            if (this->info.memUsage == VMA_MEMORY_USAGE_GPU_ONLY) { usage.eTransferDst = 1, usage.eTransferSrc = 1; };
 
             // 
             vkh::VkMemoryAllocateFlagsInfo allocFlags = {};
-            if (allocationInfo->memUsage == VMA_MEMORY_USAGE_GPU_ONLY) {
+            if (this->info.memUsage == VMA_MEMORY_USAGE_GPU_ONLY) {
                 allocFlags.flags.eAddress = 1u;
             };
-            //allocFlags.flags.eMask = 1u;
 
             //
             if (!this->info.deviceDispatch) { this->info.deviceDispatch = vkGlobal::device; };
             if (!this->info.instanceDispatch) { this->info.instanceDispatch = vkGlobal::instance; };
 
             // reload device and instance
-            if (!this->info.device) { this->info.device = this->info.deviceDispatch->handle; };
-            if (!this->info.instance) { this->info.instance = this->info.instanceDispatch->handle; };
+            if (!this->info.device && this->info.deviceDispatch) { this->info.device = this->info.deviceDispatch->handle; };
+            if (!this->info.instance && this->info.instanceDispatch) { this->info.instance = this->info.instanceDispatch->handle; };
 
             // 
             createInfo->usage = usage;
@@ -70,7 +72,7 @@ namespace vkt {
             exportAllocInfo.pNext = &allocFlags;
             memAllocInfo.pNext = &exportAllocInfo;
             memAllocInfo.allocationSize = memReqs.size;
-            memAllocInfo.memoryTypeIndex = uint32_t(allocationInfo->getMemoryType(memReqs.memoryTypeBits, { .eDeviceLocal = 1 }));
+            memAllocInfo.memoryTypeIndex = uint32_t(this->info.getMemoryType(memReqs.memoryTypeBits, { .eDeviceLocal = 1 }));
 
             // 
             vkh::handleVk(this->info.deviceDispatch->AllocateMemory(memAllocInfo, nullptr, &this->info.memory));
