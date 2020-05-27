@@ -494,31 +494,32 @@ namespace vkt {
 
     // TODO: Add XVK support
     struct MemoryAllocationInfo { // 
-        uint32_t glID = 0u, glMemory = 0u;
-        std::vector<uint32_t> queueFamilyIndices = {};
-
-        // 
-        vkt::uni_ptr<xvk::Instance> instanceDispatch = vkGlobal::instance;
-        vkt::uni_ptr<xvk::Device> deviceDispatch = vkGlobal::device;
-        //vkt::uni_ptr<xvk::Loader> loader = {};
+        uint32_t glID = 0u, glMemory = 0u;      // 0U
+        HANDLE handle = {};                     // 8U
 
         // Required for dispatch load (and for XVK)
-        VkInstance instance = {};
-        VkPhysicalDevice physicalDevice = {};
-        VkDevice device = {};
+        VkInstance instance = {};               // 16U
+        VkPhysicalDevice physicalDevice = {};   // 24U
+        VkDevice device = {};                   // 32U
+        void* pMapped = nullptr;                // 40U
 
         // 
-        VkDeviceMemory memory = {};
-        VkDeviceSize offset = 0ull;
-        VkDeviceSize range = 0ull;
-        VkDeviceSize reqSize = 0ull;
-        VkImageLayout initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-        //VkDispatchLoaderDynamic dispatch = {};
+        VkDeviceMemory memory = {};             // 48U
+        VkDeviceSize offset = 0ull;             // 56U
+        VkDeviceSize range = 0ull;              // 64U
+        VkDeviceSize reqSize = 0ull;            // 72U
 
-        HANDLE handle = {};
-        void* pMapped = nullptr;
+        // 
+        VkImageLayout initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;    // 80U
+        VmaMemoryUsage memUsage = VMA_MEMORY_USAGE_GPU_ONLY;        // 88U
+
+        // 
         vkh::VkPhysicalDeviceMemoryProperties memoryProperties = {};
-        VmaMemoryUsage memUsage = VMA_MEMORY_USAGE_GPU_ONLY;
+
+        // 
+        std::vector<uint32_t> queueFamilyIndices = {};
+        vkt::uni_ptr<xvk::Instance> instanceDispatch = vkGlobal::instance;
+        vkt::uni_ptr<xvk::Device> deviceDispatch = vkGlobal::device;
 
         // 
         int32_t getMemoryType(const uint32_t& memoryTypeBitsRequirement, const vkh::VkMemoryPropertyFlags& requiredProperties = { .eDeviceLocal = 1 }) const {
