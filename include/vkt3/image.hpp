@@ -561,6 +561,10 @@ namespace vkt {
         virtual vkh::VkDescriptorImageInfo& getDescriptor() { return imgInfo; };
         virtual const vkh::VkDescriptorImageInfo& getDescriptor() const { return imgInfo; };
 
+        // 
+        virtual vkh::VkDescriptorImageInfo* getDescriptorPtr() { return &imgInfo; };
+        virtual const vkh::VkDescriptorImageInfo* getDescriptorPtr() const { return &imgInfo; };
+
     protected: friend VmaImageAllocation; friend ImageAllocation; // 
         vkh::VkDescriptorImageInfo imgInfo = {};
         vkt::uni_ptr<ImageAllocation> allocation = {};

@@ -482,6 +482,10 @@ namespace vkt {
         virtual vkh::VkDescriptorBufferInfo& getDescriptor() { return bufInfo; };
         virtual const vkh::VkDescriptorBufferInfo& getDescriptor() const { return bufInfo; };
 
+        // 
+        virtual vkh::VkDescriptorBufferInfo* getDescriptorPtr() { return &bufInfo; };
+        virtual const vkh::VkDescriptorBufferInfo* getDescriptorPtr() const { return &bufInfo; };
+
         // alias of uniPtr
         virtual vkt::uni_ptr<BufferAllocation>& getAllocation() { return allocation; };
         virtual const vkt::uni_ptr<BufferAllocation>& getAllocation() const { return allocation; };

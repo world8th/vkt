@@ -259,6 +259,8 @@ namespace vkt
         vk::PhysicalDeviceDescriptorIndexingFeaturesEXT gDescIndexing{};
         vk::PhysicalDeviceFloat16Int8FeaturesKHR gFloat16U8{}; // Vulkan 1.3
         vk::PhysicalDeviceBufferDeviceAddressFeatures gDeviceAddress{};
+        vk::PhysicalDeviceFragmentShaderBarycentricFeaturesNV gBarycentric{};
+
 
         // XVK loaded (NEW!)
         VmaVulkanFunctions func = {};
@@ -527,9 +529,8 @@ namespace vkt
             this->usedDeviceExtensions = deviceExtensions;
             this->usedDeviceLayers = deviceLayers;
 
-            //auto gConsertvative = VkPhysicalDeviceConservativeRasterizationPropertiesEXT{};
-
             // 
+            this->gRayTracing.pNext = &this->gBarycentric;
             this->gTrasformFeedback.pNext = &this->gRayTracing;
             this->gDeviceAddress.pNext = &this->gTrasformFeedback;
             this->gTexelBufferAligment.pNext = &this->gDeviceAddress;
