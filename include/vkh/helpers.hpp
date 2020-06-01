@@ -66,7 +66,7 @@ namespace vkh {
             std::cerr << stream.str() << std::endl; throw (*result);
 
             assert(result == VK_SUCCESS);
-#ifdef VKT_ENABLE_GLFW_SUPPORT
+#ifdef VKT_ENABLE_GLFW_LINKED
             glfwTerminate();
 #endif
             exit(result);

@@ -455,12 +455,18 @@ namespace vkt {
         static inline vkt::uni_ptr<xvk::Instance> instance = {};
 
     #ifdef VKT_ENABLE_GLFW_SUPPORT
+    #ifdef VKT_ENABLE_GLFW_LINKED
         vkGlobal(GLFWglproc(*glfwGetProcAddress)(const char*) = ::glfwGetProcAddress) {
+    #else 
+        vkGlobal(GLFWglproc(*glfwGetProcAddress)(const char*) = nullptr) {
+    #endif
             if (!initialized) {
                 loader = std::make_shared<xvk::Loader>();
                 if (!(initialized = (*loader)())) { std::cerr << "vulkan load failed..." << std::endl; };
     #ifdef ENABLE_OPENGL_INTEROP
-                vkt::initializeGL(glfwGetProcAddress);
+                if (glfwGetProcAddress) {
+                    vkt::initializeGL(glfwGetProcAddress);
+                }
     #endif
             };
         };
@@ -469,9 +475,6 @@ namespace vkt {
             if (!initialized) {
                 loader = std::make_shared<xvk::Loader>();
                 if (!(initialized = (*loader)())) { std::cerr << "vulkan load failed..." << std::endl; };
-    //#ifdef ENABLE_OPENGL_INTEROP
-    //            vkt::initializeGL();
-    //#endif
             };
         };
     #endif

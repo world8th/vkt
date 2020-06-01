@@ -226,7 +226,7 @@ namespace vkt
                 this->descriptorPool = fw->descriptorPool;
                 this->physicalDevice = fw->physicalDevice;
                 this->commandPool = fw->commandPool;
-                this->renderPass = fw->renderPass;
+                //this->renderPass = fw->renderPass;
                 this->depthImage = fw->depthImage;
                 this->depthImageView = fw->depthImageView;
                 this->pipelineCache = fw->pipelineCache;
@@ -280,7 +280,6 @@ namespace vkt
         VkDescriptorPool descriptorPool = {};
         VkPhysicalDevice physicalDevice = {};
         VkCommandPool commandPool = {};
-        VkRenderPass renderPass = {};
         VkImage depthImage = {};
         VkImageView depthImageView = {};
         VkPipelineCache pipelineCache = {};
@@ -370,9 +369,17 @@ namespace vkt
             SurfaceFormat surfaceFormat = {};
             VkExtent2D surfaceSize = VkExtent2D{ 0u, 0u };
             VkSurfaceKHR surface = {};
+            VkSwapchainKHR swapchain = {};
+            VkRenderPass renderPass = {};
             GLFWwindow* window = nullptr;
             GLFWwindow* opengl = nullptr;
+            std::vector<Framebuffer> swapchainBuffers = {};
         } applicationWindow = {};
+
+        inline VkSwapchainKHR& getSwapchain() { return applicationWindow.swapchain; };
+        inline VkSurfaceKHR& getSurface() { return applicationWindow.surface; };
+        inline const VkSwapchainKHR& getSwapchain() const { return applicationWindow.swapchain; };
+        inline const VkSurfaceKHR& getSurface() const { return applicationWindow.surface; };
 #endif
 
     public:
@@ -397,11 +404,11 @@ namespace vkt
             return memoryAllocInfo;
         };
 
-        inline VkImageView getDepthImageView() const {
+        inline VkImageView& getDepthImageView() {
             return depthImageView;
         };
 
-        inline VkImage getDepthImage() const {
+        inline VkImage& getDepthImage() {
             return depthImage;
         };
 
@@ -410,6 +417,7 @@ namespace vkt
 
             // get required extensions
 #ifdef VKT_ENABLE_GLFW_SUPPORT
+#ifdef VKT_ENABLE_GLFW_LINKED
             uint32_t glfwExtensionCount = 0;
             const char** glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
 
@@ -417,6 +425,7 @@ namespace vkt
             for (uint32_t i = 0; i < glfwExtensionCount; i++) {
                 wantedExtensions.push_back(glfwExtensions[i]);
             };
+#endif
 #endif
 
             // get our needed extensions
@@ -496,12 +505,12 @@ namespace vkt
         };
 
         // New constructor for clarify physical device
-        inline VkDevice createDevice(const VkPhysicalDevice& physicalDevice, bool isComputePrior = true, std::string shaderPath = "", bool enableAdvancedAcceleration = false) {
+        inline VkDevice& createDevice(const VkPhysicalDevice& physicalDevice, bool isComputePrior = true, std::string shaderPath = "", bool enableAdvancedAcceleration = false) {
             this->physicalDevice = physicalDevice; return this->createDevice(isComputePrior, shaderPath, enableAdvancedAcceleration);
         };
 
         //
-        inline VkDevice createDevice(bool isComputePrior = true, std::string shaderPath = "", bool enableAdvancedAcceleration = false) {
+        inline VkDevice& createDevice(bool isComputePrior = true, std::string shaderPath = "", bool enableAdvancedAcceleration = false) {
 
             // use extensions
             auto deviceExtensions = std::vector<const char*>();
@@ -658,7 +667,7 @@ namespace vkt
                 .maxSets = 256u, .poolSizeCount = static_cast<uint32_t>(dps.size()), .pPoolSizes = dps.data()
             }, nullptr, &this->descriptorPool));
 
-            return device;
+            return this->device;
         };
 
 #ifdef VKT_ENABLE_GLFW_SUPPORT
@@ -667,7 +676,11 @@ namespace vkt
             applicationWindow.window = window;
             applicationWindow.surfaceSize = VkExtent2D{ WIDTH, HEIGHT };
             glfwMakeContextCurrent(nullptr); // CONTEXT-REQUIRED!
+#ifdef VKT_ENABLE_GLFW_SURFACE
+#ifdef VKT_ENABLE_GLFW_LINKED
             vkh::handleVk(glfwCreateWindowSurface((VkInstance&)(instance), applicationWindow.window, nullptr, (VkSurfaceKHR*)&applicationWindow.surface));
+#endif
+#endif
             glfwMakeContextCurrent(window); // CONTEXT-REQUIRED!
             return applicationWindow;
         };
@@ -676,10 +689,15 @@ namespace vkt
         inline SurfaceWindow& createWindowSurface(SurfaceWindow& applicationWindow) {
             applicationWindow.surfaceSize = VkExtent2D{ applicationWindow.surfaceSize.width, applicationWindow.surfaceSize.height };
             glfwMakeContextCurrent(nullptr); // CONTEXT-REQUIRED!
+#ifdef VKT_ENABLE_GLFW_SURFACE
+#ifdef VKT_ENABLE_GLFW_LINKED
             vkh::handleVk(glfwCreateWindowSurface((VkInstance&)(instance), applicationWindow.window, nullptr, (VkSurfaceKHR*)&applicationWindow.surface));
+#endif
+#endif
             glfwMakeContextCurrent(applicationWindow.window); // CONTEXT-REQUIRED!
             return applicationWindow;
         };
+
 
         // 
         inline SurfaceWindow& getAppObject() {
@@ -825,8 +843,8 @@ namespace vkt
                 .dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT,
             });
 
-            vkh::handleVk(this->deviceDispatch->CreateRenderPass(render_pass_helper, nullptr, &this->renderPass));
-            return this->renderPass;
+            vkh::handleVk(this->deviceDispatch->CreateRenderPass(render_pass_helper, nullptr, &applicationWindow.renderPass));
+            return applicationWindow.renderPass;
         }
 
         // update swapchain framebuffer
@@ -885,9 +903,8 @@ namespace vkt
         }
 
         // 
-        inline std::vector<Framebuffer> createSwapchainFramebuffer(VkSwapchainKHR swapchain, VkRenderPass renderpass) {
-            // framebuffers vector
-            std::vector<Framebuffer> swapchainBuffers = {};
+        inline std::vector<Framebuffer>& createSwapchainFramebuffer(VkSwapchainKHR& swapchain, VkRenderPass& renderpass) { // framebuffers vector
+            auto& swapchainBuffers = applicationWindow.swapchainBuffers;
             updateSwapchainFramebuffer(swapchainBuffers, swapchain, renderpass);
             for (int i = 0; i < swapchainBuffers.size(); i++)
             { // create semaphore
@@ -902,6 +919,38 @@ namespace vkt
                 vkh::handleVk(this->deviceDispatch->CreateFence(vkh::VkFenceCreateInfo{ .flags{1} }, nullptr, &swapchainBuffers[i].waitFence));
             };
             return swapchainBuffers;
+        }
+
+
+        // 
+        inline auto updateSwapchainFramebuffer(std::vector<Framebuffer>& swapchainBuffers) {
+            return updateSwapchainFramebuffer(swapchainBuffers, applicationWindow.swapchain, applicationWindow.renderPass);
+        }
+
+        // 
+        inline auto updateSwapchainFramebuffer() {
+            return updateSwapchainFramebuffer(applicationWindow.swapchainBuffers, applicationWindow.swapchain, applicationWindow.renderPass);
+        }
+
+        // 
+        inline std::vector<Framebuffer>& createSwapchainFramebuffer() {
+            return createSwapchainFramebuffer(applicationWindow.swapchain, applicationWindow.renderPass);
+        }
+
+
+        // 
+        inline auto updateSwapchainFramebuffer(std::vector<Framebuffer>& swapchainBuffers, VkRenderPass& renderPass) {
+            return updateSwapchainFramebuffer(swapchainBuffers, applicationWindow.swapchain, renderPass);
+        }
+
+        // 
+        inline auto updateSwapchainFramebuffer(VkRenderPass& renderPass) {
+            return updateSwapchainFramebuffer(applicationWindow.swapchainBuffers, applicationWindow.swapchain, renderPass);
+        }
+
+        // 
+        inline std::vector<Framebuffer>& createSwapchainFramebuffer(VkRenderPass& renderPass) {
+            return createSwapchainFramebuffer(applicationWindow.swapchain, renderPass);
         }
 
         // create swapchain template
@@ -945,9 +994,8 @@ namespace vkt
             swapchainCreateInfo.clipped = true;
 
             // create swapchain
-            VkSwapchainKHR swapchain = {};
-            vkh::handleVk(this->deviceDispatch->CreateSwapchainKHR(swapchainCreateInfo, nullptr, &swapchain));
-            return swapchain;
+            vkh::handleVk(this->deviceDispatch->CreateSwapchainKHR(swapchainCreateInfo, nullptr, &applicationWindow.swapchain));
+            return applicationWindow.swapchain;
         }
 #endif
     };
