@@ -299,7 +299,7 @@ namespace vkt
 
         //VkDevice createDevice(bool isComputePrior = true, std::string shaderPath = "./", bool enableAdvancedAcceleration = true);
         inline VkPhysicalDevice& getPhysicalDevice(const uint32_t& gpuID) { physicalDevice = physicalDevices[gpuID]; return physicalDevice; };
-        inline VkPhysicalDevice& getPhysicalDevice() { if (!physicalDevice) { physicalDevice = physicalDevices[0u]; }; return physicalDevice; };
+        inline VkPhysicalDevice& getPhysicalDevice() { if (!physicalDevice && physicalDevices.size() > 0) { physicalDevice = physicalDevices[0u]; }; return physicalDevice; };
 
         // Compatible with JavaCPP directly
         inline uintptr_t getInstanceCreateInfoAddress() { return (uintptr_t)(&instanceCreate); };
@@ -386,6 +386,11 @@ namespace vkt
 #endif
 
     public:
+
+        inline void loadXVK() {
+            if (instance) { instanceDispatch = *(vkGlobal::instance = std::make_shared<xvk::Instance>(vkGlobal::loader, instance)); }
+            if (device) { deviceDispatch = *(vkGlobal::device = std::make_shared<xvk::Device>(vkGlobal::instance, device)); }
+        };
 
         inline uintptr_t memoryAllocationInfoPtr() {
             memoryAllocInfo.device = device;
