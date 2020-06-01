@@ -376,10 +376,13 @@ namespace vkt
             std::vector<Framebuffer> swapchainBuffers = {};
         } applicationWindow = {};
 
-        inline VkSwapchainKHR& getSwapchain() { return applicationWindow.swapchain; };
         inline VkSurfaceKHR& getSurface() { return applicationWindow.surface; };
-        inline const VkSwapchainKHR& getSwapchain() const { return applicationWindow.swapchain; };
+        inline VkRenderPass& getRenderPass() { return applicationWindow.renderPass; };
+        inline VkSwapchainKHR& getSwapchain() { return applicationWindow.swapchain; };
+
         inline const VkSurfaceKHR& getSurface() const { return applicationWindow.surface; };
+        inline const VkRenderPass& getRenderPass() const { return applicationWindow.renderPass; };
+        inline const VkSwapchainKHR& getSwapchain() const { return applicationWindow.swapchain; };
 #endif
 
     public:
