@@ -388,8 +388,10 @@ namespace vkt
     public:
 
         inline void loadXVK() {
-            if (instance) { instanceDispatch = *(vkGlobal::instance = std::make_shared<xvk::Instance>(vkGlobal::loader, instance)); }
-            if (device) { deviceDispatch = *(vkGlobal::device = std::make_shared<xvk::Device>(vkGlobal::instance, device)); }
+            if (instance && !instanceDispatch) { instanceDispatch = std::make_shared<xvk::Instance>(vkGlobal::loader, instance); }
+            if (device   && !deviceDispatch)   {   deviceDispatch = std::make_shared<xvk::Device  >(vkGlobal::instance, device); }
+            if (!vkGlobal::instance) { vkGlobal::instance = instanceDispatch; }
+            if (!vkGlobal::device  ) { vkGlobal::device   =   deviceDispatch; }
         };
 
         inline uintptr_t memoryAllocationInfoPtr() {
