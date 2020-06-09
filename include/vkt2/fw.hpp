@@ -835,12 +835,13 @@ namespace vkt
             VmaAllocationCreateInfo allocCreateInfo = {};
             allocCreateInfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
 
-            // 
+            //
+            auto dusage = { .eDepthStencilAttachment = 1 };
             auto image_info = vkh::VkImageCreateInfo{
                 .imageType = VK_IMAGE_TYPE_2D,
                 .format = VkFormat(surfaceFormats.depthFormat),
                 .extent = {applicationWindow.surfaceSize.width, applicationWindow.surfaceSize.height, 1u},
-                .usage = { .eDepthStencilAttachment = 1 }
+                .usage = dusage
             };
             vmaCreateImage(this->allocator, (VkImageCreateInfo*)&image_info, &allocCreateInfo, &reinterpret_cast<VkImage&>(depthImage), &vmaDepthImageAllocation, &vmaDepthImageAllocationInfo);
             depthImageView = device.createImageView(vk::ImageViewCreateInfo{{}, depthImage, vk::ImageViewType::e2D, surfaceFormats.depthFormat, vk::ComponentMapping(), vk::ImageSubresourceRange{vk::ImageAspectFlagBits::eDepth, 0, 1, 0, 1} });

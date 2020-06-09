@@ -833,25 +833,34 @@ namespace vkt
                 .finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL
             });
 
-            render_pass_helper.addSubpassDependency(vkh::VkSubpassDependency{
+            auto dp0 = vkh::VkSubpassDependency{
                 .srcSubpass = VK_SUBPASS_EXTERNAL,
                 .dstSubpass = 0u,
-                .srcStageMask = vkh::VkPipelineStageFlags{.eColorAttachmentOutput = 1, .eTransfer = 1, .eBottomOfPipe = 1, },
-                .dstStageMask = vkh::VkPipelineStageFlags{.eColorAttachmentOutput = 1, },
-                .srcAccessMask = vkh::VkAccessFlags{.eColorAttachmentWrite = 1 },
-                .dstAccessMask = vkh::VkAccessFlags{.eColorAttachmentRead = 1, .eColorAttachmentWrite = 1 },
-                .dependencyFlags = vkh::VkDependencyFlags{.eByRegion = 1}
-            });
+            };
 
-            render_pass_helper.addSubpassDependency(vkh::VkSubpassDependency{
+            auto dp1 = vkh::VkSubpassDependency{
                 .srcSubpass = 0u,
                 .dstSubpass = VK_SUBPASS_EXTERNAL,
-                .srcStageMask = vkh::VkPipelineStageFlags{.eColorAttachmentOutput = 1 },
-                .dstStageMask = vkh::VkPipelineStageFlags{.eTopOfPipe = 1, .eColorAttachmentOutput = 1, .eTransfer = 1 },
-                .srcAccessMask = vkh::VkAccessFlags{.eColorAttachmentRead = 1, .eColorAttachmentWrite = 1 },
-                .dstAccessMask = vkh::VkAccessFlags{.eColorAttachmentRead = 1, .eColorAttachmentWrite = 1 },
-                .dependencyFlags = vkh::VkDependencyFlags{.eByRegion = 1}
-            });
+            };
+
+            {
+                auto srcStageMask = vkh::VkPipelineStageFlags{.eColorAttachmentOutput = 1, .eTransfer = 1, .eBottomOfPipe = 1, };   ASSIGN(dp0, srcStageMask);
+                auto dstStageMask = vkh::VkPipelineStageFlags{.eColorAttachmentOutput = 1, };                                       ASSIGN(dp0, dstStageMask);
+                auto srcAccessMask = vkh::VkAccessFlags{.eColorAttachmentWrite = 1 };                                               ASSIGN(dp0, srcAccessMask);
+                auto dstAccessMask = vkh::VkAccessFlags{.eColorAttachmentRead = 1, .eColorAttachmentWrite = 1 };                    ASSIGN(dp0, dstAccessMask);
+                auto dependencyFlags = vkh::VkDependencyFlags{.eByRegion = 1};                                                      ASSIGN(dp0, dependencyFlags);
+            }
+
+            {
+                auto srcStageMask = vkh::VkPipelineStageFlags{.eColorAttachmentOutput = 1 };                                         ASSIGN(dp1, srcStageMask);
+                auto dstStageMask = vkh::VkPipelineStageFlags{.eTopOfPipe = 1, .eColorAttachmentOutput = 1, .eTransfer = 1 };        ASSIGN(dp1, dstStageMask);
+                auto srcAccessMask = vkh::VkAccessFlags{.eColorAttachmentRead = 1, .eColorAttachmentWrite = 1 };                     ASSIGN(dp1, srcAccessMask);
+                auto dstAccessMask = vkh::VkAccessFlags{.eColorAttachmentRead = 1, .eColorAttachmentWrite = 1 };                     ASSIGN(dp1, dstAccessMask);
+                auto dependencyFlags = vkh::VkDependencyFlags{.eByRegion = 1};                                                       ASSIGN(dp1, dependencyFlags);
+            }
+
+            render_pass_helper.addSubpassDependency(dp0);
+            render_pass_helper.addSubpassDependency(dp1);
 
             vkh::handleVk(this->deviceDispatch->CreateRenderPass(render_pass_helper, nullptr, &applicationWindow.renderPass));
             return applicationWindow.renderPass;
@@ -864,7 +873,8 @@ namespace vkt
             auto& surfaceFormats = getSurfaceFormat(this->physicalDevice);
             auto  gpuMemoryProps = vkh::vsGetPhysicalDeviceMemoryProperties(this->instanceDispatch, physicalDevice);//physicalDevice.getMemoryProperties();
 
-            // 
+            //
+            auto imageUsage = vkh::VkImageUsageFlags{ .eTransferSrc = 1, .eDepthStencilAttachment = 1 };
             auto imageInfoVK = vkh::VkImageCreateInfo{};
             imageInfoVK.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
             imageInfoVK.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
@@ -877,27 +887,37 @@ namespace vkt
             imageInfoVK.mipLevels = 1;
             imageInfoVK.samples = VK_SAMPLE_COUNT_1_BIT;
             imageInfoVK.tiling = VK_IMAGE_TILING_OPTIMAL;
-            imageInfoVK.usage = { .eTransferSrc = 1, .eDepthStencilAttachment = 1 };
+            imageInfoVK.usage = imageUsage;
 
             // 
             VmaAllocationCreateInfo allocCreateInfo = {};
             allocCreateInfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
 
-            // 
+            //
+            vkh::VkImageCreateFlags iflg = {};
+            vkt::unlock32(iflg) = 0u;
+
+            //
+            auto aspect = vkh::VkImageAspectFlags{.eColor = 1};
+            auto dspect = vkh::VkImageAspectFlags{.eDepth = 1};
+
+            //
+            auto dusage = vkh::VkImageUsageFlags { .eDepthStencilAttachment = 1 };
             auto image_info = vkh::VkImageCreateInfo{
+                .flags = iflg,
                 .imageType = VK_IMAGE_TYPE_2D,
                 .format = VkFormat(surfaceFormats.depthFormat),
                 .extent = {applicationWindow.surfaceSize.width, applicationWindow.surfaceSize.height, 1u},
-                .usage = { .eDepthStencilAttachment = 1 }
+                .usage = dusage
             };
             vkh::handleVk(vmaCreateImage(this->allocator, (VkImageCreateInfo*)&image_info, &allocCreateInfo, &reinterpret_cast<VkImage&>(depthImage), &vmaDepthImageAllocation, &vmaDepthImageAllocationInfo));
             vkh::handleVk(this->deviceDispatch->CreateImageView(vkh::VkImageViewCreateInfo{
-                .flags = {},
+                .flags = iflg,
                 .image = depthImage,
                 .viewType = VK_IMAGE_VIEW_TYPE_2D,
                 .format = surfaceFormats.depthFormat,
                 .components = vkh::VkComponentMapping(),
-                .subresourceRange = vkh::VkImageSubresourceRange{{.eDepth = 1}, 0, 1, 0, 1}
+                .subresourceRange = vkh::VkImageSubresourceRange{dspect, 0, 1, 0, 1}
             }, nullptr, &depthImageView));
 
             // 
@@ -907,7 +927,7 @@ namespace vkt
             { // create framebuffers
                 std::array<VkImageView, 2> views = {}; // predeclare views
                 views[1] = depthImageView; // depth view
-                vkh::handleVk(deviceDispatch->CreateImageView(vkh::VkImageViewCreateInfo{ .flags = {}, .image = swapchainImages[i], .viewType = VK_IMAGE_VIEW_TYPE_2D, .format = surfaceFormats.colorFormat, .components = vkh::VkComponentMapping{}, .subresourceRange = vkh::VkImageSubresourceRange{{ .eColor = 1 }, 0, 1, 0, 1} }, nullptr, &views[0]));
+                vkh::handleVk(deviceDispatch->CreateImageView(vkh::VkImageViewCreateInfo{ .flags = {}, .image = swapchainImages[i], .viewType = VK_IMAGE_VIEW_TYPE_2D, .format = surfaceFormats.colorFormat, .components = vkh::VkComponentMapping{}, .subresourceRange = vkh::VkImageSubresourceRange{aspect, 0, 1, 0, 1} }, nullptr, &views[0]));
                 vkh::handleVk(deviceDispatch->CreateFramebuffer(vkh::VkFramebufferCreateInfo{ .flags = {}, .renderPass = renderpass, .attachmentCount = uint32_t(views.size()), .pAttachments = views.data(), .width = applicationWindow.surfaceSize.width, .height = applicationWindow.surfaceSize.height, .layers = 1u }, nullptr, &swapchainBuffers[i].frameBuffer));
             };
         }

@@ -1952,5 +1952,6 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         operator const VsGeometryInstance& () const { return *this; };
         VsGeometryInstance& operator =(const VsGeometryInstance& info) { memcpy(this,&info,sizeof(VsGeometryInstance)); return *this; };
     };
+#pragma pack(pop)
 
 };

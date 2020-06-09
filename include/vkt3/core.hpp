@@ -70,7 +70,7 @@
 // 
 #include <xvk/xvk.hpp>
 
-
+#define ASSIGN(obj,name) obj.name=name;
 
 namespace vkt {
 
