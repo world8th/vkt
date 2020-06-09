@@ -195,7 +195,7 @@ namespace vkt {
 
     // 
     protected: friend VmaImageAllocation; friend ImageAllocation; friend ImageRegion;
-        VkImage image = {};
+        VkImage image = VK_NULL_HANDLE;
         MemoryAllocationInfo info = {};
     };
 
@@ -296,8 +296,8 @@ namespace vkt {
     // 
     protected: friend VmaImageAllocation; friend ImageAllocation; // 
         VmaAllocationInfo allocationInfo = {};
-        VmaAllocation allocation = {};
-        VmaAllocator allocator = {};
+        VmaAllocation allocation = VK_NULL_HANDLE;
+        VmaAllocator allocator = VK_NULL_HANDLE;
     };
 
     // 
@@ -578,7 +578,7 @@ namespace vkt {
         virtual const vkh::VkDescriptorImageInfo* getDescriptorPtr() const { return &imgInfo; };
 
     protected: friend VmaImageAllocation; friend ImageAllocation; // 
-        vkh::VkDescriptorImageInfo imgInfo = {};
+        vkh::VkDescriptorImageInfo imgInfo = {.imageView = VK_NULL_HANDLE, .imageLayout = VK_IMAGE_LAYOUT_UNDEFINED, .sampler = VK_NULL_HANDLE};
         vkt::uni_ptr<ImageAllocation> allocation = {};
 
     public: // irrevalent sources

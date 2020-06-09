@@ -272,23 +272,23 @@ namespace vkt
         vkh::VkDeviceCreateInfo deviceCreate = {};
 
         // 
-        VkFence fence = {};
-        VkQueue queue = {};
-        VkDevice device = {};
-        VkInstance instance = {};
-        VkDescriptorPool descriptorPool = {};
-        VkPhysicalDevice physicalDevice = {};
-        VkCommandPool commandPool = {};
-        VkImage depthImage = {};
-        VkImageView depthImageView = {};
-        VkPipelineCache pipelineCache = {};
-        VkDebugUtilsMessengerEXT messenger = {};
+        VkFence fence = VK_NULL_HANDLE;
+        VkQueue queue = VK_NULL_HANDLE;
+        VkDevice device = VK_NULL_HANDLE;
+        VkInstance instance = VK_NULL_HANDLE;
+        VkDescriptorPool descriptorPool = VK_NULL_HANDLE;
+        VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
+        VkCommandPool commandPool = VK_NULL_HANDLE;
+        VkImage depthImage = VK_NULL_HANDLE;
+        VkImageView depthImageView = VK_NULL_HANDLE;
+        VkPipelineCache pipelineCache = VK_NULL_HANDLE;
+        VkDebugUtilsMessengerEXT messenger = VK_NULL_HANDLE;
 
-        VmaAllocator allocator = {};
+        VmaAllocator allocator = VK_NULL_HANDLE;
         uint32_t queueFamilyIndex = 0;
         uint32_t instanceVersion = 0;
 
-        VmaAllocation vmaDepthImageAllocation = {};
+        VmaAllocation vmaDepthImageAllocation = VK_NULL_HANDLE;
         VmaAllocationInfo vmaDepthImageAllocationInfo = {};
 
         std::vector<VkPhysicalDevice> physicalDevices = {};
@@ -367,9 +367,9 @@ namespace vkt
         struct SurfaceWindow {
             SurfaceFormat surfaceFormat = {};
             VkExtent2D surfaceSize = VkExtent2D{ 0u, 0u };
-            VkSurfaceKHR surface = {};
-            VkSwapchainKHR swapchain = {};
-            VkRenderPass renderPass = {};
+            VkSurfaceKHR surface = VK_NULL_HANDLE;
+            VkSwapchainKHR swapchain = VK_NULL_HANDLE;
+            VkRenderPass renderPass = VK_NULL_HANDLE;
             GLFWwindow* window = nullptr;
             GLFWwindow* opengl = nullptr;
             std::vector<Framebuffer> swapchainBuffers = {};

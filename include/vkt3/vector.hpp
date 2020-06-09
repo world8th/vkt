@@ -201,8 +201,8 @@ namespace vkt {
         virtual operator vkh::VkDeviceOrHostAddressConstKHR() const { return this->deviceAddress(); };
 
     public: // in-variant 
-        VkBuffer buffer = {}; vkh::VkBufferUsageFlags usage = {};
-        VkDeviceAddress cached = {};
+        VkBuffer buffer = VK_NULL_HANDLE; vkh::VkBufferUsageFlags usage = {};
+        VkDeviceAddress cached = VK_NULL_HANDLE;
         MemoryAllocationInfo info = {};
 
     protected: friend BufferAllocation; friend VmaBufferAllocation;
@@ -334,8 +334,8 @@ namespace vkt {
     // 
     protected: friend VmaBufferAllocation; friend BufferAllocation; // 
         VmaAllocationInfo allocationInfo = {};
-        VmaAllocation allocation = {};
-        VmaAllocator allocator = {};
+        VmaAllocation allocation = VK_NULL_HANDLE;
+        VmaAllocator allocator = VK_NULL_HANDLE;
     };
 
 
@@ -467,7 +467,7 @@ namespace vkt {
         virtual const unsigned& getGL() const { return this->allocation->info.glID; };
 
         // 
-        virtual bool has() const { return allocation ? true : false; };
+        virtual bool has() const { return (allocation && allocation.has()) ? true : false; };
         virtual bool has_value() const { return this->has(); };
 
         // 
@@ -535,9 +535,9 @@ namespace vkt {
 
         // 
         //protected: friend Vector<T>; // 
-        protected: VkBufferView view = {};
-        protected: vkh::VkDescriptorBufferInfo bufInfo = { {}, 0u, VK_WHOLE_SIZE }; // Cached Feature
-        protected: vkh::VkStridedBufferRegionKHR bufRegion = { {}, 0u, 1u, VK_WHOLE_SIZE };
+        protected: VkBufferView view = VK_NULL_HANDLE;
+        protected: vkh::VkDescriptorBufferInfo bufInfo = { VK_NULL_HANDLE, 0u, VK_WHOLE_SIZE }; // Cached Feature
+        protected: vkh::VkStridedBufferRegionKHR bufRegion = { VK_NULL_HANDLE, 0u, 1u, VK_WHOLE_SIZE };
         protected: vkt::uni_ptr<BufferAllocation> allocation = {};
         protected: uint8_t* pMapped = nullptr;
         //protected: T pMapped[8] = nullptr;
