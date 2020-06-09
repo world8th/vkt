@@ -537,6 +537,20 @@ namespace vkt {
         }
     };
 
+    // aggregate cache
+    auto* cache = new unsigned char[256u*256u];
+
+    template<class T = uint64_t>
+    T& aggregate(T str){
+        memcpy(cache, &str, sizeof(T));
+        return reinterpret_cast<T&>(*cache);
+    }
+
+    template<class T = uint64_t>
+    T& aggregate(T str, T& cache){
+        memcpy(cache, &str, sizeof(T));
+        return reinterpret_cast<T&>(*cache);
+    }
 
 
 

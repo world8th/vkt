@@ -789,21 +789,21 @@ namespace vkt
             render_pass_helper.addSubpassDependency(vkh::VkSubpassDependency{
                 .srcSubpass = VK_SUBPASS_EXTERNAL,
                 .dstSubpass = 0u,
-                .srcStageMask = {.eColorAttachmentOutput = 1, .eTransfer = 1, .eBottomOfPipe = 1, },
-                .dstStageMask = {.eColorAttachmentOutput = 1, },
-                .srcAccessMask = {.eColorAttachmentWrite = 1 },
-                .dstAccessMask = {.eColorAttachmentRead = 1, .eColorAttachmentWrite = 1 },
-                .dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT,
+                .srcStageMask = vkh::VkPipelineStageFlags{.eColorAttachmentOutput = 1, .eTransfer = 1, .eBottomOfPipe = 1, },
+                .dstStageMask = vkh::VkPipelineStageFlags{.eColorAttachmentOutput = 1, },
+                .srcAccessMask = vkh::VkAccessFlags{.eColorAttachmentWrite = 1 },
+                .dstAccessMask = vkh::VkAccessFlags{.eColorAttachmentRead = 1, .eColorAttachmentWrite = 1 },
+                .dependencyFlags = vkh::VkDependencyFlags{.eByRegion = 1},
             });
 
             render_pass_helper.addSubpassDependency(vkh::VkSubpassDependency{
                 .srcSubpass = 0u,
                 .dstSubpass = VK_SUBPASS_EXTERNAL,
-                .srcStageMask = {.eColorAttachmentOutput = 1 },
-                .dstStageMask = {.eTopOfPipe = 1, .eColorAttachmentOutput = 1, .eTransfer = 1 },
-                .srcAccessMask = {.eColorAttachmentRead = 1, .eColorAttachmentWrite = 1 },
-                .dstAccessMask = {.eColorAttachmentRead = 1, .eColorAttachmentWrite = 1 },
-                .dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT,
+                .srcStageMask = vkh::VkPipelineStageFlags{.eColorAttachmentOutput = 1 },
+                .dstStageMask = vkh::VkPipelineStageFlags{.eTopOfPipe = 1, .eColorAttachmentOutput = 1, .eTransfer = 1 },
+                .srcAccessMask = vkh::VkAccessFlags{.eColorAttachmentRead = 1, .eColorAttachmentWrite = 1 },
+                .dstAccessMask = vkh::VkAccessFlags{.eColorAttachmentRead = 1, .eColorAttachmentWrite = 1 },
+                .dependencyFlags = vkh::VkDependencyFlags{.eByRegion = 1},
             });
 
             return (renderPass = device.createRenderPass(render_pass_helper));

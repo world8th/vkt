@@ -619,10 +619,11 @@ namespace vkt
                 vkt::vkGlobal::device = this->deviceDispatch;
             };
 
-            // 
-                          this->deviceDispatch->GetDeviceQueue(queueFamilyIndex, 0u, &this->queue);
+            //
+            auto resetFlag = vkh::VkCommandPoolCreateFlags{.eResetCommandBuffer = 1};
+            this->deviceDispatch->GetDeviceQueue(queueFamilyIndex, 0u, &this->queue);
             vkh::handleVk(this->deviceDispatch->CreateFence(vkh::VkFenceCreateInfo{}, nullptr, &this->fence));
-            vkh::handleVk(this->deviceDispatch->CreateCommandPool(vkh::VkCommandPoolCreateInfo{ .flags = {.eResetCommandBuffer = 1}, .queueFamilyIndex = queueFamilyIndex }, nullptr, &this->commandPool));
+            vkh::handleVk(this->deviceDispatch->CreateCommandPool(vkh::VkCommandPoolCreateInfo{ .flags = resetFlag, .queueFamilyIndex = queueFamilyIndex }, nullptr, &this->commandPool));
 
             // REMAP WITH XVK AGAIN!
             func.vkAllocateMemory = this->deviceDispatch->vkAllocateMemory;
@@ -670,7 +671,7 @@ namespace vkt
                 vkh::VkDescriptorPoolSize{.type = VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, .descriptorCount = 256u}
             };
 
-            // 
+            //
             vkh::handleVk(this->deviceDispatch->CreateDescriptorPool(vkh::VkDescriptorPoolCreateInfo{
                 .flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT,
                 .maxSets = 256u, .poolSizeCount = static_cast<uint32_t>(dps.size()), .pPoolSizes = dps.data()
@@ -988,6 +989,7 @@ namespace vkt
             };
 
             // swapchain info
+            auto imageUsage = vkh::VkImageUsageFlags{ .eColorAttachment = 1 };
             auto swapchainCreateInfo = vkh::VkSwapchainCreateInfoKHR{};
             swapchainCreateInfo.surface = surface;
             swapchainCreateInfo.minImageCount = std::min(surfaceCapabilities.maxImageCount, 3u);
@@ -995,7 +997,7 @@ namespace vkt
             swapchainCreateInfo.imageColorSpace = formats.colorSpace;
             swapchainCreateInfo.imageExtent = applicationWindow.surfaceSize;
             swapchainCreateInfo.imageArrayLayers = 1;
-            swapchainCreateInfo.imageUsage = { .eColorAttachment = 1 };
+            swapchainCreateInfo.imageUsage = imageUsage;
             swapchainCreateInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
             swapchainCreateInfo.preTransform = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;
             swapchainCreateInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
