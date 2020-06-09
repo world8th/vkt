@@ -125,14 +125,14 @@ namespace vkt {
             return this->assign(allocation);
         };
 
-        // 
+        //
         virtual unsigned& getGLBuffer() { return this->info.glID; };
         virtual unsigned& getGLMemory() { return this->info.glMemory; };
 
         // 
         virtual const unsigned& getGLBuffer() const { return this->info.glID; };
         virtual const unsigned& getGLMemory() const { return this->info.glMemory; };
-         
+
         // 
         virtual void* map() { return info.pMapped; };
         virtual void* mapped() { return info.pMapped; };
@@ -339,13 +339,13 @@ namespace vkt {
     public: using T = uint8_t;
         VectorBase() {};
 
-        // 
-        VectorBase(const vkt::uni_ptr<BufferAllocation>& allocation, vkt::uni_arg<VkDeviceSize> offset = 0ull, vkt::uni_arg<VkDeviceSize> size = VK_WHOLE_SIZE, vkt::uni_arg<VkDeviceSize> stride = 1u) : allocation(allocation), bufInfo({ allocation->buffer, offset, size }) { this->construct(allocation, offset, size, stride); };
-        VectorBase(const vkt::uni_ptr<VmaBufferAllocation>& allocation, vkt::uni_arg<VkDeviceSize> offset = 0ull, vkt::uni_arg<VkDeviceSize> size = VK_WHOLE_SIZE, vkt::uni_arg<VkDeviceSize> stride = 1u) : allocation(allocation.dyn_cast<BufferAllocation>()), bufInfo({ allocation->buffer, offset, size }) { this->construct(allocation.dyn_cast<BufferAllocation>(), offset, size, stride); };
+        //
+        VectorBase(const vkt::uni_ptr<BufferAllocation>& allocation, vkt::uni_arg<VkDeviceSize> offset = uint64_t(0ull), vkt::uni_arg<VkDeviceSize> size = VK_WHOLE_SIZE, vkt::uni_arg<VkDeviceSize> stride = 1u) : allocation(allocation), bufInfo({ allocation->buffer, offset, size }) { this->construct(allocation, offset, size, stride); };
+        VectorBase(const vkt::uni_ptr<VmaBufferAllocation>& allocation, vkt::uni_arg<VkDeviceSize> offset = uint64_t(0ull), vkt::uni_arg<VkDeviceSize> size = VK_WHOLE_SIZE, vkt::uni_arg<VkDeviceSize> stride = 1u) : allocation(allocation.dyn_cast<BufferAllocation>()), bufInfo({ allocation->buffer, offset, size }) { this->construct(allocation.dyn_cast<BufferAllocation>(), offset, size, stride); };
 
         // 
-        VectorBase(const std::shared_ptr<BufferAllocation>& allocation, vkt::uni_arg<VkDeviceSize> offset = 0ull, vkt::uni_arg<VkDeviceSize> size = VK_WHOLE_SIZE, vkt::uni_arg<VkDeviceSize> stride = 1u) : allocation(allocation), bufInfo({ allocation->buffer, offset, size }) { this->construct(allocation, offset, size, stride); };
-        VectorBase(const std::shared_ptr<VmaBufferAllocation>& allocation, vkt::uni_arg<VkDeviceSize> offset = 0ull, vkt::uni_arg<VkDeviceSize> size = VK_WHOLE_SIZE, vkt::uni_arg<VkDeviceSize> stride = 1u) : allocation(std::dynamic_pointer_cast<BufferAllocation>(allocation)), bufInfo({ allocation->buffer, offset, size }) { this->construct(std::dynamic_pointer_cast<BufferAllocation>(allocation), offset, size, stride); };
+        VectorBase(const std::shared_ptr<BufferAllocation>& allocation, vkt::uni_arg<VkDeviceSize> offset = uint64_t(0ull), vkt::uni_arg<VkDeviceSize> size = VK_WHOLE_SIZE, vkt::uni_arg<VkDeviceSize> stride = 1u) : allocation(allocation), bufInfo({ allocation->buffer, offset, size }) { this->construct(allocation, offset, size, stride); };
+        VectorBase(const std::shared_ptr<VmaBufferAllocation>& allocation, vkt::uni_arg<VkDeviceSize> offset = uint64_t(0ull), vkt::uni_arg<VkDeviceSize> size = VK_WHOLE_SIZE, vkt::uni_arg<VkDeviceSize> stride = 1u) : allocation(std::dynamic_pointer_cast<BufferAllocation>(allocation)), bufInfo({ allocation->buffer, offset, size }) { this->construct(std::dynamic_pointer_cast<BufferAllocation>(allocation), offset, size, stride); };
 
         // 
         virtual const uint8_t* mapv(const uintptr_t& i = 0u) const { const_cast<VectorBase*>(this)->pMapped = const_cast<uint8_t*>(reinterpret_cast<const uint8_t*>(allocation->mapped()) + offset()); return &pMapped[i]; };
@@ -356,7 +356,7 @@ namespace vkt {
         virtual uint8_t* const mappedv(const uintptr_t& i = 0u) { this->pMapped = reinterpret_cast<uint8_t*>(allocation->mapped()) + offset(); return &pMapped[i]; };
 
         //
-        virtual VectorBase* construct(vkt::uni_ptr<BufferAllocation> allocation, vkt::uni_arg<VkDeviceSize> offset = 0ull, vkt::uni_arg<VkDeviceSize> size = VK_WHOLE_SIZE, vkt::uni_arg<VkDeviceSize> stride = 1u) {
+        virtual VectorBase* construct(vkt::uni_ptr<BufferAllocation> allocation, vkt::uni_arg<VkDeviceSize> offset = uint64_t(0ull), vkt::uni_arg<VkDeviceSize> size = VK_WHOLE_SIZE, vkt::uni_arg<VkDeviceSize> stride = 1u) {
             this->allocation = allocation;
             this->bufInfo = vkh::VkDescriptorBufferInfo{ static_cast<VkBuffer>(allocation->buffer),offset,size };
             this->bufRegion = vkh::VkStridedBufferRegionKHR{ static_cast<VkBuffer>(allocation->buffer),offset,stride, this->ranged() / stride };
@@ -539,7 +539,7 @@ namespace vkt {
 
 
     // Wrapper Class
-    template<class M = uint8_t>
+    template<class M>
     class Vector : public VectorBase //: public std::enable_shared_from_this<Vector<T>> 
     { public: using T = M; //
         Vector(): VectorBase() {};
@@ -561,7 +561,7 @@ namespace vkt {
         };
 
         // 
-        template<class Tm = T> Vector(const vkt::uni_arg<Vector<Tm>>& V) : allocation(V), bufInfo({ V.buffer(), V.offset(), V.range() }) { *this = V; };
+        template<class Tm = T> Vector(const vkt::uni_arg<Vector<Tm>>& V)  { *this = V; };
         template<class Tm = T> inline Vector<T>& operator=(const vkt::uni_arg<Vector<Tm>>& V) {
             this->allocation = V.uniPtr();
             this->bufInfo = vkh::VkDescriptorBufferInfo{ static_cast<VkBuffer>(V.buffer()), V.offset(), V.range() };

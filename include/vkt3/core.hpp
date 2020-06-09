@@ -214,7 +214,7 @@ namespace vkt {
     public: // 
         uni_arg<T>() {};
         uni_arg<T>(const T& t) : storage(t) {};
-        uni_arg<T>(const T* t) : storage(*t) {};
+        explicit uni_arg<T>(const T* t) : storage(*t) {};
         uni_arg<T>(const uni_ptr<T>& p) : storage(*p) {}; // UnUsual and Vain
         uni_arg<T>(const uni_arg<T>& a) : storage(*a) {};
 

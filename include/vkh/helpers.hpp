@@ -61,9 +61,9 @@ namespace vkh {
 
 
     static inline decltype(auto) handleVk(vkt::uni_arg<VkResult> result) {
-        if (result != VK_SUCCESS) {
-            auto stream = std::stringstream("ERROR: VkResult Error Code: ") << std::to_string(result) << " (" << errorString(result) << ")...";
-            std::cerr << stream.str() << std::endl; throw (*result);
+        if (result != VK_SUCCESS) { // TODO: Fix Ubuntu Issue
+            //auto stream = std::stringstream("ERROR: VkResult Error Code: ") << std::to_string(result) << " (" << errorString(result) << ")...";
+            //std::cerr << stream.str() << std::endl; throw (*result);
 
             assert(result == VK_SUCCESS);
 #ifdef VKT_ENABLE_GLFW_LINKED
@@ -407,8 +407,8 @@ namespace vkh {
          ~VsDescriptorHandle() {};
 
         // any buffers and images can `write` into types
-        template<class T = T> inline       VsDescriptorHandle<T> offset(const uint32_t& idx = 0u)       { return VsDescriptorHandle<T>(entry_t, stride_t*idx+field_t, V_t); };
-        template<class T = T> inline const VsDescriptorHandle<T> offset(const uint32_t& idx = 0u) const { return VsDescriptorHandle<T>(entry_t, stride_t*idx+field_t, V_t); };
+        template<class M = T> inline VsDescriptorHandle<M> offset(const uint32_t& idx = 0u) { return VsDescriptorHandle<M>(entry_t, stride_t*idx+field_t, V_t); };
+        template<class M = T> inline const VsDescriptorHandle<M> offset(const uint32_t& idx = 0u) const { return VsDescriptorHandle<M>(entry_t, stride_t*idx+field_t, V_t); };
         inline const uint32_t& size() const { return entry_t->descriptorCount; };
 
         // 

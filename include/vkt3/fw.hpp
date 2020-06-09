@@ -211,7 +211,6 @@ namespace vkt
             "VK_LAYER_AMD_switchable_graphics"
         };
 
-
     public: friend GPUFramework;
         GPUFramework() { vkt::vkGlobal(); };
         GPUFramework(vkt::uni_ptr<GPUFramework> fw) { *this = fw; vkt::vkGlobal(); };
@@ -840,7 +839,7 @@ namespace vkt
                 .dstStageMask = {.eColorAttachmentOutput = 1, },
                 .srcAccessMask = {.eColorAttachmentWrite = 1 },
                 .dstAccessMask = {.eColorAttachmentRead = 1, .eColorAttachmentWrite = 1 },
-                .dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT,
+                //.dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT,
             });
 
             render_pass_helper.addSubpassDependency(vkh::VkSubpassDependency{
@@ -850,7 +849,7 @@ namespace vkt
                 .dstStageMask = {.eTopOfPipe = 1, .eColorAttachmentOutput = 1, .eTransfer = 1 },
                 .srcAccessMask = {.eColorAttachmentRead = 1, .eColorAttachmentWrite = 1 },
                 .dstAccessMask = {.eColorAttachmentRead = 1, .eColorAttachmentWrite = 1 },
-                .dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT,
+                //.dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT,
             });
 
             vkh::handleVk(this->deviceDispatch->CreateRenderPass(render_pass_helper, nullptr, &applicationWindow.renderPass));
@@ -868,7 +867,7 @@ namespace vkt
             auto imageInfoVK = vkh::VkImageCreateInfo{};
             imageInfoVK.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
             imageInfoVK.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-            imageInfoVK.flags = {};
+            imageInfoVK.flags = VkImageCreateFlagBits{};
             imageInfoVK.pNext = nullptr;
             imageInfoVK.arrayLayers = 1;
             imageInfoVK.extent = VkExtent3D{ applicationWindow.surfaceSize.width, applicationWindow.surfaceSize.height, 1u };

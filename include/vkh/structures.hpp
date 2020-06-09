@@ -1063,7 +1063,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
 
         // 
         void operator=(const VkDeviceAddress& deviceAddress) { this->deviceAddress = deviceAddress; };
-        void operator=(void* const& hostAddress) { this->hostAddress = hostAddress; };
+        //void operator=(void* const& hostAddress) { this->hostAddress = hostAddress; };
 
         // 
         operator VkDeviceAddress&() { return deviceAddress; };
@@ -1087,7 +1087,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
 
         // 
         VkDeviceOrHostAddressConstKHR& operator=(const VkDeviceAddress& deviceAddress) { this->deviceAddress = deviceAddress; return *this; };
-        VkDeviceOrHostAddressConstKHR& operator=(const void* const& hostAddress) { this->hostAddress = hostAddress; return *this; };
+        //VkDeviceOrHostAddressConstKHR& operator=(const void* const& hostAddress) { this->hostAddress = hostAddress; return *this; };
 
         // 
         operator VkDeviceAddress&() { return deviceAddress; };
@@ -1868,7 +1868,8 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         VK_HPP_STRUCT_OPERATORS(VkMemoryAllocateFlagsInfo, vk::MemoryAllocateFlagsInfo)
     } VkMemoryAllocateFlagsInfo;
 
-    // 
+    //
+#ifdef ENABLE_OPENGL_INTEROP
     typedef struct VkSemaphoreGetWin32HandleInfoKHR {
         VkStructureType                          sType      = VK_STRUCTURE_TYPE_SEMAPHORE_GET_WIN32_HANDLE_INFO_KHR;
         const void*                              pNext      = nullptr;
@@ -1886,6 +1887,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         STRUCT_OPERATORS(VkSemaphoreGetWin32HandleInfoKHR)
         VK_HPP_STRUCT_OPERATORS(VkSemaphoreGetWin32HandleInfoKHR, vk::SemaphoreGetWin32HandleInfoKHR)
     } VkSemaphoreGetWin32HandleInfoKHR;
+#endif
 
     // 
     typedef struct VkExportSemaphoreCreateInfo {

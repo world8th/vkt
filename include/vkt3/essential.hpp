@@ -102,7 +102,7 @@ namespace vkt {
     // 
     static inline auto readBinary(vkt::uni_arg<std::string> filePath) {
         const auto vect8u = readBinaryU8(filePath);
-        auto vect32 = std::vector<uint32_t>(tiled(vect8u.size(), 4ull));
+        auto vect32 = std::vector<uint32_t>(tiled(uint64_t(vect8u.size()), uint64_t(4ull)));
         memcpy(vect32.data(), vect8u.data(), vect8u.size()); return vect32;
     };
 
@@ -198,7 +198,7 @@ namespace vkt {
     // create compute pipelines
     static inline auto createCompute(vkt::uni_ptr<xvk::Device> device, vkt::uni_arg<FixConstruction> spi, vkt::uni_arg<VkPipelineLayout> layout, vkt::uni_arg<VkPipelineCache> cache = VkPipelineCache{}, vkt::uni_arg<uint32_t> subgroupSize = 0u) {
         auto cmpi = vkh::VkComputePipelineCreateInfo{};
-        cmpi.flags = {};
+        cmpi.flags = VkPipelineCreateFlagBits{};
         cmpi.layout = layout;
         cmpi.stage = *spi;
         cmpi.basePipelineIndex = -1;
@@ -216,7 +216,7 @@ namespace vkt {
 
     // create compute pipelines
     static inline auto createCompute(vkt::uni_ptr<xvk::Device> device, vkt::uni_arg<std::string> path, vkt::uni_arg<VkPipelineLayout> layout, vkt::uni_arg<VkPipelineCache> cache = VkPipelineCache{}, vkt::uni_arg<uint32_t> subgroupSize = 0u) {
-        return createCompute(device, readBinary(path), layout, cache, subgroupSize);
+        createCompute(device, readBinary(path), layout, cache, subgroupSize);
     };
 
     // create secondary command buffers for batching compute invocations
@@ -421,10 +421,10 @@ namespace vkt {
     // Dedicated Semaphore Creator
     static inline void createSemaphore(vkt::uni_ptr<xvk::Device> device, VkSemaphore* vkSemaphore, unsigned* glSemaphore = nullptr, const void* pNext = nullptr) {
         const auto exportable = vkh::VkExportSemaphoreCreateInfo{ .pNext = pNext, .handleTypes = {.eOpaqueWin32 = 1} };
+#ifdef ENABLE_OPENGL_INTEROP
         HANDLE handle{ INVALID_HANDLE_VALUE };
         vkh::handleVk(device->CreateSemaphoreA(vkh::VkSemaphoreCreateInfo{ .pNext = &exportable }, nullptr, vkSemaphore));
         vkh::handleVk(device->GetSemaphoreWin32HandleKHR(vkh::VkSemaphoreGetWin32HandleInfoKHR{ .semaphore = *vkSemaphore, .handleType = VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_WIN32_BIT }, &handle));
-#ifdef ENABLE_OPENGL_INTEROP
         if (glSemaphore) { // Gl-Bindings BROKEN!
             glGenSemaphoresEXT(1, glSemaphore);
             glImportSemaphoreWin32HandleEXT(*glSemaphore, GL_HANDLE_TYPE_OPAQUE_WIN32_EXT, handle);
@@ -437,13 +437,10 @@ namespace vkt {
 #ifdef VULKAN_HPP
     template<class T>
     T handleHpp(vk::ResultValue<T> V) {
-        assert(V.result == VkResult::eSuccess);
+        //assert(V.result == VkResult::eSuccess);
         return std::move(V.value);
     };
 #endif
-
-
-
 
 
     // Global initials
@@ -496,9 +493,11 @@ namespace vkt {
     };
 
     // TODO: Add XVK support
-    struct MemoryAllocationInfo { // 
+    struct MemoryAllocationInfo { //
         uint32_t glID = 0u, glMemory = 0u;      // 0U
+#ifdef ENABLE_OPENGL_INTEROP
         HANDLE handle = {};                     // 8U
+#endif
 
         // Required for dispatch load (and for XVK)
         VkInstance instance = {};               // 16U
