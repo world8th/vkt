@@ -45,6 +45,7 @@ namespace vkt {
 
             // 
             vkh::VkMemoryAllocateFlagsInfo allocFlags = {};
+            vkt::unlock32(allocFlags.flags) = 0u;
             if (this->info.memUsage == VMA_MEMORY_USAGE_GPU_ONLY) {
                 allocFlags.flags.eAddress = 1u;
             };

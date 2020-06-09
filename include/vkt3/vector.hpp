@@ -36,7 +36,7 @@ namespace vkt {
 
             // 
             vkh::VkMemoryAllocateFlagsInfo allocFlags = {};
-            //allocFlags.flags.eMask = 1u;
+            vkt::unlock32(allocFlags.flags) = 0u;
 
             //
             if (!this->info.deviceDispatch) { this->info.deviceDispatch = vkGlobal::device; };

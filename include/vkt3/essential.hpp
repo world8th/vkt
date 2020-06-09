@@ -552,6 +552,16 @@ namespace vkt {
         return reinterpret_cast<T&>(*cache);
     }
 
+    template<class T = uint32_t>
+    uint32_t& unlock32(T& cache){
+        return reinterpret_cast<uint32_t& >(cache);
+    }
+
+    template<class T = uint64_t>
+    uint64_t& unlock64(T& cache){
+        return reinterpret_cast<uint64_t&>(cache);
+    }
+
 
 
     #ifdef TBA_VULKAN_HPP_DEPRECATED
