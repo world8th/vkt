@@ -174,7 +174,7 @@ namespace vkt
             "VK_NV_external_memory_capabilities",
             "VK_NV_external_memory_win32",
 
-            // 
+            //
             "VK_NVX_image_view_handle",
             "VK_EXT_validation_cache",
             "VK_EXT_validation_features",
@@ -183,7 +183,7 @@ namespace vkt
             "VK_EXT_debug_report",
             "VK_EXT_debug_utils",
 
-            // 
+            //
             "VK_KHR_buffer_device_address",
             //"VK_EXT_buffer_device_address",
             "VK_NVX_image_view_handle"
@@ -191,7 +191,7 @@ namespace vkt
 
         // instance layers
         std::vector<const char*> wantedLayers = {
-            //"VK_LAYER_KHRONOS_validation", // Still Validation SPAM by LancER
+            "VK_LAYER_KHRONOS_validation", // Still Validation SPAM by LancER
 
             "VK_LAYER_LUNARG_assistant_layer",
             "VK_LAYER_LUNARG_standard_validation",
@@ -925,7 +925,7 @@ namespace vkt
                 vkh::handleVk(this->deviceDispatch->CreateSemaphore(vkh::VkSemaphoreCreateInfo{}, nullptr, &swapchainBuffers[i].drawSemaphore));
                 vkh::handleVk(this->deviceDispatch->CreateSemaphore(vkh::VkSemaphoreCreateInfo{}, nullptr, &swapchainBuffers[i].computeSemaphore));
                 vkh::handleVk(this->deviceDispatch->CreateSemaphore(vkh::VkSemaphoreCreateInfo{}, nullptr, &swapchainBuffers[i].presentSemaphore));
-                vkh::handleVk(this->deviceDispatch->CreateFence(vkh::VkFenceCreateInfo{ .flags{1} }, nullptr, &swapchainBuffers[i].waitFence));
+                vkh::handleVk(this->deviceDispatch->CreateFence(vkh::VkFenceCreateInfo{ .flags = {1} }, nullptr, &swapchainBuffers[i].waitFence));
             };
             return swapchainBuffers;
         }

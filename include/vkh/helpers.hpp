@@ -62,8 +62,7 @@ namespace vkh {
 
     static inline decltype(auto) handleVk(vkt::uni_arg<VkResult> result) {
         if (result != VK_SUCCESS) { // TODO: Fix Ubuntu Issue
-            //auto stream = std::stringstream("ERROR: VkResult Error Code: ") << std::to_string(result) << " (" << errorString(result) << ")...";
-            //std::cerr << stream.str() << std::endl; throw (*result);
+            std::cerr <<   "ERROR: VkResult Error Code: " << std::to_string(result) << " (" << errorString(result) << ")..."  << std::endl; throw (*result);
 
             assert(result == VK_SUCCESS);
 #ifdef VKT_ENABLE_GLFW_LINKED

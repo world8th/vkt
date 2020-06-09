@@ -67,12 +67,21 @@ namespace vkt {
             this->info.reqSize = this->info.range = memReqs.size;
 
             //
+#ifdef VKT_WIN32_DETECTED
             vkh::VkExportMemoryAllocateInfo exportAllocInfo{ .handleTypes = {.eOpaqueWin32 = 1} };
+#else
+            vkh::VkExportMemoryAllocateInfo exportAllocInfo{ .handleTypes = {.eOpaqueFd = 1} };
+#endif
+
             vkh::VkMemoryAllocateInfo memAllocInfo = {};
-            exportAllocInfo.pNext = &allocFlags;
-            memAllocInfo.pNext = &exportAllocInfo;
+#if defined(ENABLE_OPENGL_INTEROP)
+            allocFlags.pNext = &exportAllocInfo;
+#endif
+
+            const vkh::VkMemoryPropertyFlags property = {.eDeviceLocal = 1};
+            memAllocInfo.pNext = &allocFlags;
             memAllocInfo.allocationSize = memReqs.size;
-            memAllocInfo.memoryTypeIndex = uint32_t(this->info.getMemoryType(memReqs.memoryTypeBits, { .eDeviceLocal = 1 }));
+            memAllocInfo.memoryTypeIndex = uint32_t(this->info.getMemoryType(memReqs.memoryTypeBits, property));
 
             // 
             vkh::handleVk(this->info.deviceDispatch->AllocateMemory(memAllocInfo, nullptr, &this->info.memory));
@@ -81,8 +90,10 @@ namespace vkt {
 
             // 
 #if defined(ENABLE_OPENGL_INTEROP) && defined(VK_USE_PLATFORM_WIN32_KHR)
+#ifdef VKT_WIN32_DETECTED
             const auto handleInfo = VkMemoryGetWin32HandleInfoKHR{ VK_STRUCTURE_TYPE_MEMORY_GET_WIN32_HANDLE_INFO_KHR, nullptr, this->info.memory, VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_WIN32_BIT };
             this->info.deviceDispatch->GetMemoryWin32HandleKHR(&handleInfo, &this->info.handle);
+#endif
 #endif
 
             // 

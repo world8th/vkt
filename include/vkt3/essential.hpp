@@ -524,16 +524,16 @@ namespace vkt {
         vkt::uni_ptr<xvk::Device> deviceDispatch = vkGlobal::device;
 
         // 
-        int32_t getMemoryType(const uint32_t& memoryTypeBitsRequirement, const vkh::VkMemoryPropertyFlags& requiredProperties = { .eDeviceLocal = 1 }) const {
+        uint32_t getMemoryType(const uint32_t& memoryTypeBitsRequirement, const vkh::VkMemoryPropertyFlags& requiredProperties = { .eDeviceLocal = 1 }) const {
             const uint32_t memoryCount = memoryProperties.memoryTypeCount;
             for (uint32_t memoryIndex = 0; memoryIndex < memoryCount; ++memoryIndex) {
                 const uint32_t memoryTypeBits = (1 << memoryIndex);
                 const bool isRequiredMemoryType = memoryTypeBitsRequirement & memoryTypeBits;
                 const auto properties = VkMemoryPropertyFlags(memoryProperties.memoryTypes[memoryIndex].propertyFlags);
                 const bool hasRequiredProperties = (properties & VkMemoryPropertyFlags(requiredProperties)) == VkMemoryPropertyFlags(requiredProperties);
-                if (isRequiredMemoryType && hasRequiredProperties) return static_cast<int32_t>(memoryIndex);
+                if (isRequiredMemoryType && hasRequiredProperties) return static_cast<uint32_t>(memoryIndex);
             }
-            return -1;
+            return 0u;
         }
     };
 
