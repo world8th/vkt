@@ -24,10 +24,12 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         ::NAME cvk() { return reinterpret_cast<::NAME&>(*this); };\
         const ::NAME cvk() const { return reinterpret_cast<const ::NAME&>(*this); };\
         NAME& operator =( const vkt::uni_arg<::NAME>& info ) { memcpy(this, info, sizeof(NAME)); return *this; };\
-        NAME& operator =( const vkt::uni_arg<NAME>& info ) { memcpy(this, info, sizeof(NAME)); return *this; }; 
+        NAME& operator =( const vkt::uni_arg<NAME>& info ) { memcpy(this, info, sizeof(NAME)); return *this; }; \
+        NAME& also(const std::function<NAME&(NAME&)>& fn) { return fn(*this); }; // Alternative of Vulkan.HPP
 
 #ifdef VULKAN_HPP
     #define VK_HPP_STRUCT_OPERATORS(NAME,VKNAME)\
+        inline static VKNAME cpp() { const auto data = NAME{}; return reinterpret_cast<const VKNAME&>(data); };\
         operator VKNAME&() { return reinterpret_cast<VKNAME&>(*this); };\
         operator const VKNAME&() const { return reinterpret_cast<const VKNAME&>(*this); };\
         operator VKNAME*() { return reinterpret_cast<VKNAME*>(this); };\

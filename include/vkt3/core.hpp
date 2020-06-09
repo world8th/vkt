@@ -284,9 +284,19 @@ namespace vkt {
         return reinterpret_cast<uint32_t& >(cache);
     }
 
+    template<class T = uint32_t>
+    uint32_t& zero32(T& cache){
+        return (reinterpret_cast<uint32_t& >(cache) = 0u);
+    }
+
     template<class T = uint64_t>
     uint64_t& unlock64(T& cache){
         return reinterpret_cast<uint64_t&>(cache);
+    }
+
+    template<class T = uint64_t>
+    uint64_t& zero64(T& cache){
+        return (reinterpret_cast<uint64_t& >(cache) = 0u);
     }
 
 

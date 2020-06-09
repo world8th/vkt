@@ -46,13 +46,15 @@ namespace vkh {
         operator BITS&() {return reinterpret_cast<BITS&>(*this);};\
         operator const BITS&() const {return reinterpret_cast<const BITS&>(*this);};\
         explicit operator COMP& () { return reinterpret_cast<COMP&>(*this); };\
-        explicit operator const COMP& () const { return reinterpret_cast<const COMP&>(*this); };
+        explicit operator const COMP& () const { return reinterpret_cast<const COMP&>(*this); };\
+        NAME& also(const std::function<NAME&(NAME&)>& fn) { return fn(*this); }; // Alternative of Vulkan.HPP
 
     //NAME& operator=(const vkt::uni_arg<COMP>& F) { memcpy(this, F, sizeof(NAME)); return *this; };\
 
-    // 
+    //
 #ifdef VULKAN_HPP
     #define VK_HPP_OPERATORS(NAME,FTYP,BITS) \
+        inline static FTYP cpp() { const auto data = NAME{}; return reinterpret_cast<const FTYP&>(data); };\
         NAME& operator=(const vkt::uni_arg<BITS>& F) { memcpy(this, F, sizeof(NAME)); return *this; };\
         NAME operator|(const BITS& F) { auto f = F | reinterpret_cast<BITS&>(*this); return std::move(reinterpret_cast<NAME&>(f)); };\
         NAME operator&(const BITS& F) { auto f = F & reinterpret_cast<BITS&>(*this); return std::move(reinterpret_cast<NAME&>(f)); };\
