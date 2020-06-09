@@ -186,8 +186,9 @@ namespace vkt {
     // create shader module
     static inline auto makeComputePipelineStageInfo(vkt::uni_ptr<xvk::Device> device, const std::vector<uint32_t>& code, vkt::uni_arg<const char*> entry = "main", vkt::uni_arg<uint32_t> subgroupSize = 0u) {
         auto f = FixConstruction{};
+        auto fl = vkh::VkPipelineShaderStageCreateFlags{ .eRequireFullSubgroups = 1u };
         f.spi = makePipelineStageInfoWithoutModule(device, VK_SHADER_STAGE_COMPUTE_BIT, entry);
-        f.spi.flags = vkh::VkPipelineShaderStageCreateFlags{ .eRequireFullSubgroups = 1u };
+        f.spi.flags = fl;
         createShaderModuleIntrusive(device, TempCode = code, (VkShaderModule&)(f.spi.module));
         f.sgmp = vkh::VkPipelineShaderStageRequiredSubgroupSizeCreateInfoEXT{};
         f.sgmp.requiredSubgroupSize = subgroupSize;
@@ -198,7 +199,8 @@ namespace vkt {
     // create compute pipelines
     static inline auto createCompute(vkt::uni_ptr<xvk::Device> device, vkt::uni_arg<FixConstruction> spi, vkt::uni_arg<VkPipelineLayout> layout, vkt::uni_arg<VkPipelineCache> cache = VkPipelineCache{}, vkt::uni_arg<uint32_t> subgroupSize = 0u) {
         auto cmpi = vkh::VkComputePipelineCreateInfo{};
-        cmpi.flags = VkPipelineCreateFlagBits{};
+        auto fl = vkh::VkPipelineCreateFlags{}; vkt::unlock32(fl) = 0u;
+        cmpi.flags = fl;
         cmpi.layout = layout;
         cmpi.stage = *spi;
         cmpi.basePipelineIndex = -1;
@@ -537,30 +539,6 @@ namespace vkt {
         }
     };
 
-    // aggregate cache
-    auto* cache = new unsigned char[256u*256u];
-
-    template<class T = uint64_t>
-    T& aggregate(T str){
-        memcpy(cache, &str, sizeof(T));
-        return reinterpret_cast<T&>(*cache);
-    }
-
-    template<class T = uint64_t>
-    T& aggregate(T str, T& cache){
-        memcpy(cache, &str, sizeof(T));
-        return reinterpret_cast<T&>(*cache);
-    }
-
-    template<class T = uint32_t>
-    uint32_t& unlock32(T& cache){
-        return reinterpret_cast<uint32_t& >(cache);
-    }
-
-    template<class T = uint64_t>
-    uint64_t& unlock64(T& cache){
-        return reinterpret_cast<uint64_t&>(cache);
-    }
 
 
 

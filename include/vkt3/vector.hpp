@@ -604,12 +604,12 @@ namespace vkt {
         virtual T* const end() { return &at(size() - 1ul); };
 
         // 
-        virtual const T* map(const uintptr_t& i = 0u) const { const_cast<Vector<T>*>(this)->pMapped = const_cast<uint8_t*>(reinterpret_cast<const uint8_t*>(allocation->mapped()) + offset()); return &(reinterpret_cast<const T*>(pMapped))[i]; };
-        virtual T* const map(const uintptr_t& i = 0u) { this->pMapped = reinterpret_cast<uint8_t*>(allocation->mapped()) + offset(); return &(reinterpret_cast<T*>(pMapped))[i]; };
+        virtual const T* map(const uintptr_t& i = 0u) const { const_cast<Vector<T>*>(this)->pMapped = const_cast<uint8_t*>(reinterpret_cast<const uint8_t*>(this->allocation->mapped()) + offset()); return &(reinterpret_cast<const T*>(this->pMapped))[i]; };
+        virtual T* const map(const uintptr_t& i = 0u) { this->pMapped = reinterpret_cast<uint8_t*>(this->allocation->mapped()) + offset(); return &(reinterpret_cast<T*>(this->pMapped))[i]; };
 
         // 
-        virtual const T* mapped(const uintptr_t& i = 0u) const { const_cast<Vector<T>*>(this)->pMapped = const_cast<uint8_t*>(reinterpret_cast<const uint8_t*>(allocation->mapped()) + offset()); return &(reinterpret_cast<const T*>(pMapped))[i]; };
-        virtual T* const mapped(const uintptr_t& i = 0u) { this->pMapped = reinterpret_cast<uint8_t*>(allocation->mapped()) + offset(); return &reinterpret_cast<T*>(this->pMapped)[i]; };
+        virtual const T* mapped(const uintptr_t& i = 0u) const { const_cast<Vector<T>*>(this)->pMapped = const_cast<uint8_t*>(reinterpret_cast<const uint8_t*>(this->allocation->mapped()) + offset()); return &(reinterpret_cast<const T*>(this->pMapped))[i]; };
+        virtual T* const mapped(const uintptr_t& i = 0u) { this->pMapped = reinterpret_cast<uint8_t*>(this->allocation->mapped()) + offset(); return &reinterpret_cast<T*>(this->pMapped)[i]; };
 
         // 
         virtual T* const data(const uintptr_t& i = 0u) { return mapped(i); };

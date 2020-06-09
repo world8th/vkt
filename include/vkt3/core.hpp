@@ -206,7 +206,7 @@ namespace vkt {
         virtual inline T* operator->() { return get_ptr(); };
         virtual inline const T* operator->() const { return get_ptr(); };
 
-        //
+        // 
         virtual inline T& operator*() { return *get_ptr(); };
         virtual inline const T& operator*() const { return *get_ptr(); };
     };
@@ -263,6 +263,32 @@ namespace vkt {
         virtual T& operator*() { return ref(); };
         virtual const T& operator*() const { return ref(); };
     };
+
+    // aggregate cache
+    auto* cache = new unsigned char[256u*256u];
+
+    template<class T = uint64_t>
+    T& aggregate(T str){
+        memcpy(cache, &str, sizeof(T));
+        return reinterpret_cast<T&>(*cache);
+    }
+
+    template<class T = uint64_t>
+    T& aggregate(T str, T& cache){
+        memcpy(cache, &str, sizeof(T));
+        return reinterpret_cast<T&>(*cache);
+    }
+
+    template<class T = uint32_t>
+    uint32_t& unlock32(T& cache){
+        return reinterpret_cast<uint32_t& >(cache);
+    }
+
+    template<class T = uint64_t>
+    uint64_t& unlock64(T& cache){
+        return reinterpret_cast<uint64_t&>(cache);
+    }
+
 
 #ifdef ENABLE_OPENGL_INTEROP
     // FOR LWJGL-3 Request!

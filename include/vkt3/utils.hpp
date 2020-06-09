@@ -14,8 +14,7 @@ namespace vkt {
     static inline std::vector<Tm> DebugBufferData(vkt::uni_arg<VmaAllocator> allocator, vkt::uni_arg<VkQueue> queue, vkt::uni_arg<VkCommandPool> commandPool, vkt::Vector<Tm> mVector) {
         auto usage = vkh::VkBufferUsageFlags{.eTransferSrc = 1, .eStorageTexelBuffer = 1, .eStorageBuffer = 1, .eIndexBuffer = 1, .eVertexBuffer = 1, .eTransformFeedbackBuffer = 1 };
         auto flags = vkh::VkBufferCreateFlags{}; vkt::unlock32(flags) = 0u;
-        auto gVector = vkt::Vector<Tm>(std::make_shared<vkt::VmaBufferAllocation>(allocator, vkh::VkBufferCreateInfo{
-            .flags = flags, .size = uint64_t(mVector.range()), .usage = usage,
+        auto gVector = vkt::Vector<Tm>(std::make_shared<vkt::VmaBufferAllocation>(allocator, vkh::VkBufferCreateInfo{.flags = flags, .size = uint64_t(mVector.range()), .usage = usage,
         }, vkt::VmaMemoryInfo{ .memUsage = VMA_MEMORY_USAGE_GPU_TO_CPU, .instanceDispatch = vkt::vkGlobal::instance, .deviceDispatch = vkt::vkGlobal::device }));
 
         vkt::submitOnce(vkt::vkGlobal::device, queue, commandPool, [&](const VkCommandBuffer& cmd) {
@@ -27,7 +26,7 @@ namespace vkt {
         return vect;
     };
 
-    
+
     // 
     VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(
         VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
