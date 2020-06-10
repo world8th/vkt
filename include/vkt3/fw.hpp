@@ -227,7 +227,6 @@ namespace vkt
                 this->commandPool = fw->commandPool;
                 //this->renderPass = fw->renderPass;
                 this->depthImage = fw->depthImage;
-                this->depthImageView = fw->depthImageView;
                 this->pipelineCache = fw->pipelineCache;
                 this->memoryProperties = fw->memoryProperties;
                 this->messenger = fw->messenger;
@@ -279,10 +278,11 @@ namespace vkt
         VkDescriptorPool descriptorPool = VK_NULL_HANDLE;
         VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
         VkCommandPool commandPool = VK_NULL_HANDLE;
-        VkImage depthImage = VK_NULL_HANDLE;
-        VkImageView depthImageView = VK_NULL_HANDLE;
+        //VkImage depthImage = VK_NULL_HANDLE;
+        //VkImageView depthImageView = VK_NULL_HANDLE;
         VkPipelineCache pipelineCache = VK_NULL_HANDLE;
         VkDebugUtilsMessengerEXT messenger = VK_NULL_HANDLE;
+        vkt::ImageRegion depthImage = {};
 
         VmaAllocator allocator = VK_NULL_HANDLE;
         uint32_t queueFamilyIndex = 0;
@@ -414,11 +414,11 @@ namespace vkt
         };
 
         inline VkImageView& getDepthImageView() {
-            return depthImageView;
+            return depthImage.getImageView();
         };
 
         inline VkImage& getDepthImage() {
-            return depthImage;
+            return depthImage.getImage();
         };
 
         inline VkInstance& createInstance() {
@@ -824,7 +824,7 @@ namespace vkt
                 .storeOp = VK_ATTACHMENT_STORE_OP_STORE,
                 .stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
                 .stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
-                .initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
+                .initialLayout = VK_IMAGE_LAYOUT_GENERAL,
                 .finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
             });
 
@@ -834,8 +834,8 @@ namespace vkt
                 .storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
                 .stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
                 .stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
-                .initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
-                .finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL
+                .initialLayout = VK_IMAGE_LAYOUT_GENERAL,
+                .finalLayout = VK_IMAGE_LAYOUT_GENERAL
             });
 
             auto dp0 = vkh::VkSubpassDependency{
@@ -907,23 +907,30 @@ namespace vkt
             auto dspect = vkh::VkImageAspectFlags{.eDepth = 1};
 
             //
-            auto dusage = vkh::VkImageUsageFlags { .eDepthStencilAttachment = 1 };
-            auto image_info = vkh::VkImageCreateInfo{
-                .flags = iflg,
-                .imageType = VK_IMAGE_TYPE_2D,
-                .format = VkFormat(surfaceFormats.depthFormat),
-                .extent = {applicationWindow.surfaceSize.width, applicationWindow.surfaceSize.height, 1u},
-                .usage = dusage
+            {
+                auto aspect = vkh::VkImageAspectFlags{.eDepth = 1, .eStencil = 1};
+                auto depuse = vkh::VkImageUsageFlags{.eTransferDst = 1, .eSampled = 1, .eDepthStencilAttachment = 1 };
+
+                this->depthImage = vkt::ImageRegion(std::make_shared<vkt::VmaImageAllocation>(this->getAllocator(), vkh::VkImageCreateInfo{
+                    .format = surfaceFormats.depthFormat,
+                    .extent = vkh::VkExtent3D{applicationWindow.surfaceSize.width, applicationWindow.surfaceSize.height, 1u},
+                    .usage = depuse,
+                }, vkt::VmaMemoryInfo{}), vkh::VkImageViewCreateInfo{
+                    .format = surfaceFormats.depthFormat,
+                    .subresourceRange = vkh::VkImageSubresourceRange{.aspectMask = aspect},
+                }, VK_IMAGE_LAYOUT_GENERAL);
+
+                vkh::handleVk(this->deviceDispatch->CreateSampler(vkh::VkSamplerCreateInfo{
+                    .magFilter = VK_FILTER_LINEAR,
+                    .minFilter = VK_FILTER_LINEAR,
+                    .addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
+                    .addressModeV = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE
+                }, nullptr, &this->depthImage.refSampler()));
             };
-            vkh::handleVk(vmaCreateImage(this->allocator, (VkImageCreateInfo*)&image_info, &allocCreateInfo, &reinterpret_cast<VkImage&>(depthImage), &vmaDepthImageAllocation, &vmaDepthImageAllocationInfo));
-            vkh::handleVk(this->deviceDispatch->CreateImageView(vkh::VkImageViewCreateInfo{
-                .flags = iflg,
-                .image = depthImage,
-                .viewType = VK_IMAGE_VIEW_TYPE_2D,
-                .format = surfaceFormats.depthFormat,
-                .components = vkh::VkComponentMapping(),
-                .subresourceRange = vkh::VkImageSubresourceRange{dspect, 0, 1, 0, 1}
-            }, nullptr, &depthImageView));
+
+            vkt::submitOnce(this->deviceDispatch, this->queue, this->commandPool, [&,this](VkCommandBuffer& cmd) {
+                this->getDeviceDispatch()->CmdClearDepthStencilImage(cmd, this->depthImage.transfer(cmd), this->depthImage.getImageLayout(), vkh::VkClearDepthStencilValue{ .depth = 1.0f, .stencil = 0 }, 1u, depthImage.getImageSubresourceRange());
+            });
 
             // 
             auto swapchainImages = vkh::vsGetPhysicalDeviceSurfaceFormatsKHR(this->deviceDispatch, swapchain);
@@ -931,8 +938,12 @@ namespace vkt
             for (int i = 0; i < swapchainImages.size(); i++)
             { // create framebuffers
                 std::array<VkImageView, 2> views = {}; // predeclare views
-                views[1] = depthImageView; // depth view
+
+                // Image Views
                 vkh::handleVk(deviceDispatch->CreateImageView(vkh::VkImageViewCreateInfo{ .flags = {}, .image = swapchainImages[i], .viewType = VK_IMAGE_VIEW_TYPE_2D, .format = surfaceFormats.colorFormat, .components = vkh::VkComponentMapping{}, .subresourceRange = vkh::VkImageSubresourceRange{aspect, 0, 1, 0, 1} }, nullptr, &views[0]));
+                views[1] = this->depthImage.getImageView(); // depth view
+
+                //
                 vkh::handleVk(deviceDispatch->CreateFramebuffer(vkh::VkFramebufferCreateInfo{ .flags = {}, .renderPass = renderpass, .attachmentCount = uint32_t(views.size()), .pAttachments = views.data(), .width = applicationWindow.surfaceSize.width, .height = applicationWindow.surfaceSize.height, .layers = 1u }, nullptr, &swapchainBuffers[i].frameBuffer));
             };
         }
