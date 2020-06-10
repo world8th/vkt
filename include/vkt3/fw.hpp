@@ -500,7 +500,12 @@ namespace vkt
             vkt::vkGlobal::instance = this->instanceDispatch;
 
             // get physical device for application
-            physicalDevices = vkh::vsEnumeratePhysicalDevices(this->instanceDispatch);
+            physicalDevices = vkh::vsEnumeratePhysicalDevices(this->instanceDispatch.get_shared());
+
+            //
+            //uint32_t count = 0u; vkh::handleVk(this->instanceDispatch->EnumeratePhysicalDevices(&count, nullptr));
+            //this->physicalDevices.resize(count);
+            //vkh::handleVk(this->instanceDispatch->EnumeratePhysicalDevices(&count, this->physicalDevices.data()));
 
             // 
 #ifdef VKT_ENABLE_DEBUG

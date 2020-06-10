@@ -75,8 +75,10 @@ namespace vkh {
 
 
     inline auto vsEnumeratePhysicalDevices(vkt::uni_ptr<xvk::Instance> instance) {
+        //uint32_t count = 0u; handleVk(vkEnumeratePhysicalDevices(instance->handle, &count, nullptr));
         uint32_t count = 0u; handleVk(instance->EnumeratePhysicalDevices(&count, nullptr));
         std::vector<VkPhysicalDevice> data(count);
+        //handleVk(vkEnumeratePhysicalDevices(instance->handle, &count, data.data()));
         handleVk(instance->EnumeratePhysicalDevices(&count, data.data()));
         return data;
     };

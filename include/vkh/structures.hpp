@@ -39,8 +39,6 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         const VKNAME* operator->() const { return reinterpret_cast<const VKNAME*>(this); };\
         VKNAME& hpp() { return reinterpret_cast<VKNAME&>(*this); };\
         const VKNAME& hpp() const { return reinterpret_cast<const VKNAME&>(*this); };\
-        VKNAME chpp() { return reinterpret_cast<VKNAME&>(*this); };\
-        const VKNAME chpp() const { return reinterpret_cast<const VKNAME&>(*this); };\
         NAME& operator =( const vkt::uni_arg<VKNAME>& info ) { memcpy(this, info, sizeof(NAME)); return *this; };
 #else
         #define VK_HPP_STRUCT_OPERATORS(NAME,VKNAME) // Not Vulkan HPP Support
