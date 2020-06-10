@@ -991,8 +991,8 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
 
     //
     typedef struct VkMemoryType {
-        VkMemoryPropertyFlags    propertyFlags = {};
-        uint32_t                 heapIndex = 0u;
+        VkMemoryPropertyFlags    propertyFlags  = {};
+        uint32_t                 heapIndex      = 0u;
 
         STRUCT_OPERATORS(VkMemoryType)
         VK_HPP_STRUCT_OPERATORS(VkMemoryType, vk::MemoryType)
@@ -1394,8 +1394,8 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
     typedef struct VkBindAccelerationStructureMemoryInfoKHR {
         VkStructureType               sType                 = VK_STRUCTURE_TYPE_BIND_ACCELERATION_STRUCTURE_MEMORY_INFO_KHR;
         const void*                   pNext                 = nullptr;
-        VkAccelerationStructureKHR    accelerationStructure = {};
-        VkDeviceMemory                memory                = {};
+        VkAccelerationStructureKHR    accelerationStructure = VK_NULL_HANDLE;
+        VkDeviceMemory                memory                = VK_NULL_HANDLE;
         VkDeviceSize                  memoryOffset          = 0u;
         uint32_t                      deviceIndexCount      = 0u;
         const uint32_t*               pDeviceIndices        = nullptr;
@@ -1511,7 +1511,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         VkImageLayout              newLayout            = VK_IMAGE_LAYOUT_GENERAL;
         uint32_t                   srcQueueFamilyIndex  = 0u;
         uint32_t                   dstQueueFamilyIndex  = 0u;
-        VkImage                    image                = {};
+        VkImage                    image                = VK_NULL_HANDLE;
         VkImageSubresourceRange    subresourceRange     = {};
         
         STRUCT_OPERATORS(VkImageMemoryBarrier)
@@ -1801,7 +1801,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
     typedef struct VkSemaphoreSignalInfo {
         VkStructureType     sType       = VK_STRUCTURE_TYPE_SEMAPHORE_SIGNAL_INFO;
         const void*         pNext       = nullptr;
-        VkSemaphore         semaphore   = {};
+        VkSemaphore         semaphore   = VK_NULL_HANDLE;
         uint64_t            value       = 0u;
 
         STRUCT_OPERATORS(VkSemaphoreSignalInfo)
@@ -1831,7 +1831,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         VkStructureType                 sType                   = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
         const void*                     pNext                   = nullptr;
         VkSwapchainCreateFlagsKHR       flags                   = {};
-        VkSurfaceKHR                    surface                 = {};
+        VkSurfaceKHR                    surface                 = VK_NULL_HANDLE;
         uint32_t                        minImageCount           = 0u;
         VkFormat                        imageFormat             = VK_FORMAT_R8G8B8A8_SRGB;
         VkColorSpaceKHR                 imageColorSpace         = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
@@ -1845,7 +1845,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         VkCompositeAlphaFlagBitsKHR     compositeAlpha          = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
         VkPresentModeKHR                presentMode             = VK_PRESENT_MODE_IMMEDIATE_KHR;
         VkBool32                        clipped                 = true;
-        VkSwapchainKHR                  oldSwapchain            = {};
+        VkSwapchainKHR                  oldSwapchain            = VK_NULL_HANDLE;
 
         VkSwapchainCreateInfoKHR& setQueueFamilyIndices(const std::vector<uint32_t>& V = {}) { pQueueFamilyIndices = V.data(); queueFamilyIndexCount = static_cast<uint32_t>(V.size()); return *this; };
 
@@ -1873,7 +1873,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
     typedef struct VkSemaphoreGetWin32HandleInfoKHR {
         VkStructureType                          sType      = VK_STRUCTURE_TYPE_SEMAPHORE_GET_WIN32_HANDLE_INFO_KHR;
         const void*                              pNext      = nullptr;
-        VkSemaphore                              semaphore  = {};
+        VkSemaphore                              semaphore  = VK_NULL_HANDLE;
         VkExternalSemaphoreHandleTypeFlagBits    handleType = {};
 
         operator VkSemaphore& () { return semaphore; };

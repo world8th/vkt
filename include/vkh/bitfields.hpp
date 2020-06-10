@@ -46,8 +46,10 @@ namespace vkh {
         const BITS& c() const { return reinterpret_cast<const BITS&>(*this); }; \
         operator BITS&() {return reinterpret_cast<BITS&>(*this);};\
         operator const BITS&() const {return reinterpret_cast<const BITS&>(*this);};\
-        explicit operator COMP& () { return reinterpret_cast<COMP&>(*this); };\
-        explicit operator const COMP& () const { return reinterpret_cast<const COMP&>(*this); };\
+        operator int&() {return reinterpret_cast<int&>(*this);};\
+        operator const int&() const {return reinterpret_cast<const int&>(*this);};\
+        operator COMP& () { return reinterpret_cast<COMP&>(*this); };\
+        operator const COMP& () const { return reinterpret_cast<const COMP&>(*this); };\
         NAME& also(const std::function<NAME*(NAME*)>& fn) { return *fn(this); };\
         inline static NAME create(const std::function<NAME*(NAME*)>& fn = {}) { auto data = NAME{}; vkt::zero32(data); return *(fn ? fn(&data) : &data); };
 

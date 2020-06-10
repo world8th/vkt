@@ -578,7 +578,7 @@ namespace vkt {
         virtual const vkh::VkDescriptorImageInfo* getDescriptorPtr() const { return &imgInfo; };
 
     protected: friend VmaImageAllocation; friend ImageAllocation; // 
-        vkh::VkDescriptorImageInfo imgInfo = {.imageView = VK_NULL_HANDLE, .imageLayout = VK_IMAGE_LAYOUT_UNDEFINED, .sampler = VK_NULL_HANDLE};
+        vkh::VkDescriptorImageInfo imgInfo = { .sampler = VK_NULL_HANDLE, .imageView = VK_NULL_HANDLE, .imageLayout = VK_IMAGE_LAYOUT_UNDEFINED };
         vkt::uni_ptr<ImageAllocation> allocation = {};
 
     public: // irrevalent sources
