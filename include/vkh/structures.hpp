@@ -3,6 +3,7 @@
 #include <vkh/core.hpp>
 #include <vkh/enums.hpp>
 #include <vkh/bitfields.hpp>
+#include <functional>
 
 namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
                 // TODO: WIP FULL C++20 SUPPORT
@@ -23,8 +24,8 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         const ::NAME& vk() const { return reinterpret_cast<const ::NAME&>(*this); };\
         NAME& operator =( const vkt::uni_arg<::NAME>& info ) { memcpy(this, info, sizeof(NAME)); return *this; };\
         NAME& operator =( const vkt::uni_arg<NAME>& info ) { memcpy(this, info, sizeof(NAME)); return *this; }; \
-        NAME& also(const std::function<NAME&(NAME&)>& fn) { return fn(*this); };\
-        inline static NAME create(const std::function<NAME&(NAME&)>& fn = {}) { auto data = NAME{}; return (fn ? fn(data) : data); };
+        NAME& also(const std::function<NAME*(NAME*)>& fn) { return *fn(this); };\
+        inline static NAME create(const std::function<NAME*(NAME*)>& fn = {}) { auto data = NAME{}; return *(fn ? fn(&data) : &data); };
 
 #ifdef VULKAN_HPP
     #define VK_HPP_STRUCT_OPERATORS(NAME,VKNAME)\
