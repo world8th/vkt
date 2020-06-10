@@ -49,7 +49,7 @@ namespace vkh {
         explicit operator COMP& () { return reinterpret_cast<COMP&>(*this); };\
         explicit operator const COMP& () const { return reinterpret_cast<const COMP&>(*this); };\
         NAME& also(const std::function<NAME*(NAME*)>& fn) { return *fn(this); };\
-        inline static NAME create(const std::function<NAME*(NAME*)>& fn = {}) { auto data = NAME{}; return *(fn ? fn(&data) : &data); };
+        inline static NAME create(const std::function<NAME*(NAME*)>& fn = {}) { auto data = NAME{}; vkt::zero32(data); return *(fn ? fn(&data) : &data); };
 
     //NAME& operator=(const vkt::uni_arg<COMP>& F) { memcpy(this, F, sizeof(NAME)); return *this; };\
 
