@@ -19,7 +19,7 @@ Writing for C++20 prior...
 ```MD
 - Architecture    : vRt, VKt (9:Gen)
 - RHI             : Yes, Vulkan-HPP
-- Support OS      : Windows 10 (2004 or Newer)
+- Support OS      : Windows 10 (2004 or newer, with OpenGL), Ubuntu 20.04 (WIP, NO OpenGL)
 - Support HW      : RTX 2070 or familiar...
 - Extensions      : NATIVE 
 - Project Type    : Experimental, Personal
@@ -33,7 +33,7 @@ Writing for C++20 prior...
 - Based On        : Vulkan.H, C++20, STL
 - General To Do   : Complete Bitfields and Structures, make more compatible with Vulkan-HPP
 
-Date: 19.01.2020 helixd2k18@IMN
+Date: 12.06.2020 helixd2k18@IMN
 ```
 
 ## Authors P.S.
