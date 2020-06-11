@@ -949,8 +949,8 @@ namespace vkt
                 for (int i = 0; i < swapchainImages.size(); i++) {
                     vkt::imageBarrier(cmd, vkt::ImageBarrierInfo{
                         .image = swapchainImages[i],
-                        .originLayout = VK_IMAGE_LAYOUT_UNDEFINED,
                         .targetLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
+                        .originLayout = VK_IMAGE_LAYOUT_UNDEFINED,
                     });
                 }
             });
