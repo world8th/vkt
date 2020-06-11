@@ -19,7 +19,7 @@ namespace vkt {
         VkFramebuffer frameBuffer = VK_NULL_HANDLE;
         VkCommandBuffer commandBuffer = VK_NULL_HANDLE; // terminal command (barrier)
         VkFence waitFence = VK_NULL_HANDLE;
-        //VkImage image = VK_NULL_HANDLE;
+        VkImage image = VK_NULL_HANDLE;
         VkSemaphore drawSemaphore = VK_NULL_HANDLE, computeSemaphore = VK_NULL_HANDLE, presentSemaphore = VK_NULL_HANDLE;
         //VkSemaphore timeline = VK_NULL_HANDLE;
     };

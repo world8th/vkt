@@ -162,7 +162,7 @@ namespace vkh {
     };
 
 
-    inline auto vsGetPhysicalDeviceSurfaceFormatsKHR(vkt::uni_ptr<xvk::Device> device, const VkSwapchainKHR& swapchain) { // TODO: V2
+    inline auto vsGetSwapchainImagesKHR(vkt::uni_ptr<xvk::Device> device, const VkSwapchainKHR& swapchain) { // TODO: V2
         uint32_t count = 0u; device->GetSwapchainImagesKHR(swapchain, &count, nullptr);
         std::vector<VkImage> data(count);
         handleVk(device->GetSwapchainImagesKHR(swapchain, &count, reinterpret_cast<VkImage*>(data.data())));
@@ -405,12 +405,12 @@ namespace vkh {
         template<class C = T>
           VsDescriptorHandle(const VsDescriptorHandle<C>& handle) : entry_t(handle.entry_t), field_t(handle.field_t), stride_t(handle.stride_t), V_t(handle.V_t) {};
           VsDescriptorHandle(const VkDescriptorUpdateTemplateEntry& entry_t, const uintptr_t& field_t = 0ull, const std::shared_ptr<std::vector<uint8_t>>& V_t = {}, const size_t stride_t = sizeof(T)) : V_t(V_t), entry_t(entry_t), field_t(field_t), stride_t(stride_t) {};
-         ~VsDescriptorHandle() {};
+         ~VsDescriptorHandle() {  };
 
         // any buffers and images can `write` into types
-        template<class M = T> inline VsDescriptorHandle<M> offset(const uint32_t& idx = 0u) { return VsDescriptorHandle<M>(entry_t, stride_t*idx+field_t, V_t); };
-        template<class M = T> inline const VsDescriptorHandle<M> offset(const uint32_t& idx = 0u) const { return VsDescriptorHandle<M>(entry_t, stride_t*idx+field_t, V_t); };
-        inline const uint32_t& size() const { return entry_t->descriptorCount; };
+        template<class M = T> inline VsDescriptorHandle<M> offset(const uint32_t& idx = 0u) { return VsDescriptorHandle<M>(entry_t, stride_t*std::min(idx,entry_t.descriptorCount)+field_t, V_t); };
+        template<class M = T> inline const VsDescriptorHandle<M> offset(const uint32_t& idx = 0u) const { return VsDescriptorHandle<M>(entry_t, stride_t*std::min(idx,entry_t.descriptorCount)+field_t, V_t); };
+        inline const uint32_t& size() const { return entry_t.descriptorCount; };
 
         // 
         template<class C = T> inline VsDescriptorHandle<T>& operator=(const VsDescriptorHandle<C>& d) { stride_t = d.stride_t, entry_t = d.entry_t, field_t = d.field_t, V_t = d.V_t; return *this; };
@@ -438,10 +438,18 @@ namespace vkh {
     };
 
     // TODO: REMOVE CODE TAFTOLOGY
-    class VsDescriptorSetCreateInfoHelper { public: uint32_t flags = 0u; using T = uintptr_t; // 
-        inline  VsDescriptorSetCreateInfoHelper& reset() { heap->clear(); entries.clear(); handles.clear(); writes.clear(); writes_acs.clear(); format(); return *this; };
-        inline ~VsDescriptorSetCreateInfoHelper() { reset(); };
+    class VsDescriptorSetCreateInfoHelper { public: uint32_t flags = 0u; using T = uintptr_t; //
+        inline  VsDescriptorSetCreateInfoHelper& reset() {
+            heap->clear(); heap->resize(0);
+            entries.clear(); entries.resize(0u);
+            handles.clear(); //handles.resize(0);
+            writes.clear(); writes.resize(0);
+            writes_acs.clear(); writes_acs.resize(0);
+            format(); return *this;
+        };
+        inline ~VsDescriptorSetCreateInfoHelper() { this->reset(); };
         inline  VsDescriptorSetCreateInfoHelper(const VkDescriptorSetLayout& layout = {}, const VkDescriptorPool& pool = {}) {
+            heap = std::make_shared<std::vector<uint8_t>>(); this->reset();
             template_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_UPDATE_TEMPLATE_CREATE_INFO;
             template_info.pNext = nullptr;
             template_info.flags = flags;
@@ -454,7 +462,6 @@ namespace vkh {
             allocate_info.descriptorPool = pool;
             allocate_info.pSetLayouts = &template_info.descriptorSetLayout;
             allocate_info.descriptorSetCount = 1u;
-            heap = std::make_shared<std::vector<uint8_t>>();
         };
 
         // official function (not template)

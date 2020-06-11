@@ -928,16 +928,13 @@ namespace vkt
                 }, nullptr, &this->depthImage.refSampler()));
             };
 
-            vkt::submitOnce(this->deviceDispatch, this->queue, this->commandPool, [&,this](VkCommandBuffer& cmd) {
-                this->getDeviceDispatch()->CmdClearDepthStencilImage(cmd, this->depthImage.transfer(cmd), this->depthImage.getImageLayout(), vkh::VkClearDepthStencilValue{ .depth = 1.0f, .stencil = 0 }, 1u, depthImage.getImageSubresourceRange());
-            });
-
-            // 
-            auto swapchainImages = vkh::vsGetPhysicalDeviceSurfaceFormatsKHR(this->deviceDispatch, swapchain);
+            //
+            auto swapchainImages = vkh::vsGetSwapchainImagesKHR(this->deviceDispatch, swapchain);
             swapchainBuffers.resize(swapchainImages.size());
             for (int i = 0; i < swapchainImages.size(); i++)
             { // create framebuffers
                 std::array<VkImageView, 2> views = {}; // predeclare views
+                swapchainBuffers[i].image = swapchainImages[i];
 
                 // Image Views
                 vkh::handleVk(deviceDispatch->CreateImageView(vkh::VkImageViewCreateInfo{ .flags = {}, .image = swapchainImages[i], .viewType = VK_IMAGE_VIEW_TYPE_2D, .format = surfaceFormats.colorFormat, .components = vkh::VkComponentMapping{}, .subresourceRange = vkh::VkImageSubresourceRange{aspect, 0, 1, 0, 1} }, nullptr, &views[0]));
@@ -946,6 +943,17 @@ namespace vkt
                 //
                 vkh::handleVk(deviceDispatch->CreateFramebuffer(vkh::VkFramebufferCreateInfo{ .flags = {}, .renderPass = renderpass, .attachmentCount = uint32_t(views.size()), .pAttachments = views.data(), .width = applicationWindow.surfaceSize.width, .height = applicationWindow.surfaceSize.height, .layers = 1u }, nullptr, &swapchainBuffers[i].frameBuffer));
             };
+
+            vkt::submitOnce(this->deviceDispatch, this->queue, this->commandPool, [&,this](VkCommandBuffer& cmd) {
+                this->getDeviceDispatch()->CmdClearDepthStencilImage(cmd, this->depthImage.transfer(cmd), this->depthImage.getImageLayout(), vkh::VkClearDepthStencilValue{ .depth = 1.0f, .stencil = 0 }, 1u, depthImage.getImageSubresourceRange());
+                for (int i = 0; i < swapchainImages.size(); i++) {
+                    vkt::imageBarrier(cmd, vkt::ImageBarrierInfo{
+                        .image = swapchainImages[i],
+                        .originLayout = VK_IMAGE_LAYOUT_UNDEFINED,
+                        .targetLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
+                    });
+                }
+            });
         }
 
         // 

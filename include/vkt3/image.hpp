@@ -402,8 +402,8 @@ namespace vkt {
 
         virtual ImageRegion& transfer(VkCommandBuffer& cmdBuf) {
             vkt::imageBarrier(cmdBuf, vkt::ImageBarrierInfo{
-                .deviceDispatch = this->allocation->info.deviceDispatch,
                 .instanceDispatch = this->allocation->info.instanceDispatch,
+                .deviceDispatch = this->allocation->info.deviceDispatch,
                 .image = this->allocation->getImage(),
                 .targetLayout = reinterpret_cast<const VkImageLayout&>(this->imgInfo.imageLayout),
                 .originLayout = this->allocation->info.initialLayout,
