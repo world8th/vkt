@@ -576,7 +576,11 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         const void*                         pNext               = nullptr;
         VkPipelineShaderStageCreateFlags    flags               = {}; // TODO: FLAGS
         VkShaderStageFlagBits               stage               = VK_SHADER_STAGE_COMPUTE_BIT;
+#ifndef VKT_USE_CPP_MODULES
         VkShaderModule                      module              = VK_NULL_HANDLE;
+#else
+        VkShaderModule                      modular             = VK_NULL_HANDLE;
+#endif
         const char*                         pName               = "main";
         const VkSpecializationInfo*         pSpecializationInfo = nullptr; // TODO: NATIVE
 
