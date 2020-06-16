@@ -6,6 +6,8 @@
 
 //#include "utils.hpp"
 //#include "structs.hpp"
+#include <cstdint>
+#include <cassert>
 #include <memory>
 #include <optional>
 #include <iostream>
@@ -30,9 +32,6 @@
 #if !defined(USE_D3D12) && !defined(USE_VULKAN)
 #define USE_VULKAN
 #endif
-
-// 
-#include <cstdint>
 
 // 
 #if defined(VKT_ENABLE_GLFW_SUPPORT) || defined(ENABLE_OPENGL_INTEROP)

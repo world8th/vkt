@@ -6,6 +6,7 @@
 #include <string>
 #include <sstream>
 #include <iostream>
+#include <algorithm>
 
 #ifdef VKT_ENABLE_GLFW_SUPPORT
 #include <GLFW/glfw3.h>

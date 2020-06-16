@@ -167,7 +167,11 @@ namespace vkt {
     // create shader module 
     static inline auto makePipelineStageInfo(vkt::uni_ptr<xvk::Device> device, const std::vector<uint32_t>& code, vkt::uni_arg<VkShaderStageFlagBits> stage = VK_SHADER_STAGE_COMPUTE_BIT, vkt::uni_arg<const char*> entry = "main") {
         vkh::VkPipelineShaderStageCreateInfo spi = {};
+#ifndef VKT_USE_CPP_MODULES
         createShaderModuleIntrusive(device, code, spi.module);
+#else
+        createShaderModuleIntrusive(device, code, spi.modular);
+#endif
         spi.pName = entry;
         spi.stage = stage;
         spi.pSpecializationInfo = {};
@@ -189,7 +193,11 @@ namespace vkt {
         auto fl = vkh::VkPipelineShaderStageCreateFlags{ .eRequireFullSubgroups = 1u };
         f.spi = makePipelineStageInfoWithoutModule(device, VK_SHADER_STAGE_COMPUTE_BIT, entry);
         f.spi.flags = fl;
+#ifndef VKT_USE_CPP_MODULES
         createShaderModuleIntrusive(device, TempCode = code, (VkShaderModule&)(f.spi.module));
+#else
+        createShaderModuleIntrusive(device, TempCode = code, (VkShaderModule&)(f.spi.modular));
+#endif
         f.sgmp = vkh::VkPipelineShaderStageRequiredSubgroupSizeCreateInfoEXT{};
         f.sgmp.requiredSubgroupSize = subgroupSize;
         if (subgroupSize) f.spi.pNext = &f.sgmp;
