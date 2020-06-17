@@ -132,11 +132,12 @@ namespace vkt {
         //T storage = {};
 
     public: friend uni_ptr<T>; // 
-        uni_ptr<T>() {};
-        uni_ptr<T>(std::shared_ptr<T> shared) : shared(shared), regular(std::ref(*shared)) {};
-        uni_ptr<T>(T* ptr) : regular(std::ref(*ptr)) {};
-        uni_ptr<T>(T& ptr) : regular(std::ref(ptr)) {};  // for argument passing
-        uni_ptr<T>(const uni_ptr<T>& ptr) : shared(ptr.shared), regular(std::ref(*ptr.regular)) {};
+        uni_ptr() {};
+        uni_ptr(const uni_ptr<T>& ptr) : shared(ptr.shared), regular(std::ref(*ptr.regular)) {};
+        uni_ptr(const std::shared_ptr<T>& shared) : shared(shared), regular(std::ref(*shared)) {};
+        uni_ptr(T* ptr) : regular(std::ref(*ptr)) {};
+        uni_ptr(T& ptr) : regular(std::ref(ptr)) {};  // for argument passing
+        
 
         // 
         virtual inline uni_ptr* operator= (T* ptr) { regular = std::ref(*ptr); return this; };
@@ -212,18 +213,31 @@ namespace vkt {
 
     template<class T = uint8_t>
     class uni_arg {
-    protected: std::optional<T> storage;//= { T{} };//std::nullopt;
+    protected: 
+        std::optional<T> storage = std::nullopt;
     public: // 
-        uni_arg<T>() {};
-        uni_arg<T>(const T& t) : storage(t) {};
-        explicit uni_arg<T>(const T* t) : storage(*t) {};
-        uni_arg<T>(const uni_ptr<T>& p) : storage(*p) {}; // UnUsual and Vain
-        uni_arg<T>(const uni_arg<T>& a) : storage(*a) {};
+        //uni_arg<T>() {};
+        //uni_arg<T>(const T& t) : storage(t) {};
+        //explicit uni_arg<T>(const T* t) : storage(*t) {};
+        //uni_arg<T>(const uni_ptr<T>& p) : storage(*p) {}; // UnUsual and Vain
+        //uni_arg<T>(const uni_arg<T>& a) : storage(*a) {};
+
+        uni_arg() {};
+        uni_arg(const T& t) : storage(t) {};
+        explicit uni_arg(const T* t) : storage(*t) {};
+        uni_arg(const uni_ptr<T>& p) : storage(*p) {}; // UnUsual and Vain
+        uni_arg(const uni_arg<T>& a) : storage(*a) {};
 
         // 
-        virtual uni_arg<T>& operator= (const T& ptr) { storage =  ptr; return *this; };
+        //virtual uni_arg<T>& operator= (const T& ptr) { storage =  ptr; return reinterpret_cast<uni_arg<T>&>(*this); };
+        //virtual uni_arg<T>& operator= (const T* ptr) { storage = *ptr; return reinterpret_cast<uni_arg<T>&>(*this); };
+        //virtual uni_arg<T>& operator= (uni_arg<T> t) { storage =  t.ref(); return reinterpret_cast<uni_arg<T>&>(*this); };
+        //virtual uni_arg<T>& operator= (uni_ptr<T> p) { storage = *p.ptr(); return reinterpret_cast<uni_arg<T>&>(*this); };
+
+        //
+        virtual uni_arg<T>& operator= (const T& ptr) { storage = ptr; return *this; };
         virtual uni_arg<T>& operator= (const T* ptr) { storage = *ptr; return *this; };
-        virtual uni_arg<T>& operator= (uni_arg<T> t) { storage =  t.ref(); return *this; };
+        virtual uni_arg<T>& operator= (uni_arg<T> t) { storage = t.ref(); return *this; };
         virtual uni_arg<T>& operator= (uni_ptr<T> p) { storage = *p.ptr(); return *this; };
 
         // experimental

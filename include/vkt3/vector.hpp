@@ -21,7 +21,7 @@ namespace vkt {
         BufferAllocation() {};
         BufferAllocation(vkt::uni_arg<vkh::VkBufferCreateInfo> createInfo, vkt::uni_arg<MemoryAllocationInfo> allocationInfo = MemoryAllocationInfo{}) : info(allocationInfo) { this->construct(allocationInfo, createInfo); };
         BufferAllocation(const vkt::uni_ptr   <BufferAllocation>& allocation) : buffer(allocation->buffer), info(allocation->info) { this->assign(allocation); };
-        BufferAllocation(const std::shared_ptr<BufferAllocation>& allocation) : buffer(allocation->buffer), info(allocation->info) { this->assign(vkt::uni_ptr<BufferAllocation>(allocation)); };
+        //BufferAllocation(const std::shared_ptr<BufferAllocation>& allocation) : buffer(allocation->buffer), info(allocation->info) { this->assign(vkt::uni_ptr<BufferAllocation>(allocation)); };
         ~BufferAllocation() { // Broken Support, but supports Win32 memory export
             if (this->buffer && this->info.device && this->info.memory) {
                 this->info.deviceDispatch->DeviceWaitIdle();

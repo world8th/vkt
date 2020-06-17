@@ -26,7 +26,6 @@ namespace vkt {
         return vect;
     };
 
-
     // 
     VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(
         VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,

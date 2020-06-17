@@ -10,7 +10,7 @@
 #endif
 
 // 
-#include <misc/args.hxx>
+//#include <misc/args.hxx>
 #include <misc/half.hpp>
 #include <misc/pcg_random.hpp>
 
@@ -490,7 +490,7 @@ namespace vkt {
         imageMemoryBarriers.dstQueueFamilyIndex = ~0U;
         imageMemoryBarriers.oldLayout = info->originLayout;
         imageMemoryBarriers.newLayout = info->targetLayout;
-        imageMemoryBarriers.subresourceRange = info->subresourceRange;
+        imageMemoryBarriers.subresourceRange = reinterpret_cast<const VkImageSubresourceRange&>(*info->subresourceRange);
         imageMemoryBarriers.image = info->image;
 
         // Put barrier on top
