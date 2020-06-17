@@ -43,7 +43,7 @@ namespace vkt {
         const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo,
         const VkAllocationCallbacks* pAllocator,
         VkDebugUtilsMessengerEXT* pCallback) {
-
+#ifdef VKT_VULKAN_DEBUG
         // Note: It seems that static_cast<...> doesn't work. Use the C-style forced cast.
         auto func = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");
         if (func != nullptr) {
@@ -52,6 +52,9 @@ namespace vkt {
         else {
             return VK_ERROR_EXTENSION_NOT_PRESENT;
         }
+#else
+        return VK_SUCCESS;
+#endif
     };
 
     // 
