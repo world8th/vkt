@@ -508,7 +508,7 @@ namespace vkt
             //vkh::handleVk(this->instanceDispatch->EnumeratePhysicalDevices(&count, this->physicalDevices.data()));
 
             // 
-#ifdef VKT_ENABLE_DEBUG
+#ifdef VKT_VULKAN_DEBUG
             if (CreateDebugUtilsMessengerEXT(instance, &debugCreateInfo, nullptr, &reinterpret_cast<VkDebugUtilsMessengerEXT&>(messenger)) != VK_SUCCESS) {
                 throw std::runtime_error("failed to set up debug callback");
             }

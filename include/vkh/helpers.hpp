@@ -28,7 +28,7 @@ namespace vkh {
 #define DEFAULT_FENCE_TIMEOUT (30ull*1000ull*1000ull*1000ull) // Default fence timeout in nanoseconds
 
 
-    std::string errorString(VkResult errorCode) {
+    static inline std::string errorString(VkResult errorCode) {
         switch (errorCode) {
 #define STR(r) case VK_ ##r: return #r
             STR(NOT_READY);

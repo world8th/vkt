@@ -118,7 +118,7 @@ namespace vkt {
         virtual bool32_t& operator=(const bool32_t&a){b_=a;};
     };
 
-    void handle(const bool& valid = false) {
+    inline void handle(const bool& valid = false) {
         if (!valid) {
             std::cerr << "std::optional is wrong or not initialized" << std::endl; assert(valid);
         };
@@ -278,44 +278,44 @@ namespace vkt {
     };
 
     // aggregate cache
-    auto* cache = new unsigned char[256u*256u];
+    inline auto* cache = new unsigned char[256u*256u];
 
     template<class T = uint64_t>
-    T& aggregate(T str){
+    inline T& aggregate(T str){
         memcpy(cache, &str, sizeof(T));
         return reinterpret_cast<T&>(*cache);
     }
 
     template<class T = uint64_t>
-    T& aggregate(T str, T& cache){
+    inline T& aggregate(T str, T& cache){
         memcpy(cache, &str, sizeof(T));
         return reinterpret_cast<T&>(*cache);
     }
 
     template<class T = uint32_t>
-    uint32_t& unlock32(T& cache){
+    inline uint32_t& unlock32(T& cache){
         return reinterpret_cast<uint32_t& >(cache);
     }
 
     template<class T = uint32_t>
-    uint32_t& zero32(T& cache){
+    inline uint32_t& zero32(T& cache){
         return (reinterpret_cast<uint32_t& >(cache) = 0u);
     }
 
     template<class T = uint64_t>
-    uint64_t& unlock64(T& cache){
+    inline uint64_t& unlock64(T& cache){
         return reinterpret_cast<uint64_t&>(cache);
     }
 
     template<class T = uint64_t>
-    uint64_t& zero64(T& cache){
+    inline uint64_t& zero64(T& cache){
         return (reinterpret_cast<uint64_t& >(cache) = 0u);
     }
 
 
 #ifdef ENABLE_OPENGL_INTEROP
     // FOR LWJGL-3 Request!
-    void initializeGL(GLFWglproc(*glfwGetProcAddress)(const char*)) {
+    inline void initializeGL(GLFWglproc(*glfwGetProcAddress)(const char*)) {
 #ifdef VKT_USE_GLAD
         if (!gladLoadGLLoader(glfwGetProcAddress)) {
             printf("Something went wrong!\n"); exit(-1);
@@ -329,7 +329,7 @@ namespace vkt {
 
     // FOR LWJGL-3 Request!
 #ifdef VKT_ENABLE_GLFW_LINKED
-    void initializeGL() {
+    inline void initializeGL() {
 #ifdef VKT_USE_GLAD
         if (!gladLoadGLLoader(glfwGetProcAddress)) {
             printf("Something went wrong!\n"); exit(-1);

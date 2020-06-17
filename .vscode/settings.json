@@ -77,7 +77,10 @@
         "xutility": "cpp",
         "compare": "cpp",
         "cstdarg": "cpp",
-        "regex": "cpp"
+        "regex": "cpp",
+        "bitset": "cpp",
+        "deque": "cpp",
+        "stack": "cpp"
     },
     "C_Cpp.default.cppStandard": "c++20",
     "C_Cpp.default.cStandard": "c11"

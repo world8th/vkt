@@ -76,7 +76,7 @@ namespace vkt {
 
     // Read binary (for SPIR-V)
     // Updated 10.05.2020
-    std::vector<BYTE> readBinaryU8(vkt::uni_arg<std::string> filePath) { // open the file:
+    inline std::vector<BYTE> readBinaryU8(vkt::uni_arg<std::string> filePath) { // open the file:
         std::vector<BYTE> vec{};
         std::ifstream file(filePath, std::ios::in | std::ios::binary | std::ios::ate);
         if (file.is_open()) { // Stop eating new lines in binary mode!!!
@@ -126,7 +126,7 @@ namespace vkt {
 
 
     // Used for directly create shader from code! (Prevent Code LOST!)
-    std::vector<uint32_t> TempCode = {};
+    inline std::vector<uint32_t> TempCode = {};
 
     // 
     static inline auto makeShaderModuleInfo(const std::vector<uint32_t>& code) {

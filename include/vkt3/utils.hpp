@@ -27,7 +27,7 @@ namespace vkt {
     };
 
     // 
-    VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(
+    inline VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(
         VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
         VkDebugUtilsMessageTypeFlagsEXT messageType,
         const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
@@ -38,7 +38,7 @@ namespace vkt {
     };
 
     // 
-    VkResult CreateDebugUtilsMessengerEXT(
+    inline VkResult CreateDebugUtilsMessengerEXT(
         VkInstance instance,
         const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo,
         const VkAllocationCallbacks* pAllocator,
@@ -58,7 +58,7 @@ namespace vkt {
     };
 
     // 
-    std::vector<const char*> GetRequiredExtensions() {
+    inline std::vector<const char*> GetRequiredExtensions() {
 #ifdef VKT_ENABLE_GLFW_LINKED
         uint32_t glfwExtensionCount = 0;
         const char** glfwExtensions = nullptr;
@@ -74,7 +74,7 @@ namespace vkt {
     };
 
     // 
-    VkResult AllocateDescriptorSetWithUpdate(vkt::uni_ptr<xvk::Device>& device, vkh::VsDescriptorSetCreateInfoHelper& helper, VkDescriptorSet& descriptorSet, bool& protection) {
+    inline VkResult AllocateDescriptorSetWithUpdate(vkt::uni_ptr<xvk::Device>& device, vkh::VsDescriptorSetCreateInfoHelper& helper, VkDescriptorSet& descriptorSet, bool& protection) {
         if (!protection) {
             // Corrupt... 
             if (descriptorSet) { vkh::handleVk(device->FreeDescriptorSets(helper, 1u, &descriptorSet)); descriptorSet = {}; };
