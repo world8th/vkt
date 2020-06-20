@@ -379,9 +379,9 @@ namespace vkt {
     class vkGlobal {
     public: // Currently, only Vulkan Loader
         static inline bool initialized = false;
-        static inline vkt::uni_ptr<xvk::Loader> loader = {};
-        static inline vkt::uni_ptr<xvk::Device> device = {};
-        static inline vkt::uni_ptr<xvk::Instance> instance = {};
+        static inline std::shared_ptr<xvk::Loader> loader = {};
+        static inline std::shared_ptr<xvk::Device> device = {};
+        static inline std::shared_ptr<xvk::Instance> instance = {};
 
     #ifdef VKT_ENABLE_GLFW_SUPPORT
     #ifdef VKT_ENABLE_GLFW_LINKED
@@ -412,8 +412,8 @@ namespace vkt {
     // 
     struct VmaMemoryInfo {
         VmaMemoryUsage memUsage = VMA_MEMORY_USAGE_GPU_ONLY;
-        vkt::uni_ptr<xvk::Instance> instanceDispatch = vkGlobal::instance;
-        vkt::uni_ptr<xvk::Device> deviceDispatch = vkGlobal::device;
+        std::shared_ptr<xvk::Instance> instanceDispatch = vkGlobal::instance;
+        std::shared_ptr<xvk::Device> deviceDispatch = vkGlobal::device;
 
         // Resolve JavaCPP Problem...
         VmaMemoryInfo& setDeviceDispatch(std::shared_ptr<xvk::Device> ptr) { deviceDispatch = ptr; return *this; };

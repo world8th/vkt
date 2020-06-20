@@ -3,7 +3,6 @@
 // 
 #include <memory>
 #include <vector>
-#include <glm/glm.hpp>
 #include <functional>
 
 /*
@@ -25,6 +24,7 @@
 */
 
 #include <vkh/core.hpp>
+#include <glm/glm.hpp>
 
 // 
 namespace vkh {
