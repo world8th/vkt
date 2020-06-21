@@ -47,7 +47,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         NAME& operator=(const vkt::uni_arg<T>& V) { memcpy(this, V, sizeof(T)); return *this; };\
         operator T&() { return reinterpret_cast<T&>(*this); };\
         operator const T&() const { return reinterpret_cast<const T&>(*this); };
-
+    
     // GLM-Compatible
     typedef struct VkOffset3D {
         int32_t    x = 0;

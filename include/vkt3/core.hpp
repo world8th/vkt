@@ -282,6 +282,80 @@ namespace vkt {
         virtual const T& operator*() const { return ref(); };
     };
 
+    // Bi-Directional Conversion
+    template<class T = uint8_t, class B = char8_t>
+    class uni_dir {
+    protected:
+        std::optional<T> storage = std::nullopt;
+    public: // 
+        uni_dir() {};
+        uni_dir(const T& t) : storage(t) {};
+        uni_dir(const B& t) : storage(reinterpret_cast<const T&>(t)) {};
+        uni_dir(const T* t) : storage(*t) {};
+        uni_dir(const B* t) : storage(reinterpret_cast<const T&>(*t)) {};
+
+        uni_dir(const uni_ptr<T>& p) : storage(*p) {}; // UnUsual and Vain
+        uni_dir(const uni_ptr<B>& p) : storage(reinterpret_cast<T&>(*p)) {}; // UnUsual and Vain
+        uni_dir(const uni_arg<T>& a) : storage(*a) {};
+        uni_dir(const uni_arg<B>& a) : storage(reinterpret_cast<T&>(*a)) {};
+
+        //
+        virtual uni_dir<T, B>& operator= (const T& ptr) { storage = ptr; return *this; };
+        virtual uni_dir<T, B>& operator= (const T* ptr) { storage = *ptr; return *this; };
+        virtual uni_dir<T, B>& operator= (uni_arg<T> t) { storage = t.ref(); return *this; };
+        virtual uni_dir<T, B>& operator= (uni_ptr<T> p) { storage = *p.ptr(); return *this; };
+
+        //
+        virtual uni_dir<T, B>& operator= (const B& ptr) { storage = reinterpret_cast<const T&>(ptr); return *this; };
+        virtual uni_dir<T, B>& operator= (const B* ptr) { storage = reinterpret_cast<const T&>(*ptr); return *this; };
+        virtual uni_dir<T, B>& operator= (uni_arg<B> t) { storage = reinterpret_cast<T&>(t.ref()); return *this; };
+        virtual uni_dir<T, B>& operator= (uni_ptr<B> p) { storage = reinterpret_cast<T&>(*p.ptr()); return *this; };
+
+        // 
+        virtual operator T& () { return ref(); };
+        virtual operator const T& () const { return ref(); };
+
+        // 
+        virtual operator T* () { return ptr(); };
+        virtual operator const T* () const { return ptr(); };
+
+        // 
+        virtual operator B& () { return reinterpret_cast<B&>(ref()); };
+        virtual operator const B& () const { return reinterpret_cast<const B&>(ref()); };
+
+        // 
+        virtual operator B* () { return reinterpret_cast<B*>(ptr()); };
+        virtual operator const B* () const { return reinterpret_cast<const B*>(ptr()); };
+
+        // 
+        virtual operator uni_ptr<T>() { handle(has()); return *storage; };
+        virtual operator uni_ptr<const T>() const { handle(has()); return *storage; };
+
+        // 
+        virtual bool has_value() const { return storage.has_value(); };
+        virtual bool has() const { return this->has_value(); };
+
+        // 
+        virtual T* ptr() { handle(has()); return &(*storage); };
+        virtual const T* ptr() const { handle(has()); return &(*storage); };
+
+        //
+        template<class M = T> inline M* ptr() { handle(has()); return &reinterpret_cast<M&>(this->ref()); };
+        template<class M = T> inline const M* ptr() const { handle(has()); return &reinterpret_cast<const M&>(this->ref()); };
+
+        // 
+        virtual T& ref() { handle(has()); return *storage; };
+        virtual const T& ref() const { handle(has()); return *storage; };
+
+        // 
+        virtual T* operator->() { return ptr(); };
+        virtual const T* operator->() const { return ptr(); };
+
+        //
+        virtual T& operator*() { return ref(); };
+        virtual const T& operator*() const { return ref(); };
+    };
+
     // aggregate cache
     inline auto* cache = new unsigned char[256u*256u];
 
