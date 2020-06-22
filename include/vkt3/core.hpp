@@ -11,6 +11,11 @@
 #include <memory>
 #include <optional>
 #include <iostream>
+#include <vector>
+
+// 
+#include <misc/soa_vector.hpp>
+#include <misc/half.hpp>
 
 // 
 #ifndef NSM
