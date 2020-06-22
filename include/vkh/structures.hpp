@@ -1696,7 +1696,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
     } VkMemoryRequirements2;
 
     // 
-    typedef union VkClearValue;
+    union VkClearValue;
 
     // 
     typedef union VkClearColorValue {
