@@ -1,5 +1,6 @@
 #pragma once // #
 
+//#define VKT_CORE_ENABLE_XVK
 #include <vkh/core.hpp>
 #include <vkh/structures.hpp>
 #include <string_view>
@@ -74,7 +75,7 @@ namespace vkh {
         return result;
     };
 
-
+#ifdef VKT_CORE_ENABLE_XVK
     inline auto vsEnumeratePhysicalDevices(vkt::uni_ptr<xvk::Instance> instance) {
         //uint32_t count = 0u; handleVk(vkEnumeratePhysicalDevices(instance->handle, &count, nullptr));
         uint32_t count = 0u; handleVk(instance->EnumeratePhysicalDevices(&count, nullptr));
@@ -180,6 +181,7 @@ namespace vkh {
         handleVk(instance->GetPhysicalDeviceSurfacePresentModesKHR(physicalDevice, surface, &count, reinterpret_cast<::VkPresentModeKHR*>(data.data())));
         return data;
     };
+#endif
 
 
     // LEGACY Functional
