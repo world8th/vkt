@@ -192,6 +192,10 @@ namespace vkt {
         virtual inline bool has() { return regular && shared; };
         virtual inline bool has() const { return regular && shared; };
 
+        //
+        virtual inline T* get() { return get_ptr(); };
+        virtual inline const T* get() const { return get_ptr(); };
+
         // 
         virtual inline T* ptr() { return get_ptr(); };
         virtual inline const T* ptr() const { return get_ptr(); };

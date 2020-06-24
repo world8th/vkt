@@ -279,6 +279,7 @@
 	///
 	/// Unless predefined it will be enabled automatically when the `__F16C__` symbol is defined, which some compilers do on supporting platforms.
 	#define HALF_ENABLE_F16C_INTRINSICS __F16C__
+    #include <immintrin.h>
 #endif
 
 #ifdef HALF_DOXYGEN_ONLY

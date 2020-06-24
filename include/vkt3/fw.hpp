@@ -12,12 +12,26 @@
 #define GLFW_EXPOSE_NATIVE_GLX
 #endif
 
-// 
-#define ENABLE_VULKAN_HPP
+//
 #define ENABLE_EXTENSION_GLM
 #define ENABLE_EXTENSION_VMA
 #define ENABLE_EXTENSION_RTX
 #define GLFW_INCLUDE_VULKAN
+
+//
+#ifndef VKT_CORE_ENABLE_XVK
+#define VKT_CORE_ENABLE_XVK
+#endif
+
+//
+#ifndef VKT_CORE_ENABLE_VMA
+#define VKT_CORE_ENABLE_VMA
+#endif
+
+//
+#ifndef ENABLE_VULKAN_HPP
+#define ENABLE_VULKAN_HPP
+#endif
 
 // Force include for avoid GLAD problem...
 #include "essential.hpp"
@@ -387,10 +401,10 @@ namespace vkt
     public:
 
         inline void loadXVK() {
-            if (instance && !instanceDispatch) { instanceDispatch = std::make_shared<xvk::Instance>(vkGlobal::loader, instance); }
-            if (device   && !deviceDispatch)   {   deviceDispatch = std::make_shared<xvk::Device  >(vkGlobal::instance, device); }
-            if (!vkGlobal::instance) { vkGlobal::instance = instanceDispatch; }
-            if (!vkGlobal::device  ) { vkGlobal::device   =   deviceDispatch; }
+            if (instance && !instanceDispatch) { instanceDispatch = std::make_shared<xvk::Instance>(vkGlobal::loader.get(), instance); }
+            if (device   && !deviceDispatch)   {   deviceDispatch = std::make_shared<xvk::Device  >(vkGlobal::instance.get(), device); }
+            if (!vkGlobal::instance) { vkGlobal::instance = instanceDispatch.get_shared(); }
+            if (!vkGlobal::device  ) { vkGlobal::device   =   deviceDispatch.get_shared(); }
         };
 
         inline uintptr_t memoryAllocationInfoPtr() {
@@ -495,9 +509,9 @@ namespace vkt
             cinstanceinfo.pNext = &debugCreateInfo;
 
             // Dynamically Load the Vulkan library
-            this->instanceDispatch = std::make_shared<xvk::Instance>(vkt::vkGlobal::loader, (this->instanceCreate = cinstanceinfo));
+            this->instanceDispatch = std::make_shared<xvk::Instance>(vkt::vkGlobal::loader.get(), (this->instanceCreate = cinstanceinfo));
             this->instance = this->instanceDispatch->handle;
-            vkt::vkGlobal::instance = this->instanceDispatch;
+            vkt::vkGlobal::instance = this->instanceDispatch.get_shared();
 
             // get physical device for application
             physicalDevices = vkh::vsEnumeratePhysicalDevices(this->instanceDispatch.get_shared());
@@ -621,7 +635,7 @@ namespace vkt
                 }));
                 vkh::handleVk(this->deviceDispatch->CreatePipelineCache(vkh::VkPipelineCacheCreateInfo(), nullptr, &this->pipelineCache));
                 this->device = this->deviceDispatch->handle;
-                vkt::vkGlobal::device = this->deviceDispatch;
+                vkt::vkGlobal::device = this->deviceDispatch.get_shared();
             };
 
             //

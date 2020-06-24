@@ -6,6 +6,10 @@
 #endif
 #endif
 
+#ifndef VKT_CORE_ENABLE_VMA
+#define VKT_CORE_ENABLE_VMA
+#endif
+
 #include "essential.hpp"
 #include <memory>
 
@@ -248,7 +252,7 @@ namespace vkt {
 
             // when loader initialized
             if (vkt::vkGlobal::initialized) {
-                if (!this->info.instanceDispatch) this->info.instanceDispatch = std::make_shared<xvk::Instance>(vkt::vkGlobal::loader, info.instance);
+                if (!this->info.instanceDispatch) this->info.instanceDispatch = std::make_shared<xvk::Instance>(vkt::vkGlobal::loader.get(), info.instance);
                 if (!this->info.deviceDispatch) this->info.deviceDispatch = std::make_shared<xvk::Device>(this->info.instanceDispatch, info.device);
             };
 
