@@ -497,7 +497,8 @@ namespace vkt {
         const auto srcStageMask = vkh::VkPipelineStageFlags{ .eBottomOfPipe = 1 };
         const auto dstStageMask = vkh::VkPipelineStageFlags{ .eTopOfPipe = 1 };
         const auto dependencyFlags = vkh::VkDependencyFlags{};
-        auto srcMask = vkh::VkAccessFlags{}, dstMask = vkh::VkAccessFlags{};
+        auto srcMask = vkh::VkAccessFlags{};
+        auto dstMask = vkh::VkAccessFlags{};
 
         //
         typedef VkImageLayout il;

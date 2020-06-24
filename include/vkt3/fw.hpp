@@ -951,7 +951,19 @@ namespace vkt
                 swapchainBuffers[i].image = swapchainImages[i];
 
                 // Image Views
-                vkh::handleVk(deviceDispatch->CreateImageView(vkh::VkImageViewCreateInfo{ .flags = {}, .image = swapchainImages[i], .viewType = VK_IMAGE_VIEW_TYPE_2D, .format = surfaceFormats.colorFormat, .components = vkh::VkComponentMapping{}, .subresourceRange = vkh::VkImageSubresourceRange{aspect, 0, 1, 0, 1} }, nullptr, &views[0]));
+                auto flags = VkImageViewCreateFlags{};
+                auto aspect = vkh::VkImageAspectFlags{.eColor = 1};
+                vkh::handleVk(deviceDispatch->CreateImageView(vkh::VkImageViewCreateInfo{
+                    .flags = {},
+                    .image = swapchainImages[i],
+                    .viewType = VK_IMAGE_VIEW_TYPE_2D,
+                    .format = surfaceFormats.colorFormat,
+                    .components = vkh::VkComponentMapping{},
+                    .subresourceRange = vkh::VkImageSubresourceRange{aspect, 0, 1, 0, 1} }.also([=](vkh::VkImageViewCreateInfo* it) {
+                        it->flags = flags;
+                        it->subresourceRange.aspectMask = aspect;
+                        return it;
+                    }), nullptr, &views[0]));
                 views[1] = this->depthImage.getImageView(); // depth view
 
                 //
