@@ -848,7 +848,7 @@ namespace vkt
                 .storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
                 .stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
                 .stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
-                .initialLayout = VK_IMAGE_LAYOUT_GENERAL,
+                .initialLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
                 .finalLayout = VK_IMAGE_LAYOUT_GENERAL
             });
 
@@ -924,6 +924,7 @@ namespace vkt
             {
                 auto aspect = vkh::VkImageAspectFlags{.eDepth = 1, .eStencil = 1};
                 auto depuse = vkh::VkImageUsageFlags{.eTransferDst = 1, .eSampled = 1, .eDepthStencilAttachment = 1 };
+                depuse = depuse | VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
 
                 this->depthImage = vkt::ImageRegion(std::make_shared<vkt::VmaImageAllocation>(this->getAllocator(), vkh::VkImageCreateInfo{
                     .format = surfaceFormats.depthFormat,
@@ -932,7 +933,7 @@ namespace vkt
                 }, vkt::VmaMemoryInfo{}), vkh::VkImageViewCreateInfo{
                     .format = surfaceFormats.depthFormat,
                     .subresourceRange = vkh::VkImageSubresourceRange{.aspectMask = aspect},
-                }, VK_IMAGE_LAYOUT_GENERAL);
+                }, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
 
                 vkh::handleVk(this->deviceDispatch->CreateSampler(vkh::VkSamplerCreateInfo{
                     .magFilter = VK_FILTER_LINEAR,
@@ -959,11 +960,7 @@ namespace vkt
                     .viewType = VK_IMAGE_VIEW_TYPE_2D,
                     .format = surfaceFormats.colorFormat,
                     .components = vkh::VkComponentMapping{},
-                    .subresourceRange = vkh::VkImageSubresourceRange{aspect, 0, 1, 0, 1} }.also([=](vkh::VkImageViewCreateInfo* it) {
-                        it->flags = flags;
-                        it->subresourceRange.aspectMask = aspect;
-                        return it;
-                    }), nullptr, &views[0]));
+                    .subresourceRange = vkh::VkImageSubresourceRange{aspect, 0, 1, 0, 1} }, nullptr, &views[0]));
                 views[1] = this->depthImage.getImageView(); // depth view
 
                 //
