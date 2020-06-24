@@ -230,23 +230,11 @@ namespace vkt {
     protected: 
         std::optional<T> storage = std::nullopt;
     public: // 
-        //uni_arg<T>() {};
-        //uni_arg<T>(const T& t) : storage(t) {};
-        //explicit uni_arg<T>(const T* t) : storage(*t) {};
-        //uni_arg<T>(const uni_ptr<T>& p) : storage(*p) {}; // UnUsual and Vain
-        //uni_arg<T>(const uni_arg<T>& a) : storage(*a) {};
-
         uni_arg() {};
         uni_arg(const T& t) : storage(t) {};
-        explicit uni_arg(const T* t) : storage(*t) {};
+        uni_arg(const T* t) : storage(*t) {};
         uni_arg(const uni_ptr<T>& p) : storage(*p) {}; // UnUsual and Vain
         uni_arg(const uni_arg<T>& a) : storage(*a) {};
-
-        // 
-        //virtual uni_arg<T>& operator= (const T& ptr) { storage =  ptr; return reinterpret_cast<uni_arg<T>&>(*this); };
-        //virtual uni_arg<T>& operator= (const T* ptr) { storage = *ptr; return reinterpret_cast<uni_arg<T>&>(*this); };
-        //virtual uni_arg<T>& operator= (uni_arg<T> t) { storage =  t.ref(); return reinterpret_cast<uni_arg<T>&>(*this); };
-        //virtual uni_arg<T>& operator= (uni_ptr<T> p) { storage = *p.ptr(); return reinterpret_cast<uni_arg<T>&>(*this); };
 
         //
         virtual uni_arg<T>& operator= (const T& ptr) { storage = ptr; return *this; };
