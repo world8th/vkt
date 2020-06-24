@@ -463,7 +463,7 @@ namespace vkh {
             template_info.pipelineBindPoint = VK_PIPELINE_BIND_POINT_COMPUTE;
             template_info.templateType = VK_DESCRIPTOR_UPDATE_TEMPLATE_TYPE_DESCRIPTOR_SET;
             allocate_info.descriptorPool = pool;
-            allocate_info.pSetLayouts = &template_info.descriptorSetLayout;
+            allocate_info.pSetLayouts = &layout;
             allocate_info.descriptorSetCount = 1u;
         };
 
