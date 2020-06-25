@@ -601,6 +601,10 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
     //
     inline constexpr auto VsDefaultPipelineFlags = VkPipelineCreateFlags{};
     inline constexpr auto VsDefaultPipelineShaderStageFlags = VkPipelineShaderStageCreateFlags{};
+    inline constexpr auto VsDefaultFramebufferFlags = VkFramebufferCreateFlags{};
+    inline constexpr auto VsDefaultGeometryFlags = VkGeometryFlagsNV{};
+    inline constexpr auto VsDefaultBuildAccelerationStructureFlags = VkBuildAccelerationStructureFlagsNV{};
+    inline constexpr auto VsDefaultShaderModuleFlags = VkShaderModuleCreateFlags{};
     inline constexpr auto VsDefaultShaderStageFlags = VkShaderStageFlags{};
 
     //
@@ -651,12 +655,12 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
 
     // Vulkan 1.3
     typedef struct VkPhysicalDeviceSubgroupSizeControlPropertiesEXT {
-        VkStructureType            sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_SIZE_CONTROL_PROPERTIES_EXT;
-        void*                      pNext = nullptr;
-        uint32_t                   minSubgroupSize = 0u;//16u;
-        uint32_t                   maxSubgroupSize = 0u;//64u;
+        VkStructureType            sType                        = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_SIZE_CONTROL_PROPERTIES_EXT;
+        void*                      pNext                        = nullptr;
+        uint32_t                   minSubgroupSize              = 0u;//16u;
+        uint32_t                   maxSubgroupSize              = 0u;//64u;
         uint32_t                   maxComputeWorkgroupSubgroups = 0u;
-        VkShaderStageFlags         requiredSubgroupSizeStages = {};
+        VkShaderStageFlags         requiredSubgroupSizeStages   = VsDefaultShaderStageFlags;
 
         STRUCT_OPERATORS(VkPhysicalDeviceSubgroupSizeControlPropertiesEXT)
         VK_HPP_STRUCT_OPERATORS(VkPhysicalDeviceSubgroupSizeControlPropertiesEXT,vk::PhysicalDeviceSubgroupSizeControlPropertiesEXT)
@@ -826,7 +830,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
 
     // 
     typedef struct VkAttachmentDescription {
-        VkAttachmentDescriptionFlags    flags           = {}; // TODO: FLAGS
+        VkAttachmentDescriptionFlags    flags           = 0u; // TODO: FLAGS
         VkFormat                        format          = VK_FORMAT_R8G8B8A8_UNORM;
         VkSampleCountFlagBits           samples         = VK_SAMPLE_COUNT_1_BIT;
         VkAttachmentLoadOp              loadOp          = VK_ATTACHMENT_LOAD_OP_CLEAR;
@@ -862,14 +866,19 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
     } VkSubpassDescription;
 
     // 
+    inline constexpr auto VsDefaultAccessFlags = VkAccessFlags{};
+    inline constexpr auto VsDefaultDependencyFlags = VkDependencyFlags{};
+    inline constexpr auto VsDefaultPipelineStageFlags = VkPipelineStageFlags{};
+
+    // 
     typedef struct VkSubpassDependency {
         uint32_t                srcSubpass      = 0u;
         uint32_t                dstSubpass      = 0u;
-        VkPipelineStageFlags    srcStageMask    = {};
-        VkPipelineStageFlags    dstStageMask    = {};
-        VkAccessFlags           srcAccessMask   = {};
-        VkAccessFlags           dstAccessMask   = {};
-        VkDependencyFlags       dependencyFlags = {};
+        VkPipelineStageFlags    srcStageMask    = VsDefaultPipelineStageFlags;
+        VkPipelineStageFlags    dstStageMask    = VsDefaultPipelineStageFlags;
+        VkAccessFlags           srcAccessMask   = VsDefaultAccessFlags;
+        VkAccessFlags           dstAccessMask   = VsDefaultAccessFlags;
+        VkDependencyFlags       dependencyFlags = VsDefaultDependencyFlags;
 
         STRUCT_OPERATORS(VkSubpassDependency)
         VK_HPP_STRUCT_OPERATORS(VkSubpassDependency,vk::SubpassDependency)
@@ -894,12 +903,6 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         STRUCT_OPERATORS(VkRenderPassCreateInfo)
         VK_HPP_STRUCT_OPERATORS(VkRenderPassCreateInfo,vk::RenderPassCreateInfo)
     } VkRenderPassCreateInfo;
-
-    // 
-    inline constexpr auto VsDefaultFramebufferFlags = VkFramebufferCreateFlags{};
-    inline constexpr auto VsDefaultGeometryFlags = VkGeometryFlagsNV{};
-    inline constexpr auto VsDefaultBuildAccelerationStructureFlags = VkBuildAccelerationStructureFlagsNV{};
-    inline constexpr auto VsDefaultShaderModuleFlags = VkShaderModuleCreateFlags{};
 
     // 
     typedef struct VkFramebufferCreateInfo {
@@ -1026,9 +1029,6 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         STRUCT_OPERATORS(VkBindAccelerationStructureMemoryInfoNV)
         VK_HPP_STRUCT_OPERATORS(VkBindAccelerationStructureMemoryInfoNV,vk::BindAccelerationStructureMemoryInfoNV)
     } VkBindAccelerationStructureMemoryInfoNV;
-
-    //
-    inline constexpr auto VsDefaultAccessFlags = VkAccessFlags{};
 
     // 
     typedef struct VkMemoryBarrier {
@@ -1501,7 +1501,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
     typedef struct VkCommandBufferBeginInfo {
         VkStructureType                          sType              = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
         const void*                              pNext              = nullptr;
-        VkCommandBufferUsageFlags                flags              = {};
+        VkCommandBufferUsageFlags                flags              = 0u; // TODO: FLAGS
         const VkCommandBufferInheritanceInfo*    pInheritanceInfo   = nullptr;
 
         STRUCT_OPERATORS(VkCommandBufferBeginInfo)
@@ -1544,7 +1544,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
     typedef struct VkInstanceCreateInfo {
         VkStructureType             sType                   = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
         const void*                 pNext                   = nullptr;
-        VkInstanceCreateFlags       flags                   = 0u;
+        VkInstanceCreateFlags       flags                   = 0u; // TODO: FLAGS
         const VkApplicationInfo*    pApplicationInfo        = nullptr;
         uint32_t                    enabledLayerCount       = 0u;
         const char* const*          ppEnabledLayerNames     = nullptr;
@@ -1609,7 +1609,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
     typedef struct VkPipelineCacheCreateInfo {
         VkStructureType               sType             = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
         const void*                   pNext             = nullptr;
-        VkPipelineCacheCreateFlags    flags             = 0u;
+        VkPipelineCacheCreateFlags    flags             = 0u; // TODO: FLAGS
         size_t                        initialDataSize   = 0ull;
         const void*                   pInitialData      = nullptr;
 
@@ -1635,7 +1635,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
     typedef struct VkDeviceQueueCreateInfo {
         VkStructureType             sType            = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
         const void*                 pNext            = nullptr;
-        VkDeviceQueueCreateFlags    flags            = 0u;
+        VkDeviceQueueCreateFlags    flags            = 0u; // TODO: FLAGS
         uint32_t                    queueFamilyIndex = 0u;
         uint32_t                    queueCount       = 0u;
         const float*                pQueuePriorities = nullptr;
@@ -1887,6 +1887,9 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
     } VkPresentInfoKHR;
 
     // 
+    inline constexpr auto VsDefaultImageUsageFlags = VkImageUsageFlags{};
+
+    // 
     typedef struct VkSwapchainCreateInfoKHR {
         VkStructureType                 sType                   = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
         const void*                     pNext                   = nullptr;
@@ -1897,7 +1900,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         VkColorSpaceKHR                 imageColorSpace         = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
         VkExtent2D                      imageExtent             = {1u, 1u};
         uint32_t                        imageArrayLayers        = 1u;
-        VkImageUsageFlags               imageUsage              = { .eColorAttachment = 1};
+        VkImageUsageFlags               imageUsage              = VsDefaultImageUsageFlags;
         VkSharingMode                   imageSharingMode        = VK_SHARING_MODE_EXCLUSIVE;
         uint32_t                        queueFamilyIndexCount   = 1u;
         const uint32_t*                 pQueueFamilyIndices     = nullptr;
@@ -1952,10 +1955,13 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
 #endif
 
     // 
+    inline constexpr auto VsDefaultExternalSemaphoreHandleTypeFlags = VkExternalSemaphoreHandleTypeFlags{};
+
+    // 
     typedef struct VkExportSemaphoreCreateInfo {
         VkStructureType                     sType       = VK_STRUCTURE_TYPE_EXPORT_SEMAPHORE_CREATE_INFO;
         const void*                         pNext       = nullptr;
-        VkExternalSemaphoreHandleTypeFlags  handleTypes = {};
+        VkExternalSemaphoreHandleTypeFlags  handleTypes = VsDefaultExternalSemaphoreHandleTypeFlags;
 
         operator VkExternalSemaphoreHandleTypeFlags&() { return handleTypes; };
         operator const VkExternalSemaphoreHandleTypeFlags&() const { return handleTypes; };
