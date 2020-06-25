@@ -217,10 +217,13 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
     using VkWriteDescriptorSetAccelerationStructureNV = VkWriteDescriptorSetAccelerationStructureKHR;
 
     // 
+    inline constexpr auto VsDefaultDescriptorPoolFlags = VkDescriptorPoolCreateFlags{};
+
+    // 
     typedef struct VkDescriptorPoolCreateInfo {
         VkStructureType                     sType            = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
         const void*                         pNext            = nullptr;
-        VkDescriptorPoolCreateFlags         flags            = {}; // TODO: FLAGS
+        VkDescriptorPoolCreateFlags         flags            = VsDefaultDescriptorPoolFlags; // TODO: FLAGS
         uint32_t                            maxSets          = 256u;
         uint32_t                            poolSizeCount    = 0u;
         const vkh::VkDescriptorPoolSize*    pPoolSizes       = nullptr;
@@ -229,11 +232,16 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         VK_HPP_STRUCT_OPERATORS(VkDescriptorPoolCreateInfo,vk::DescriptorPoolCreateInfo)
     } VkDescriptorPoolCreateInfo;
 
+    //
+    inline constexpr auto VsDefaultBufferViewFlags = VkBufferViewCreateFlags{};
+    inline constexpr auto VsDefaultBufferFlags = VkBufferCreateFlags{};
+    inline constexpr auto VsDefaultBufferUsage = VkBufferUsageFlags{};
+
     // 
     typedef struct VkBufferViewCreateInfo {
         VkStructureType            sType    = VK_STRUCTURE_TYPE_BUFFER_VIEW_CREATE_INFO;
         const void*                pNext    = nullptr;
-        VkBufferViewCreateFlags    flags    = {}; // TODO: FLAGS
+        VkBufferViewCreateFlags    flags    = VsDefaultBufferViewFlags; // TODO: FLAGS
         VkBuffer                   buffer   = VK_NULL_HANDLE;
         VkFormat                   format   = VK_FORMAT_R32G32B32A32_SFLOAT;
         VkDeviceSize               offset   = 0u;
@@ -242,10 +250,6 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         STRUCT_OPERATORS(VkBufferViewCreateInfo)
         VK_HPP_STRUCT_OPERATORS(VkBufferViewCreateInfo,vk::BufferViewCreateInfo)
     } VkBufferViewCreateInfo;
-
-    //
-    inline constexpr auto VsDefaultBufferFlags = VkBufferCreateFlags{};
-    inline constexpr auto VsDefaultBufferUsage = VkBufferUsageFlags{};
 
     //
     typedef struct VkBufferCreateInfo {

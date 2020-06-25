@@ -183,8 +183,8 @@ namespace vkt
             "VK_KHR_external_semaphore_win32",
             //"VK_KHR_external_semaphore_fd",
 
+            // 
             "VK_NV_external_memory",
-            "VK_NV_external_memory_capabilities",
             "VK_NV_external_memory_capabilities",
             "VK_NV_external_memory_win32",
 
@@ -933,7 +933,7 @@ namespace vkt
                 }, vkt::VmaMemoryInfo{}), vkh::VkImageViewCreateInfo{
                     .format = surfaceFormats.depthFormat,
                     .subresourceRange = vkh::VkImageSubresourceRange{.aspectMask = aspect},
-                }, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
+                }, VK_IMAGE_LAYOUT_GENERAL);
 
                 vkh::handleVk(this->deviceDispatch->CreateSampler(vkh::VkSamplerCreateInfo{
                     .magFilter = VK_FILTER_LINEAR,
@@ -981,6 +981,17 @@ namespace vkt
                         })
                     });
                 }
+
+                vkt::imageBarrier(cmd, vkt::ImageBarrierInfo{
+                    .image = this->depthImage.getImage(),
+                    .targetLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
+                    .originLayout = VK_IMAGE_LAYOUT_GENERAL,
+                    .subresourceRange = vkh::VkImageSubresourceRange{ {}, 0u, 1u, 0u, 1u }.also([=](auto* it) {
+                        auto aspect = vkh::VkImageAspectFlags{.eDepth = 1u, .eStencil = 1u };
+                        it->aspectMask = aspect;
+                        return it;
+                    })
+                });
             });
         }
 
