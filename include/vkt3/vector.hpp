@@ -370,6 +370,7 @@ namespace vkt {
             this->allocation = allocation;
             this->bufInfo = vkh::VkDescriptorBufferInfo{ static_cast<VkBuffer>(allocation->buffer),offset,size };
             this->bufRegion = vkh::VkStridedBufferRegionKHR{ static_cast<VkBuffer>(allocation->buffer),offset,stride, this->ranged() / stride };
+            this->bufInfo.range = this->ranged();
             return this;
         };
 
@@ -380,7 +381,7 @@ namespace vkt {
                 .format = static_cast<VkFormat>(format),
                 .offset = this->bufRegion.offset,
                 .range = this->bufInfo.range
-                }, nullptr, &view));
+            }, nullptr, &view));
             return view;
         };
 
@@ -576,6 +577,7 @@ namespace vkt {
             this->allocation = V.uniPtr();
             this->bufInfo = vkh::VkDescriptorBufferInfo{ static_cast<VkBuffer>(V.buffer()), V.offset(), V.range() };
             this->bufRegion = vkh::VkStridedBufferRegionKHR{ static_cast<VkBuffer>(V.buffer()), V.offset(), sizeof(T), V.ranged() / sizeof(T) };
+            this->bufInfo.range = this->ranged();
             return *this;
         };
 

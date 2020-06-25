@@ -85,10 +85,11 @@ namespace vkt {
 
             //
             if (descriptorSet && created) {
-                const auto writes = helper.setDescriptorSet(descriptorSet).mapWriteDescriptorSet();
+                const auto& writes = helper.setDescriptorSet(descriptorSet).mapWriteDescriptorSet();
                 device->UpdateDescriptorSets(writes.size(), reinterpret_cast<const VkWriteDescriptorSet*>(writes.data()), 0u, nullptr);
             };
 
+            // 
             protection = true;
         };
 
