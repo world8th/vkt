@@ -972,8 +972,13 @@ namespace vkt
                 for (int i = 0; i < swapchainImages.size(); i++) {
                     vkt::imageBarrier(cmd, vkt::ImageBarrierInfo{
                         .image = swapchainImages[i],
-                        .targetLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
+                        .targetLayout = VK_IMAGE_LAYOUT_GENERAL,
                         .originLayout = VK_IMAGE_LAYOUT_UNDEFINED,
+                        .subresourceRange = vkh::VkImageSubresourceRange{ {}, 0u, 1u, 0u, 1u }.also([=](auto* it) {
+                            auto aspect = vkh::VkImageAspectFlags{.eColor = 1u };
+                            it->aspectMask = aspect;
+                            return it;
+                        })
                     });
                 }
             });

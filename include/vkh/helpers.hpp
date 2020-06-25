@@ -734,7 +734,7 @@ namespace vkh {
             uintptr_t ptr = attachments.size(); attachments.push_back(attachment); auto& layout = attachments.back().finalLayout;
             if (layout == VK_IMAGE_LAYOUT_UNDEFINED) { layout = VK_IMAGE_LAYOUT_GENERAL; };
             if (subpasses.size() < 1u) { beginSubpass(); };
-            input_attachments.back().push_back({ .attachment = static_cast<uint32_t>(ptr), .layout = layout });
+            input_attachments.back().push_back({ .attachment = static_cast<uint32_t>(ptr), .layout = VK_IMAGE_LAYOUT_GENERAL });
             return *this;
         };
 
@@ -743,7 +743,7 @@ namespace vkh {
             uintptr_t ptr = attachments.size(); attachments.push_back(attachment); auto& layout = attachments.back().finalLayout;
             if (layout == VK_IMAGE_LAYOUT_UNDEFINED) { layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL; };
             if (subpasses.size() < 1u) { beginSubpass(); };
-            color_attachments.back().push_back({ .attachment = static_cast<uint32_t>(ptr), .layout = layout });
+            color_attachments.back().push_back({ .attachment = static_cast<uint32_t>(ptr), .layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL });
             return *this;
         };
 
@@ -752,7 +752,7 @@ namespace vkh {
             uintptr_t ptr = attachments.size(); attachments.push_back(attachment); auto& layout = attachments.back().finalLayout;
             if (layout == VK_IMAGE_LAYOUT_UNDEFINED) { layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL; };
             if (subpasses.size() < 1u) { beginSubpass(); };
-            depth_stencil_attachment.back() = { .attachment = static_cast<uint32_t>(ptr), .layout = layout };
+            depth_stencil_attachment.back() = { .attachment = static_cast<uint32_t>(ptr), .layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL };
             return *this;
         };
 
