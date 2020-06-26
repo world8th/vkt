@@ -274,6 +274,7 @@ namespace vkt
         vk::PhysicalDeviceFloat16Int8FeaturesKHR gFloat16U8{}; // Vulkan 1.3
         vk::PhysicalDeviceBufferDeviceAddressFeatures gDeviceAddress{};
         vk::PhysicalDeviceFragmentShaderBarycentricFeaturesNV gBarycentric{};
+        vk::PhysicalDeviceExtendedDynamicStateFeaturesEXT gExtendedDynamic{};
 
         // XVK loaded (NEW!)
         VmaVulkanFunctions func = {};
@@ -568,6 +569,7 @@ namespace vkt
             this->usedDeviceLayers = deviceLayers;
 
             // 
+            this->gBarycentric.pNext = &this->gExtendedDynamic;
             this->gRayTracing.pNext = &this->gBarycentric;
             this->gTrasformFeedback.pNext = &this->gRayTracing;
             this->gDeviceAddress.pNext = &this->gTrasformFeedback;
@@ -637,6 +639,7 @@ namespace vkt
                 vkh::handleVk(this->deviceDispatch->CreatePipelineCache(vkh::VkPipelineCacheCreateInfo(), nullptr, &this->pipelineCache));
                 this->device = this->deviceDispatch->handle;
                 vkt::vkGlobal::device = this->deviceDispatch.get_shared();
+                //vkt::vkGlobal::volkDevice();
             };
 
             //

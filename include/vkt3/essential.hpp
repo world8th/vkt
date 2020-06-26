@@ -415,6 +415,7 @@ namespace vkt {
         std::shared_ptr<xvk::Instance> instanceDispatch = vkGlobal::instance;
         std::shared_ptr<xvk::Device> deviceDispatch = vkGlobal::device;
 
+
         // Resolve JavaCPP Problem...
         VmaMemoryInfo& setDeviceDispatch(std::shared_ptr<xvk::Device> ptr) { deviceDispatch = ptr; return *this; };
         VmaMemoryInfo& setInstanceDispatch(std::shared_ptr<xvk::Instance> ptr) { instanceDispatch = ptr; return *this; };

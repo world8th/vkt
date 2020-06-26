@@ -1,3 +1,6 @@
 [submodule "include/xvk"]
 	path = include/xvk
 	url = https://github.com/Vulkan4D/xvk.git
+[submodule "include/volk"]
+	path = include/volk
+	url = https://github.com/zeux/volk.git

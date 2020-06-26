@@ -13,7 +13,7 @@
 #include <iostream>
 #include <vector>
 
-// 
+//
 #include <misc/soa_vector.hpp>
 #include <misc/half.hpp>
 
@@ -68,14 +68,17 @@
 //
 #include <vulkan/vulkan.h>
 
-// When enabled, use Vulkan-HPP support...
-#ifdef ENABLE_VULKAN_HPP
-#include <vulkan/vulkan.hpp>
-#endif
-
 // 
 #ifdef VKT_CORE_ENABLE_XVK
 #include <xvk/xvk.hpp>
+//#define VK_NO_PROTOTYPES
+//#include <volk.h>
+#endif
+
+// When enabled, use Vulkan-HPP support...
+#ifdef ENABLE_VULKAN_HPP
+#define VULKAN_HPP_ENABLE_DYNAMIC_LOADER_TOOL 0 // Avoid XVK conflict
+#include <vulkan/vulkan.hpp>
 #endif
 
 
