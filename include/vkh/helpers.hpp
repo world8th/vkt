@@ -106,22 +106,22 @@ namespace vkh {
         return data;
     };
 
-    inline auto vsEnumerateInstanceExtensionProperties(const std::string layerName = "") {
-        uint32_t count = 0u; handleVk(vkEnumerateInstanceExtensionProperties(layerName.c_str(), &count, nullptr));
+    inline auto vsEnumerateInstanceExtensionProperties(vkt::uni_ptr<xvk::Loader> loader, const std::string layerName = "") {
+        uint32_t count = 0u; handleVk(loader->vkEnumerateInstanceExtensionProperties(layerName.c_str(), &count, nullptr));
         std::vector<VkExtensionProperties> data(count);
-        handleVk(vkEnumerateInstanceExtensionProperties(layerName.c_str(), &count, data.data()));
+        handleVk(loader->vkEnumerateInstanceExtensionProperties(layerName.c_str(), &count, data.data()));
         return data;
     };
 
-    inline auto vsEnumerateInstanceLayerProperties() {
-        uint32_t count = 0u; handleVk(vkEnumerateInstanceLayerProperties(&count, nullptr));
+    inline auto vsEnumerateInstanceLayerProperties(vkt::uni_ptr<xvk::Loader> loader) {
+        uint32_t count = 0u; handleVk(loader->vkEnumerateInstanceLayerProperties(&count, nullptr));
         std::vector<VkLayerProperties> data(count);
-        handleVk(vkEnumerateInstanceLayerProperties(&count, data.data()));
+        handleVk(loader->vkEnumerateInstanceLayerProperties(&count, data.data()));
         return data;
     };
 
-    inline auto vsEnumerateInstanceVersion() {
-        uint32_t version = 0u; handleVk(vkEnumerateInstanceVersion(&version));
+    inline auto vsEnumerateInstanceVersion(vkt::uni_ptr<xvk::Loader> loader) {
+        uint32_t version = 0u; handleVk(loader->vkEnumerateInstanceVersion(&version));
         return version;
     };
 

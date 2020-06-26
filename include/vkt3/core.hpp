@@ -56,6 +56,11 @@
 #endif
 
 // 
+#ifdef VKT_CORE_ENABLE_XVK
+#include <xvk/xvk.hpp>
+#endif
+
+// 
 #ifdef VKT_CORE_ENABLE_VMA
 #include <vma/vk_mem_alloc.h>
 #endif
@@ -67,13 +72,6 @@
 
 //
 #include <vulkan/vulkan.h>
-
-// 
-#ifdef VKT_CORE_ENABLE_XVK
-#include <xvk/xvk.hpp>
-//#define VK_NO_PROTOTYPES
-//#include <volk.h>
-#endif
 
 // When enabled, use Vulkan-HPP support...
 #ifdef ENABLE_VULKAN_HPP

@@ -1971,7 +1971,6 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         VK_HPP_STRUCT_OPERATORS(VkExportSemaphoreCreateInfo, vk::ExportSemaphoreCreateInfo)
     } VkExportSemaphoreCreateInfo;
 
-
 #pragma pack(pop)
 
 #pragma pack(push, 1)

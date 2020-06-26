@@ -207,7 +207,7 @@ namespace vkt
 
         // instance layers
         std::vector<const char*> wantedLayers = {
-            "VK_LAYER_KHRONOS_validation",
+            //"VK_LAYER_KHRONOS_validation",
 
             "VK_LAYER_LUNARG_assistant_layer",
             "VK_LAYER_LUNARG_standard_validation",
@@ -438,7 +438,7 @@ namespace vkt
         };
 
         inline VkInstance& createInstance() {
-            assert((instanceVersion = vkh::vsEnumerateInstanceVersion()) >= VK_MAKE_VERSION(1, 2, 131));
+            assert((instanceVersion = vkh::vsEnumerateInstanceVersion(vkGlobal::loader)) >= VK_MAKE_VERSION(1, 2, 131));
 
             // get required extensions
 #ifdef VKT_ENABLE_GLFW_SUPPORT
@@ -454,7 +454,7 @@ namespace vkt
 #endif
 
             // get our needed extensions
-            auto installedExtensions = vkh::vsEnumerateInstanceExtensionProperties();
+            auto installedExtensions = vkh::vsEnumerateInstanceExtensionProperties(vkGlobal::loader);
             auto extensions = std::vector<const char*>();
             for (auto w : wantedExtensions) {
                 for (auto i : installedExtensions)
@@ -468,7 +468,7 @@ namespace vkt
             }
 
             // get validation layers
-            auto installedLayers = vkh::vsEnumerateInstanceLayerProperties();
+            auto installedLayers = vkh::vsEnumerateInstanceLayerProperties(vkGlobal::loader);
             auto layers = std::vector<const char*>();
             for (auto w : wantedLayers) {
                 for (auto i : installedLayers)
