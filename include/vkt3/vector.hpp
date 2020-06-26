@@ -368,8 +368,8 @@ namespace vkt {
         //
         virtual VectorBase* construct(vkt::uni_ptr<BufferAllocation> allocation, vkt::uni_arg<VkDeviceSize> offset = uint64_t(0ull), vkt::uni_arg<VkDeviceSize> size = VK_WHOLE_SIZE, vkt::uni_arg<VkDeviceSize> stride = 1u) {
             this->allocation = allocation;
-            this->bufInfo = vkh::VkDescriptorBufferInfo{ static_cast<VkBuffer>(allocation->buffer),offset,size };
-            this->bufRegion = vkh::VkStridedBufferRegionKHR{ static_cast<VkBuffer>(allocation->buffer),offset,stride, this->ranged() / stride };
+            this->bufInfo = vkh::VkDescriptorBufferInfo{ static_cast<VkBuffer>(allocation->buffer), offset, size };
+            this->bufRegion = vkh::VkStridedBufferRegionKHR{ static_cast<VkBuffer>(allocation->buffer), offset, stride, this->ranged() / stride };
             this->bufInfo.range = this->ranged();
             return this;
         };
@@ -395,6 +395,7 @@ namespace vkt {
             this->allocation = V.uniPtr();
             this->bufInfo = vkh::VkDescriptorBufferInfo{ static_cast<VkBuffer>(V.buffer()), V.offset(), V.range() };
             this->bufRegion = vkh::VkStridedBufferRegionKHR{ static_cast<VkBuffer>(V.buffer()), V.offset(), sizeof(T), V.ranged() / sizeof(T) };
+            this->bufInfo.range = this->ranged();
             return *this;
         };
 
