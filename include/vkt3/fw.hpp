@@ -205,7 +205,7 @@ namespace vkt
 
         // instance layers
         std::vector<const char*> wantedLayers = {
-            "VK_LAYER_KHRONOS_validation",
+            //"VK_LAYER_KHRONOS_validation",
 
             "VK_LAYER_LUNARG_assistant_layer",
             "VK_LAYER_LUNARG_standard_validation",
