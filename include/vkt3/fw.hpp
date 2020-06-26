@@ -87,6 +87,7 @@ namespace vkt
             "VK_EXT_conservative_rasterization",
             "VK_EXT_hdr_metadata",
             "VK_EXT_transform_feedback",
+            "VK_EXT_extended_dynamic_state",
 
             // 
             "VK_EXT_descriptor_indexing",
@@ -145,6 +146,7 @@ namespace vkt
             // 
             "VK_KHR_incremental_present",
             "VK_KHR_ray_tracing",
+            "VK_KHR_ray_query",
             "VK_KHR_pipeline_library",
             "VK_KHR_deferred_host_operations",
             "VK_KHR_buffer_device_address",
@@ -205,7 +207,7 @@ namespace vkt
 
         // instance layers
         std::vector<const char*> wantedLayers = {
-            //"VK_LAYER_KHRONOS_validation",
+            "VK_LAYER_KHRONOS_validation",
 
             "VK_LAYER_LUNARG_assistant_layer",
             "VK_LAYER_LUNARG_standard_validation",
@@ -272,7 +274,6 @@ namespace vkt
         vk::PhysicalDeviceFloat16Int8FeaturesKHR gFloat16U8{}; // Vulkan 1.3
         vk::PhysicalDeviceBufferDeviceAddressFeatures gDeviceAddress{};
         vk::PhysicalDeviceFragmentShaderBarycentricFeaturesNV gBarycentric{};
-
 
         // XVK loaded (NEW!)
         VmaVulkanFunctions func = {};
