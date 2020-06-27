@@ -389,12 +389,12 @@ namespace vkt {
         virtual vkt::uni_ptr<BufferAllocation>& uniPtr() { return allocation; };
         virtual vkt::uni_ptr<BufferAllocation> uniPtr() const { return allocation; };
 
-        // 
-        template<class Tm = T> VectorBase(const vkt::uni_arg<Vector<Tm>>& V) : allocation(V), bufInfo({ V.buffer(), V.offset(), V.range() }) { *this = V; };
+        //
+        template<class Tm = T> VectorBase(const vkt::uni_arg<Vector<Tm>>& V) : allocation(V), bufInfo({ V.buffer(), V.offset(), V.ranged() }) { *this = V; };
         template<class Tm = T> inline VectorBase& operator=(const vkt::uni_arg<Vector<Tm>>& V) {
             this->allocation = V.uniPtr();
-            this->bufInfo = vkh::VkDescriptorBufferInfo{ static_cast<VkBuffer>(V.buffer()), V.offset(), V.range() };
-            this->bufRegion = vkh::VkStridedBufferRegionKHR{ static_cast<VkBuffer>(V.buffer()), V.offset(), sizeof(T), V.ranged() / sizeof(T) };
+            this->bufInfo = vkh::VkDescriptorBufferInfo{ static_cast<VkBuffer>(V.buffer()), V.offset(), V.ranged() };
+            this->bufRegion = vkh::VkStridedBufferRegionKHR{ static_cast<VkBuffer>(V.buffer()), V.offset(), V.stride(), (V.ranged() / V.stride())*V.stride() };
             this->bufInfo.range = this->ranged();
             return *this;
         };
@@ -576,8 +576,8 @@ namespace vkt {
         template<class Tm = T> Vector(const vkt::uni_arg<Vector<Tm>>& V)  { *this = V; };
         template<class Tm = T> inline Vector<T>& operator=(const vkt::uni_arg<Vector<Tm>>& V) {
             this->allocation = V.uniPtr();
-            this->bufInfo = vkh::VkDescriptorBufferInfo{ static_cast<VkBuffer>(V.buffer()), V.offset(), V.range() };
-            this->bufRegion = vkh::VkStridedBufferRegionKHR{ static_cast<VkBuffer>(V.buffer()), V.offset(), sizeof(T), V.ranged() / sizeof(T) };
+            this->bufInfo = vkh::VkDescriptorBufferInfo{ static_cast<VkBuffer>(V.buffer()), V.offset(), V.ranged() };
+            this->bufRegion = vkh::VkStridedBufferRegionKHR{ static_cast<VkBuffer>(V.buffer()), V.offset(), V.stride(), (V.ranged() / V.stride())*V.stride() };
             this->bufInfo.range = this->ranged();
             return *this;
         };
