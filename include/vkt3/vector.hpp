@@ -588,7 +588,7 @@ namespace vkt {
         //template<class Tm = T> const vkt::uni_arg<Vector<Tm>>& cast() const { return Vector<Tm>(reinterpret_cast<Vector<T>&>(*this)); };
 
         // align by typed stride
-        virtual Vector<T>& trim() { this->bufRegion.stride = sizeof(T); this->bufRegion.size = this->bufInfo.range / this->bufRegion.stride; return *this; };
+        virtual Vector<T>& trim() { this->bufRegion.stride = sizeof(T); return *this; };
 
         // 
         virtual Vector<T>* address() { return this; };
