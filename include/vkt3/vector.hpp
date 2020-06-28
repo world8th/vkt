@@ -351,20 +351,22 @@ namespace vkt {
         VectorBase(const std::shared_ptr<BufferAllocation>& allocation, vkt::uni_arg<VkDeviceSize> offset = uint64_t(0ull), vkt::uni_arg<VkDeviceSize> size = VK_WHOLE_SIZE, vkt::uni_arg<VkDeviceSize> stride = 1u) : allocation(allocation), bufInfo({ allocation->buffer, offset, size }) { this->construct(allocation, offset, size, stride); };
         VectorBase(const std::shared_ptr<VmaBufferAllocation>& allocation, vkt::uni_arg<VkDeviceSize> offset = uint64_t(0ull), vkt::uni_arg<VkDeviceSize> size = VK_WHOLE_SIZE, vkt::uni_arg<VkDeviceSize> stride = 1u) : allocation(std::dynamic_pointer_cast<BufferAllocation>(allocation)), bufInfo({ allocation->buffer, offset, size }) { this->construct(std::dynamic_pointer_cast<BufferAllocation>(allocation), offset, size, stride); };
 
-        // 
+        //
         virtual const uint8_t* mapv(const uintptr_t& i = 0u) const { const_cast<VectorBase*>(this)->pMapped = const_cast<uint8_t*>(reinterpret_cast<const uint8_t*>(allocation->mapped()) + offset()); return &pMapped[i]; };
         virtual uint8_t* const mapv(const uintptr_t& i = 0u) { this->pMapped = reinterpret_cast<uint8_t*>(allocation->mapped()) + offset(); return &pMapped[i]; };
 
-        // 
+        //
         virtual const uint8_t* mappedv(const uintptr_t& i = 0u) const { const_cast<VectorBase*>(this)->pMapped = const_cast<uint8_t*>(reinterpret_cast<const uint8_t*>(allocation->mapped()) + offset()); return &pMapped[i]; };
         virtual uint8_t* const mappedv(const uintptr_t& i = 0u) { this->pMapped = reinterpret_cast<uint8_t*>(allocation->mapped()) + offset(); return &pMapped[i]; };
 
         //
         virtual VectorBase* construct(vkt::uni_ptr<BufferAllocation> allocation, vkt::uni_arg<VkDeviceSize> offset = uint64_t(0ull), vkt::uni_arg<VkDeviceSize> size = VK_WHOLE_SIZE, vkt::uni_arg<VkDeviceSize> stride = 1u) {
+            const auto striding = (*stride != 0ull ? *stride : 1ull);
+            const auto rangeLim = this->ranged();
             this->allocation = allocation;
             this->bufInfo = vkh::VkDescriptorBufferInfo{ static_cast<VkBuffer>(allocation->buffer), offset, size };
-            this->bufRegion = vkh::VkStridedBufferRegionKHR{ static_cast<VkBuffer>(allocation->buffer), offset, stride, this->ranged() / stride };
-            this->bufInfo.range = this->ranged();
+            this->bufRegion = vkh::VkStridedBufferRegionKHR{ static_cast<VkBuffer>(allocation->buffer), offset, striding, (rangeLim / striding) * striding };
+            this->bufInfo.range = rangeLim;
             return this;
         };
 
@@ -431,12 +433,13 @@ namespace vkt {
         virtual VkDeviceSize ranged() const { return (this->bufInfo.range != VK_WHOLE_SIZE ? std::min(VkDeviceSize(this->bufInfo.range), VkDeviceSize(this->allocation->range() - this->offset())) : VkDeviceSize(this->allocation->range() - this->offset())); };
 
         // Get static and cached value
-        virtual VkDeviceSize& range() { return (this->bufInfo.range = (this->bufRegion.size * this->bufRegion.stride - 0u)); };
-        virtual VkDeviceSize  range() const { return (this->bufRegion.size * this->bufRegion.stride - 0u); };
+        virtual VkDeviceSize& range() { return (this->bufInfo.range = (this->size() * this->bufRegion.stride - 0u)); };
+        virtual VkDeviceSize  range() const { return (this->size() * this->bufRegion.stride - 0u); };
 
-        //virtual VkDeviceSize size() const { return this->range() / this->stride; };
-        virtual const VkDeviceSize& size() const { return this->bufRegion.size; };
-        virtual VkDeviceSize& size() { return this->bufRegion.size; };
+        //
+        virtual VkDeviceSize size() const { return (this->bufInfo.range/this->bufRegion.stride); };
+        //virtual const VkDeviceSize& size() const { return this->bufRegion.size; };
+        //virtual VkDeviceSize& size() { return this->bufRegion.size; };
 
         // 
         virtual const VkDeviceSize& stride() const { return this->bufRegion.stride; };
@@ -585,7 +588,7 @@ namespace vkt {
         //template<class Tm = T> const vkt::uni_arg<Vector<Tm>>& cast() const { return Vector<Tm>(reinterpret_cast<Vector<T>&>(*this)); };
 
         // align by typed stride
-        virtual Vector<T>& trim() { this->bufRegion.stride = sizeof(T); return *this; };
+        virtual Vector<T>& trim() { this->bufRegion.stride = sizeof(T); this->bufRegion.size = this->bufInfo.range / this->bufRegion.stride; return *this; };
 
         // 
         virtual Vector<T>* address() { return this; };
