@@ -34,6 +34,7 @@
 #endif
 
 // Force include for avoid GLAD problem...
+#include "core.hpp"
 #include "essential.hpp"
 #include "vector.hpp"
 #include "image.hpp"
@@ -930,14 +931,17 @@ namespace vkt
                 auto depuse = vkh::VkImageUsageFlags{.eTransferDst = 1, .eSampled = 1, .eDepthStencilAttachment = 1 };
                 depuse = depuse | VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
 
-                this->depthImage = vkt::ImageRegion(std::make_shared<vkt::VmaImageAllocation>(this->getAllocator(), vkh::VkImageCreateInfo{
-                    .format = surfaceFormats.depthFormat,
-                    .extent = vkh::VkExtent3D{applicationWindow.surfaceSize.width, applicationWindow.surfaceSize.height, 1u},
-                    .usage = depuse,
-                }, vkt::VmaMemoryInfo{}), vkh::VkImageViewCreateInfo{
-                    .format = surfaceFormats.depthFormat,
-                    .subresourceRange = vkh::VkImageSubresourceRange{.aspectMask = aspect},
-                }, VK_IMAGE_LAYOUT_GENERAL);
+                vkt::VmaMemoryInfo memInfo = {};
+                this->depthImage = vkt::ImageRegion(std::make_shared<vkt::VmaImageAllocation>(this->getAllocator(), vkh::VkImageCreateInfo{}.also([=](vkh::VkImageCreateInfo* it){
+                    it->format = surfaceFormats.depthFormat,
+                    it->extent = vkh::VkExtent3D{ applicationWindow.surfaceSize.width, applicationWindow.surfaceSize.height, 1u },
+                    it->usage = depuse;
+                    return it;
+                }), memInfo), vkh::VkImageViewCreateInfo{}.also([=](vkh::VkImageViewCreateInfo* it){
+                    it->format = surfaceFormats.depthFormat,
+                    it->subresourceRange = vkh::VkImageSubresourceRange{ .aspectMask = aspect };
+                    return it;
+                }), VK_IMAGE_LAYOUT_GENERAL);
 
                 vkh::handleVk(this->deviceDispatch->CreateSampler(vkh::VkSamplerCreateInfo{
                     .magFilter = VK_FILTER_LINEAR,
@@ -958,13 +962,15 @@ namespace vkt
                 // Image Views
                 auto flags = VkImageViewCreateFlags{};
                 auto aspect = vkh::VkImageAspectFlags{.eColor = 1};
-                vkh::handleVk(deviceDispatch->CreateImageView(vkh::VkImageViewCreateInfo{
-                    .flags = {},
-                    .image = swapchainImages[i],
-                    .viewType = VK_IMAGE_VIEW_TYPE_2D,
-                    .format = surfaceFormats.colorFormat,
-                    .components = vkh::VkComponentMapping{},
-                    .subresourceRange = vkh::VkImageSubresourceRange{aspect, 0, 1, 0, 1} }, nullptr, &views[0]));
+                vkh::handleVk(deviceDispatch->CreateImageView(vkh::VkImageViewCreateInfo{}.also([=](vkh::VkImageViewCreateInfo* it) {
+                    it->flags = {},
+                    it->image = swapchainImages[i],
+                    it->viewType = VK_IMAGE_VIEW_TYPE_2D,
+                    it->format = surfaceFormats.colorFormat,
+                    it->components = vkh::VkComponentMapping{},
+                    it->subresourceRange = vkh::VkImageSubresourceRange{ aspect, 0, 1, 0, 1 };
+                    return it;
+                }), nullptr, &views[0]));
                 views[1] = this->depthImage.getImageView(); // depth view
 
                 //
