@@ -305,6 +305,10 @@ namespace vkh {
         uintptr_t hitOffsetIndex() { return missShaderGroups.size()+missOffsetIndex(); };
         uintptr_t groupCount() { return missShaderGroups.size() + hitShaderGroups.size() + 1u; };
 
+        //
+        size_t missShaderCount() { return missShaderGroups.size(); };
+        size_t hitShaderCount() { return hitShaderGroups.size(); };
+
         // 
         VsRayTracingPipelineCreateInfoHelper(const VkRayTracingPipelineCreateInfoKHR& info = {}) : vkInfo(info) {};
 
