@@ -15,7 +15,7 @@
 //
 #include <spirv/unified1/GLSL.std.450.h>
 #include <spirv/unified1/spirv.hpp>
-#include <spirv_cross_c.h>
+#include <spirv_cross/spirv_cross_c.h>
 
 //
 namespace vkh {
@@ -129,27 +129,29 @@ namespace vkh {
                                     (spv::Op::OpDecorate | (4u << 16u)),
                                     uint32_t(nameID),
                                     spv::Decoration::DecorationXfbStride,
-                                    semantics[loc->second].stride
+                                    semantics.at(loc->second).stride
                             });
                         };
 
                         // Place Buffers info
                         if (buffers.find(nameID) == buffers.end() || buffersExist.find(nameID) == buffersExist.end()) {
+                            const int location = loc->second;
                             modSource.insert(modSource.begin() + shift, {
                                     (spv::Op::OpDecorate | (4u << 16u)),
                                     uint32_t(nameID),
                                     spv::Decoration::DecorationXfbBuffer,
-                                    semantics[loc->second].buffer
+                                    semantics.at(loc->second).buffer
                             });
                         };
 
                         // Place Offset info
                         if (offsets.find(nameID) == offsets.end() || offsetsExist.find(nameID) == offsetsExist.end()) {
+                            const int location = loc->second;
                             modSource.insert(modSource.begin() + shift, {
                                     (spv::Op::OpDecorate | (4u << 16u)),
                                     uint32_t(nameID),
                                     spv::Decoration::DecorationOffset,
-                                    semantics[loc->second].offset
+                                    semantics.at(loc->second).offset
                             });
                         };
 
