@@ -48,12 +48,12 @@ namespace vkh {
         std::unordered_map<int, int> buffers = {};
         std::unordered_map<int, int> outputs = {};
 
-        //
-        std::unordered_map<int, bool> mappingExist = {};
-        std::unordered_map<int, bool> stridesExist = {};
-        std::unordered_map<int, bool> offsetsExist = {};
-        std::unordered_map<int, bool> buffersExist = {};
-        std::unordered_map<int, bool> outputsExist = {};
+        // Where Located That Decorations? (for future usage)
+        std::unordered_map<int, size_t> mappingExist = {};
+        std::unordered_map<int, size_t> stridesExist = {};
+        std::unordered_map<int, size_t> offsetsExist = {};
+        std::unordered_map<int, size_t> buffersExist = {};
+        std::unordered_map<int, size_t> outputsExist = {};
 
         // Getting for names and per names...
         // Checking if decorations exists!
@@ -64,13 +64,13 @@ namespace vkh {
                 int name = unModSource[i + 1];
                 {
                     if (spv::Decoration(unModSource[i + 2]) == spv::Decoration::DecorationXfbStride) {
-                        stridesExist[name] = true;
+                        stridesExist[name] = i;
                     };
                     if (spv::Decoration(unModSource[i + 2]) == spv::Decoration::DecorationOffset) {
-                        offsetsExist[name] = true;
+                        offsetsExist[name] = i;
                     };
                     if (spv::Decoration(unModSource[i + 2]) == spv::Decoration::DecorationXfbBuffer) {
-                        buffersExist[name] = true;
+                        buffersExist[name] = i;
                     };
                 };
             } else if (op == spv::Op::OpName) {
@@ -152,6 +152,8 @@ namespace vkh {
                                     semantics[loc->second].offset
                             });
                         };
+
+                        // Placed! Let's Restart! (For Correct)
                         {
                             done = true;
                             break;
