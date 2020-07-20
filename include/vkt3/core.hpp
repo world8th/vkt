@@ -55,16 +55,6 @@
 #endif
 #endif
 
-// 
-#ifdef VKT_CORE_ENABLE_XVK
-#include <xvk/xvk.hpp>
-#endif
-
-// 
-#ifdef VKT_CORE_ENABLE_VMA
-#include <vma/vk_mem_alloc.h>
-#endif
-
 // Enable Vulkan-HPP when defined
 #ifdef VULKAN_HPP
 #define ENABLE_VULKAN_HPP
@@ -79,6 +69,15 @@
 #include <vulkan/vulkan.hpp>
 #endif
 
+// 
+#ifdef VKT_CORE_ENABLE_XVK
+#include <xvk/xvk.hpp>
+#endif
+
+// 
+#ifdef VKT_CORE_ENABLE_VMA
+#include <vma/vk_mem_alloc.h>
+#endif
 
 #define ASSIGN(obj,name) obj.name=name;
 

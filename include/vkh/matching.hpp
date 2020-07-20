@@ -16,9 +16,9 @@ namespace vkh {
 
     /// Get the details of vulkan texture formats.
     // TODO: Remove Vulkan-HPP Requirements
-    inline BlockParams getBlockParams(vk::Format format) {
+    inline BlockParams getBlockParams(VkFormat format) {
 #ifdef VULKAN_HPP
-        switch (format) {
+        switch (vk::Format(format)) {
             case vk::Format::eR4G4UnormPack8: return BlockParams{1, 1, 1};
             case vk::Format::eR4G4B4A4UnormPack16: return BlockParams{1, 1, 2};
             case vk::Format::eB4G4R4A4UnormPack16: return BlockParams{1, 1, 2};
@@ -165,4 +165,13 @@ namespace vkh {
 #endif
         return BlockParams{0, 0, 0};
     }
+
+
+
+
+
+
+
+
+
 }

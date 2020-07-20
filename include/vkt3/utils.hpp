@@ -74,7 +74,7 @@ namespace vkt {
     };
 
     // 
-    inline VkResult AllocateDescriptorSetWithUpdate(vkt::uni_ptr<xvk::Device>& device, vkh::VsDescriptorSetCreateInfoHelper& helper, VkDescriptorSet& descriptorSet, bool& protection) {
+    inline VkResult AllocateDescriptorSetWithUpdate(const vkt::uni_ptr<xvk::Device>& device, vkh::VsDescriptorSetCreateInfoHelper& helper, VkDescriptorSet& descriptorSet, bool& protection) {
         if (!protection) {
             // Corrupt... 
             if (descriptorSet) { vkh::handleVk(device->FreeDescriptorSets(helper, 1u, &descriptorSet)); descriptorSet = {}; };
