@@ -1974,24 +1974,26 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
 #pragma pack(pop)
 
 #pragma pack(push, 1)
+    struct uint24_t;
+
     struct uint24__ { // for compatibility only
         uint32_t a : 24;
-        operator const uint32_t&() const {return a; };
-        uint24__(const uint32_t& a) : a(a) {};
-        uint24__(const uint24__& a) : a(a.a) {};
-        uint24__& operator=(const uint32_t& a) { this->a = a; return *this; };
-        uint24__& operator=(const uint24__& a) { this->a = a.a; return *this; };
+        operator uint32_t() const { return a; }; // You can not more to overlap...
+        uint24__(const uint24__& a) { *this = a; };
+        uint24__(const uint32_t& a) { *this = a; };
+        uint24_t& operator=(const uint32_t& a) { uint32_t* ptr = reinterpret_cast<uint32_t*>(this); *ptr = glm::bitfieldInsert(*ptr, uint32_t(a), 0, 24); };
+        uint24_t& operator=(const uint24__& a) { uint32_t* ptr = reinterpret_cast<uint32_t*>(this); *ptr = glm::bitfieldInsert(*ptr, uint32_t(a), 0, 24); };
     };
 
     struct uint24_t { // for compatibility only
         uint8_t a[3u] = {0u,0u,0u};
-        uint24_t(const uint24__& a) { memcpy(this, &a, 3u); };
-        uint24_t(const uint24_t& a) { memcpy(this, &a, 3u); };
-        uint24_t(const uint32_t& a) { memcpy(this, &a, 3u); };
+        uint24_t(const uint24__& a) { *this = a; };
+        uint24_t(const uint24_t& a) { *this = a; };
+        uint24_t(const uint32_t& a) { *this = a; };
         operator uint32_t() const { return reinterpret_cast<const uint24__&>(a); };
-        uint24_t& operator=(const uint32_t& a) { memcpy(this, &a, 3u); return *this; };
-        uint24_t& operator=(const uint24__& a) { memcpy(this, &a, 3u); return *this; };
-        uint24_t& operator=(const uint24_t& a) { memcpy(this, &a, 3u); return *this; };
+        uint24_t& operator=(const uint32_t& a) { uint32_t* ptr = reinterpret_cast<uint32_t*>(this); *ptr = glm::bitfieldInsert(*ptr, uint32_t(a), 0, 24); };
+        uint24_t& operator=(const uint24__& a) { uint32_t* ptr = reinterpret_cast<uint32_t*>(this); *ptr = glm::bitfieldInsert(*ptr, uint32_t(a), 0, 24); };
+        uint24_t& operator=(const uint24_t& a) { uint32_t* ptr = reinterpret_cast<uint32_t*>(this); *ptr = glm::bitfieldInsert(*ptr, uint32_t(a), 0, 24); };
     };
 
     // CODING EXTRAS...
@@ -2001,10 +2003,10 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
             glm::vec4(0.f,1.f,0.f,0.f),
             glm::vec4(0.f,0.f,1.f,0.f)
         };
-        uint32_t instanceId : 24;
-        uint32_t mask : 8;
-        uint32_t instanceOffset : 24;
-        uint32_t flags : 8;
+        uint24_t customId = 0u;
+        uint8_t mask = 0xFFu;
+        uint24_t instanceOffset = 0u;
+        uint8_t flags = 0u;
 
         //uint24_t instanceId = 0u;
         //uint8_t mask = 0xFF;
