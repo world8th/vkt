@@ -91,6 +91,7 @@ typedef enum {
     VK_ICD_WSI_PLATFORM_DISPLAY,
     VK_ICD_WSI_PLATFORM_HEADLESS,
     VK_ICD_WSI_PLATFORM_METAL,
+    VK_ICD_WSI_PLATFORM_DIRECTFB,
 } VkIcdWsiPlatform;
 
 typedef struct {
@@ -136,6 +137,14 @@ typedef struct {
     Window window;
 } VkIcdSurfaceXlib;
 #endif  // VK_USE_PLATFORM_XLIB_KHR
+
+#ifdef VK_USE_PLATFORM_DIRECTFB_EXT
+typedef struct {
+    VkIcdSurfaceBase base;
+    IDirectFB *dfb;
+    IDirectFBSurface *surface;
+} VkIcdSurfaceDirectFB;
+#endif  // VK_USE_PLATFORM_DIRECTFB_EXT
 
 #ifdef VK_USE_PLATFORM_ANDROID_KHR
 typedef struct {
