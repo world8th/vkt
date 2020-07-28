@@ -215,8 +215,8 @@ namespace vkh {
         inline VsRayTracingPipelineCreateInfoHelperNV& addShaderStages(const std::vector<VkPipelineShaderStageCreateInfo>& stages_in = {}, const VkRayTracingShaderGroupTypeNV& prior_group_type = VK_RAY_TRACING_SHADER_GROUP_TYPE_TRIANGLES_HIT_GROUP_NV) {
             for (auto& stage : stages_in) {
                 if (stage.stage == VK_SHADER_STAGE_RAYGEN_BIT_NV) {
-                    const uintptr_t last_idx = stages.size(); stages.push_back(stage);
-                    raygenShaderGroup.generalShader = last_idx;
+                    const uintptr_t lastIdx = stages.size(); stages.push_back(stage);
+                    raygenShaderGroup.generalShader = uint32_t(lastIdx);
                 };
             };
             
@@ -226,7 +226,7 @@ namespace vkh {
                     const uintptr_t lastIdx = stages.size(); stages.push_back(stage);
                     groupIdx = missShaderGroups.size(); missShaderGroups.push_back({});
                     //if (group_idx == -1U) { group_idx = miss_shader_groups.size(); miss_shader_groups.push_back({}); };
-                    missShaderGroups[groupIdx].generalShader = lastIdx;//break;
+                    missShaderGroups[groupIdx].generalShader = uint32_t(lastIdx);//break;
                 };
             };
              
@@ -238,15 +238,15 @@ namespace vkh {
                     auto& group = hitShaderGroups[groupIdx];
                     if (stage.stage == VK_SHADER_STAGE_CLOSEST_HIT_BIT_NV) {
                         group.type = prior_group_type;
-                        group.closestHitShader = lastIdx;
+                        group.closestHitShader = uint32_t(lastIdx);;
                     };
                     if (stage.stage == VK_SHADER_STAGE_ANY_HIT_BIT_NV) {
                         group.type = prior_group_type;
-                        group.anyHitShader = lastIdx;
+                        group.anyHitShader = uint32_t(lastIdx);;
                     };
                     if (stage.stage == VK_SHADER_STAGE_INTERSECTION_BIT_NV) {
                         group.type = VK_RAY_TRACING_SHADER_GROUP_TYPE_PROCEDURAL_HIT_GROUP_NV,
-                            group.intersectionShader = lastIdx;
+                            group.intersectionShader = uint32_t(lastIdx);;
                     };
                 };
             };
@@ -259,8 +259,8 @@ namespace vkh {
             auto& groups = compileGroups();
             vkInfo.pGroups = groups.data();
             vkInfo.pStages = stages.data();
-            vkInfo.stageCount = stages.size();
-            vkInfo.groupCount = groups.size();
+            vkInfo.stageCount = uint32_t(stages.size());
+            vkInfo.groupCount = uint32_t(groups.size());
             //vkInfo.maxRecursionDepth = 4u;
             return vkInfo;
         };

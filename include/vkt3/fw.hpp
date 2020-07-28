@@ -143,6 +143,9 @@ namespace vkt
             "VK_AMD_gpu_shader_half_float",
             "VK_KHX_shader_explicit_arithmetic_types",
             "VK_KHR_shader_atomic_int64",
+            "VK_KHR_shader_float16_int8",
+            "VK_KHR_shader_float_controls",
+            "VK_EXT_shader_atomic_float",
 
             // 
             "VK_KHR_incremental_present",
@@ -152,13 +155,11 @@ namespace vkt
             "VK_KHR_deferred_host_operations",
             "VK_KHR_buffer_device_address",
             "VK_KHR_vulkan_memory_model",
-            "VK_KHR_shader_float16_int8",
-            "VK_KHR_shader_float_controls",
             "VK_KHR_shader_clock",
             "VK_KHR_swapchain",
             "VK_KHR_surface",
             "VK_KHR_display",
-
+            
             // 
             "VK_NV_device_diagnostic_checkpoints",
             "VK_NV_compute_shader_derivatives",
@@ -266,6 +267,7 @@ namespace vkt
         vkh::VkPhysicalDeviceMemoryProperties2 memoryProperties = {};
 
         // 
+        vk::PhysicalDeviceShaderAtomicFloatFeaturesEXT gAtomicFloat{};
         vk::PhysicalDeviceTransformFeedbackFeaturesEXT gTrasformFeedback{};
         vk::PhysicalDeviceRayTracingFeaturesKHR gRayTracing{};
         vk::PhysicalDeviceTexelBufferAlignmentFeaturesEXT gTexelBufferAligment{};
@@ -570,6 +572,7 @@ namespace vkt
             this->usedDeviceLayers = deviceLayers;
 
             // 
+            this->gExtendedDynamic.pNext = &this->gAtomicFloat;
             this->gBarycentric.pNext = &this->gExtendedDynamic;
             this->gRayTracing.pNext = &this->gBarycentric;
             this->gTrasformFeedback.pNext = &this->gRayTracing;

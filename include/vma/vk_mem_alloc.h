@@ -478,7 +478,7 @@ vmaCreateBuffer(allocator, &bufCreateInfo, &allocCreateInfo, &buf, &alloc, &allo
 
 VkMemoryPropertyFlags memFlags;
 vmaGetMemoryTypeProperties(allocator, allocInfo.memoryType, &memFlags);
-if((memFlags & VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT) == 0)
+if((memFlags & VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT) != 0)
 {
     // Allocation ended up in mappable memory. You can map it and access it directly.
     void* mappedData;
@@ -2644,7 +2644,7 @@ typedef enum VmaAllocationCreateFlagBits {
     
     Pointer to mapped memory will be returned through VmaAllocationInfo::pMappedData.
 
-    Is it valid to use this flag for allocation made from memory type that is not
+    It is valid to use this flag for allocation made from memory type that is not
     `HOST_VISIBLE`. This flag is then ignored and memory is not mapped. This is
     useful if you need an allocation that is efficient to use on GPU
     (`DEVICE_LOCAL`) and still want to map it directly if possible on platforms that
@@ -3943,7 +3943,7 @@ remove them if not needed.
 
 #if defined(__ANDROID_API__) && (__ANDROID_API__ < 16)
 #include <cstdlib>
-void *aligned_alloc(size_t alignment, size_t size)
+void *vma_aligned_alloc(size_t alignment, size_t size)
 {
     // alignment must be >= sizeof(void*)
     if(alignment < sizeof(void*))
@@ -3955,8 +3955,25 @@ void *aligned_alloc(size_t alignment, size_t size)
 }
 #elif defined(__APPLE__) || defined(__ANDROID__) || (defined(__linux__) && defined(__GLIBCXX__) && !defined(_GLIBCXX_HAVE_ALIGNED_ALLOC))
 #include <cstdlib>
-void *aligned_alloc(size_t alignment, size_t size)
+
+#if defined(__APPLE__)
+#include <AvailabilityMacros.h>
+#endif
+
+void *vma_aligned_alloc(size_t alignment, size_t size)
 {
+#if defined(__APPLE__) && (defined(MAC_OS_X_VERSION_10_16) || defined(__IPHONE_14_0))
+#if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_16 || __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_14_0
+    // For C++14, usr/include/malloc/_malloc.h declares aligned_alloc()) only
+    // with the MacOSX11.0 SDK in Xcode 12 (which is what adds 
+    // MAC_OS_X_VERSION_10_16), even though the function is marked
+    // availabe for 10.15. That's why the preprocessor checks for 10.16 but
+    // the __builtin_available checks for 10.15.
+    // People who use C++17 could call aligned_alloc with the 10.15 SDK already.
+    if (__builtin_available(macOS 10.15, iOS 13, *))
+        return aligned_alloc(alignment, size);
+#endif
+#endif
     // alignment must be >= sizeof(void*)
     if(alignment < sizeof(void*))
     {
@@ -3967,6 +3984,16 @@ void *aligned_alloc(size_t alignment, size_t size)
     if(posix_memalign(&pointer, alignment, size) == 0)
         return pointer;
     return VMA_NULL;
+}
+#elif defined(_WIN32)
+void *vma_aligned_alloc(size_t alignment, size_t size)
+{
+    return _aligned_malloc(size, alignment);
+}
+#else
+void *vma_aligned_alloc(size_t alignment, size_t size)
+{
+    return aligned_alloc(alignment, size);
 }
 #endif
 
@@ -3999,11 +4026,7 @@ void *aligned_alloc(size_t alignment, size_t size)
 #endif
 
 #ifndef VMA_SYSTEM_ALIGNED_MALLOC
-   #if defined(_WIN32)
-       #define VMA_SYSTEM_ALIGNED_MALLOC(size, alignment)   (_aligned_malloc((size), (alignment)))
-   #else
-       #define VMA_SYSTEM_ALIGNED_MALLOC(size, alignment)   (aligned_alloc((alignment), (size) ))
-   #endif
+   #define VMA_SYSTEM_ALIGNED_MALLOC(size, alignment) vma_aligned_alloc((alignment), (size))
 #endif
 
 #ifndef VMA_SYSTEM_FREE
@@ -4243,28 +4266,6 @@ static inline uint32_t VmaCountBitsSet(uint32_t v)
     return c;
 }
 
-// Aligns given value up to nearest multiply of align value. For example: VmaAlignUp(11, 8) = 16.
-// Use types like uint32_t, uint64_t as T.
-template <typename T>
-static inline T VmaAlignUp(T val, T align)
-{
-    return (val + align - 1) / align * align;
-}
-// Aligns given value down to nearest multiply of align value. For example: VmaAlignUp(11, 8) = 8.
-// Use types like uint32_t, uint64_t as T.
-template <typename T>
-static inline T VmaAlignDown(T val, T align)
-{
-    return val / align * align;
-}
-
-// Division with mathematical rounding to nearest number.
-template <typename T>
-static inline T VmaRoundDiv(T x, T y)
-{
-    return (x + (y / (T)2)) / y;
-}
-
 /*
 Returns true if given number is a power of two.
 T must be unsigned integer number or signed integer but always nonnegative.
@@ -4274,6 +4275,30 @@ template <typename T>
 inline bool VmaIsPow2(T x)
 {
     return (x & (x-1)) == 0;
+}
+
+// Aligns given value up to nearest multiply of align value. For example: VmaAlignUp(11, 8) = 16.
+// Use types like uint32_t, uint64_t as T.
+template <typename T>
+static inline T VmaAlignUp(T val, T alignment)
+{
+    VMA_HEAVY_ASSERT(VmaIsPow2(alignment));
+    return (val + alignment - 1) & ~(alignment - 1);
+}
+// Aligns given value down to nearest multiply of align value. For example: VmaAlignUp(11, 8) = 8.
+// Use types like uint32_t, uint64_t as T.
+template <typename T>
+static inline T VmaAlignDown(T val, T alignment)
+{
+    VMA_HEAVY_ASSERT(VmaIsPow2(alignment));
+    return val & ~(alignment - 1);
+}
+
+// Division with mathematical rounding to nearest number.
+template <typename T>
+static inline T VmaRoundDiv(T x, T y)
+{
+    return (x + (y / (T)2)) / y;
 }
 
 // Returns smallest power of 2 greater or equal to v.

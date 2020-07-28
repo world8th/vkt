@@ -1991,9 +1991,9 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         uint24_t(const uint24_t& a) { *this = a; };
         uint24_t(const uint32_t& a) { *this = a; };
         operator uint32_t() const { return reinterpret_cast<const uint24__&>(a); };
-        uint24_t& operator=(const uint32_t& a) { uint32_t* ptr = reinterpret_cast<uint32_t*>(this); *ptr = glm::bitfieldInsert(*ptr, uint32_t(a), 0, 24); };
-        uint24_t& operator=(const uint24__& a) { uint32_t* ptr = reinterpret_cast<uint32_t*>(this); *ptr = glm::bitfieldInsert(*ptr, uint32_t(a), 0, 24); };
-        uint24_t& operator=(const uint24_t& a) { uint32_t* ptr = reinterpret_cast<uint32_t*>(this); *ptr = glm::bitfieldInsert(*ptr, uint32_t(a), 0, 24); };
+        uint24_t& operator=(const uint32_t& a) { uint32_t* ptr = reinterpret_cast<uint32_t*>(this); *ptr = glm::bitfieldInsert(*ptr, uint32_t(a), 0, 24); return *this; };
+        uint24_t& operator=(const uint24__& a) { uint32_t* ptr = reinterpret_cast<uint32_t*>(this); *ptr = glm::bitfieldInsert(*ptr, uint32_t(a), 0, 24); return *this; };
+        uint24_t& operator=(const uint24_t& a) { uint32_t* ptr = reinterpret_cast<uint32_t*>(this); *ptr = glm::bitfieldInsert(*ptr, uint32_t(a), 0, 24); return *this; };
     };
 
     // CODING EXTRAS...
