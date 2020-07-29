@@ -14,6 +14,7 @@
 #include <vector>
 
 //
+#define VK_NO_PROTOTYPES
 #include <misc/soa_vector.hpp>
 #include <misc/half.hpp>
 
