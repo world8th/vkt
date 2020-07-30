@@ -85,8 +85,8 @@ namespace vkt
             .stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
             .stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
             .initialLayout = VK_IMAGE_LAYOUT_GENERAL,
-            .finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
-            });
+            .finalLayout = VK_IMAGE_LAYOUT_GENERAL
+        });
 
         render_pass_helper.setDepthStencilAttachment(vkh::VkAttachmentDescription{
             .format = VkFormat(formats.depthFormat),
@@ -95,8 +95,8 @@ namespace vkt
             .stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
             .stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
             .initialLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
-            .finalLayout = VK_IMAGE_LAYOUT_GENERAL
-            });
+            .finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL
+        });
 
         auto dp0 = vkh::VkSubpassDependency{
             .srcSubpass = VK_SUBPASS_EXTERNAL,
@@ -174,21 +174,21 @@ namespace vkt
             vkt::VmaMemoryInfo memInfo = {};
             this->depthImage = vkt::ImageRegion(std::make_shared<vkt::VmaImageAllocation>(this->getAllocator(), vkh::VkImageCreateInfo{}.also([=](vkh::VkImageCreateInfo* it) {
                 it->format = surfaceFormats.depthFormat,
-                    it->extent = vkh::VkExtent3D{ applicationWindow.surfaceSize.width, applicationWindow.surfaceSize.height, 1u },
-                    it->usage = depuse;
+                it->extent = vkh::VkExtent3D{ applicationWindow.surfaceSize.width, applicationWindow.surfaceSize.height, 1u },
+                it->usage = depuse;
                 return it;
-                }), memInfo), vkh::VkImageViewCreateInfo{}.also([=](vkh::VkImageViewCreateInfo* it) {
-                    it->format = surfaceFormats.depthFormat,
-                        it->subresourceRange = vkh::VkImageSubresourceRange{ .aspectMask = aspect };
-                    return it;
-                    }), VK_IMAGE_LAYOUT_GENERAL);
+            }), memInfo), vkh::VkImageViewCreateInfo{}.also([=](vkh::VkImageViewCreateInfo* it) {
+                it->format = surfaceFormats.depthFormat,
+                it->subresourceRange = vkh::VkImageSubresourceRange{ .aspectMask = aspect };
+                return it;
+            }), VK_IMAGE_LAYOUT_GENERAL);
 
             vkh::handleVk(this->deviceDispatch->CreateSampler(vkh::VkSamplerCreateInfo{
                 .magFilter = VK_FILTER_LINEAR,
                 .minFilter = VK_FILTER_LINEAR,
                 .addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
                 .addressModeV = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE
-                }, nullptr, &this->depthImage.refSampler()));
+            }, nullptr, &this->depthImage.refSampler()));
         };
 
         //
@@ -204,13 +204,13 @@ namespace vkt
             auto aspect = vkh::VkImageAspectFlags{ .eColor = 1 };
             vkh::handleVk(deviceDispatch->CreateImageView(vkh::VkImageViewCreateInfo{}.also([=](vkh::VkImageViewCreateInfo* it) {
                 it->flags = {},
-                    it->image = swapchainImages[i],
-                    it->viewType = VK_IMAGE_VIEW_TYPE_2D,
-                    it->format = surfaceFormats.colorFormat,
-                    it->components = vkh::VkComponentMapping{},
-                    it->subresourceRange = vkh::VkImageSubresourceRange{ aspect, 0, 1, 0, 1 };
+                it->image = swapchainImages[i],
+                it->viewType = VK_IMAGE_VIEW_TYPE_2D,
+                it->format = surfaceFormats.colorFormat,
+                it->components = vkh::VkComponentMapping{},
+                it->subresourceRange = vkh::VkImageSubresourceRange{ aspect, 0, 1, 0, 1 };
                 return it;
-                }), nullptr, &views[0]));
+            }), nullptr, &views[0]));
             views[1] = this->depthImage.getImageView(); // depth view
 
             //
@@ -229,9 +229,10 @@ namespace vkt
                         it->aspectMask = aspect;
                         return it;
                     })
-                    });
-            }
+                });
+            };
 
+            /*
             vkt::imageBarrier(cmd, vkt::ImageBarrierInfo{
                 .image = this->depthImage.getImage(),
                 .targetLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
@@ -241,8 +242,8 @@ namespace vkt
                     it->aspectMask = aspect;
                     return it;
                 })
-                });
-            });
+            });*/
+        });
     }
 
     VkSwapchainKHR GPUFramework::createSwapchain()
