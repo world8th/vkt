@@ -664,6 +664,10 @@ namespace vkh {
         inline operator const VkDescriptorSetLayoutCreateInfo* () const { return &vk_info; };
         inline operator VkDescriptorSetLayoutCreateInfo* () { return &format(); };
 
+        // 
+        inline const VkDescriptorSetLayoutCreateInfo& get() const { return vk_info; };
+        inline VkDescriptorSetLayoutCreateInfo& get() { return format(); };
+
     protected: // 
         VkDescriptorSetLayoutCreateInfo vk_info = {};
         VkDescriptorSetLayoutBindingFlagsCreateInfo flags_info = {};
