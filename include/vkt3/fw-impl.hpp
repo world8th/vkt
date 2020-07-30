@@ -641,9 +641,9 @@ namespace vkt
 
         //
         vkh::handleVk(this->deviceDispatch->CreateDescriptorPool(vkh::VkDescriptorPoolCreateInfo{
-            .flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT,
+            .flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT | VK_DESCRIPTOR_POOL_CREATE_UPDATE_AFTER_BIND_BIT ,
             .maxSets = 256u, .poolSizeCount = static_cast<uint32_t>(dps.size()), .pPoolSizes = dps.data()
-            }, nullptr, &this->descriptorPool));
+        }, nullptr, &this->descriptorPool));
 
         return this->device;
     };
