@@ -1986,7 +1986,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
     };
 
     struct uint24_t { // for compatibility only
-        uint8_t a[3u] = {0u,0u,0u};
+        glm::u8vec3 a = glm::u8vec3(0u);
         uint24_t(const uint24__& a) { *this = a; };
         uint24_t(const uint24_t& a) { *this = a; };
         uint24_t(const uint32_t& a) { *this = a; };
@@ -1998,11 +1998,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
 
     // CODING EXTRAS...
     struct VsGeometryInstance {
-        glm::mat3x4 transform = {
-            glm::vec4(1.f,0.f,0.f,0.f),
-            glm::vec4(0.f,1.f,0.f,0.f),
-            glm::vec4(0.f,0.f,1.f,0.f)
-        };
+        glm::mat3x4 transform = glm::mat3x4(1.f);
         uint24_t customId = 0u;
         uint8_t mask = 0xFFu;
         uint24_t instanceOffset = 0u;
