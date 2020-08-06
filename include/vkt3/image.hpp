@@ -72,11 +72,11 @@ namespace vkt {
             vkh::VkExportMemoryAllocateInfo exportAllocInfo{ .handleTypes = {.eOpaqueFd = 1} };
 #endif
 
+            // 
             vkh::VkMemoryAllocateInfo memAllocInfo = {};
-#if defined(ENABLE_OPENGL_INTEROP)
             allocFlags.pNext = &exportAllocInfo;
-#endif
 
+            // 
             const vkh::VkMemoryPropertyFlags property = {.eDeviceLocal = 1};
             memAllocInfo.pNext = &allocFlags;
             memAllocInfo.allocationSize = memReqs.size;
