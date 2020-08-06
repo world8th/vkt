@@ -257,6 +257,7 @@ namespace vkt
 
         inline virtual uintptr_t memoryAllocationInfoPtr() {
             memoryAllocInfo.device = device;
+            memoryAllocInfo.queueFamilyIndices = {};
             memoryAllocInfo.memoryProperties = this->getMemoryProperties().memoryProperties;
             memoryAllocInfo.instanceDispatch = this->getInstanceDispatch();
             memoryAllocInfo.deviceDispatch = this->getDeviceDispatch();
@@ -267,6 +268,7 @@ namespace vkt
 
         inline virtual MemoryAllocationInfo& memoryAllocationInfo() {
             memoryAllocInfo.device = device;
+            memoryAllocInfo.queueFamilyIndices = {};
             memoryAllocInfo.memoryProperties = this->getMemoryProperties().memoryProperties;
             memoryAllocInfo.instanceDispatch = this->getInstanceDispatch();
             memoryAllocInfo.deviceDispatch = this->getDeviceDispatch();
