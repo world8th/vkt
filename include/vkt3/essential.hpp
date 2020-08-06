@@ -428,7 +428,7 @@ namespace vkt {
     // TODO: Add XVK support
     struct MemoryAllocationInfo { //
         uint32_t glID = 0u, glMemory = 0u;      // 0U
-#ifdef ENABLE_OPENGL_INTEROP
+#ifdef VKT_WIN32_DETECTED
         HANDLE handle = {};                     // 8U
 #endif
 
@@ -465,7 +465,7 @@ namespace vkt {
                 const auto properties = VkMemoryPropertyFlags(memoryProperties.memoryTypes[memoryIndex].propertyFlags);
                 const bool hasRequiredProperties = (properties & VkMemoryPropertyFlags(requiredProperties)) == VkMemoryPropertyFlags(requiredProperties);
                 if (isRequiredMemoryType && hasRequiredProperties) return static_cast<uint32_t>(memoryIndex);
-            }
+            };
             return 0u;
         }
     };
