@@ -2002,7 +2002,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         uint24_t customId = 0u;
         uint8_t mask = 0xFFu;
         uint24_t instanceOffset = 0u;
-        uint8_t flags = 0u;
+        uint8_t flags = VK_GEOMETRY_INSTANCE_TRIANGLE_CULL_DISABLE_BIT_NV;
 
         //uint24_t instanceId = 0u;
         //uint8_t mask = 0xFF;

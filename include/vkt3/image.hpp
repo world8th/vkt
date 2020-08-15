@@ -395,7 +395,7 @@ namespace vkt {
         virtual VkSampler& refSampler() { return this->imgInfo.sampler; };
         virtual const VkSampler& refSampler() const { return this->imgInfo.sampler; };
 
-        virtual ImageRegion& transfer(VkCommandBuffer& cmdBuf) {
+        virtual ImageRegion& transfer(VkCommandBuffer& cmdBuf) const {
             vkt::imageBarrier(cmdBuf, vkt::ImageBarrierInfo{
                 .instanceDispatch = this->allocation->info.instanceDispatch,
                 .deviceDispatch = this->allocation->info.deviceDispatch,
@@ -404,8 +404,8 @@ namespace vkt {
                 .originLayout = this->allocation->info.initialLayout,
                 .subresourceRange = this->subresourceRange
             });
-            this->allocation->info.initialLayout = reinterpret_cast<const VkImageLayout&>(this->imgInfo.imageLayout);
-            return *this;
+            const_cast<ImageRegion*>(this)->allocation->info.initialLayout = reinterpret_cast<const VkImageLayout&>(this->imgInfo.imageLayout);
+            return const_cast<ImageRegion&>(*this);
         };
 
         // 
