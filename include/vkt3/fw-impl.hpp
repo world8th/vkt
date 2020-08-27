@@ -409,6 +409,7 @@ namespace vkt
             "VK_EXT_shader_atomic_float",
 
             // 
+            "VK_KHR_timeline_semaphore",
             "VK_KHR_incremental_present",
             "VK_KHR_ray_tracing",
             "VK_KHR_ray_query",

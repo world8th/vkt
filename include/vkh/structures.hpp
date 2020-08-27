@@ -1934,7 +1934,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
     } VkMemoryAllocateFlagsInfo;
 
     //
-#ifdef ENABLE_OPENGL_INTEROP
+//#ifdef ENABLE_OPENGL_INTEROP
     typedef struct VkSemaphoreGetWin32HandleInfoKHR {
         VkStructureType                          sType      = VK_STRUCTURE_TYPE_SEMAPHORE_GET_WIN32_HANDLE_INFO_KHR;
         const void*                              pNext      = nullptr;
@@ -1952,7 +1952,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         STRUCT_OPERATORS(VkSemaphoreGetWin32HandleInfoKHR)
         VK_HPP_STRUCT_OPERATORS(VkSemaphoreGetWin32HandleInfoKHR, vk::SemaphoreGetWin32HandleInfoKHR)
     } VkSemaphoreGetWin32HandleInfoKHR;
-#endif
+//#endif
 
     // 
     inline constexpr auto VsDefaultExternalSemaphoreHandleTypeFlags = VkExternalSemaphoreHandleTypeFlags{};

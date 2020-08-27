@@ -53,9 +53,61 @@
 #include <vkh/helpers.hpp>
 
 // 
+#ifdef ENABLE_OPTIX_DENOISE
+#include <cuda.h>
+#include <cuda_runtime.h>
+#include <optix/optix.h>
+#include <optix/optix_stubs.h>
+#include <optix/optix_types.h>
+#endif
+
+// 
 namespace vkt {
 #ifdef ENABLE_OPENGL_INTEROP
     using namespace gl;
+#endif
+
+#ifdef ENABLE_OPTIX_DENOISE
+#define OPTIX_CHECK(call)                                                      \
+  do {                                                                         \
+    OptixResult res = call;                                                    \
+    if (res != OPTIX_SUCCESS) {                                                \
+      std::stringstream ss;                                                    \
+      ss << "Optix call (" << #call << " ) failed with code " << res           \
+         << " (" __FILE__ << ":" << __LINE__ << ")\n";                         \
+      std::cerr << ss.str().c_str() << std::endl;                              \
+      throw std::runtime_error(ss.str().c_str());                              \
+    }                                                                          \
+  } while (false)
+
+#define CUDA_CHECK(call)                                                       \
+  do {                                                                         \
+    cudaError_t error = call;                                                  \
+    if (error != cudaSuccess) {                                                \
+      std::stringstream ss;                                                    \
+      ss << "CUDA call (" << #call << " ) failed with code " << error          \
+         << " (" __FILE__ << ":" << __LINE__ << ")\n";                         \
+      throw std::runtime_error(ss.str().c_str());                              \
+    }                                                                          \
+  } while (false)
+
+#define OPTIX_CHECK_LOG(call)                                                  \
+  do {                                                                         \
+    OptixResult res = call;                                                    \
+    if (res != OPTIX_SUCCESS) {                                                \
+      std::stringstream ss;                                                    \
+      ss << "Optix call (" << #call << " ) failed with code " << res           \
+         << " (" __FILE__ << ":" << __LINE__ << ")\nLog:\n"                    \
+         << log << "\n";                                                       \
+      throw std::runtime_error(ss.str().c_str());                              \
+    }                                                                          \
+  } while (false)
+
+    static void context_log_cb(unsigned int level, const char* tag,
+        const char* message, void* /*cbdata */) {
+        std::cerr << "[" << std::setw(2) << level << "][" << std::setw(12) << tag
+            << "]: " << message << "\n";
+    }
 #endif
 
     //#ifdef USE_VULKAN
@@ -351,17 +403,36 @@ namespace vkt {
     };
 
     // Dedicated Semaphore Creator
-    static inline void createSemaphore(vkt::uni_ptr<xvk::Device> device, VkSemaphore* vkSemaphore, unsigned* glSemaphore = nullptr, const void* pNext = nullptr) {
-        const auto exportable = vkh::VkExportSemaphoreCreateInfo{ .pNext = pNext, .handleTypes = {.eOpaqueWin32 = 1} };
-#ifdef ENABLE_OPENGL_INTEROP
+    static inline void createSemaphore(vkt::uni_ptr<xvk::Device> device, VkSemaphore* vkSemaphore, unsigned* unitPtr = nullptr, const void* pNext = nullptr, const bool GL = false) {
+        const auto exportable = vkh::VkExportSemaphoreCreateInfo{ .pNext = pNext, .handleTypes = { .eOpaqueWin32 = 1} };
+
         HANDLE handle{ INVALID_HANDLE_VALUE };
-        vkh::handleVk(device->CreateSemaphoreA(vkh::VkSemaphoreCreateInfo{ .pNext = &exportable }, nullptr, vkSemaphore));
+        vkh::handleVk(device->CreateSemaphoreW(vkh::VkSemaphoreCreateInfo{ .pNext = &exportable }, nullptr, vkSemaphore));
         vkh::handleVk(device->GetSemaphoreWin32HandleKHR(vkh::VkSemaphoreGetWin32HandleInfoKHR{ .semaphore = *vkSemaphore, .handleType = VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_WIN32_BIT }, &handle));
-        if (glSemaphore) { // Gl-Bindings BROKEN!
-            glGenSemaphoresEXT(1, glSemaphore);
-            glImportSemaphoreWin32HandleEXT(*glSemaphore, GL_HANDLE_TYPE_OPAQUE_WIN32_EXT, handle);
-        };
+        if (unitPtr) {
+#ifdef ENABLE_OPTIX_DENOISE
+#ifdef ENABLE_OPENGL_INTEROP
+            if (GL)
 #endif
+            {
+                cudaExternalSemaphoreHandleDesc externalSemaphoreHandleDesc = {};
+                std::memset(&externalSemaphoreHandleDesc, 0, sizeof(externalSemaphoreHandleDesc));
+                externalSemaphoreHandleDesc.flags = 0;
+                externalSemaphoreHandleDesc.type = cudaExternalSemaphoreHandleTypeD3D12Fence;
+                externalSemaphoreHandleDesc.handle.win32.handle = (void*)handle;
+                CUDA_CHECK(cudaImportExternalSemaphore((cudaExternalSemaphore_t*)unitPtr, &externalSemaphoreHandleDesc));
+            };
+#endif
+#ifdef ENABLE_OPENGL_INTEROP
+#ifdef ENABLE_OPTIX_DENOISE
+            if (GL)
+#endif
+            {
+                glGenSemaphoresEXT(1, unitPtr);
+                glImportSemaphoreWin32HandleEXT(*unitPtr, GL_HANDLE_TYPE_OPAQUE_WIN32_EXT, handle);
+            };
+#endif
+        };
         //glCheckError();
     };
 
