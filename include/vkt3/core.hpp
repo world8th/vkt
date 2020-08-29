@@ -44,12 +44,6 @@
 #endif
 
 // 
-#if defined(VKT_ENABLE_GLFW_SUPPORT) || defined(ENABLE_OPENGL_INTEROP)
-#include <GLFW/glfw3.h>
-#include <GLFW/glfw3native.h>
-#endif
-
-// 
 #ifdef ENABLE_OPENGL_INTEROP
 #ifdef VKT_USE_GLAD
 #include <glad/glad.h>
@@ -58,6 +52,12 @@
 #include <glbinding/gl/extension.h>
 #include <glbinding/glbinding.h>
 #endif
+#endif
+
+// 
+#if defined(VKT_ENABLE_GLFW_SUPPORT) || defined(ENABLE_OPENGL_INTEROP)
+#include <GLFW/glfw3.h>
+#include <GLFW/glfw3native.h>
 #endif
 
 // Enable Vulkan-HPP when defined
@@ -398,7 +398,7 @@ namespace vkt {
     // FOR LWJGL-3 Request!
     inline void initializeGL(GLFWglproc(*glfwGetProcAddress)(const char*)) {
 #ifdef VKT_USE_GLAD
-        if (!gladLoadGLLoader(glfwGetProcAddress)) {
+        if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
             printf("Something went wrong!\n"); exit(-1);
         }
         printf("OpenGL %d.%d\n", GLVersion.major, GLVersion.minor);
@@ -412,7 +412,7 @@ namespace vkt {
 #ifdef VKT_ENABLE_GLFW_LINKED
     inline void initializeGL() {
 #ifdef VKT_USE_GLAD
-        if (!gladLoadGLLoader(glfwGetProcAddress)) {
+        if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
             printf("Something went wrong!\n"); exit(-1);
         }
         printf("OpenGL %d.%d\n", GLVersion.major, GLVersion.minor);

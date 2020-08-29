@@ -64,7 +64,9 @@
 // 
 namespace vkt {
 #ifdef ENABLE_OPENGL_INTEROP
+#ifndef VKT_USE_GLAD
     using namespace gl;
+#endif
 #endif
 
 #ifdef ENABLE_OPTIX_DENOISE
@@ -278,7 +280,7 @@ namespace vkt {
 
     // create compute pipelines
     static inline auto createCompute(vkt::uni_ptr<xvk::Device> device, vkt::uni_arg<std::string> path, vkt::uni_arg<VkPipelineLayout> layout, vkt::uni_arg<VkPipelineCache> cache = VkPipelineCache{}, vkt::uni_arg<uint32_t> subgroupSize = 0u) {
-        createCompute(device, readBinary(path), layout, cache, subgroupSize);
+        return createCompute(device, readBinary(path), layout, cache, subgroupSize);
     };
 
     // create secondary command buffers for batching compute invocations
@@ -407,7 +409,11 @@ namespace vkt {
         const auto exportable = vkh::VkExportSemaphoreCreateInfo{ .pNext = pNext, .handleTypes = { .eOpaqueWin32 = 1} };
 
         HANDLE handle{ INVALID_HANDLE_VALUE };
+#ifdef UNICODE
         vkh::handleVk(device->CreateSemaphoreW(vkh::VkSemaphoreCreateInfo{ .pNext = &exportable }, nullptr, vkSemaphore));
+#else
+        vkh::handleVk(device->CreateSemaphoreA(vkh::VkSemaphoreCreateInfo{ .pNext = &exportable }, nullptr, vkSemaphore));
+#endif
         vkh::handleVk(device->GetSemaphoreWin32HandleKHR(vkh::VkSemaphoreGetWin32HandleInfoKHR{ .semaphore = *vkSemaphore, .handleType = VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_WIN32_BIT }, &handle));
         if (unitPtr) {
 #ifdef ENABLE_OPTIX_DENOISE

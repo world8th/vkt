@@ -21,7 +21,7 @@ namespace vkt {
         ImageAllocation() {};
         ImageAllocation(vkt::uni_arg<vkh::VkImageCreateInfo> createInfo, vkt::uni_arg<MemoryAllocationInfo> allocationInfo = MemoryAllocationInfo{}) : info(allocationInfo) { this->construct(allocationInfo, createInfo); }
         ImageAllocation(const vkt::uni_ptr<ImageAllocation>& allocation) : image(allocation->image), info(allocation->info) { *this = allocation; };
-        //ImageAllocation(const std::shared_ptr<ImageAllocation>& allocation) : image(allocation->image), info(allocation->info) { *this = vkt::uni_ptr<ImageAllocation>(allocation); };
+        ImageAllocation(const std::shared_ptr<ImageAllocation>& allocation) : image(allocation->image), info(allocation->info) { *this = vkt::uni_ptr<ImageAllocation>(allocation); };
         ~ImageAllocation() {
             if (this->image && this->info.device) {
                 this->info.deviceDispatch->DeviceWaitIdle();
