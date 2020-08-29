@@ -90,26 +90,26 @@ namespace vkt {
 
     //
     template<class T, class U = uint32_t> class bit_ops { protected: U n = 0u; //friend BitOps<T,U>;
-        public: bit_ops<T,U>(const T& v = 0u) : n((U&)v){};
-        public: bit_ops<T,U>(const U& n = 0u) : n(n){};
-        public: bit_ops<T,U>(T&& v = 0u) : n((U&)v){};
-        public: bit_ops<T,U>(U&& n = 0u) : n(n){};
-        public: operator U&() { return n; };
-        public: operator const U&() const { return n; };
-        public: T operator &(const T& o){ return T{n&(U&)o}; };
-        public: T operator |(const T& o){ return T{n|(U&)o}; };
-        public: T operator ^(const T& o){ return T{n^(U&)o}; };
+        public: inline bit_ops<T,U>(const T& v = 0u) : n((U&)v){};
+        public: inline bit_ops<T,U>(const U& n = 0u) : n(n){};
+        public: inline bit_ops<T,U>(T&& v = 0u) : n((U&)v){};
+        public: inline bit_ops<T,U>(U&& n = 0u) : n(n){};
+        public: inline operator U&() { return n; };
+        public: inline operator const U&() const { return n; };
+        public: inline T operator &(const T& o){ return T{n&(U&)o}; };
+        public: inline T operator |(const T& o){ return T{n|(U&)o}; };
+        public: inline T operator ^(const T& o){ return T{n^(U&)o}; };
     };
 
     // 
     template<class S, class B, class U = uint32_t> class flags { protected: U n = 0u;
-        public: flags<S,B,U>(const U& f = 0u) { *(U*)(this) = f; };
-        public: flags<S,B,U>(const S& f = 0u) { *(U*)(this) = (U&)f; };
-        public: flags<S,B,U>(const B& f = 0u) { *(U*)(this) = (U&)f; };
-        public: operator U&() { return *(U*)this; };
-        public: operator const U&() const { return *(U*)this; };
-        public: operator B&() { return *(B*)this; };
-        public: operator const B&() const { return *(B*)this; };
+        public: inline flags<S,B,U>(const U& f = 0u) { *(U*)(this) = f; };
+        public: inline flags<S,B,U>(const S& f = 0u) { *(U*)(this) = (U&)f; };
+        public: inline flags<S,B,U>(const B& f = 0u) { *(U*)(this) = (U&)f; };
+        public: inline operator U&() { return *(U*)this; };
+        public: inline operator const U&() const { return *(U*)this; };
+        public: inline operator B&() { return *(B*)this; };
+        public: inline operator const B&() const { return *(B*)this; };
     };
 
     // boolean 32-bit capable for C++
@@ -119,18 +119,18 @@ namespace vkt {
     };
     public: friend bool32_t;
         constexpr bool32_t(): b_(0u) {};
-        bool32_t(const bool&a=false): b_(a?1u:0u) {};
-        bool32_t(const uint32_t&a): b_(a&1u) {}; // make bitmasked
-        bool32_t(const bool32_t&a): b_(a) {};
+        inline bool32_t(const bool&a=false): b_(a?1u:0u) {};
+        inline bool32_t(const uint32_t&a): b_(a&1u) {}; // make bitmasked
+        inline bool32_t(const bool32_t&a): b_(a) {};
 
         // type conversion operators
-        virtual operator bool() const {return bool(b_&1u);};
-        virtual operator uint32_t() const {return (b_&1u);};
+        inline virtual operator bool() const {return bool(b_&1u);};
+        inline virtual operator uint32_t() const {return (b_&1u);};
 
         // 
-        virtual bool32_t& operator=(const bool&a){b_=(a?1u:0u);};
-        virtual bool32_t& operator=(const uint32_t&a){b_=a&1u;};
-        virtual bool32_t& operator=(const bool32_t&a){b_=a;};
+        inline virtual bool32_t& operator=(const bool&a){b_=(a?1u:0u);};
+        inline virtual bool32_t& operator=(const uint32_t&a){b_=a&1u;};
+        inline virtual bool32_t& operator=(const bool32_t&a){b_=a;};
     };
 
     inline void handle(const bool& valid = false) {
@@ -151,22 +151,22 @@ namespace vkt {
         //T storage = {};
 
     public: friend uni_ptr<T>; // 
-        uni_ptr() {};
-        uni_ptr(const uni_ptr<T>& ptr) : shared(ptr.shared), regular(std::ref(*ptr.regular)) {};
-        uni_ptr(const std::shared_ptr<T>& shared) : shared(shared), regular(std::ref(*shared)) {};
-        uni_ptr(T* ptr) : regular(std::ref(*ptr)) {};
-        uni_ptr(T& ptr) : regular(std::ref(ptr)) {};  // for argument passing
-        uni_ptr(T* ptr, long size, void* owner) : regular(std::ref(*ptr)), size(size), owner(owner) {
+        inline uni_ptr() {};
+        inline uni_ptr(const uni_ptr<T>& ptr) : shared(ptr.shared), regular(std::ref(*ptr.regular)) {};
+        inline uni_ptr(const std::shared_ptr<T>& shared) : shared(shared), regular(std::ref(*shared)) {};
+        inline uni_ptr(T* ptr) : regular(std::ref(*ptr)) {};
+        inline uni_ptr(T& ptr) : regular(std::ref(ptr)) {};  // for argument passing
+        inline uni_ptr(T* ptr, long size, void* owner) : regular(std::ref(*ptr)), size(size), owner(owner) {
             shared = owner != NULL && owner != ptr ? *(std::shared_ptr<T>*)owner : std::shared_ptr<T>(ptr);
         };
-        uni_ptr* assign(T* ptr, int size, void* owner) {
+        inline uni_ptr* assign(T* ptr, int size, void* owner) {
             this->regular = std::ref(*ptr);
             this->size = size;
             this->owner = owner;
             this->shared = owner != NULL && owner != ptr ? *(std::shared_ptr<T>*)owner : std::shared_ptr<T>(ptr);
             return this;
         };
-        static void deallocate(void* owner) {
+        static inline void deallocate(void* owner) {
             if (owner) { delete (std::shared_ptr<T>*)owner; }; // only when shared available
         };
 
@@ -174,12 +174,12 @@ namespace vkt {
         virtual inline uni_ptr* operator= (T* ptr) { regular = std::ref(*ptr); return this; };
         virtual inline uni_ptr* operator= (T& ptr) { regular = std::ref( ptr); return this; }; // for argument passing
         virtual inline uni_ptr* operator= (std::shared_ptr<T> ptr) { shared = ptr, regular = std::ref(*ptr); return this; };
-        virtual inline uni_ptr* operator= (const uni_ptr<T>& ptr) { 
+        virtual inline uni_ptr* operator= (const uni_ptr<T>& ptr) {
             T& ref = *ptr.regular;
             shared = ptr.shared, regular = std::ref(ref);
             return this;
         };
-        virtual inline uni_ptr* operator= (uni_ptr<T>& ptr) { 
+        virtual inline uni_ptr* operator= (uni_ptr<T>& ptr) {
             T& ref = *ptr.regular;
             shared = ptr.shared, regular = std::ref(ref);
             return this;
@@ -198,7 +198,7 @@ namespace vkt {
         virtual inline std::shared_ptr<T>  get_shared() const { return (this->shared ? this->shared : std::shared_ptr<T>(const_cast<T*>(get_ptr()))); };
 
         // 
-        virtual inline T* get_ptr() { 
+        virtual T* get_ptr() { 
             T& r = *regular;
             if (shared && (owner == NULL || owner == &r)) {
                 owner = new std::shared_ptr<T>(shared);
@@ -261,46 +261,46 @@ namespace vkt {
         uni_arg(const uni_arg<T>& a) : storage(*a) {};
 
         //
-        virtual uni_arg<T>& operator= (const T& ptr) { storage = ptr; return *this; };
-        virtual uni_arg<T>& operator= (const T* ptr) { storage = *ptr; return *this; };
-        virtual uni_arg<T>& operator= (uni_arg<T> t) { storage = t.ref(); return *this; };
-        virtual uni_arg<T>& operator= (uni_ptr<T> p) { storage = *p.ptr(); return *this; };
+        virtual inline uni_arg<T>& operator= (const T& ptr) { storage = ptr; return *this; };
+        virtual inline uni_arg<T>& operator= (const T* ptr) { storage = *ptr; return *this; };
+        virtual inline uni_arg<T>& operator= (uni_arg<T> t) { storage = t.ref(); return *this; };
+        virtual inline uni_arg<T>& operator= (uni_ptr<T> p) { storage = *p.ptr(); return *this; };
 
         // experimental
-        virtual operator T& () { return ref(); };
-        virtual operator const T& () const { return ref(); };
+        virtual inline operator T& () { return ref(); };
+        virtual inline operator const T& () const { return ref(); };
 
         // 
-        virtual operator T* () { return ptr(); };
-        virtual operator const T* () const { return ptr(); };
+        virtual inline operator T* () { return ptr(); };
+        virtual inline operator const T* () const { return ptr(); };
 
         // 
-        virtual operator uni_ptr<T>() { handle(has()); return *storage; };
-        virtual operator uni_ptr<const T>() const { handle(has()); return *storage; };
+        virtual inline operator uni_ptr<T>() { handle(has()); return *storage; };
+        virtual inline operator uni_ptr<const T>() const { handle(has()); return *storage; };
 
         // 
-        virtual bool has_value() const { return storage.has_value(); };
-        virtual bool has() const { return this->has_value(); };
+        virtual inline bool has_value() const { return storage.has_value(); };
+        virtual inline bool has() const { return this->has_value(); };
 
         // 
-        virtual T* ptr() { handle(has()); return &(*storage); };
-        virtual const T* ptr() const { handle(has()); return &(*storage); };
+        virtual inline T* ptr() { handle(has()); return &(*storage); };
+        virtual inline const T* ptr() const { handle(has()); return &(*storage); };
 
         //
         template<class M = T> inline M* ptr() { handle(has()); return &reinterpret_cast<M&>(this->ref()); };
         template<class M = T> inline const M* ptr() const { handle(has()); return &reinterpret_cast<const M&>(this->ref()); };
 
         // 
-        virtual T& ref() { handle(has()); return *storage; };
-        virtual const T& ref() const { handle(has()); return *storage; };
+        virtual inline T& ref() { handle(has()); return *storage; };
+        virtual inline const T& ref() const { handle(has()); return *storage; };
 
         // 
-        virtual T* operator->() { return ptr(); };
-        virtual const T* operator->() const { return ptr(); };
+        virtual inline T* operator->() { return ptr(); };
+        virtual inline const T* operator->() const { return ptr(); };
 
         //
-        virtual T& operator*() { return ref(); };
-        virtual const T& operator*() const { return ref(); };
+        virtual inline T& operator*() { return ref(); };
+        virtual inline const T& operator*() const { return ref(); };
     };
 
     // Bi-Directional Conversion
@@ -321,60 +321,60 @@ namespace vkt {
         uni_dir(const uni_arg<B>& a) : storage(reinterpret_cast<T&>(*a)) {};
 
         //
-        virtual uni_dir<T, B>& operator= (const T& ptr) { storage = ptr; return *this; };
-        virtual uni_dir<T, B>& operator= (const T* ptr) { storage = *ptr; return *this; };
-        virtual uni_dir<T, B>& operator= (uni_arg<T> t) { storage = t.ref(); return *this; };
-        virtual uni_dir<T, B>& operator= (uni_ptr<T> p) { storage = *p.ptr(); return *this; };
+        virtual inline uni_dir<T, B>& operator= (const T& ptr) { storage = ptr; return *this; };
+        virtual inline uni_dir<T, B>& operator= (const T* ptr) { storage = *ptr; return *this; };
+        virtual inline uni_dir<T, B>& operator= (uni_arg<T> t) { storage = t.ref(); return *this; };
+        virtual inline uni_dir<T, B>& operator= (uni_ptr<T> p) { storage = *p.ptr(); return *this; };
 
         //
-        virtual uni_dir<T, B>& operator= (const B& ptr) { storage = reinterpret_cast<const T&>(ptr); return *this; };
-        virtual uni_dir<T, B>& operator= (const B* ptr) { storage = reinterpret_cast<const T&>(*ptr); return *this; };
-        virtual uni_dir<T, B>& operator= (uni_arg<B> t) { storage = reinterpret_cast<T&>(t.ref()); return *this; };
-        virtual uni_dir<T, B>& operator= (uni_ptr<B> p) { storage = reinterpret_cast<T&>(*p.ptr()); return *this; };
+        virtual inline uni_dir<T, B>& operator= (const B& ptr) { storage = reinterpret_cast<const T&>(ptr); return *this; };
+        virtual inline uni_dir<T, B>& operator= (const B* ptr) { storage = reinterpret_cast<const T&>(*ptr); return *this; };
+        virtual inline uni_dir<T, B>& operator= (uni_arg<B> t) { storage = reinterpret_cast<T&>(t.ref()); return *this; };
+        virtual inline uni_dir<T, B>& operator= (uni_ptr<B> p) { storage = reinterpret_cast<T&>(*p.ptr()); return *this; };
 
         // 
-        virtual operator T& () { return ref(); };
-        virtual operator const T& () const { return ref(); };
+        virtual inline operator T& () { return ref(); };
+        virtual inline operator const T& () const { return ref(); };
 
         // 
-        virtual operator T* () { return ptr(); };
-        virtual operator const T* () const { return ptr(); };
+        virtual inline operator T* () { return ptr(); };
+        virtual inline operator const T* () const { return ptr(); };
 
         // 
-        virtual operator B& () { return reinterpret_cast<B&>(ref()); };
-        virtual operator const B& () const { return reinterpret_cast<const B&>(ref()); };
+        virtual inline operator B& () { return reinterpret_cast<B&>(ref()); };
+        virtual inline operator const B& () const { return reinterpret_cast<const B&>(ref()); };
 
         // 
-        virtual operator B* () { return reinterpret_cast<B*>(ptr()); };
-        virtual operator const B* () const { return reinterpret_cast<const B*>(ptr()); };
+        virtual inline operator B* () { return reinterpret_cast<B*>(ptr()); };
+        virtual inline operator const B* () const { return reinterpret_cast<const B*>(ptr()); };
 
         // 
-        virtual operator uni_ptr<T>() { handle(has()); return *storage; };
-        virtual operator uni_ptr<const T>() const { handle(has()); return *storage; };
+        virtual inline operator uni_ptr<T>() { handle(has()); return *storage; };
+        virtual inline operator uni_ptr<const T>() const { handle(has()); return *storage; };
 
         // 
-        virtual bool has_value() const { return storage.has_value(); };
-        virtual bool has() const { return this->has_value(); };
+        virtual inline bool has_value() const { return storage.has_value(); };
+        virtual inline bool has() const { return this->has_value(); };
 
         // 
-        virtual T* ptr() { handle(has()); return &(*storage); };
-        virtual const T* ptr() const { handle(has()); return &(*storage); };
+        virtual inline T* ptr() { handle(has()); return &(*storage); };
+        virtual inline const T* ptr() const { handle(has()); return &(*storage); };
 
         //
         template<class M = T> inline M* ptr() { handle(has()); return &reinterpret_cast<M&>(this->ref()); };
         template<class M = T> inline const M* ptr() const { handle(has()); return &reinterpret_cast<const M&>(this->ref()); };
 
         // 
-        virtual T& ref() { handle(has()); return *storage; };
-        virtual const T& ref() const { handle(has()); return *storage; };
+        virtual inline T& ref() { handle(has()); return *storage; };
+        virtual inline const T& ref() const { handle(has()); return *storage; };
 
         // 
-        virtual T* operator->() { return ptr(); };
-        virtual const T* operator->() const { return ptr(); };
+        virtual inline T* operator->() { return ptr(); };
+        virtual inline const T* operator->() const { return ptr(); };
 
         //
-        virtual T& operator*() { return ref(); };
-        virtual const T& operator*() const { return ref(); };
+        virtual inline T& operator*() { return ref(); };
+        virtual inline const T& operator*() const { return ref(); };
     };
 
     // aggregate cache

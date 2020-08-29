@@ -14,39 +14,39 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
 
     // 
     #define STRUCT_OPERATORS(NAME)\
-        operator NAME*() { return this; };\
-        operator const NAME*() const { return this; };\
-        operator ::NAME&() { return reinterpret_cast<::NAME&>(*this); };\
-        operator const ::NAME&() const { return reinterpret_cast<const ::NAME&>(*this); };\
-        operator ::NAME*() { return reinterpret_cast<::NAME*>(this); };\
-        operator const ::NAME*() const { return reinterpret_cast<const ::NAME*>(this); };\
-        ::NAME& vk() { return reinterpret_cast<::NAME&>(*this); };\
-        const ::NAME& vk() const { return reinterpret_cast<const ::NAME&>(*this); };\
-        NAME& operator =( const vkt::uni_arg<::NAME>& info ) { memcpy(this, info, sizeof(NAME)); return *this; };\
-        NAME& operator =( const vkt::uni_arg<NAME>& info ) { memcpy(this, info, sizeof(NAME)); return *this; }; \
-        NAME& also(const std::function<NAME*(NAME*)>& fn) { return *fn(this); };\
+        inline operator NAME*() { return this; };\
+        inline operator const NAME*() const { return this; };\
+        inline operator ::NAME&() { return reinterpret_cast<::NAME&>(*this); };\
+        inline operator const ::NAME&() const { return reinterpret_cast<const ::NAME&>(*this); };\
+        inline operator ::NAME*() { return reinterpret_cast<::NAME*>(this); };\
+        inline operator const ::NAME*() const { return reinterpret_cast<const ::NAME*>(this); };\
+        inline ::NAME& vk() { return reinterpret_cast<::NAME&>(*this); };\
+        inline const ::NAME& vk() const { return reinterpret_cast<const ::NAME&>(*this); };\
+        inline NAME& operator =( const vkt::uni_arg<::NAME>& info ) { memcpy(this, info, sizeof(NAME)); return *this; };\
+        inline NAME& operator =( const vkt::uni_arg<NAME>& info ) { memcpy(this, info, sizeof(NAME)); return *this; }; \
+        inline NAME& also(const std::function<NAME*(NAME*)>& fn) { return *fn(this); };\
         inline static NAME create(const std::function<NAME*(NAME*)>& fn = {}) { auto data = NAME{}; return *(fn ? fn(&data) : &data); };
 
 #ifdef VULKAN_HPP
     #define VK_HPP_STRUCT_OPERATORS(NAME,VKNAME)\
         inline static VKNAME cpp() { const auto data = NAME{}; return reinterpret_cast<const VKNAME&>(data); };\
-        operator VKNAME&() { return reinterpret_cast<VKNAME&>(*this); };\
-        operator const VKNAME&() const { return reinterpret_cast<const VKNAME&>(*this); };\
-        operator VKNAME*() { return reinterpret_cast<VKNAME*>(this); };\
-        operator const VKNAME*() const { return reinterpret_cast<const VKNAME*>(this); };\
-        VKNAME* operator->() { return reinterpret_cast<VKNAME*>(this); };\
-        const VKNAME* operator->() const { return reinterpret_cast<const VKNAME*>(this); };\
-        VKNAME& hpp() { return reinterpret_cast<VKNAME&>(*this); };\
-        const VKNAME& hpp() const { return reinterpret_cast<const VKNAME&>(*this); };\
-        NAME& operator =( const vkt::uni_arg<VKNAME>& info ) { memcpy(this, info, sizeof(NAME)); return *this; };
+        inline operator VKNAME&() { return reinterpret_cast<VKNAME&>(*this); };\
+        inline operator const VKNAME&() const { return reinterpret_cast<const VKNAME&>(*this); };\
+        inline operator VKNAME*() { return reinterpret_cast<VKNAME*>(this); };\
+        inline operator const VKNAME*() const { return reinterpret_cast<const VKNAME*>(this); };\
+        inline VKNAME* operator->() { return reinterpret_cast<VKNAME*>(this); };\
+        inline const VKNAME* operator->() const { return reinterpret_cast<const VKNAME*>(this); };\
+        inline VKNAME& hpp() { return reinterpret_cast<VKNAME&>(*this); };\
+        inline const VKNAME& hpp() const { return reinterpret_cast<const VKNAME&>(*this); };\
+        inline NAME& operator =( const vkt::uni_arg<VKNAME>& info ) { memcpy(this, info, sizeof(NAME)); return *this; };
 #else
         #define VK_HPP_STRUCT_OPERATORS(NAME,VKNAME) // Not Vulkan HPP Support
 #endif
 
     #define STRUCT_TYPE_COMPATIBLE(NAME,T)\
-        NAME& operator=(const vkt::uni_arg<T>& V) { memcpy(this, V, sizeof(T)); return *this; };\
-        operator T&() { return reinterpret_cast<T&>(*this); };\
-        operator const T&() const { return reinterpret_cast<const T&>(*this); };
+        inline NAME& operator=(const vkt::uni_arg<T>& V) { memcpy(this, V, sizeof(T)); return *this; };\
+        inline operator T&() { return reinterpret_cast<T&>(*this); };\
+        inline operator const T&() const { return reinterpret_cast<const T&>(*this); };
     
     // GLM-Compatible
     typedef struct VkOffset3D {
