@@ -144,6 +144,10 @@ namespace vkt {
     protected: //using T = uint8_t;
         std::optional<std::reference_wrapper<T>> regular = std::nullopt;
         std::shared_ptr<T> shared = {};
+
+    public:
+        long size = 0ull;
+        void* owner = nullptr;
         //T storage = {};
 
     public: friend uni_ptr<T>; // 
@@ -152,7 +156,19 @@ namespace vkt {
         uni_ptr(const std::shared_ptr<T>& shared) : shared(shared), regular(std::ref(*shared)) {};
         uni_ptr(T* ptr) : regular(std::ref(*ptr)) {};
         uni_ptr(T& ptr) : regular(std::ref(ptr)) {};  // for argument passing
-        
+        uni_ptr(T* ptr, long size, void* owner) : regular(std::ref(*ptr)), size(size), owner(owner) {
+            shared = owner != NULL && owner != ptr ? *(std::shared_ptr<T>*)owner : std::shared_ptr<T>(ptr);
+        };
+        uni_ptr* assign(T* ptr, int size, void* owner) {
+            this->regular = std::ref(*ptr);
+            this->size = size;
+            this->owner = owner;
+            this->shared = owner != NULL && owner != ptr ? *(std::shared_ptr<T>*)owner : std::shared_ptr<T>(ptr);
+            return this;
+        };
+        static void deallocate(void* owner) {
+            if (owner) { delete (std::shared_ptr<T>*)owner; }; // only when shared available
+        };
 
         // 
         virtual inline uni_ptr* operator= (T* ptr) { regular = std::ref(*ptr); return this; };
@@ -184,6 +200,9 @@ namespace vkt {
         // 
         virtual inline T* get_ptr() { 
             T& r = *regular;
+            if (shared && (owner == NULL || owner == &r)) {
+                owner = new std::shared_ptr<T>(shared);
+            };
             return (shared ? &(*shared) : &r);
         };
 
