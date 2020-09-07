@@ -46,8 +46,10 @@
 // 
 #ifdef ENABLE_OPENGL_INTEROP
 #ifdef VKT_USE_GLAD
+#define GLFW_INCLUDE_NONE // Bad Include
 #include <glad/glad.h>
 #else
+#define GLFW_INCLUDE_NONE // Bad Include
 #include <glbinding/gl/gl.h>
 #include <glbinding/gl/extension.h>
 #include <glbinding/glbinding.h>
