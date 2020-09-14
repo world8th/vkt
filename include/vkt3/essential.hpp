@@ -356,6 +356,7 @@ namespace vkt {
             0u, nullptr));
     };
 
+
     // create fence function
     static inline auto createFence(vkt::uni_ptr<xvk::Device> device, const vkt::uni_arg<bool>& signaled = true) {
         VkFenceCreateInfo info = {};
@@ -365,43 +366,67 @@ namespace vkt {
     };
 
     // submit command (with async wait)
-    static inline auto submitCmd(vkt::uni_ptr<xvk::Device> device, const vkt::uni_arg<VkQueue>& queue, const std::vector<VkCommandBuffer>& cmds, vkt::uni_arg<vkh::VkSubmitInfo> smbi = vkh::VkSubmitInfo{}) {
+    static inline auto submitUtilize(vkt::uni_ptr<xvk::Device> device, vkt::uni_arg<VkQueue> queue, vkt::uni_arg<VkCommandPool> cmdPool, std::vector<VkCommandBuffer> cmds, vkt::uni_arg<vkh::VkSubmitInfo> smbi = vkh::VkSubmitInfo{}) {
+        //
+        if (cmds.size() > 0) {
+            smbi->commandBufferCount = static_cast<uint32_t>(cmds.size());
+            smbi->pCommandBuffers = (VkCommandBuffer*)cmds.data();
+        };
+
+        //
+        VkFence fence = createFence(device, false);
+        vkh::handleVk(device->QueueSubmit(queue, 1u, *smbi, fence));
+
+        // 
+        return std::async(std::launch::async | std::launch::deferred, [](vkt::uni_ptr<xvk::Device> device, vkt::uni_arg<VkQueue> queue, vkt::uni_arg<VkCommandPool> cmdPool, vkt::uni_arg<VkFence> fence, std::vector<VkCommandBuffer> cmds, vkt::uni_arg<vkh::VkSubmitInfo> smbi = vkh::VkSubmitInfo{}) {
+            if (cmds.size() > 0) {
+                smbi->commandBufferCount = static_cast<uint32_t>(cmds.size());
+                smbi->pCommandBuffers = (VkCommandBuffer*)cmds.data();
+            };
+            vkh::handleVk(device->WaitForFences(1u, fence, true, 30ull * 1000ull * 1000ull * 1000ull));
+            device->DestroyFence(fence, nullptr);
+            device->FreeCommandBuffers(cmdPool, smbi->commandBufferCount, smbi->pCommandBuffers);
+        }, device, queue, cmdPool, fence, cmds, smbi);
+    };
+
+    // submit command (with async wait)
+    static inline auto submitCmd(vkt::uni_ptr<xvk::Device> device, vkt::uni_arg<VkQueue> queue, const std::vector<VkCommandBuffer>& cmds, vkt::uni_arg<vkh::VkSubmitInfo> smbi = vkh::VkSubmitInfo{}) {
         // no commands 
         if (cmds.size() <= 0) return;
         smbi->commandBufferCount = static_cast<uint32_t>(cmds.size());
         smbi->pCommandBuffers = (VkCommandBuffer*)cmds.data();
 
+        // 
         VkFence fence = createFence(device, false);
         vkh::handleVk(device->QueueSubmit(queue, 1u, *smbi, fence));
         vkh::handleVk(device->WaitForFences(1u, &fence, true, 30ull * 1000ull * 1000ull * 1000ull));
         (device->DestroyFence(fence, nullptr));
 
+        // 
         return;
     };
 
     // once submit command buffer
     // TODO: return VkResult
-    static inline auto submitOnce(vkt::uni_ptr<xvk::Device> device, vkt::uni_arg<VkQueue> queue, const vkt::uni_arg<VkCommandPool>& cmdPool, const std::function<void(VkCommandBuffer&)>& cmdFn = {}, const vkt::uni_arg<vkh::VkSubmitInfo>& smbi = vkh::VkSubmitInfo{}) {
+    static inline auto submitOnce(vkt::uni_ptr<xvk::Device> device, vkt::uni_arg<VkQueue> queue, vkt::uni_arg<VkCommandPool> cmdPool, const std::function<void(VkCommandBuffer&)>& cmdFn = {}, const vkt::uni_arg<vkh::VkSubmitInfo>& smbi = vkh::VkSubmitInfo{}) {
         auto cmdBuf = createCommandBuffer(device, cmdPool, false); cmdFn(cmdBuf); vkh::handleVk(device->EndCommandBuffer(cmdBuf)); //vkEndCommandBuffer(cmdBuf);
         submitCmd(device, queue, { cmdBuf }); device->FreeCommandBuffers(cmdPool, 1u, &cmdBuf);
     };
 
     // submit command (with async wait)
     // TODO: return VkResult
-    static inline auto submitCmdAsync(vkt::uni_ptr<xvk::Device> device, vkt::uni_arg<VkQueue> queue, const std::vector<VkCommandBuffer>& cmds, const vkt::uni_arg<vkh::VkSubmitInfo>& smbi = vkh::VkSubmitInfo{}) {
-        return std::async(std::launch::async | std::launch::deferred, [=]() {
-            return submitCmd(device, queue, cmds, smbi);
-            });
-    };
+    // BROKEN! 
+    //static inline auto submitCmdAsync(vkt::uni_ptr<xvk::Device> device, vkt::uni_arg<VkQueue> queue, std::vector<VkCommandBuffer> cmds, vkt::uni_arg<vkh::VkSubmitInfo> smbi = vkh::VkSubmitInfo{}) {
+    //    return std::async(std::launch::async | std::launch::deferred, [=]() {
+    //        return submitCmd(device, queue, cmds, smbi);
+    //    });
+    //};
 
     // once submit command buffer
     // TODO: return VkResult
-    static inline auto submitOnceAsync(vkt::uni_ptr<xvk::Device> device, vkt::uni_arg<VkQueue> queue, const vkt::uni_arg<VkCommandPool>& cmdPool, const std::function<void(VkCommandBuffer&)>& cmdFn = {}, const vkt::uni_arg<vkh::VkSubmitInfo>& smbi = vkh::VkSubmitInfo{}) {
-        VkCommandBuffer cmdBuf = createCommandBuffer(device, cmdPool, false); cmdFn(cmdBuf); vkh::handleVk(device->EndCommandBuffer(cmdBuf));//vkEndCommandBuffer(cmdBuf);
-        return std::async(std::launch::async | std::launch::deferred, [&]() {
-            submitCmdAsync(device, queue, { cmdBuf }, smbi).get();
-            device->FreeCommandBuffers(cmdPool, 1u, &cmdBuf);
-            });
+    static inline auto submitOnceAsync(vkt::uni_ptr<xvk::Device> device, vkt::uni_arg<VkQueue> queue, vkt::uni_arg<VkCommandPool> cmdPool, const std::function<void(VkCommandBuffer&)>& cmdFn = {}, const vkt::uni_arg<vkh::VkSubmitInfo>& smbi = vkh::VkSubmitInfo{}) {
+        VkCommandBuffer cmdBuf = createCommandBuffer(device, cmdPool, false); cmdFn(cmdBuf); vkh::handleVk(device->EndCommandBuffer(cmdBuf)); cmdFn(cmdBuf);
+        return submitUtilize(device, queue, cmdPool, { cmdBuf }, smbi);
     };
 
     // Dedicated Semaphore Creator
