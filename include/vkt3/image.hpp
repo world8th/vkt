@@ -36,10 +36,25 @@ namespace vkt {
             this->info = allocationInfo;
 
             // 
+            VkExternalMemoryImageCreateInfo extMemInfo = {};
+            extMemInfo.sType = VK_STRUCTURE_TYPE_EXTERNAL_MEMORY_IMAGE_CREATE_INFO;
+            extMemInfo.pNext = nullptr;
+
+            // 
             vkh::VkImageUsageFlags usage = createInfo->usage;
             if (this->info.memUsage == VMA_MEMORY_USAGE_CPU_TO_GPU) { usage.eTransferSrc = 1; };
             if (this->info.memUsage == VMA_MEMORY_USAGE_GPU_TO_CPU) { usage.eTransferDst = 1; };
             if (this->info.memUsage == VMA_MEMORY_USAGE_GPU_ONLY) { usage.eTransferDst = 1, usage.eTransferSrc = 1; };
+
+            // 
+            {
+                auto* prevPtr = createInfo->pNext;
+                createInfo->pNext = &extMemInfo;
+                extMemInfo.pNext = prevPtr;
+#ifdef VKT_WIN32_DETECTED
+                extMemInfo.handleTypes = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_WIN32_BIT;
+#endif
+            };
 
             // 
             vkh::VkMemoryAllocateFlagsInfo allocFlags = {};
