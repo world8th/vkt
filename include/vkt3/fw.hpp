@@ -120,6 +120,11 @@ namespace vkt
 
 
         // 
+        public: virtual GPUFramework* submitUtilize(vkt::uni_arg<VkCommandBuffer> cmds, vkt::uni_arg<vkh::VkSubmitInfo> smbi = vkh::VkSubmitInfo{}) {
+            return this->submitUtilize(std::vector<VkCommandBuffer>{ cmds }, smbi);
+        };
+
+        // 
         public: virtual GPUFramework* submitUtilize(const std::vector<VkCommandBuffer>& cmds, vkt::uni_arg<vkh::VkSubmitInfo> smbi = vkh::VkSubmitInfo{}) {
             vkt::submitUtilize(this->getDeviceDispatch(), VkQueue(*this), VkCommandPool(*this), cmds, smbi);
             return this;

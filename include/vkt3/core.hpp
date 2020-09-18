@@ -141,6 +141,7 @@ namespace vkt {
         };
     };
 
+    // Prefer Owner with Shared PTR!
     template<class T = uint8_t>
     class uni_ptr {
     protected: //using T = uint8_t;
@@ -154,8 +155,12 @@ namespace vkt {
 
     public: friend uni_ptr<T>; // 
         inline uni_ptr() {};
-        inline uni_ptr(const uni_ptr<T>& ptr) : shared(ptr.shared), regular(std::ref(*ptr.regular)) {};
-        inline uni_ptr(const std::shared_ptr<T>& shared) : shared(shared), regular(std::ref(*shared)) {};
+        inline uni_ptr(const uni_ptr<T>& ptr) : shared(ptr.shared), regular(std::ref(*ptr.regular)), size(ptr.size), owner(ptr.owner) { 
+            if (shared && !owner) { owner = &this->shared; }; // JavaCPP direct shared_ptr
+        };
+        inline uni_ptr(const std::shared_ptr<T>& shared) : shared(shared), regular(std::ref(*shared)) { 
+            if (shared && !owner) { owner = &this->shared; }; // JavaCPP direct shared_ptr
+        };
         inline uni_ptr(T* ptr) : regular(std::ref(*ptr)) {};
         inline uni_ptr(T& ptr) : regular(std::ref(ptr)) {};  // for argument passing
         inline uni_ptr(T* ptr, long size, void* owner) : regular(std::ref(*ptr)), size(size), owner(owner) {
@@ -175,15 +180,15 @@ namespace vkt {
         // 
         virtual inline uni_ptr* operator= (T* ptr) { regular = std::ref(*ptr); return this; };
         virtual inline uni_ptr* operator= (T& ptr) { regular = std::ref( ptr); return this; }; // for argument passing
-        virtual inline uni_ptr* operator= (std::shared_ptr<T> ptr) { shared = ptr, regular = std::ref(*ptr); return this; };
-        virtual inline uni_ptr* operator= (const uni_ptr<T>& ptr) {
-            T& ref = *ptr.regular;
-            shared = ptr.shared, regular = std::ref(ref);
+        virtual inline uni_ptr* operator= (const std::shared_ptr<T>& ptr) {
+            shared = ptr, regular = std::ref(*ptr); 
+            if (shared && !owner) { owner = &this->shared; }; // JavaCPP direct shared_ptr
             return this;
         };
-        virtual inline uni_ptr* operator= (uni_ptr<T>& ptr) {
+        virtual inline uni_ptr* operator= (const uni_ptr<T>& ptr) {
             T& ref = *ptr.regular;
-            shared = ptr.shared, regular = std::ref(ref);
+            shared = ptr.shared, regular = std::ref(ref), owner = ptr.owner, size = ptr.size;
+            if (shared && !owner) { owner = &this->shared; }; // JavaCPP direct shared_ptr
             return this;
         };
 
