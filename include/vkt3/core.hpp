@@ -153,7 +153,7 @@ namespace vkt {
 
     inline void handle(const bool& valid = false) {
         if (!valid) {
-            std::cerr << "std::optional is wrong or not initialized" << std::endl; assert(valid);
+            //std::cerr << "std::optional is wrong or not initialized" << std::endl; assert(valid);
         };
     };
 
@@ -504,7 +504,7 @@ namespace vkh {
 
     static inline decltype(auto) handleVk(vkt::uni_arg<VkResult> result) {
         if (result != VK_SUCCESS) { // TODO: Fix Ubuntu Issue
-            std::cerr << "ERROR: VkResult Error Code: " << std::to_string(result) << " (" << errorString(result) << ")..." << std::endl; throw (*result);
+            //std::cerr << "ERROR: VkResult Error Code: " << std::to_string(result) << " (" << errorString(result) << ")..." << std::endl; throw (*result);
 
             assert(result == VK_SUCCESS);
 #ifdef VKT_ENABLE_GLFW_LINKED
