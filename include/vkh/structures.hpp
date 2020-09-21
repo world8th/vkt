@@ -1,9 +1,8 @@
 #pragma once // #
 
-#include <vkh/core.hpp>
+#include <vkt3/core.hpp>
 #include <vkh/enums.hpp>
 #include <vkh/bitfields.hpp>
-#include <functional>
 
 namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
                 // TODO: WIP FULL C++20 SUPPORT

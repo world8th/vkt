@@ -1,7 +1,10 @@
 #pragma once // #
-// 
-#include "./fw.hpp"
 
+// 
+#include <vkt3/fw.hpp>
+#include <vkh/helpers.hpp>
+
+// 
 #define VKT_IMPLEMENT_FRAMEWORK
 
 // TODO: FULL REWRITE OF THAT "PROJECT"!!!

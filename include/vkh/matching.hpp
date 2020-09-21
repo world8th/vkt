@@ -3,7 +3,7 @@
 #include <vkh/core.hpp>
 #include <vkh/enums.hpp>
 #include <vkh/bitfields.hpp>
-#include <functional>
+
 
 namespace vkh {
 

@@ -1,29 +1,6 @@
 #pragma once // #
 
-// 
-#include <memory>
-#include <vector>
-#include <functional>
-
-/*
-// Enable Vulkan-HPP when defined
-#ifdef VULKAN_HPP
-#define ENABLE_VULKAN_HPP
-#endif
-
-//
-#include <vulkan/vulkan.h>
-
-// When enabled, use Vulkan-HPP support...
-#ifdef ENABLE_VULKAN_HPP
-#include <vulkan/vulkan.hpp>
-#endif
-
-// 
-#include <xvk/xvk.hpp>
-*/
-
-#include <vkh/core.hpp>
+#include <vkt3/core.hpp>
 #include <glm/glm.hpp>
 
 // 

@@ -73,29 +73,7 @@ namespace vkt {
         return extensions;
     };
 
-    // 
-    inline VkResult AllocateDescriptorSetWithUpdate(const vkt::uni_ptr<xvk::Device>& device, vkh::VsDescriptorSetCreateInfoHelper& helper, VkDescriptorSet& descriptorSet, bool& protection) {
-        if (!protection) {
-            // Corrupt... 
-            if (descriptorSet) { vkh::handleVk(device->vkFreeDescriptorSets(device->handle, helper, 1u, &descriptorSet)); descriptorSet = {}; };
 
-            // 
-            bool created = false;
-            if (!descriptorSet) { vkh::handleVk(device->vkAllocateDescriptorSets(device->handle, helper, &descriptorSet)); created = true; };
-
-            //
-            if (descriptorSet && created) {
-                const auto& writes = helper.setDescriptorSet(descriptorSet).mapWriteDescriptorSet();
-                device->vkUpdateDescriptorSets(device->handle, uint32_t(writes.size()), reinterpret_cast<const VkWriteDescriptorSet*>(writes.data()), 0u, nullptr);
-            };
-
-            // 
-            protection = true;
-        };
-
-        // 
-        return VK_SUCCESS;
-    };
 
     
 

@@ -5,7 +5,6 @@
 #endif
 
 #include "essential.hpp"
-#include <memory>
 
 namespace vkt {
 

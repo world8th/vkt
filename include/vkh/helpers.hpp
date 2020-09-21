@@ -1,7 +1,7 @@
 #pragma once // #
 
 //#define VKT_CORE_ENABLE_XVK
-#include <vkh/core.hpp>
+#include <vkt3/core.hpp>
 #include <vkh/structures.hpp>
 #include <string_view>
 #include <string>
@@ -27,53 +27,6 @@ namespace vkh {
 
 #define VK_FLAGS_NONE 0 // Custom define for better code readability
 #define DEFAULT_FENCE_TIMEOUT (30ull*1000ull*1000ull*1000ull) // Default fence timeout in nanoseconds
-
-
-    static inline std::string errorString(VkResult errorCode) {
-        switch (errorCode) {
-#define STR(r) case VK_ ##r: return #r
-            STR(NOT_READY);
-            STR(TIMEOUT);
-            STR(EVENT_SET);
-            STR(EVENT_RESET);
-            STR(INCOMPLETE);
-            STR(ERROR_OUT_OF_HOST_MEMORY);
-            STR(ERROR_OUT_OF_DEVICE_MEMORY);
-            STR(ERROR_INITIALIZATION_FAILED);
-            STR(ERROR_DEVICE_LOST);
-            STR(ERROR_MEMORY_MAP_FAILED);
-            STR(ERROR_LAYER_NOT_PRESENT);
-            STR(ERROR_EXTENSION_NOT_PRESENT);
-            STR(ERROR_FEATURE_NOT_PRESENT);
-            STR(ERROR_INCOMPATIBLE_DRIVER);
-            STR(ERROR_TOO_MANY_OBJECTS);
-            STR(ERROR_FORMAT_NOT_SUPPORTED);
-            STR(ERROR_SURFACE_LOST_KHR);
-            STR(ERROR_NATIVE_WINDOW_IN_USE_KHR);
-            STR(SUBOPTIMAL_KHR);
-            STR(ERROR_OUT_OF_DATE_KHR);
-            STR(ERROR_INCOMPATIBLE_DISPLAY_KHR);
-            STR(ERROR_VALIDATION_FAILED_EXT);
-            STR(ERROR_INVALID_SHADER_NV);
-#undef STR
-        default:
-            return "UNKNOWN_ERROR";
-        }
-    };
-
-
-    static inline decltype(auto) handleVk(vkt::uni_arg<VkResult> result) {
-        if (result != VK_SUCCESS) { // TODO: Fix Ubuntu Issue
-            std::cerr <<   "ERROR: VkResult Error Code: " << std::to_string(result) << " (" << errorString(result) << ")..."  << std::endl; throw (*result);
-
-            assert(result == VK_SUCCESS);
-#ifdef VKT_ENABLE_GLFW_LINKED
-            glfwTerminate();
-#endif
-            exit(result);
-        };
-        return result;
-    };
 
 #ifdef VKT_CORE_ENABLE_XVK
     inline auto vsEnumeratePhysicalDevices(vkt::uni_ptr<xvk::Instance> instance) {
@@ -844,5 +797,30 @@ namespace vkh {
 
     // TODO: IMAGE VIEW REGION IN MIP LEVEL
     // WILL USED FOR SIMPLER COPYING
+
+    // 
+    inline VkResult AllocateDescriptorSetWithUpdate(const vkt::uni_ptr<xvk::Device>& device, vkh::VsDescriptorSetCreateInfoHelper& helper, VkDescriptorSet& descriptorSet, bool& protection) {
+        if (!protection) {
+            // Corrupt... 
+            if (descriptorSet) { vkh::handleVk(device->vkFreeDescriptorSets(device->handle, helper, 1u, &descriptorSet)); descriptorSet = {}; };
+
+            // 
+            bool created = false;
+            if (!descriptorSet) { vkh::handleVk(device->vkAllocateDescriptorSets(device->handle, helper, &descriptorSet)); created = true; };
+
+            //
+            if (descriptorSet && created) {
+                const auto& writes = helper.setDescriptorSet(descriptorSet).mapWriteDescriptorSet();
+                device->vkUpdateDescriptorSets(device->handle, uint32_t(writes.size()), reinterpret_cast<const ::VkWriteDescriptorSet*>(writes.data()), 0u, nullptr);
+            };
+
+            // 
+            protection = true;
+        };
+
+        // 
+        return VK_SUCCESS;
+    };
+
 
 };
