@@ -1,9 +1,9 @@
 ﻿#pragma once // #
 
 // 
-#include "essential.hpp"
-#include "vector.hpp"
-#include "image.hpp"
+#include "./essential.hpp"
+#include "./vector.hpp"
+#include "./image.hpp"
 
 // 
 namespace vkt {

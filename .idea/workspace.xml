@@ -2,12 +2,72 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="4d2a495b-8033-4094-8f05-9d8023f436de" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/include/vkt3/core.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/vkt3/core.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/volk" beforeDir="false" afterPath="$PROJECT_DIR$/include/volk" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/volk/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/include/volk/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/volk/volk.c" beforeDir="false" afterPath="$PROJECT_DIR$/include/volk/volk.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/volk/volk.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/volk/volk.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/glm/detail/setup.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/glm/detail/setup.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/glm/detail/type_half.inl" beforeDir="false" afterPath="$PROJECT_DIR$/include/glm/detail/type_half.inl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/glm/detail/type_vec2.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/glm/detail/type_vec2.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/glm/detail/type_vec3.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/glm/detail/type_vec3.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/glm/detail/type_vec4.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/glm/detail/type_vec4.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/glm/ext/matrix_transform.inl" beforeDir="false" afterPath="$PROJECT_DIR$/include/glm/ext/matrix_transform.inl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/glm/ext/quaternion_exponential.inl" beforeDir="false" afterPath="$PROJECT_DIR$/include/glm/ext/quaternion_exponential.inl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/glm/ext/vector_int1_precision.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/glm/ext/vector_int2_precision.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/glm/ext/vector_int3_precision.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/glm/ext/vector_int4_precision.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/glm/ext/vector_uint1_precision.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/glm/ext/vector_uint2_precision.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/glm/ext/vector_uint3_precision.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/glm/ext/vector_uint4_precision.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/glm/simd/neon.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/glm/simd/neon.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/glm/trigonometric.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/glm/trigonometric.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/vkt3/fw-impl.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/vkt3/fw-impl.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/vkt3/fw.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/vkt3/fw.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/vkt3/image.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/vkt3/image.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/vkt3/structs.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/vkt3/structs.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/vkt3/utils.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/vkt3/utils.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/vkt3/vector.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/vkt3/vector.hpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk" beforeDir="false" afterPath="$PROJECT_DIR$/include/xvk" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/Vulkan-Headers" beforeDir="false" afterPath="$PROJECT_DIR$/include/xvk/Vulkan-Headers" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/Vulkan-Headers/.cmake-format.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/Vulkan-Headers/.gitattributes" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/Vulkan-Headers/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/Vulkan-Headers/BUILD.gn" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/Vulkan-Headers/BUILD.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/Vulkan-Headers/CMakeLists.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/Vulkan-Headers/CODE_OF_CONDUCT.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/Vulkan-Headers/LICENSE.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/Vulkan-Headers/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/Vulkan-Headers/cmake/Copyright_cmake.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/Vulkan-Headers/cmake/cmake_uninstall.cmake.in" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/Vulkan-Headers/include/vulkan/vk_icd.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/Vulkan-Headers/include/vulkan/vk_layer.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/Vulkan-Headers/include/vulkan/vk_platform.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/Vulkan-Headers/include/vulkan/vk_sdk_platform.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/Vulkan-Headers/include/vulkan/vulkan.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/Vulkan-Headers/include/vulkan/vulkan.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/Vulkan-Headers/include/vulkan/vulkan_android.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/Vulkan-Headers/include/vulkan/vulkan_beta.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/Vulkan-Headers/include/vulkan/vulkan_core.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/Vulkan-Headers/include/vulkan/vulkan_directfb.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/Vulkan-Headers/include/vulkan/vulkan_fuchsia.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/Vulkan-Headers/include/vulkan/vulkan_ggp.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/Vulkan-Headers/include/vulkan/vulkan_ios.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/Vulkan-Headers/include/vulkan/vulkan_macos.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/Vulkan-Headers/include/vulkan/vulkan_metal.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/Vulkan-Headers/include/vulkan/vulkan_vi.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/Vulkan-Headers/include/vulkan/vulkan_wayland.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/Vulkan-Headers/include/vulkan/vulkan_win32.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/Vulkan-Headers/include/vulkan/vulkan_xcb.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/Vulkan-Headers/include/vulkan/vulkan_xlib.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/Vulkan-Headers/include/vulkan/vulkan_xlib_xrandr.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/Vulkan-Headers/registry/cgenerator.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/Vulkan-Headers/registry/conventions.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/Vulkan-Headers/registry/generator.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/Vulkan-Headers/registry/genvk.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/Vulkan-Headers/registry/reg.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/Vulkan-Headers/registry/spec_tools/util.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/Vulkan-Headers/registry/validusage.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/Vulkan-Headers/registry/vk.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/Vulkan-Headers/registry/vkconventions.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glfw" beforeDir="false" afterPath="$PROJECT_DIR$/include/xvk/glfw" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glfw/.appveyor.yml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glfw/.gitattributes" beforeDir="false" />
@@ -15,7 +75,10 @@
       <change beforePath="$PROJECT_DIR$/include/xvk/glfw/.mailmap" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glfw/.travis.yml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glfw/CMake/GenerateMappings.cmake" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/xvk/glfw/CMake/MacOSXBundleInfo.plist.in" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/glfw/CMake/Info.plist.in" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/glfw/CMake/cmake_uninstall.cmake.in" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/glfw/CMake/glfw3.pc.in" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/glfw/CMake/glfw3Config.cmake.in" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glfw/CMake/i686-w64-mingw32-clang.cmake" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glfw/CMake/i686-w64-mingw32.cmake" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glfw/CMake/modules/FindEpollShim.cmake" beforeDir="false" />
@@ -27,7 +90,6 @@
       <change beforePath="$PROJECT_DIR$/include/xvk/glfw/CMakeLists.txt" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glfw/LICENSE.md" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glfw/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/xvk/glfw/cmake_uninstall.cmake.in" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glfw/deps/getopt.c" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glfw/deps/getopt.h" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glfw/deps/glad/gl.h" beforeDir="false" />
@@ -57,7 +119,8 @@
       <change beforePath="$PROJECT_DIR$/include/xvk/glfw/docs/compile.dox" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glfw/docs/context.dox" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glfw/docs/extra.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/xvk/glfw/docs/extra.less" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/glfw/docs/extra.css.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/glfw/docs/extra.scss" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glfw/docs/footer.html" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glfw/docs/header.html" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glfw/docs/input.dox" beforeDir="false" />
@@ -81,9 +144,10 @@
       <change beforePath="$PROJECT_DIR$/include/xvk/glfw/examples/offscreen.c" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glfw/examples/particles.c" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glfw/examples/sharing.c" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/xvk/glfw/examples/simple.c" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glfw/examples/splitview.c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/glfw/examples/triangle-opengl.c" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glfw/examples/wave.c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/glfw/examples/windows.c" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glfw/include/GLFW/glfw3.h" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glfw/include/GLFW/glfw3native.h" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glfw/src/CMakeLists.txt" beforeDir="false" />
@@ -97,8 +161,7 @@
       <change beforePath="$PROJECT_DIR$/include/xvk/glfw/src/context.c" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glfw/src/egl_context.c" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glfw/src/egl_context.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/xvk/glfw/src/glfw3.pc.in" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/xvk/glfw/src/glfw3Config.cmake.in" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/glfw/src/glfw.rc.in" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glfw/src/glfw_config.h.in" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glfw/src/glx_context.c" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glfw/src/glx_context.h" beforeDir="false" />
@@ -159,14 +222,13 @@
       <change beforePath="$PROJECT_DIR$/include/xvk/glfw/tests/joysticks.c" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glfw/tests/monitors.c" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glfw/tests/msaa.c" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/xvk/glfw/tests/opacity.c" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glfw/tests/reopen.c" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glfw/tests/tearing.c" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glfw/tests/threads.c" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glfw/tests/timeout.c" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glfw/tests/title.c" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glfw/tests/triangle-vulkan.c" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/xvk/glfw/tests/windows.c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/glfw/tests/window.c" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glm" beforeDir="false" afterPath="$PROJECT_DIR$/include/xvk/glm" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glm/.appveyor.yml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glm/.gitignore" beforeDir="false" />
@@ -1694,6 +1756,7 @@
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Android.mk" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/BUILD.bazel" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/BUILD.gn" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/glslang/CHANGES.md" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/CMakeLists.txt" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/CODE_OF_CONDUCT.md" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/ChooseMSVCCRT.cmake" beforeDir="false" />
@@ -2185,6 +2248,7 @@
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Test/baseResults/hlsl.matType.frag.out" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Test/baseResults/hlsl.matType.int.frag.out" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Test/baseResults/hlsl.matpack-1.frag.out" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Test/baseResults/hlsl.matpack-pragma-global.frag.out" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Test/baseResults/hlsl.matpack-pragma.frag.out" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Test/baseResults/hlsl.matrixSwizzle.vert.out" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Test/baseResults/hlsl.matrixindex.frag.out" beforeDir="false" />
@@ -2432,6 +2496,7 @@
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Test/baseResults/rayQuery-allOps.frag.out" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Test/baseResults/rayQuery-allOps.rgen.out" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Test/baseResults/rayQuery-committed.Error.rgen.out" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Test/baseResults/rayQuery-initialization.Error.comp.out" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Test/baseResults/rayQuery-initialize.rgen.out" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Test/baseResults/rayQuery-no-cse.rgen.out" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Test/baseResults/rayQuery.rgen.out" beforeDir="false" />
@@ -2559,6 +2624,8 @@
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Test/baseResults/spv.arbPostDepthCoverage_Error.frag.out" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Test/baseResults/spv.atomic.comp.out" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Test/baseResults/spv.atomicCounter.comp.out" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Test/baseResults/spv.atomicFloat.comp.out" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Test/baseResults/spv.atomicFloat_Error.comp.out" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Test/baseResults/spv.atomicInt64.comp.out" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Test/baseResults/spv.barrier.vert.out" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Test/baseResults/spv.bitCast.frag.out" beforeDir="false" />
@@ -2641,6 +2708,7 @@
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Test/baseResults/spv.ext.RayGenShaderArray.rgen.out" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Test/baseResults/spv.ext.RayGenShader_Errors.rgen.out" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Test/baseResults/spv.ext.RayPrimCull_Errors.rgen.out" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Test/baseResults/spv.ext.World3x4.rahit.out" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Test/baseResults/spv.extPostDepthCoverage.frag.out" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Test/baseResults/spv.extPostDepthCoverage_Error.frag.out" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Test/baseResults/spv.float16.frag.out" beforeDir="false" />
@@ -2732,7 +2800,9 @@
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Test/baseResults/spv.precise.tesc.out" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Test/baseResults/spv.precise.tese.out" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Test/baseResults/spv.precision.frag.out" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Test/baseResults/spv.precisionArgs.frag.out" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Test/baseResults/spv.precisionNonESSamp.frag.out" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Test/baseResults/spv.precisionTexture.frag.out" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Test/baseResults/spv.prepost.frag.out" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Test/baseResults/spv.privateVariableTypes.frag.out" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Test/baseResults/spv.pushConstant.vert.out" beforeDir="false" />
@@ -3170,6 +3240,7 @@
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Test/hlsl.matType.frag" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Test/hlsl.matType.int.frag" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Test/hlsl.matpack-1.frag" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Test/hlsl.matpack-pragma-global.frag" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Test/hlsl.matpack-pragma.frag" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Test/hlsl.matrixSwizzle.vert" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Test/hlsl.matrixindex.frag" beforeDir="false" />
@@ -3435,6 +3506,7 @@
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Test/rayQuery-allOps.frag" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Test/rayQuery-allOps.rgen" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Test/rayQuery-committed.Error.rgen" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Test/rayQuery-initialization.Error.comp" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Test/rayQuery-initialize.rgen" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Test/rayQuery-no-cse.rgen" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Test/rayQuery.rgen" beforeDir="false" />
@@ -3562,6 +3634,8 @@
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Test/spv.arbPostDepthCoverage_Error.frag" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Test/spv.atomic.comp" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Test/spv.atomicCounter.comp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Test/spv.atomicFloat.comp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Test/spv.atomicFloat_Error.comp" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Test/spv.atomicInt64.comp" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Test/spv.barrier.vert" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Test/spv.bitCast.frag" beforeDir="false" />
@@ -3643,6 +3717,7 @@
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Test/spv.ext.RayGenShaderArray.rgen" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Test/spv.ext.RayGenShader_Errors.rgen" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Test/spv.ext.RayPrimCull_Errors.rgen" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Test/spv.ext.World3x4.rahit" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Test/spv.extPostDepthCoverage.frag" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Test/spv.extPostDepthCoverage_Error.frag" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Test/spv.float16.frag" beforeDir="false" />
@@ -3734,7 +3809,9 @@
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Test/spv.precise.tesc" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Test/spv.precise.tese" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Test/spv.precision.frag" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Test/spv.precisionArgs.frag" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Test/spv.precisionNonESSamp.frag" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Test/spv.precisionTexture.frag" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Test/spv.prepost.frag" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Test/spv.privateVariableTypes.frag" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Test/spv.pushConstant.vert" beforeDir="false" />
@@ -3909,6 +3986,8 @@
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/Test/xfbUnsizedArray.error.vert" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/WORKSPACE" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/_config.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/glslang/build_info.h.tmpl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/glslang/build_info.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/build_overrides/glslang.gni" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/glslang/CInterface/glslang_c_interface.cpp" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/glslang/CMakeLists.txt" beforeDir="false" />
@@ -3929,7 +4008,6 @@
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/glslang/HLSL/hlslTokenStream.cpp" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/glslang/HLSL/hlslTokenStream.h" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/glslang/HLSL/hlslTokens.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/xvk/glslang/glslang/HLSL/pch.cpp" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/glslang/HLSL/pch.h" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/glslang/Include/BaseTypes.h" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/glslang/Include/Common.h" beforeDir="false" />
@@ -3944,8 +4022,6 @@
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/glslang/Include/glslang_c_interface.h" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/glslang/Include/glslang_c_shader_types.h" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/glslang/Include/intermediate.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/xvk/glslang/glslang/Include/revision.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/xvk/glslang/glslang/Include/revision.template" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/glslang/MachineIndependent/Constant.cpp" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/glslang/MachineIndependent/InfoSink.cpp" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/glslang/MachineIndependent/Initialize.cpp" beforeDir="false" />
@@ -3982,7 +4058,6 @@
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/glslang/MachineIndependent/localintermediate.h" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/glslang/MachineIndependent/parseConst.cpp" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/glslang/MachineIndependent/parseVersions.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/xvk/glslang/glslang/MachineIndependent/pch.cpp" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/glslang/MachineIndependent/pch.h" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/glslang/MachineIndependent/preprocessor/Pp.cpp" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/glslang/MachineIndependent/preprocessor/PpAtom.cpp" beforeDir="false" />
@@ -4025,7 +4100,6 @@
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/gtests/TestFixture.cpp" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/gtests/TestFixture.h" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/gtests/main.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/xvk/glslang/gtests/pch.cpp" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/gtests/pch.h" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/hlsl/CMakeLists.txt" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/hlsl/stub.cpp" beforeDir="false" />
@@ -4035,33 +4109,36 @@
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/kokoro/android-ndk-build/build.sh" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/kokoro/android-ndk-build/continuous.cfg" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/kokoro/android-ndk-build/presubmit.cfg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/glslang/kokoro/license-check/build-docker.sh" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/glslang/kokoro/license-check/build.sh" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/glslang/kokoro/license-check/continuous.cfg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/glslang/kokoro/license-check/presubmit.cfg" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/kokoro/linux-clang-cmake/build-docker.sh" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/kokoro/linux-clang-cmake/build.sh" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/xvk/glslang/kokoro/linux-clang-cmake/continuous.cfg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/xvk/glslang/kokoro/linux-clang-cmake/presubmit.cfg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/glslang/kokoro/linux-clang-cmake/shared/continuous.cfg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/glslang/kokoro/linux-clang-cmake/shared/presubmit.cfg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/glslang/kokoro/linux-clang-cmake/static/continuous.cfg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/glslang/kokoro/linux-clang-cmake/static/presubmit.cfg" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/kokoro/linux-clang-release-bazel/build.sh" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/kokoro/linux-clang-release-bazel/continuous.cfg" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/kokoro/linux-clang-release-bazel/presubmit.cfg" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/kokoro/linux-gcc-cmake/build-docker.sh" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/kokoro/linux-gcc-cmake/build.sh" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/xvk/glslang/kokoro/linux-gcc-cmake/continuous.cfg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/xvk/glslang/kokoro/linux-gcc-cmake/presubmit.cfg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/glslang/kokoro/linux-gcc-cmake/shared/continuous.cfg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/glslang/kokoro/linux-gcc-cmake/shared/presubmit.cfg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/glslang/kokoro/linux-gcc-cmake/static/continuous.cfg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/glslang/kokoro/linux-gcc-cmake/static/presubmit.cfg" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/kokoro/macos-clang-release-bazel/build.sh" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/kokoro/macos-clang-release-bazel/continuous.cfg" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/kokoro/macos-clang-release-bazel/presubmit.cfg" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/kokoro/windows-msvc-2015-release-bazel/build.bat" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/kokoro/windows-msvc-2015-release-bazel/continuous.cfg" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/kokoro/windows-msvc-2015-release-bazel/presubmit.cfg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/xvk/glslang/make-revision" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/xvk/glslang/license-checker.cfg" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/ndk_test/Android.mk" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/ndk_test/jni/Application.mk" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/ndk_test/test.cpp" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/glslang/update_glslang_sources.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/xvk/xvk.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/xvk/xvk.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/xvk/xvkBase.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/xvk/xvkBase.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/xvk/xvkInterface.c" beforeDir="false" afterPath="$PROJECT_DIR$/include/xvk/xvkInterface.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/xvk/xvkInterface.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/xvk/xvkInterface.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/xvk/xvkInterface.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/xvk/xvkInterface.hpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

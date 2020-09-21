@@ -34,12 +34,12 @@
 #endif
 
 // Force include for avoid GLAD problem...
-#include "core.hpp"
-#include "essential.hpp"
-#include "vector.hpp"
-#include "image.hpp"
-#include "utils.hpp"
-#include "structs.hpp"
+#include "./core.hpp"
+#include "./essential.hpp"
+#include "./vector.hpp"
+#include "./image.hpp"
+#include "./structs.hpp"
+//#include "./utils.hpp"
 
 //#define VKT_ENABLE_DEBUG
 

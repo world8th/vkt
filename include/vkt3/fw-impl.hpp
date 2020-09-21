@@ -1,8 +1,11 @@
 #pragma once // #
 
 // 
-#include <vkt3/fw.hpp>
 #include <vkh/helpers.hpp>
+
+// 
+#include "./fw.hpp"
+#include "./utils.hpp"
 
 // 
 #define VKT_IMPLEMENT_FRAMEWORK
