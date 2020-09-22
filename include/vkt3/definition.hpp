@@ -1,6 +1,10 @@
 #pragma once // #
 
 // 
+#ifndef VKT_DEFINITION_H
+#define VKT_DEFINITION_H
+
+// 
 #ifdef USE_CIMG
 #include "tinyexr.h"
 #define cimg_plugin "CImg/tinyexr_plugin.hpp"
@@ -49,4 +53,7 @@
 #include <optix/optix.h>
 #include <optix/optix_stubs.h>
 #include <optix/optix_types.h>
+#endif
+
+
 #endif

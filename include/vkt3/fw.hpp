@@ -35,7 +35,7 @@
 
 // Force include for avoid GLAD problem...
 #include "./core.hpp"
-#include "./essential.hpp"
+#include "./inline.hpp"
 #include "./vector.hpp"
 #include "./image.hpp"
 #include "./structs.hpp"
@@ -120,56 +120,12 @@ namespace vkt
 
 
         // 
-        public: virtual GPUFramework* submitUtilize(vkt::uni_arg<VkCommandBuffer> cmds, vkt::uni_arg<vkh::VkSubmitInfo> smbi = vkh::VkSubmitInfo{}) {
-            return this->submitUtilize(std::vector<VkCommandBuffer>{ cmds }, smbi);
-        };
-
-        // 
-        public: virtual GPUFramework* submitUtilize(const std::vector<VkCommandBuffer>& cmds, vkt::uni_arg<vkh::VkSubmitInfo> smbi = vkh::VkSubmitInfo{}) {
-            vkt::submitUtilize(this->getDeviceDispatch(), VkQueue(*this), VkCommandPool(*this), cmds, smbi);
-            return this;
-        };
-
-        // 
-        public: virtual GPUFramework* submitOnce(const std::function<void(VkCommandBuffer&)>& cmdFn = {}, vkt::uni_arg<vkh::VkSubmitInfo> smbi = vkh::VkSubmitInfo{}) {
-            vkt::submitOnce(this->getDeviceDispatch(), VkQueue(*this), VkCommandPool(*this), cmdFn, smbi);
-            return this;
-        };
-
-        // Async Version
-        public: virtual std::future<GPUFramework*> submitOnceAsync(const std::function<void(VkCommandBuffer&)>& cmdFn = {}, vkt::uni_arg<vkh::VkSubmitInfo> smbi = vkh::VkSubmitInfo{}) {
-            return std::async(std::launch::async | std::launch::deferred, [=, this]() {
-                vkt::submitOnceAsync(this->getDeviceDispatch(), VkQueue(*this), VkCommandPool(*this), cmdFn, smbi).get();
-                return this;
-            });
-        };
-
-        // 
-        public: virtual GPUFramework* submitCmd(vkt::uni_arg<VkCommandBuffer> cmds, vkt::uni_arg<vkh::VkSubmitInfo> smbi = vkh::VkSubmitInfo{}) {
-            return this->submitCmd(std::vector<VkCommandBuffer>{ cmds }, smbi);
-        };
-
-        // 
-        public: virtual GPUFramework* submitCmd(const std::vector<VkCommandBuffer>& cmds, vkt::uni_arg<vkh::VkSubmitInfo> smbi = vkh::VkSubmitInfo{}) {
-            vkt::submitCmd(this->getDeviceDispatch(), VkQueue(*this), cmds, smbi);
-            return this;
-        };
-
-        /*
-        // Async Version
-        public: virtual std::future<GPUFramework*> submitCmdAsync(vkt::uni_arg<VkCommandBuffer> cmds, vkt::uni_arg<vkh::VkSubmitInfo> smbi = vkh::VkSubmitInfo{}) {
-            return this->submitCmdAsync(std::vector<VkCommandBuffer>{ cmds }, smbi);
-        };
-
-        // Async Version
-        public: virtual std::future<GPUFramework*> submitCmdAsync(std::vector<VkCommandBuffer> cmds, vkt::uni_arg<vkh::VkSubmitInfo> smbi = vkh::VkSubmitInfo{}) {
-            return std::async(std::launch::async | std::launch::deferred, [=, this]() {
-                vkt::submitCmdAsync(this->getDeviceDispatch(), VkQueue(*this), cmds, smbi).get();
-                return this;
-            });
-        };
-        */
-
+        public: virtual GPUFramework* submitUtilize(vkt::uni_arg<VkCommandBuffer> cmds, vkt::uni_arg<vkh::VkSubmitInfo> smbi = vkh::VkSubmitInfo{});
+        public: virtual GPUFramework* submitUtilize(const std::vector<VkCommandBuffer>& cmds, vkt::uni_arg<vkh::VkSubmitInfo> smbi = vkh::VkSubmitInfo{});
+        public: virtual GPUFramework* submitOnce(const std::function<void(VkCommandBuffer&)>& cmdFn = {}, vkt::uni_arg<vkh::VkSubmitInfo> smbi = vkh::VkSubmitInfo{});
+        public: virtual std::future<GPUFramework*> submitOnceAsync(const std::function<void(VkCommandBuffer&)>& cmdFn = {}, vkt::uni_arg<vkh::VkSubmitInfo> smbi = vkh::VkSubmitInfo{});
+        public: virtual GPUFramework* submitCmd(vkt::uni_arg<VkCommandBuffer> cmds, vkt::uni_arg<vkh::VkSubmitInfo> smbi = vkh::VkSubmitInfo{});
+        public: virtual GPUFramework* submitCmd(const std::vector<VkCommandBuffer>& cmds, vkt::uni_arg<vkh::VkSubmitInfo> smbi = vkh::VkSubmitInfo{});
 
         //VkDevice createDevice(bool isComputePrior = true, std::string shaderPath = "./", bool enableAdvancedAcceleration = true);
         inline virtual VkPhysicalDevice& getPhysicalDevice(const uint32_t& gpuID) { physicalDevice = physicalDevices[gpuID]; return physicalDevice; };

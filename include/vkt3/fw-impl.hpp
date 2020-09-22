@@ -4,6 +4,9 @@
 #include <vkh/helpers.hpp>
 
 // 
+#include "./definition.hpp"
+#include "./inline.hpp"
+#include "./essential.hpp"
 #include "./fw.hpp"
 #include "./utils.hpp"
 
@@ -13,6 +16,44 @@
 // TODO: FULL REWRITE OF THAT "PROJECT"!!!
 namespace vkt
 {
+
+
+    // 
+    GPUFramework* GPUFramework::submitUtilize(vkt::uni_arg<VkCommandBuffer> cmds, vkt::uni_arg<vkh::VkSubmitInfo> smbi) {
+        return this->submitUtilize(std::vector<VkCommandBuffer>{ cmds }, smbi);
+    };
+
+    // 
+    GPUFramework* GPUFramework::submitUtilize(const std::vector<VkCommandBuffer>& cmds, vkt::uni_arg<vkh::VkSubmitInfo> smbi) {
+        vkt::submitUtilize(this->getDeviceDispatch(), VkQueue(*this), VkCommandPool(*this), cmds, smbi);
+        return this;
+    };
+
+    // 
+    GPUFramework* GPUFramework::submitOnce(const std::function<void(VkCommandBuffer&)>& cmdFn, vkt::uni_arg<vkh::VkSubmitInfo> smbi) {
+        vkt::submitOnce(this->getDeviceDispatch(), VkQueue(*this), VkCommandPool(*this), cmdFn, smbi);
+        return this;
+    };
+
+    // Async Version
+    std::future<GPUFramework*> GPUFramework::submitOnceAsync(const std::function<void(VkCommandBuffer&)>& cmdFn, vkt::uni_arg<vkh::VkSubmitInfo> smbi) {
+        return std::async(std::launch::async | std::launch::deferred, [=, this]() {
+            vkt::submitOnceAsync(this->getDeviceDispatch(), VkQueue(*this), VkCommandPool(*this), cmdFn, smbi).get();
+            return this;
+        });
+    };
+
+    // 
+    GPUFramework* GPUFramework::submitCmd(vkt::uni_arg<VkCommandBuffer> cmds, vkt::uni_arg<vkh::VkSubmitInfo> smbi) {
+        return this->submitCmd(std::vector<VkCommandBuffer>{ cmds }, smbi);
+    };
+
+    // 
+    GPUFramework* GPUFramework::submitCmd(const std::vector<VkCommandBuffer>& cmds, vkt::uni_arg<vkh::VkSubmitInfo> smbi) {
+        vkt::submitCmd(this->getDeviceDispatch(), VkQueue(*this), cmds, smbi);
+        return this;
+    };
+
 
 #ifdef VKT_IMPLEMENT_FRAMEWORK
 #ifdef VKT_ENABLE_GLFW_SUPPORT

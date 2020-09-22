@@ -2,6 +2,7 @@
 
 #include "./core.hpp"
 
+// 
 namespace vkt {
 
     // application surface format information structure

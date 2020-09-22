@@ -73,8 +73,4 @@ namespace vkt {
         return extensions;
     };
 
-
-
-    
-
 };

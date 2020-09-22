@@ -1,11 +1,14 @@
 #pragma once // #
 
+//
 #ifndef VKT_CORE_ENABLE_VMA
 #define VKT_CORE_ENABLE_VMA
 #endif
 
-#include "./essential.hpp"
+// 
+#include "./inline.hpp"
 
+// 
 namespace vkt {
 
 #if defined(ENABLE_OPENGL_INTEROP) && !defined(VKT_USE_GLAD)

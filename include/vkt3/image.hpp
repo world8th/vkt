@@ -4,7 +4,8 @@
 #define VKT_CORE_ENABLE_VMA
 #endif
 
-#include "./essential.hpp"
+#include "./inline.hpp"
+
 
 namespace vkt {
 
