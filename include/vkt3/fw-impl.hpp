@@ -1,6 +1,10 @@
 #pragma once // #
 
 // 
+#ifndef VKT_IMPLEMENT_FRAMEWORK
+#define VKT_IMPLEMENT_FRAMEWORK
+
+// 
 #include <vkh/helpers.hpp>
 
 // 
@@ -10,13 +14,10 @@
 #include "./fw.hpp"
 #include "./utils.hpp"
 
-// 
-#define VKT_IMPLEMENT_FRAMEWORK
-
 // TODO: FULL REWRITE OF THAT "PROJECT"!!!
 namespace vkt
 {
-
+#ifdef VKT_IMPLEMENT_FRAMEWORK
 
     // 
     GPUFramework* GPUFramework::submitUtilize(vkt::uni_arg<VkCommandBuffer> cmds, vkt::uni_arg<vkh::VkSubmitInfo> smbi) {
@@ -54,10 +55,7 @@ namespace vkt
         return this;
     };
 
-
-#ifdef VKT_IMPLEMENT_FRAMEWORK
-#ifdef VKT_ENABLE_GLFW_SUPPORT
-
+#ifdef VKT_USE_GLFW
     SurfaceFormat& GPUFramework::getSurfaceFormat(VkPhysicalDevice gpu)
     {
         //auto surfaceFormats = gpu.getSurfaceFormatsKHR(applicationWindow.surface);
@@ -587,7 +585,7 @@ namespace vkt
         int32_t computeFamilyIndex = -1, graphicsFamilyIndex = -1;
         auto queueCreateInfos = std::vector<vkh::VkDeviceQueueCreateInfo>();
 
-#ifdef VKT_ENABLE_GLFW_SUPPORT
+#ifdef VKT_USE_GLFW
         for (auto queuefamily : gpuQueueProps) {
             graphicsFamilyIndex++;
 
@@ -737,8 +735,8 @@ namespace vkt
         assert((instanceVersion = vkh::vsEnumerateInstanceVersion(vkGlobal::loader)) >= VK_MAKE_VERSION(1, 2, 131));
 
         // get required extensions
-#ifdef VKT_ENABLE_GLFW_SUPPORT
-#ifdef VKT_ENABLE_GLFW_LINKED
+#ifdef VKT_USE_GLFW
+#ifdef VKT_GLFW_LINKED
         uint32_t glfwExtensionCount = 0;
         const char** glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
 
@@ -833,3 +831,5 @@ namespace vkt
 
 
 }; // namespace NSM
+
+#endif

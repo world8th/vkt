@@ -19,18 +19,18 @@
 #define GLFW_INCLUDE_VULKAN
 
 //
-#ifndef VKT_CORE_ENABLE_XVK
-#define VKT_CORE_ENABLE_XVK
+#ifndef VKT_CORE_USE_XVK
+#define VKT_CORE_USE_XVK
 #endif
 
 //
-#ifndef VKT_CORE_ENABLE_VMA
-#define VKT_CORE_ENABLE_VMA
+#ifndef VKT_CORE_USE_VMA
+#define VKT_CORE_USE_VMA
 #endif
 
 //
-#ifndef ENABLE_VULKAN_HPP
-#define ENABLE_VULKAN_HPP
+#ifndef VKT_USE_VULKAN_HPP
+#define VKT_USE_VULKAN_HPP
 #endif
 
 // Force include for avoid GLAD problem...
@@ -84,8 +84,8 @@ namespace vkt
 
         // XVK loaded (NEW!)
         VmaVulkanFunctions func = {};
-        vkt::uni_ptr<xvk::Instance> instanceDispatch = {};
-        vkt::uni_ptr<xvk::Device> deviceDispatch = {};
+        vkt::Instance instanceDispatch = {};
+        vkt::Device deviceDispatch = {};
 
         // JavaCPP and XVK compatible (NEW!)
         vkh::VkApplicationInfo applicationInfo = {};
@@ -163,8 +163,8 @@ namespace vkt
         inline virtual const VmaAllocator& getAllocator() const { return allocator; };
 
         // 
-        inline virtual vkt::uni_ptr<xvk::Device>& getDeviceDispatch() { return deviceDispatch; };
-        inline virtual vkt::uni_ptr<xvk::Instance>& getInstanceDispatch() { return instanceDispatch; };
+        inline virtual vkt::Device& getDeviceDispatch() { return deviceDispatch; };
+        inline virtual vkt::Instance& getInstanceDispatch() { return instanceDispatch; };
 
         // 
         inline virtual const VkDevice& getDeviceDispatch() const { return device; };
@@ -194,7 +194,7 @@ namespace vkt
         inline virtual operator const VkPhysicalDeviceMemoryProperties2& () const { return memoryProperties; };
         inline virtual operator const VmaAllocator&() const { return allocator; };
 
-#ifdef VKT_ENABLE_GLFW_SUPPORT
+#ifdef VKT_USE_GLFW
         struct SurfaceWindow {
             SurfaceFormat surfaceFormat = {};
             VkExtent2D surfaceSize = VkExtent2D{ 0u, 0u };
@@ -264,14 +264,14 @@ namespace vkt
         //
         virtual VkDevice& createDevice(bool isComputePrior = true, std::string shaderPath = "", bool enableAdvancedAcceleration = false);
 
-#ifdef VKT_ENABLE_GLFW_SUPPORT
+#ifdef VKT_USE_GLFW
         // create window and surface for this application (multi-window not supported)
         inline virtual SurfaceWindow& createWindowSurface(GLFWwindow* window, uint32_t WIDTH, uint32_t HEIGHT) {
             applicationWindow.window = window;
             applicationWindow.surfaceSize = VkExtent2D{ WIDTH, HEIGHT };
             glfwMakeContextCurrent(nullptr); // CONTEXT-REQUIRED!
-#ifdef VKT_ENABLE_GLFW_SURFACE
-#ifdef VKT_ENABLE_GLFW_LINKED
+#ifdef VKT_GLFW_SURFACE
+#ifdef VKT_GLFW_LINKED
             vkh::handleVk(glfwCreateWindowSurface((VkInstance&)(instance), applicationWindow.window, nullptr, (VkSurfaceKHR*)&applicationWindow.surface));
 #endif
 #endif
@@ -283,8 +283,8 @@ namespace vkt
         inline virtual SurfaceWindow& createWindowSurface(SurfaceWindow& applicationWindow) {
             applicationWindow.surfaceSize = VkExtent2D{ applicationWindow.surfaceSize.width, applicationWindow.surfaceSize.height };
             glfwMakeContextCurrent(nullptr); // CONTEXT-REQUIRED!
-#ifdef VKT_ENABLE_GLFW_SURFACE
-#ifdef VKT_ENABLE_GLFW_LINKED
+#ifdef VKT_GLFW_SURFACE
+#ifdef VKT_GLFW_LINKED
             vkh::handleVk(glfwCreateWindowSurface((VkInstance&)(instance), applicationWindow.window, nullptr, (VkSurfaceKHR*)&applicationWindow.surface));
 #endif
 #endif

@@ -59,7 +59,7 @@ namespace vkt {
 
     // 
     inline std::vector<const char*> GetRequiredExtensions() {
-#ifdef VKT_ENABLE_GLFW_LINKED
+#ifdef VKT_GLFW_LINKED
         uint32_t glfwExtensionCount = 0;
         const char** glfwExtensions = nullptr;
         glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);

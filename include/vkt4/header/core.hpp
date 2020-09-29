@@ -45,7 +45,7 @@
 #endif
 
 // 
-#ifdef ENABLE_OPENGL_INTEROP
+#ifdef VKT_OPENGL_INTEROP
 #ifdef VKT_USE_GLAD
 #define GLFW_INCLUDE_NONE // Bad Include
 #include <glad/glad.h>
@@ -58,32 +58,32 @@
 #endif
 
 // 
-#if defined(VKT_ENABLE_GLFW_SUPPORT) || defined(ENABLE_OPENGL_INTEROP)
+#if defined(VKT_USE_GLFW) || defined(VKT_OPENGL_INTEROP)
 #include <GLFW/glfw3.h>
 #include <GLFW/glfw3native.h>
 #endif
 
 // Enable Vulkan-HPP when defined
 #ifdef VULKAN_HPP
-#define ENABLE_VULKAN_HPP
+#define VKT_USE_VULKAN_HPP
 #endif
 
 //
 #include <vulkan/vulkan.h>
 
 // When enabled, use Vulkan-HPP support...
-#ifdef ENABLE_VULKAN_HPP
+#ifdef VKT_USE_VULKAN_HPP
 #define VULKAN_HPP_ENABLE_DYNAMIC_LOADER_TOOL 0 // Avoid XVK conflict
 #include <vulkan/vulkan.hpp>
 #endif
 
 // 
-#ifdef VKT_CORE_ENABLE_XVK
+#ifdef VKT_CORE_USE_XVK
 #include <xvk/xvk.hpp>
 #endif
 
 // 
-#ifdef VKT_CORE_ENABLE_VMA
+#ifdef VKT_CORE_USE_VMA
 #include <vma/vk_mem_alloc.h>
 #endif
 
@@ -434,7 +434,7 @@ namespace vkt {
     }
 
 
-#ifdef ENABLE_OPENGL_INTEROP
+#ifdef VKT_OPENGL_INTEROP
     // FOR LWJGL-3 Request!
     inline void initializeGL(GLFWglproc(*glfwGetProcAddress)(const char*)) {
 #ifdef VKT_USE_GLAD
@@ -449,7 +449,7 @@ namespace vkt {
 
 
     // FOR LWJGL-3 Request!
-#ifdef VKT_ENABLE_GLFW_LINKED
+#ifdef VKT_GLFW_LINKED
     inline void initializeGL() {
 #ifdef VKT_USE_GLAD
         if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
@@ -505,7 +505,7 @@ namespace vkh {
             //std::cerr << "ERROR: VkResult Error Code: " << std::to_string(result) << " (" << errorString(result) << ")..." << std::endl; throw (*result);
 
             assert(result == VK_SUCCESS);
-#ifdef VKT_ENABLE_GLFW_LINKED
+#ifdef VKT_GLFW_LINKED
             glfwTerminate();
 #endif
             exit(result);

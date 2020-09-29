@@ -612,11 +612,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         const void*                         pNext               = nullptr;
         VkPipelineShaderStageCreateFlags    flags               = VsDefaultPipelineShaderStageFlags; // TODO: FLAGS
         VkShaderStageFlagBits               stage               = VK_SHADER_STAGE_COMPUTE_BIT;
-#ifndef VKT_USE_CPP_MODULES
         VkShaderModule                      module              = VK_NULL_HANDLE;
-#else
-        VkShaderModule                      modular             = VK_NULL_HANDLE;
-#endif
         const char*                         pName               = "main";
         const VkSpecializationInfo*         pSpecializationInfo = nullptr; // TODO: NATIVE
 
@@ -1933,7 +1929,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
     } VkMemoryAllocateFlagsInfo;
 
     //
-//#ifdef ENABLE_OPENGL_INTEROP
+//#ifdef VKT_OPENGL_INTEROP
     typedef struct VkSemaphoreGetWin32HandleInfoKHR {
         VkStructureType                          sType      = VK_STRUCTURE_TYPE_SEMAPHORE_GET_WIN32_HANDLE_INFO_KHR;
         const void*                              pNext      = nullptr;

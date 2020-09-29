@@ -1,6 +1,6 @@
 #pragma once // #
 
-//#define VKT_CORE_ENABLE_XVK
+//#define VKT_CORE_USE_XVK
 #include <vkt3/core.hpp>
 #include <vkh/structures.hpp>
 #include <string_view>
@@ -9,7 +9,7 @@
 #include <iostream>
 #include <algorithm>
 
-#ifdef VKT_ENABLE_GLFW_SUPPORT
+#ifdef VKT_USE_GLFW
 #include <GLFW/glfw3.h>
 #include <GLFW/glfw3native.h>
 #endif
@@ -28,8 +28,8 @@ namespace vkh {
 #define VK_FLAGS_NONE 0 // Custom define for better code readability
 #define DEFAULT_FENCE_TIMEOUT (30ull*1000ull*1000ull*1000ull) // Default fence timeout in nanoseconds
 
-#ifdef VKT_CORE_ENABLE_XVK
-    inline auto vsEnumeratePhysicalDevices(vkt::uni_ptr<xvk::Instance> instance) {
+#ifdef VKT_CORE_USE_XVK
+    inline auto vsEnumeratePhysicalDevices(vkt::Instance instance) {
         //uint32_t count = 0u; handleVk(vkEnumeratePhysicalDevices(instance->handle, &count, nullptr));
         uint32_t count = 0u; handleVk(instance->EnumeratePhysicalDevices(&count, nullptr));
         std::vector<VkPhysicalDevice> data(count);
@@ -38,21 +38,21 @@ namespace vkh {
         return data;
     };
 
-    inline auto vsEnumerateDeviceExtensionProperties(vkt::uni_ptr<xvk::Instance> instance, const VkPhysicalDevice& physicalDevice, const std::string layerName = "") {
+    inline auto vsEnumerateDeviceExtensionProperties(vkt::Instance instance, const VkPhysicalDevice& physicalDevice, const std::string layerName = "") {
         uint32_t count = 0u; handleVk(instance->vkEnumerateDeviceExtensionProperties(physicalDevice, layerName.c_str(), &count, nullptr));
         std::vector<VkExtensionProperties> data(count);
         handleVk(instance->vkEnumerateDeviceExtensionProperties(physicalDevice, layerName.c_str(), &count, data.data()));
         return data;
     };
 
-    inline auto vsEnumerateDeviceLayerProperties(vkt::uni_ptr<xvk::Instance> instance, const VkPhysicalDevice& physicalDevice) {
+    inline auto vsEnumerateDeviceLayerProperties(vkt::Instance instance, const VkPhysicalDevice& physicalDevice) {
         uint32_t count = 0u; handleVk(instance->EnumerateDeviceLayerProperties(physicalDevice, &count, nullptr));
         std::vector<VkLayerProperties> data(count);
         handleVk(instance->EnumerateDeviceLayerProperties(physicalDevice, &count, data.data()));
         return data;
     };
 
-    inline auto vsGetPhysicalDeviceQueueFamilyProperties(vkt::uni_ptr<xvk::Instance> instance, const VkPhysicalDevice& physicalDevice) {
+    inline auto vsGetPhysicalDeviceQueueFamilyProperties(vkt::Instance instance, const VkPhysicalDevice& physicalDevice) {
         uint32_t count = 0u; (instance->GetPhysicalDeviceQueueFamilyProperties(physicalDevice, &count, nullptr));
         std::vector<vkh::VkQueueFamilyProperties> data(count);
         (instance->GetPhysicalDeviceQueueFamilyProperties(physicalDevice, &count, reinterpret_cast<::VkQueueFamilyProperties*>(data.data())));
@@ -78,57 +78,57 @@ namespace vkh {
         return version;
     };
 
-    inline auto vsGetPhysicalDeviceSurfaceFormatsKHR(vkt::uni_ptr<xvk::Instance> instance, const VkPhysicalDevice& physicalDevice, const VkSurfaceKHR& surface) { // TODO: V2
+    inline auto vsGetPhysicalDeviceSurfaceFormatsKHR(vkt::Instance instance, const VkPhysicalDevice& physicalDevice, const VkSurfaceKHR& surface) { // TODO: V2
         uint32_t count = 0u; handleVk(instance->GetPhysicalDeviceSurfaceFormatsKHR(physicalDevice, surface, &count, nullptr));
         std::vector<VkSurfaceFormatKHR> data(count);
         handleVk(instance->GetPhysicalDeviceSurfaceFormatsKHR(physicalDevice, surface, &count, reinterpret_cast<VkSurfaceFormatKHR*>(data.data())));
         return data;
     };
 
-    inline auto vsGetPhysicalDeviceFormatProperties(vkt::uni_ptr<xvk::Instance> instance, const VkPhysicalDevice& physicalDevice, const VkFormat& format) {
+    inline auto vsGetPhysicalDeviceFormatProperties(vkt::Instance instance, const VkPhysicalDevice& physicalDevice, const VkFormat& format) {
         VkFormatProperties props = {}; (instance->GetPhysicalDeviceFormatProperties(physicalDevice, format, &props)); return props;
     };
 
 
-    inline auto vsGetPhysicalDeviceMemoryProperties(vkt::uni_ptr<xvk::Instance> instance, const VkPhysicalDevice& physicalDevice) {
+    inline auto vsGetPhysicalDeviceMemoryProperties(vkt::Instance instance, const VkPhysicalDevice& physicalDevice) {
         VkPhysicalDeviceMemoryProperties props = {}; (instance->GetPhysicalDeviceMemoryProperties(physicalDevice, &reinterpret_cast<::VkPhysicalDeviceMemoryProperties&>(props))); return props;
     };
 
-    inline auto vsGetPhysicalDeviceMemoryProperties2(vkt::uni_ptr<xvk::Instance> instance, const VkPhysicalDevice& physicalDevice, vkh::VkPhysicalDeviceMemoryProperties2& props) {
+    inline auto vsGetPhysicalDeviceMemoryProperties2(vkt::Instance instance, const VkPhysicalDevice& physicalDevice, vkh::VkPhysicalDeviceMemoryProperties2& props) {
         (instance->GetPhysicalDeviceMemoryProperties2(physicalDevice, &reinterpret_cast<::VkPhysicalDeviceMemoryProperties2&>(props))); return props;
     };
 
 
-    inline auto vsGetPhysicalDeviceProperties(vkt::uni_ptr<xvk::Instance> instance, const VkPhysicalDevice& physicalDevice) {
+    inline auto vsGetPhysicalDeviceProperties(vkt::Instance instance, const VkPhysicalDevice& physicalDevice) {
         VkPhysicalDeviceProperties props = {}; instance->GetPhysicalDeviceProperties(physicalDevice, &reinterpret_cast<::VkPhysicalDeviceProperties&>(props)); return props;
     };
 
-    inline auto vsGetPhysicalDeviceProperties2(vkt::uni_ptr<xvk::Instance> instance, const VkPhysicalDevice& physicalDevice, vkh::VkPhysicalDeviceProperties2& props) {
+    inline auto vsGetPhysicalDeviceProperties2(vkt::Instance instance, const VkPhysicalDevice& physicalDevice, vkh::VkPhysicalDeviceProperties2& props) {
         instance->GetPhysicalDeviceProperties2(physicalDevice, &reinterpret_cast<::VkPhysicalDeviceProperties2&>(props)); return props;
     };
 
 
-    inline auto vsGetPhysicalDeviceFeatures(vkt::uni_ptr<xvk::Instance> instance, const VkPhysicalDevice& physicalDevice) {
+    inline auto vsGetPhysicalDeviceFeatures(vkt::Instance instance, const VkPhysicalDevice& physicalDevice) {
         VkPhysicalDeviceProperties props = {}; instance->GetPhysicalDeviceFeatures(physicalDevice, &reinterpret_cast<::VkPhysicalDeviceFeatures&>(props)); return props;
     };
 
-    inline auto vsGetPhysicalDeviceFeatures2(vkt::uni_ptr<xvk::Instance> instance, const VkPhysicalDevice& physicalDevice, vkh::VkPhysicalDeviceFeatures2& props) {
+    inline auto vsGetPhysicalDeviceFeatures2(vkt::Instance instance, const VkPhysicalDevice& physicalDevice, vkh::VkPhysicalDeviceFeatures2& props) {
         instance->GetPhysicalDeviceFeatures2(physicalDevice, &reinterpret_cast<::VkPhysicalDeviceFeatures2&>(props)); return props;
     };
 
 
-    inline auto vsGetSwapchainImagesKHR(vkt::uni_ptr<xvk::Device> device, const VkSwapchainKHR& swapchain) { // TODO: V2
+    inline auto vsGetSwapchainImagesKHR(vkt::Device device, const VkSwapchainKHR& swapchain) { // TODO: V2
         uint32_t count = 0u; device->GetSwapchainImagesKHR(swapchain, &count, nullptr);
         std::vector<VkImage> data(count);
         handleVk(device->GetSwapchainImagesKHR(swapchain, &count, reinterpret_cast<VkImage*>(data.data())));
         return data;
     };
 
-    inline auto vsGetPhysicalDeviceSurfaceCapabilitiesKHR(vkt::uni_ptr<xvk::Instance> instance, const VkPhysicalDevice& physicalDevice, const VkSurfaceKHR& surface) {
+    inline auto vsGetPhysicalDeviceSurfaceCapabilitiesKHR(vkt::Instance instance, const VkPhysicalDevice& physicalDevice, const VkSurfaceKHR& surface) {
         VkSurfaceCapabilitiesKHR props = {}; handleVk(instance->GetPhysicalDeviceSurfaceCapabilitiesKHR(physicalDevice, surface, &reinterpret_cast<::VkSurfaceCapabilitiesKHR&>(props))); return props;
     };
 
-    inline auto vsGetPhysicalDeviceSurfacePresentModesKHR(vkt::uni_ptr<xvk::Instance> instance, const VkPhysicalDevice& physicalDevice, const VkSurfaceKHR& surface) { // TODO: V2
+    inline auto vsGetPhysicalDeviceSurfacePresentModesKHR(vkt::Instance instance, const VkPhysicalDevice& physicalDevice, const VkSurfaceKHR& surface) { // TODO: V2
         uint32_t count = 0u; handleVk(instance->GetPhysicalDeviceSurfacePresentModesKHR(physicalDevice, surface, &count, nullptr));
         std::vector<VkPresentModeKHR> data(count);
         handleVk(instance->GetPhysicalDeviceSurfacePresentModesKHR(physicalDevice, surface, &count, reinterpret_cast<::VkPresentModeKHR*>(data.data())));
@@ -799,7 +799,7 @@ namespace vkh {
     // WILL USED FOR SIMPLER COPYING
 
     // 
-    inline VkResult AllocateDescriptorSetWithUpdate(const vkt::uni_ptr<xvk::Device>& device, vkh::VsDescriptorSetCreateInfoHelper& helper, VkDescriptorSet& descriptorSet, bool& protection) {
+    inline VkResult AllocateDescriptorSetWithUpdate(const vkt::Device& device, vkh::VsDescriptorSetCreateInfoHelper& helper, VkDescriptorSet& descriptorSet, bool& protection) {
         if (!protection) {
             // Corrupt... 
             if (descriptorSet) { vkh::handleVk(device->vkFreeDescriptorSets(device->handle, helper, 1u, &descriptorSet)); descriptorSet = {}; };

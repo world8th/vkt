@@ -1,8 +1,8 @@
 #pragma once // #
 
 // 
-//#ifndef VKT_CORE_ENABLE_VMA
-//#define VKT_CORE_ENABLE_VMA
+//#ifndef VKT_CORE_USE_VMA
+//#define VKT_CORE_USE_VMA
 //#endif
 
 // 
@@ -11,7 +11,7 @@
 // 
 namespace vkt {
 
-#if defined(ENABLE_OPENGL_INTEROP) && !defined(VKT_USE_GLAD)
+#if defined(VKT_OPENGL_INTEROP) && !defined(VKT_USE_GLAD)
     using namespace gl;
 #endif
 
@@ -116,7 +116,7 @@ namespace vkt {
             };
 
             // 
-#ifdef ENABLE_OPENGL_INTEROP
+#ifdef VKT_OPENGL_INTEROP
             GLenum format = GL_RGBA8;
             if (createInfo->format == VK_FORMAT_R8G8B8_UNORM) { format = gl::GLenum(GL_RGB8); };
             if (createInfo->format == VK_FORMAT_R16G16B16_UNORM) { format = gl::GLenum(GL_RGB16); };
@@ -191,7 +191,7 @@ namespace vkt {
         virtual const std::vector<uint32_t>& getQueueFamilyIndices() const { return this->info.queueFamilyIndices; };
 
         // Bindless Textures Directly
-#ifdef ENABLE_OPENGL_INTEROP
+#ifdef VKT_OPENGL_INTEROP
         virtual GLuint& getGL() { return this->info.glID; };
         virtual const GLuint& getGL() const { return this->info.glID; };
 
@@ -351,7 +351,7 @@ namespace vkt {
             vkh::handleVk(this->allocation->info.deviceDispatch->CreateImageView(*info, nullptr, &this->imgInfo.imageView));
 
             // 
-#ifdef ENABLE_OPENGL_INTEROP
+#ifdef VKT_OPENGL_INTEROP
             if (!this->allocation->info.glID) {
                 VkImageViewHandleInfoNVX handleInfo = {};
                 handleInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_HANDLE_INFO_NVX;
@@ -456,7 +456,7 @@ namespace vkt {
         // 
         virtual operator const VkImageSubresourceLayers() const { return VkImageSubresourceLayers{ reinterpret_cast<const VkImageAspectFlags&>(subresourceRange.aspectMask), subresourceRange.baseMipLevel, subresourceRange.baseArrayLayer, subresourceRange.layerCount }; };
 
-#ifdef ENABLE_OPENGL_INTEROP // Bindless Textures Directly
+#ifdef VKT_OPENGL_INTEROP // Bindless Textures Directly
         virtual uint64_t deviceAddress () { 
             if (this->getGL()) {
                 return glGetTextureHandleARB(this->getGL());
@@ -476,7 +476,7 @@ namespace vkt {
             return glGetTextureSamplerHandleARB(this->getGL(), sampler); 
         };
 #else   // Get By Vulkan API Directly
-#ifdef ENABLE_NVX_IMAGE_ADDRESS
+#ifdef VKT_NVX_IMAGE_ADDRESS
         virtual uint64_t deviceAddress() { return this->allocation->getDevice().getImageViewAddressNVX(this->getImageView(), this->getAllocation()->dispatchLoaderDynamic()).deviceAddress; };
         virtual const uint64_t deviceAddress() const { return this->allocation->getDevice().getImageViewAddressNVX(this->getImageView(), this->getAllocation()->dispatchLoaderDynamic()).deviceAddress; };
 #endif

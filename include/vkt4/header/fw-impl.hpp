@@ -58,7 +58,7 @@ namespace vkt
 
 
 #ifdef VKT_IMPLEMENT_FRAMEWORK
-#ifdef VKT_ENABLE_GLFW_SUPPORT
+#ifdef VKT_USE_GLFW
 
     SurfaceFormat& GPUFramework::getSurfaceFormat(VkPhysicalDevice gpu)
     {
@@ -589,7 +589,7 @@ namespace vkt
         int32_t computeFamilyIndex = -1, graphicsFamilyIndex = -1;
         auto queueCreateInfos = std::vector<vkh::VkDeviceQueueCreateInfo>();
 
-#ifdef VKT_ENABLE_GLFW_SUPPORT
+#ifdef VKT_USE_GLFW
         for (auto queuefamily : gpuQueueProps) {
             graphicsFamilyIndex++;
 
@@ -739,8 +739,8 @@ namespace vkt
         assert((instanceVersion = vkh::vsEnumerateInstanceVersion(vkGlobal::loader)) >= VK_MAKE_VERSION(1, 2, 131));
 
         // get required extensions
-#ifdef VKT_ENABLE_GLFW_SUPPORT
-#ifdef VKT_ENABLE_GLFW_LINKED
+#ifdef VKT_USE_GLFW
+#ifdef VKT_GLFW_LINKED
         uint32_t glfwExtensionCount = 0;
         const char** glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
 

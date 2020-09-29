@@ -1,8 +1,8 @@
 #pragma once // #
 
 //
-//#ifndef VKT_CORE_ENABLE_VMA
-//#define VKT_CORE_ENABLE_VMA
+//#ifndef VKT_CORE_USE_VMA
+//#define VKT_CORE_USE_VMA
 //#endif
 
 // 
@@ -11,7 +11,7 @@
 // 
 namespace vkt {
 
-#if defined(ENABLE_OPENGL_INTEROP) && !defined(VKT_USE_GLAD)
+#if defined(VKT_OPENGL_INTEROP) && !defined(VKT_USE_GLAD)
     using namespace gl;
 #endif
 
@@ -102,7 +102,7 @@ namespace vkt {
             };
 
             // 
-#ifdef ENABLE_OPENGL_INTEROP
+#ifdef VKT_OPENGL_INTEROP
             if (this->info.handle) {
                 if (!this->info.glID) {
                     glCreateBuffers(1u, &this->info.glID);

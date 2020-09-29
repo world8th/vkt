@@ -10,7 +10,7 @@
 // Here is NOT usable for C++20 modules!!!
 namespace vkt {
 
-#ifdef ENABLE_OPENGL_INTEROP
+#ifdef VKT_OPENGL_INTEROP
 #ifndef VKT_USE_GLAD
     using namespace gl;
 #endif
@@ -113,8 +113,8 @@ namespace vkt {
         static inline std::shared_ptr<xvk::Device> device = {};
         static inline std::shared_ptr<xvk::Instance> instance = {};
 
-    #ifdef VKT_ENABLE_GLFW_SUPPORT
-    #ifdef VKT_ENABLE_GLFW_LINKED
+    #ifdef VKT_USE_GLFW
+    #ifdef VKT_GLFW_LINKED
         vkGlobal(GLFWglproc(*glfwGetProcAddress)(const char*) = ::glfwGetProcAddress) 
     #else 
         vkGlobal(GLFWglproc(*glfwGetProcAddress)(const char*) = nullptr) 
@@ -123,7 +123,7 @@ namespace vkt {
             if (!initialized) {
                 loader = std::make_shared<xvk::Loader>();
                 if (!(initialized = (*loader)())) { std::cerr << "vulkan load failed..." << std::endl; };
-    #ifdef ENABLE_OPENGL_INTEROP
+    #ifdef VKT_OPENGL_INTEROP
                 if (glfwGetProcAddress) {
                     vkt::initializeGL(glfwGetProcAddress);
                 }
@@ -184,8 +184,8 @@ namespace vkt {
 
         // 
         std::vector<uint32_t> queueFamilyIndices = {};
-        vkt::uni_ptr<xvk::Instance> instanceDispatch = vkGlobal::instance;
-        vkt::uni_ptr<xvk::Device> deviceDispatch = vkGlobal::device;
+        vkt::Instance instanceDispatch = vkGlobal::instance;
+        vkt::Device deviceDispatch = vkGlobal::device;
 
         // 
         uint32_t getMemoryType(const uint32_t& memoryTypeBitsRequirement, const vkh::VkMemoryPropertyFlags& requiredProperties = { .eDeviceLocal = 1 }) const {
@@ -203,8 +203,8 @@ namespace vkt {
 
     // TODO: native image barrier in library
     struct ImageBarrierInfo {
-        vkt::uni_ptr<xvk::Instance> instanceDispatch = vkGlobal::instance;
-        vkt::uni_ptr<xvk::Device> deviceDispatch = vkGlobal::device;
+        vkt::Instance instanceDispatch = vkGlobal::instance;
+        vkt::Device deviceDispatch = vkGlobal::device;
         vkt::uni_arg<VkImage> image = {};
         vkt::uni_arg<VkImageLayout> targetLayout = VK_IMAGE_LAYOUT_GENERAL;
         vkt::uni_arg<VkImageLayout> originLayout = VK_IMAGE_LAYOUT_UNDEFINED;
