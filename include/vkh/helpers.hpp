@@ -802,7 +802,7 @@ namespace vkh {
     inline VkResult AllocateDescriptorSetWithUpdate(const vkt::Device& device, vkh::VsDescriptorSetCreateInfoHelper& helper, VkDescriptorSet& descriptorSet, bool& protection) {
         if (!protection) {
             // Corrupt... 
-            if (descriptorSet) { vkh::handleVk(device->vkFreeDescriptorSets(device->handle, helper, 1u, &descriptorSet)); descriptorSet = {}; };
+            //if (descriptorSet) { vkh::handleVk(device->vkFreeDescriptorSets(device->handle, helper, 1u, &descriptorSet)); descriptorSet = {}; };
 
             // 
             bool created = false;
