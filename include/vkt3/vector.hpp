@@ -28,10 +28,22 @@ namespace vkt {
         BufferAllocation(vkt::uni_arg<vkh::VkBufferCreateInfo> createInfo, vkt::uni_arg<MemoryAllocationInfo> allocationInfo = MemoryAllocationInfo{}) : info(allocationInfo) { this->construct(allocationInfo, createInfo); };
         BufferAllocation(const vkt::uni_ptr   <BufferAllocation>& allocation) : buffer(allocation->buffer), info(allocation->info) { this->assign(allocation); };
         BufferAllocation(const std::shared_ptr<BufferAllocation>& allocation) : buffer(allocation->buffer), info(allocation->info) { this->assign(vkt::uni_ptr<BufferAllocation>(allocation)); };
-        ~BufferAllocation() { // Broken Support, but supports Win32 memory export
-            if (this->buffer && this->info.device && this->info.memory) {
-                this->info.deviceDispatch->DeviceWaitIdle();
-            }
+        ~BufferAllocation() {
+            if (!this->isManaged()) { // Avoid VMA Memory Corruption
+                if ((this->buffer || this->info.memory) && this->info.device) {
+                    this->info.deviceDispatch->DeviceWaitIdle();
+                };
+                if (this->buffer && this->info.device) {
+                    this->info.deviceDispatch->DestroyBuffer(this->buffer, nullptr), this->buffer = nullptr;
+                };
+                if (this->info.memory && this->info.device) {
+                    this->info.deviceDispatch->FreeMemory(this->info.memory, nullptr), this->info.memory = nullptr;
+                };
+            };
+        };
+
+        virtual bool isManaged() const {
+            return false;
         };
 
         virtual BufferAllocation* construct(
@@ -229,8 +241,11 @@ namespace vkt {
 
         // 
         ~VmaBufferAllocation() {
-            this->info.deviceDispatch->DeviceWaitIdle();
-            vmaDestroyBuffer(allocator, buffer, allocation);
+            if (this->buffer && this->isManaged()) {
+                this->info.deviceDispatch->DeviceWaitIdle();
+                vmaDestroyBuffer(allocator, this->buffer, allocation);
+                this->buffer = nullptr, this->info.memory = nullptr;
+            };
         };
 
         //
@@ -306,6 +321,11 @@ namespace vkt {
         // 
         virtual VmaBufferAllocation& operator=(const vkt::uni_ptr<VmaBufferAllocation>& allocation) {
             return this->assign(allocation);
+        };
+
+        // 
+        virtual bool isManaged() const override {
+            return true;
         };
 
         // Get mapped memory

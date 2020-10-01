@@ -30,8 +30,16 @@ namespace vkt {
         ImageAllocation(const vkt::uni_ptr<ImageAllocation>& allocation) : image(allocation->image), info(allocation->info) { *this = allocation; };
         ImageAllocation(const std::shared_ptr<ImageAllocation>& allocation) : image(allocation->image), info(allocation->info) { *this = vkt::uni_ptr<ImageAllocation>(allocation); };
         ~ImageAllocation() {
-            if (this->image && this->info.device) {
-                this->info.deviceDispatch->DeviceWaitIdle();
+            if (!this->isManaged()) { // Avoid VMA Memory Corruption
+                if ((this->image || this->info.memory) && this->info.device) {
+                    this->info.deviceDispatch->DeviceWaitIdle();
+                };
+                if (this->image && this->info.device) {
+                    this->info.deviceDispatch->DestroyImage(this->image, nullptr), this->image = nullptr;
+                };
+                if (this->info.memory && this->info.device) {
+                    this->info.deviceDispatch->FreeMemory(this->info.memory, nullptr), this->info.memory = nullptr;
+                };
             };
         };
 
@@ -154,6 +162,10 @@ namespace vkt {
             return this;
         };
 
+        virtual bool isManaged() const {
+            return false;
+        };
+
         // 
         virtual const unsigned& getGLImage() const { return this->info.glID; };
         virtual const unsigned& getGLMemory() const { return this->info.glMemory; };
@@ -231,8 +243,11 @@ namespace vkt {
 
         //
         ~VmaImageAllocation() {
-            this->info.deviceDispatch->DeviceWaitIdle();
-            vmaDestroyImage(allocator, image, allocation);
+            if (this->image && this->isManaged()) {
+                this->info.deviceDispatch->DeviceWaitIdle();
+                vmaDestroyImage(allocator, this->image, allocation);
+                this->image = nullptr, this->info.memory = nullptr;
+            };
         };
 
         // 
@@ -297,6 +312,10 @@ namespace vkt {
 
             //this->info.device = this->_getDevice();
             return *this;
+        };
+
+        virtual bool isManaged() const override {
+            return true;
         };
 
         // Allocation
