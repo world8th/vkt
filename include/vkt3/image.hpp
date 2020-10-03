@@ -92,9 +92,14 @@ namespace vkt {
             createInfo->usage = usage;
             vkh::handleVk(this->info.deviceDispatch->CreateImage(*createInfo, nullptr, &this->image));
 
+            //
+            VkMemoryDedicatedRequirementsKHR dedicatedReqs = { VK_STRUCTURE_TYPE_MEMORY_DEDICATED_REQUIREMENTS_KHR, NULL };
+            VkMemoryRequirements2 memReqs2 = { VK_STRUCTURE_TYPE_MEMORY_REQUIREMENTS_2, &dedicatedReqs };
+
             // 
-            VkMemoryRequirements memReqs = {};
-            this->info.deviceDispatch->GetImageMemoryRequirements(this->image, &memReqs);
+            const VkImageMemoryRequirementsInfo2 imageReqInfo = { VK_STRUCTURE_TYPE_IMAGE_MEMORY_REQUIREMENTS_INFO_2, NULL, image };
+            this->info.deviceDispatch->GetImageMemoryRequirements2(&imageReqInfo, &memReqs2);
+            VkMemoryRequirements& memReqs = memReqs2.memoryRequirements;
             this->info.reqSize = this->info.range = memReqs.size;
 
             //
@@ -107,6 +112,12 @@ namespace vkt {
             // 
             vkh::VkMemoryAllocateInfo memAllocInfo = {};
             allocFlags.pNext = &exportAllocInfo;
+
+            // prefer dedicated allocation, where and when possible
+            VkMemoryDedicatedAllocateInfoKHR dedicatedInfo = { VK_STRUCTURE_TYPE_MEMORY_DEDICATED_ALLOCATE_INFO_KHR, NULL, image, VK_NULL_HANDLE, };
+            if (dedicatedReqs.prefersDedicatedAllocation || dedicatedReqs.requiresDedicatedAllocation) {
+                exportAllocInfo.pNext = &dedicatedInfo;
+            };
 
             // 
             const vkh::VkMemoryPropertyFlags property = { .eDeviceLocal = 1 };

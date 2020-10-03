@@ -1,4 +1,4 @@
-#pragma once // #
+﻿#pragma once // #
 
 //
 #ifndef VKT_CORE_USE_VMA
@@ -68,6 +68,21 @@ namespace vkt {
 #endif
 
             // 
+            VkExternalMemoryBufferCreateInfo extMemInfo = {};
+            extMemInfo.sType = VK_STRUCTURE_TYPE_EXTERNAL_MEMORY_BUFFER_CREATE_INFO;
+            extMemInfo.pNext = nullptr;
+
+            // 
+            {
+                auto* prevPtr = createInfo->pNext;
+                createInfo->pNext = &extMemInfo;
+                extMemInfo.pNext = prevPtr;
+#ifdef VKT_WIN32_DETECTED
+                extMemInfo.handleTypes = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_WIN32_BIT;
+#endif
+            };
+
+            // 
             if (this->info.memUsage == VMA_MEMORY_USAGE_GPU_ONLY) {
                 createInfo->usage.eSharedDeviceAddress = 1; // NEEDS SHARED BIT!
                 allocFlags.flags.eAddress = 1;
@@ -78,9 +93,14 @@ namespace vkt {
             this->info.range = createInfo->size;
             this->usage = createInfo->usage;
 
+            //
+            VkMemoryDedicatedRequirementsKHR dedicatedReqs = { VK_STRUCTURE_TYPE_MEMORY_DEDICATED_REQUIREMENTS_KHR, NULL};
+            VkMemoryRequirements2 memReqs2 = { VK_STRUCTURE_TYPE_MEMORY_REQUIREMENTS_2, &dedicatedReqs };
+
             // 
-            VkMemoryRequirements memReqs = {};
-            (this->info.deviceDispatch->GetBufferMemoryRequirements(buffer, &memReqs));
+            const VkBufferMemoryRequirementsInfo2 bufferReqInfo = { VK_STRUCTURE_TYPE_BUFFER_MEMORY_REQUIREMENTS_INFO_2, NULL, buffer };
+            (this->info.deviceDispatch->GetBufferMemoryRequirements2(&bufferReqInfo, &memReqs2));
+            VkMemoryRequirements& memReqs = memReqs2.memoryRequirements;
 
             //
 #ifdef VKT_WIN32_DETECTED
@@ -93,11 +113,16 @@ namespace vkt {
             vkh::VkMemoryAllocateInfo memAllocInfo = {};
             allocFlags.pNext = &exportAllocInfo;
 
+            // prefer dedicated allocation, where and when possible
+            VkMemoryDedicatedAllocateInfoKHR dedicatedInfo = { VK_STRUCTURE_TYPE_MEMORY_DEDICATED_ALLOCATE_INFO_KHR, NULL, VK_NULL_HANDLE, buffer, };
+            if (dedicatedReqs.prefersDedicatedAllocation || dedicatedReqs.requiresDedicatedAllocation) {
+                exportAllocInfo.pNext = &dedicatedInfo;
+            };
+
             // 
             memAllocInfo.pNext = &allocFlags;
             memAllocInfo.allocationSize = this->info.reqSize = memReqs.size;
             memAllocInfo.memoryTypeIndex = uint32_t(this->info.getMemoryType(memReqs.memoryTypeBits, { .eDeviceLocal = 1 }));
-
 
             // 
             //this->info.device.bindBufferMemory(buffer, info.memory = info.device.allocateMemory(memAllocInfo), 0);
