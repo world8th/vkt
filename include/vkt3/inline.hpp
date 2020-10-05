@@ -211,6 +211,56 @@ namespace vkt {
         vkt::uni_arg<vkh::VkImageSubresourceRange> subresourceRange = vkh::VkImageSubresourceRange{ {}, 0u, 1u, 0u, 1u };
     };
 
+
+    //
+    static inline auto polyfillStage(const vkh::VkAccessFlags& accessFlags, vkh::VkPipelineStageFlags& stageFlags, bool write = false) {
+        if (accessFlags.eShaderRead || accessFlags.eShaderWrite || accessFlags.eUniformRead) {
+            stageFlags.eComputeShader = 1u, stageFlags.eFragmentShader = 1u, stageFlags.eGeometryShader = 1, stageFlags.eMeshShader = 1u, stageFlags.eRayTracingShader = 1u, stageFlags.eTaskShader = 1u, stageFlags.eTessellationControlShader = 1u, stageFlags.eTessellationEvaluationShader = 1u, stageFlags.eVertexShader = 1u;
+        };
+        if (accessFlags.eAccelerationStructureRead || accessFlags.eAccelerationStructureWrite) {
+            stageFlags.eAccelerationStructureBuild = 1u;
+        };
+        if (accessFlags.eAccelerationStructureRead) {
+            stageFlags.eRayTracingShader = 1u;
+        };
+        if (accessFlags.eColorAttachmentWrite || accessFlags.eColorAttachmentRead || accessFlags.eColorAttachmentReadNonCoherent) {
+            stageFlags.eColorAttachmentOutput = 1u;
+        };
+        if (accessFlags.eCommandProcessRead || accessFlags.eCommandProcessWrite) {
+            stageFlags.eCommandProcess = 1u;
+        };
+        if (accessFlags.eConditionalRenderingRead) {
+            stageFlags.eConditionalRendering = 1u;
+        };
+        if (accessFlags.eDepthStencilAttachmentRead || accessFlags.eDepthStencilAttachmentWrite) {
+            stageFlags.eEarlyFragmentTests = 1u, stageFlags.eLateFragmentTests = 1u;
+        };
+        if (accessFlags.eFragmentDensityMapRead) {
+            stageFlags.eFragmentDensityProcess = 1u;
+        };
+        if (accessFlags.eHostRead || accessFlags.eHostWrite) {
+            stageFlags.eHost = 1u;
+        };
+        if (accessFlags.eInputAttachmentRead) {
+            stageFlags.eFragmentShader = 1u;
+        };
+        if (accessFlags.eShadingRateImageRead) {
+            stageFlags.eShadingRateImage = 1u;
+        };
+        if (accessFlags.eTransferRead || accessFlags.eTransferWrite) {
+            stageFlags.eTransfer = 1u;
+        };
+        if (accessFlags.eIndirectCommandRead || accessFlags.eTransformFeedbackCounterRead) {
+            stageFlags.eDrawIndirect = 1u;
+        };
+        if (accessFlags.eTransformFeedbackWrite || accessFlags.eTransformFeedbackCounterWrite) {
+            stageFlags.eTransformFeedback = 1u;
+        };
+        if (accessFlags.eVertexAttributeRead || accessFlags.eIndexRead) {
+            stageFlags.eVertexInput = 1u;
+        };
+    };
+
     //
     static inline auto imageBarrier(const vkt::uni_arg<VkCommandBuffer>& cmd = VkCommandBuffer{}, const vkt::uni_arg<ImageBarrierInfo>& info = ImageBarrierInfo{}) {
         VkResult result = VK_SUCCESS; // planned to complete
@@ -225,9 +275,11 @@ namespace vkt {
         imageMemoryBarriers.subresourceRange = reinterpret_cast<const VkImageSubresourceRange&>(*info->subresourceRange);
         imageMemoryBarriers.image = info->image;
 
-        // Put barrier on top
-        const auto srcStageMask = vkh::VkPipelineStageFlags{ .eBottomOfPipe = 1 };
-        const auto dstStageMask = vkh::VkPipelineStageFlags{ .eTopOfPipe = 1 };
+        // 
+        auto srcStageMask = vkh::VkPipelineStageFlags{ .eBottomOfPipe = 1 };
+        auto dstStageMask = vkh::VkPipelineStageFlags{ .eTopOfPipe = 1 };
+
+        // 
         const auto dependencyFlags = vkh::VkDependencyFlags{};
         auto srcMask = vkh::VkAccessFlags{};
         auto dstMask = vkh::VkAccessFlags{};
@@ -236,7 +288,7 @@ namespace vkt {
         typedef VkImageLayout il;
         typedef VkAccessFlagBits afb;
 
-        // Is it me, or are these the same?
+        // 
         switch (info->originLayout) {
             case VK_IMAGE_LAYOUT_UNDEFINED:                         break;
             case VK_IMAGE_LAYOUT_GENERAL:                           srcMask.eTransferWrite = 1u; break;
@@ -265,14 +317,14 @@ namespace vkt {
         };
 
         // assign access masks
-        imageMemoryBarriers.srcAccessMask = srcMask;
-        imageMemoryBarriers.dstAccessMask = dstMask;
+        polyfillStage(imageMemoryBarriers.srcAccessMask = srcMask, srcStageMask);
+        polyfillStage(imageMemoryBarriers.dstAccessMask = dstMask, dstStageMask);
 
         //
-        (info->deviceDispatch->vkCmdPipelineBarrier(cmd, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, {},
+        info->deviceDispatch->vkCmdPipelineBarrier(cmd, srcStageMask, dstStageMask, {},
                                                     0u, nullptr,
                                                     0u, nullptr,
-                                                    1u, imageMemoryBarriers));
+                                                    1u, imageMemoryBarriers);
 
         //
         return result;
@@ -330,7 +382,7 @@ namespace vkt {
         if (info->dstRead) { polyfillAccess(info->dstStageMask, memoryBarrier.dstAccessMask, false); };
 
         // 
-        info->deviceDispatch->vkCmdPipelineBarrier(cmd, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, {},
+        info->deviceDispatch->vkCmdPipelineBarrier(cmd, info->srcStageMask, info->dstStageMask, {},
             1u, memoryBarrier,
             0u, nullptr,
             0u, nullptr);
