@@ -167,26 +167,14 @@ namespace vkt {
         return cmdBuffer;
     };
 
-    /* // general command buffer pipeline barrier (updated 26.04.2020)
-    static inline void commandBarrier(const vkt::uni_arg<vk::CommandBuffer>& cmdBuffer) {
-        vk::MemoryBarrier memoryBarrier = {};
-        memoryBarrier.srcAccessMask = (vk::AccessFlagBits::eHostWrite | vk::AccessFlagBits::eColorAttachmentWrite | vk::AccessFlagBits::eAccelerationStructureWriteNV | vk::AccessFlagBits::eShaderWrite | vk::AccessFlagBits::eTransferWrite | vk::AccessFlagBits::eTransformFeedbackCounterWriteEXT | vk::AccessFlagBits::eMemoryWrite | vk::AccessFlagBits::eTransformFeedbackWriteEXT);
-        memoryBarrier.dstAccessMask = (vk::AccessFlagBits::eHostRead  | vk::AccessFlagBits::eColorAttachmentRead  | vk::AccessFlagBits::eAccelerationStructureReadNV  | vk::AccessFlagBits::eShaderRead  | vk::AccessFlagBits::eTransferRead  | vk::AccessFlagBits::eTransformFeedbackCounterReadEXT  | vk::AccessFlagBits::eMemoryRead  | vk::AccessFlagBits::eUniformRead);
-        const auto srcStageMask = vk::PipelineStageFlagBits::eTransformFeedbackEXT | vk::PipelineStageFlagBits::eTransfer | vk::PipelineStageFlagBits::eComputeShader | vk::PipelineStageFlagBits::eRayTracingShaderNV | vk::PipelineStageFlagBits::eAccelerationStructureBuildNV | vk::PipelineStageFlagBits::eHost | vk::PipelineStageFlagBits::eAllGraphics | vk::PipelineStageFlagBits::eColorAttachmentOutput;// | vk::PipelineStageFlagBits::eBottomOfPipe;
-        const auto dstStageMask = vk::PipelineStageFlagBits::eTransformFeedbackEXT | vk::PipelineStageFlagBits::eTransfer | vk::PipelineStageFlagBits::eComputeShader | vk::PipelineStageFlagBits::eRayTracingShaderNV | vk::PipelineStageFlagBits::eAccelerationStructureBuildNV | vk::PipelineStageFlagBits::eHost | vk::PipelineStageFlagBits::eAllGraphics | vk::PipelineStageFlagBits::eColorAttachmentOutput;// | vk::PipelineStageFlagBits::eTopOfPipe;
-        cmdBuffer->pipelineBarrier(srcStageMask, dstStageMask, {}, { memoryBarrier }, {}, {});
-    };
-    */
-
     // OUTDATED and DEPRECATED! Use now vkt::memoryBarrier with vkt::MemoryBarrierInfo
     // general command buffer pipeline barrier (updated 26.04.2020)
     static inline void commandBarrier(vkt::Device device, vkt::uni_arg<VkCommandBuffer> cmdBuffer) {
-        const VkPipelineStageFlags vkStageMask = VK_PIPELINE_STAGE_TRANSFORM_FEEDBACK_BIT_EXT | VK_PIPELINE_STAGE_HOST_BIT | VK_PIPELINE_STAGE_TRANSFER_BIT | VK_PIPELINE_STAGE_VERTEX_INPUT_BIT | VK_PIPELINE_STAGE_VERTEX_SHADER_BIT | VK_PIPELINE_STAGE_RAY_TRACING_SHADER_BIT_KHR | VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT | VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT | VK_PIPELINE_STAGE_GEOMETRY_SHADER_BIT | VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_RAY_TRACING_SHADER_BIT_KHR | VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_KHR;
-        const vkh::VkPipelineStageFlags vkhStageMask = reinterpret_cast<const vkh::VkPipelineStageFlags&>(vkStageMask);
+        const VkPipelineStageFlags stageMask = VK_PIPELINE_STAGE_TRANSFORM_FEEDBACK_BIT_EXT | VK_PIPELINE_STAGE_HOST_BIT | VK_PIPELINE_STAGE_TRANSFER_BIT | VK_PIPELINE_STAGE_VERTEX_INPUT_BIT | VK_PIPELINE_STAGE_VERTEX_SHADER_BIT | VK_PIPELINE_STAGE_RAY_TRACING_SHADER_BIT_KHR | VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT | VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT | VK_PIPELINE_STAGE_GEOMETRY_SHADER_BIT | VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_RAY_TRACING_SHADER_BIT_KHR | VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_KHR;
         vkt::memoryBarrier(cmdBuffer, vkt::MemoryBarrierInfo{
             .deviceDispatch = device,
-            .srcStageMask = vkhStageMask,
-            .dstStageMask = vkhStageMask
+            .srcStageMask = reinterpret_cast<const vkh::VkPipelineStageFlags&>(stageMask),
+            .dstStageMask = reinterpret_cast<const vkh::VkPipelineStageFlags&>(stageMask)
         });
     };
 
