@@ -278,6 +278,65 @@ namespace vkt {
         return result;
     };
 
+    //
+    static inline auto polyfillAccess(const vkh::VkPipelineStageFlags& stageFlags, vkh::VkAccessFlags& accessFlags, bool write = false) {
+        if (write) {
+            if (stageFlags.eAccelerationStructureBuild) { accessFlags.eAccelerationStructureWrite = 1; };
+            if (stageFlags.eBottomOfPipe || stageFlags.eTopOfPipe) { accessFlags.eMemoryWrite = 1; };
+            if (stageFlags.eColorAttachmentOutput) { accessFlags.eColorAttachmentWrite = 1; };
+            if (stageFlags.eCommandProcess) { accessFlags.eCommandProcessWrite = 1; };
+            if (stageFlags.eComputeShader || stageFlags.eFragmentShader || stageFlags.eGeometryShader || stageFlags.eMeshShader || stageFlags.eRayTracingShader || stageFlags.eTaskShader | stageFlags.eTessellationControlShader | stageFlags.eTessellationEvaluationShader | stageFlags.eVertexShader) { accessFlags.eShaderWrite = 1; };
+            if (stageFlags.eHost) { accessFlags.eHostWrite = 1; };
+            if (stageFlags.eTransfer) { accessFlags.eTransferWrite = 1; };
+            if (stageFlags.eTransformFeedback) { accessFlags.eTransformFeedbackWrite = 1; accessFlags.eTransformFeedbackCounterWrite = 1; };
+            if (stageFlags.eEarlyFragmentTests || stageFlags.eLateFragmentTests) { accessFlags.eDepthStencilAttachmentWrite = 1; };
+        } else {
+            if (stageFlags.eAccelerationStructureBuild) { accessFlags.eAccelerationStructureRead = 1; };
+            if (stageFlags.eBottomOfPipe || stageFlags.eTopOfPipe) { accessFlags.eMemoryRead = 1; };
+            if (stageFlags.eColorAttachmentOutput) { accessFlags.eColorAttachmentRead = 1; };
+            if (stageFlags.eCommandProcess) { accessFlags.eCommandProcessRead = 1; };
+            if (stageFlags.eComputeShader || stageFlags.eFragmentShader || stageFlags.eGeometryShader || stageFlags.eMeshShader || stageFlags.eRayTracingShader || stageFlags.eTaskShader | stageFlags.eTessellationControlShader | stageFlags.eTessellationEvaluationShader | stageFlags.eVertexShader) { accessFlags.eShaderRead = 1; accessFlags.eUniformRead = 1; };
+            if (stageFlags.eFragmentShader) { accessFlags.eInputAttachmentRead = 1; };
+            if (stageFlags.eHost) { accessFlags.eHostRead = 1; };
+            if (stageFlags.eTransfer) { accessFlags.eTransferRead = 1; };
+            //if (stageFlags.eTransformFeedback) { accessFlags.eTransformFeedbackCounterRead = 1; };
+            if (stageFlags.eDrawIndirect) { accessFlags.eTransformFeedbackCounterRead = 1; };
+            if (stageFlags.eFragmentDensityProcess) { accessFlags.eFragmentDensityMapRead = 1; };
+            if (stageFlags.eConditionalRendering) { accessFlags.eConditionalRenderingRead = 1; };
+            if (stageFlags.eDrawIndirect) { accessFlags.eIndirectCommandRead = 1; };
+            if (stageFlags.eShadingRateImage) { accessFlags.eShadingRateImageRead = 1; };
+            if (stageFlags.eVertexInput) { accessFlags.eVertexAttributeRead = 1; accessFlags.eIndexRead = 1; };
+            if (stageFlags.eEarlyFragmentTests || stageFlags.eLateFragmentTests) { accessFlags.eDepthStencilAttachmentRead = 1; };
+            if (stageFlags.eRayTracingShader) { accessFlags.eAccelerationStructureRead = 1; };
+        };
+    };
+
+    //
+    struct MemoryBarrierInfo {
+        vkt::Instance instanceDispatch = vkGlobal::instance;
+        vkt::Device deviceDispatch = vkGlobal::device;
+        vkh::VkPipelineStageFlags srcStageMask = {}; bool srcRead = false; bool srcWrite = true;
+        vkh::VkPipelineStageFlags dstStageMask = {}; bool dstRead = true; bool dstWrite = false;
+    };
+
+    //
+    static inline auto memoryBarrier(const vkt::uni_arg<VkCommandBuffer>& cmd = VkCommandBuffer{}, const vkt::uni_arg<MemoryBarrierInfo>& info = MemoryBarrierInfo{}) {
+        vkh::VkMemoryBarrier memoryBarrier = {};
+
+        // 
+        if (info->srcWrite) { polyfillAccess(info->srcStageMask, memoryBarrier.srcAccessMask, true); };
+        if (info->srcRead) { polyfillAccess(info->srcStageMask, memoryBarrier.srcAccessMask, false); };
+        if (info->dstWrite) { polyfillAccess(info->dstStageMask, memoryBarrier.dstAccessMask, true); };
+        if (info->dstRead) { polyfillAccess(info->dstStageMask, memoryBarrier.dstAccessMask, false); };
+
+        // 
+        info->deviceDispatch->vkCmdPipelineBarrier(cmd, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, {},
+            1u, memoryBarrier,
+            0u, nullptr,
+            0u, nullptr);
+    };
+
+
 };
 
 #endif

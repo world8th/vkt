@@ -2,29 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="4d2a495b-8033-4094-8f05-9d8023f436de" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/include/glm/detail/setup.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/glm/detail/setup.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/glm/detail/type_half.inl" beforeDir="false" afterPath="$PROJECT_DIR$/include/glm/detail/type_half.inl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/glm/detail/type_vec2.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/glm/detail/type_vec2.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/glm/detail/type_vec3.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/glm/detail/type_vec3.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/glm/detail/type_vec4.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/glm/detail/type_vec4.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/glm/ext/matrix_transform.inl" beforeDir="false" afterPath="$PROJECT_DIR$/include/glm/ext/matrix_transform.inl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/glm/ext/quaternion_exponential.inl" beforeDir="false" afterPath="$PROJECT_DIR$/include/glm/ext/quaternion_exponential.inl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/glm/ext/vector_int1_precision.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/glm/ext/vector_int2_precision.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/glm/ext/vector_int3_precision.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/glm/ext/vector_int4_precision.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/glm/ext/vector_uint1_precision.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/glm/ext/vector_uint2_precision.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/glm/ext/vector_uint3_precision.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/glm/ext/vector_uint4_precision.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/glm/simd/neon.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/glm/simd/neon.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/glm/trigonometric.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/glm/trigonometric.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/vkt3/fw-impl.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/vkt3/fw-impl.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/vkt3/fw.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/vkt3/fw.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/vkt3/image.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/vkt3/image.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/vkt3/structs.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/vkt3/structs.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/vkt3/utils.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/vkt3/utils.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/vkt3/vector.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/vkt3/vector.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/vkt3/essential.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/vkt3/essential.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/vkt3/inline.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/vkt3/inline.hpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk" beforeDir="false" afterPath="$PROJECT_DIR$/include/xvk" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/Vulkan-Headers" beforeDir="false" afterPath="$PROJECT_DIR$/include/xvk/Vulkan-Headers" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/include/xvk/Vulkan-Headers/.cmake-format.py" beforeDir="false" />
