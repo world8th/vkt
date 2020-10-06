@@ -446,6 +446,10 @@ namespace vkt {
         union_t(const M& bitfield) : bitfield(bitfield) {};
         union_t(const O& value) : value(value) {};
         union_t(const B& bit) : value(bit) {};
+        //constexpr union_t() : value(O(0u)) {};
+        //constexpr union_t(const M& bitfield) : bitfield(bitfield) {};
+        //constexpr union_t(const O& value) : value(value) {};
+        //constexpr union_t(const B& bit) : value(bit) {};
 
         // assign ops
         union_t& operator=(const B& bit) {
@@ -460,6 +464,12 @@ namespace vkt {
             this->value = value;
             return *this;
         };
+
+        // direct Vulkan API access
+        O* operator &() { return &value; };
+        const O* operator &() const { return &value; };
+        O& operator *() { return value; };
+        const O& operator *() const { return value; };
 
         // pointers
         operator B* () { return &reinterpret_cast<B&>(value); };

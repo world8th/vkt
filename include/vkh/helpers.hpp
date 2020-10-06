@@ -625,7 +625,7 @@ namespace vkh {
         VkDescriptorSetLayoutCreateInfo vk_info = {};
         VkDescriptorSetLayoutBindingFlagsCreateInfo flags_info = {};
         std::vector<VkDescriptorSetLayoutBinding> bindings = {};
-        std::vector<VkDescriptorBindingFlags> binding_flags = {};
+        std::vector<::VkDescriptorBindingFlags> binding_flags = {};
     };
 
     // TODO: REMOVE CODE TAFTOLOGY

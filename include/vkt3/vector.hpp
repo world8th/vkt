@@ -84,7 +84,7 @@ namespace vkt {
 
             // 
             if (this->info.memUsage == VMA_MEMORY_USAGE_GPU_ONLY) {
-                createInfo->usage.eSharedDeviceAddress = 1; // NEEDS SHARED BIT!
+                createInfo->usage->eSharedDeviceAddress = 1; // NEEDS SHARED BIT!
                 allocFlags.flags->eAddress = 1;
             };
 
@@ -281,7 +281,7 @@ namespace vkt {
         ) {
             VmaAllocationCreateInfo vmaInfo = {}; vmaInfo.usage = memInfo->memUsage;
             if (memInfo->memUsage == VMA_MEMORY_USAGE_CPU_TO_GPU || memInfo->memUsage == VMA_MEMORY_USAGE_GPU_TO_CPU) { vmaInfo.flags = VMA_ALLOCATION_CREATE_MAPPED_BIT; };
-            if (memInfo->memUsage == VMA_MEMORY_USAGE_GPU_ONLY) { createInfo->usage.eSharedDeviceAddress = 1; }; // NEEDS SHARED BIT!
+            if (memInfo->memUsage == VMA_MEMORY_USAGE_GPU_ONLY) { createInfo->usage->eSharedDeviceAddress = 1; }; // NEEDS SHARED BIT!
 
             // 
             vkh::handleVk(vmaCreateBuffer(this->allocator = allocator.ref(), *createInfo, &vmaInfo, &reinterpret_cast<VkBuffer&>(this->buffer), &this->allocation, &this->allocationInfo));
