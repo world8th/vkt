@@ -226,8 +226,8 @@ namespace vkt {
         if (accessFlags.eColorAttachmentWrite || accessFlags.eColorAttachmentRead || accessFlags.eColorAttachmentReadNonCoherent) {
             stageFlags.eColorAttachmentOutput = 1u;
         };
-        if (accessFlags.eCommandProcessRead || accessFlags.eCommandProcessWrite) {
-            stageFlags.eCommandProcess = 1u;
+        if (accessFlags.eCommandPreprocessRead || accessFlags.eCommandPreprocessWrite) {
+            stageFlags.eCommandPreprocess = 1u;
         };
         if (accessFlags.eConditionalRenderingRead) {
             stageFlags.eConditionalRendering = 1u;
@@ -336,7 +336,7 @@ namespace vkt {
             if (stageFlags.eAccelerationStructureBuild) { accessFlags.eAccelerationStructureWrite = 1; };
             if (stageFlags.eBottomOfPipe || stageFlags.eTopOfPipe) { accessFlags.eMemoryWrite = 1; };
             if (stageFlags.eColorAttachmentOutput) { accessFlags.eColorAttachmentWrite = 1; };
-            if (stageFlags.eCommandProcess) { accessFlags.eCommandProcessWrite = 1; };
+            if (stageFlags.eCommandPreprocess) { accessFlags.eCommandPreprocessWrite = 1; };
             if (stageFlags.eComputeShader || stageFlags.eFragmentShader || stageFlags.eGeometryShader || stageFlags.eMeshShader || stageFlags.eRayTracingShader || stageFlags.eTaskShader | stageFlags.eTessellationControlShader | stageFlags.eTessellationEvaluationShader | stageFlags.eVertexShader) { accessFlags.eShaderWrite = 1; };
             if (stageFlags.eHost) { accessFlags.eHostWrite = 1; };
             if (stageFlags.eTransfer) { accessFlags.eTransferWrite = 1; };
@@ -346,7 +346,7 @@ namespace vkt {
             if (stageFlags.eAccelerationStructureBuild) { accessFlags.eAccelerationStructureRead = 1; };
             if (stageFlags.eBottomOfPipe || stageFlags.eTopOfPipe) { accessFlags.eMemoryRead = 1; };
             if (stageFlags.eColorAttachmentOutput) { accessFlags.eColorAttachmentRead = 1; };
-            if (stageFlags.eCommandProcess) { accessFlags.eCommandProcessRead = 1; };
+            if (stageFlags.eCommandPreprocess) { accessFlags.eCommandPreprocessRead = 1; };
             if (stageFlags.eComputeShader || stageFlags.eFragmentShader || stageFlags.eGeometryShader || stageFlags.eMeshShader || stageFlags.eRayTracingShader || stageFlags.eTaskShader | stageFlags.eTessellationControlShader | stageFlags.eTessellationEvaluationShader | stageFlags.eVertexShader) { accessFlags.eShaderRead = 1; accessFlags.eUniformRead = 1; };
             if (stageFlags.eFragmentShader) { accessFlags.eInputAttachmentRead = 1; };
             if (stageFlags.eHost) { accessFlags.eHostRead = 1; };
