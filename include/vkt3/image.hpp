@@ -75,7 +75,7 @@ namespace vkt {
             vkh::VkMemoryAllocateFlagsInfo allocFlags = {};
             vkt::unlock32(allocFlags.flags) = 0u;
             if (this->info.memUsage == VMA_MEMORY_USAGE_GPU_ONLY) {
-                allocFlags.flags.eAddress = 1u;
+                allocFlags.flags->eAddress = 1u;
             };
 
             //
@@ -104,9 +104,9 @@ namespace vkt {
 
             //
 #ifdef VKT_WIN32_DETECTED
-            vkh::VkExportMemoryAllocateInfo exportAllocInfo{ .handleTypes = {.eOpaqueWin32 = 1} };
+            vkh::VkExportMemoryAllocateInfo exportAllocInfo{ .handleTypes = vkh::VkExternalMemoryHandleTypeFlags{.eOpaqueWin32 = 1} };
 #else
-            vkh::VkExportMemoryAllocateInfo exportAllocInfo{ .handleTypes = {.eOpaqueFd = 1} };
+            vkh::VkExportMemoryAllocateInfo exportAllocInfo{ .handleTypes = vkh::VkExternalMemoryHandleTypeFlags{.eOpaqueFd = 1} };
 #endif
 
             // 

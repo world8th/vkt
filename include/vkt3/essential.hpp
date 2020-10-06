@@ -252,7 +252,7 @@ namespace vkt {
 
     // Dedicated Semaphore Creator
     static inline void createSemaphore(vkt::Device device, VkSemaphore* vkSemaphore, unsigned* unitPtr = nullptr, const void* pNext = nullptr, const bool GL = false) {
-        const auto exportable = vkh::VkExportSemaphoreCreateInfo{ .pNext = pNext, .handleTypes = { .eOpaqueWin32 = 1} };
+        const auto exportable = vkh::VkExportSemaphoreCreateInfo{ .pNext = pNext, .handleTypes = vkh::VkExternalSemaphoreHandleTypeFlags{ .eOpaqueWin32 = 1} };
 
         HANDLE handle{ INVALID_HANDLE_VALUE };
 #ifdef UNICODE

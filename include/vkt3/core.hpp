@@ -426,6 +426,92 @@ namespace vkt {
     }
 
 
+    //
+    enum default_t : uint32_t {
+
+    };
+
+    // first are bitfield struct, second are original flags type, third are bits enum
+    template<class M, class O, class B = default_t>
+    class union_t {
+    public:
+        // must be union (same value)
+        union {
+            M bitfield;
+            O value = O(0u);
+        };
+
+        // construct ops
+        union_t() : value(O(0u)) {};
+        union_t(const M& bitfield) : bitfield(bitfield) {};
+        union_t(const O& value) : value(value) {};
+        union_t(const B& bit) : value(bit) {};
+
+        // assign ops
+        union_t& operator=(const B& bit) {
+            this->value = bit;
+            return *this;
+        };
+        union_t& operator=(const M& bitfield) {
+            this->bitfield = bitfield;
+            return *this;
+        };
+        union_t& operator=(const O& value) {
+            this->value = value;
+            return *this;
+        };
+
+        // pointers
+        operator B* () { return &reinterpret_cast<B&>(value); };
+        operator const B* () const { return &reinterpret_cast<const B&>(value); };
+        operator O* () { return &value; };
+        operator const O* () const { return &value; };
+        operator M* () { return &bitfield; };
+        operator const M* () const { return &bitfield; };
+
+        // reference
+        operator B& () { return reinterpret_cast<B&>(value); };
+        operator const B& () const { return reinterpret_cast<const B&>(value); };
+        operator O& () { return value; };
+        operator const O& () const { return value; };
+        operator M& () { return bitfield; };
+        operator const M& () const { return bitfield; };
+
+        // bitfield access
+        M* operator ->() {
+            return &bitfield;
+        };
+
+        // bitfield copy ops
+        union_t operator ~() const {
+            return union_t(~value);
+        };
+        union_t operator |(const B& bit) const {
+            return union_t(value | bit);
+        };
+        union_t operator &(const B& bit) const {
+            return union_t(value & bit);
+        };
+        union_t operator ^(const B& bit) const {
+            return union_t(value ^ bit);
+        };
+
+        // bitfield assign ops
+        union_t& operator |=(const B& bit) {
+            value |= bit;
+            return *this;
+        };
+        union_t& operator &=(const B& bit) {
+            value &= bit;
+            return *this;
+        };
+        union_t& operator ^=(const B& bit) {
+            value ^= bit;
+            return *this;
+        };
+    };
+
+
 #ifdef VKT_OPENGL_INTEROP
 #ifdef VKT_USE_GLFW
     // FOR LWJGL-3 Request!
@@ -504,6 +590,8 @@ namespace vkh {
         };
         return result;
     };
+
+    
 };
 
 

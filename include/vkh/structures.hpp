@@ -47,6 +47,10 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         inline operator T&() { return reinterpret_cast<T&>(*this); };\
         inline operator const T&() const { return reinterpret_cast<const T&>(*this); };
     
+    #define FLAGS(NAME) vkt::union_t<vkh::NAME##Flags, ::NAME##Flags, ::NAME##FlagBits>
+    #define FLAGS(NAME,FIX) vkt::union_t<vkh::NAME##Flags##FIX, ::NAME##Flags##FIX, ::NAME##FlagBits##FIX>
+
+
     // GLM-Compatible
     typedef struct VkOffset3D {
         int32_t    x = 0;
@@ -222,7 +226,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
     typedef struct VkDescriptorPoolCreateInfo {
         VkStructureType                     sType            = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
         const void*                         pNext            = nullptr;
-        VkDescriptorPoolCreateFlags         flags            = VsDefaultDescriptorPoolFlags; // TODO: FLAGS
+        VkDescriptorPoolCreateFlags         flags            = {};
         uint32_t                            maxSets          = 256u;
         uint32_t                            poolSizeCount    = 0u;
         const vkh::VkDescriptorPoolSize*    pPoolSizes       = nullptr;
@@ -240,7 +244,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
     typedef struct VkBufferViewCreateInfo {
         VkStructureType            sType    = VK_STRUCTURE_TYPE_BUFFER_VIEW_CREATE_INFO;
         const void*                pNext    = nullptr;
-        VkBufferViewCreateFlags    flags    = VsDefaultBufferViewFlags; // TODO: FLAGS
+        VkBufferViewCreateFlags    flags    = {};
         VkBuffer                   buffer   = VK_NULL_HANDLE;
         VkFormat                   format   = VK_FORMAT_R32G32B32A32_SFLOAT;
         VkDeviceSize               offset   = 0u;
@@ -254,7 +258,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
     typedef struct VkBufferCreateInfo {
         VkStructureType     sType                   = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
         const void*         pNext                   = nullptr;
-        VkBufferCreateFlags flags                   = VsDefaultBufferFlags;
+        FLAGS(VkBufferCreate) flags = {};
         VkDeviceSize        size                    = 4u;
         VkBufferUsageFlags  usage                   = VsDefaultBufferUsage;
         VkSharingMode       sharingMode             = VK_SHARING_MODE_EXCLUSIVE;
@@ -275,7 +279,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
     typedef struct VkImageCreateInfo {
         VkStructureType          sType                  = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
         const void*              pNext                  = nullptr;
-        VkImageCreateFlags       flags                  = VsDefaultImageFlags;
+        FLAGS(VkImageCreate) flags                  = {};
         VkImageType              imageType              = VK_IMAGE_TYPE_2D;
         VkFormat                 format                 = VK_FORMAT_R8G8B8A8_UNORM;
         VkExtent3D               extent                 = {1u,1u,1u};
@@ -302,7 +306,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
     typedef struct VkSamplerCreateInfo {
         VkStructureType         sType                   = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
         const void*             pNext                   = nullptr;
-        VkSamplerCreateFlags    flags                   = VsDefaultSamplerFlags; // TODO: FLAGS
+        VkSamplerCreateFlags    flags                   = {}; // TODO: FLAGS
         VkFilter                magFilter               = VK_FILTER_NEAREST;
         VkFilter                minFilter               = VK_FILTER_NEAREST;
         VkSamplerMipmapMode     mipmapMode              = VK_SAMPLER_MIPMAP_MODE_NEAREST;
@@ -328,7 +332,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
 
     // 
     typedef struct VkImageSubresourceRange {
-        VkImageAspectFlags    aspectMask     = VsDefaultAspectMask;
+        FLAGS(VkImageAspect) aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
         uint32_t              baseMipLevel   = 0u;
         uint32_t              levelCount     = 1u;
         uint32_t              baseArrayLayer = 0u;
@@ -340,7 +344,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
 
     // 
     typedef struct VkImageSubresourceLayers {
-        VkImageAspectFlags    aspectMask     = VsDefaultAspectMask;
+        FLAGS(VkImageAspect) aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
         uint32_t              mipLevel       = 0u;
         uint32_t              baseArrayLayer = 0u;
         uint32_t              layerCount     = 1u;
@@ -364,7 +368,6 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
 
     //
     inline constexpr auto VsDefaultComponents = VkComponentMapping{};
-    inline constexpr auto VsDefaultSubresourceRange = VkImageSubresourceRange{ .aspectMask = VsDefaultAspectMask };
     inline constexpr auto VsDefaultCullMode = VkCullModeFlags{};
 
     //
@@ -376,7 +379,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         VkImageViewType            viewType         = VK_IMAGE_VIEW_TYPE_2D;
         VkFormat                   format           = VK_FORMAT_R8G8B8A8_UNORM;
         VkComponentMapping         components       = VsDefaultComponents;
-        VkImageSubresourceRange    subresourceRange = VsDefaultSubresourceRange;
+        VkImageSubresourceRange    subresourceRange = VkImageSubresourceRange{ .aspectMask = VsDefaultAspectMask };;
 
         STRUCT_OPERATORS(VkImageViewCreateInfo)
         VK_HPP_STRUCT_OPERATORS(VkImageViewCreateInfo,vk::ImageViewCreateInfo)
@@ -486,7 +489,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         VkBool32                                   depthClampEnable         = false;
         VkBool32                                   rasterizerDiscardEnable  = false;
         VkPolygonMode                              polygonMode              = VK_POLYGON_MODE_FILL;
-        VkCullModeFlags                            cullMode                 = VsDefaultCullMode;
+        FLAGS(VkCullMode)                      cullMode                 = VsDefaultCullMode;
         VkFrontFace                                frontFace                = VK_FRONT_FACE_COUNTER_CLOCKWISE ;
         VkBool32                                   depthBiasEnable          = false;
         float                                      depthBiasConstantFactor  = 0.f;
@@ -559,7 +562,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         VkBlendFactor            srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
         VkBlendFactor            dstAlphaBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
         VkBlendOp                alphaBlendOp        = VK_BLEND_OP_ADD;
-        VkColorComponentFlags    colorWriteMask      = VsDefaultColorComponentFlags;
+        FLAGS(VkColorComponent) colorWriteMask = VsDefaultColorComponentFlags;
 
         STRUCT_OPERATORS(VkPipelineColorBlendAttachmentState)
         VK_HPP_STRUCT_OPERATORS(VkPipelineColorBlendAttachmentState,vk::PipelineColorBlendAttachmentState)
@@ -610,7 +613,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
     typedef struct VkPipelineShaderStageCreateInfo {
         VkStructureType                     sType               = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
         const void*                         pNext               = nullptr;
-        VkPipelineShaderStageCreateFlags    flags               = VsDefaultPipelineShaderStageFlags; // TODO: FLAGS
+        FLAGS(VkPipelineShaderStageCreate) flags                = VsDefaultPipelineShaderStageFlags; // TODO: FLAGS
         VkShaderStageFlagBits               stage               = VK_SHADER_STAGE_COMPUTE_BIT;
         VkShaderModule                      module              = VK_NULL_HANDLE;
         const char*                         pName               = "main";
@@ -624,7 +627,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
     typedef struct VkGraphicsPipelineCreateInfo {
         VkStructureType                                  sType                  = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
         const void*                                      pNext                  = nullptr;
-        VkPipelineCreateFlags                            flags                  = VsDefaultPipelineFlags; // TODO: FLAGS
+        FLAGS(VkPipelineCreate)                      flags                  = VsDefaultPipelineFlags; // TODO: FLAGS
         uint32_t                                         stageCount             = 0u;
         const VkPipelineShaderStageCreateInfo*           pStages                = nullptr;
         const VkPipelineVertexInputStateCreateInfo*      pVertexInputState      = nullptr;
@@ -655,7 +658,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         uint32_t                   minSubgroupSize              = 0u;//16u;
         uint32_t                   maxSubgroupSize              = 0u;//64u;
         uint32_t                   maxComputeWorkgroupSubgroups = 0u;
-        VkShaderStageFlags         requiredSubgroupSizeStages   = VsDefaultShaderStageFlags;
+        FLAGS(VkShaderStage)   requiredSubgroupSizeStages   = VsDefaultShaderStageFlags;
 
         STRUCT_OPERATORS(VkPhysicalDeviceSubgroupSizeControlPropertiesEXT)
         VK_HPP_STRUCT_OPERATORS(VkPhysicalDeviceSubgroupSizeControlPropertiesEXT,vk::PhysicalDeviceSubgroupSizeControlPropertiesEXT)
@@ -675,7 +678,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
     typedef struct VkComputePipelineCreateInfo {
         VkStructureType                    sType                = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO;
         const void*                        pNext                = nullptr;
-        VkPipelineCreateFlags              flags                = VsDefaultPipelineFlags; // TODO: FLAGS
+        FLAGS(VkPipelineCreate)        flags                = VsDefaultPipelineFlags; // TODO: FLAGS
         VkPipelineShaderStageCreateInfo    stage                = {};
         VkPipelineLayout                   layout               = VK_NULL_HANDLE;
         VkPipeline                         basePipelineHandle   = VK_NULL_HANDLE;
@@ -703,7 +706,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
     typedef struct VkRayTracingPipelineCreateInfoNV {
         VkStructureType                               sType                 = VK_STRUCTURE_TYPE_RAY_TRACING_PIPELINE_CREATE_INFO_NV;
         const void*                                   pNext                 = nullptr;
-        VkPipelineCreateFlags                         flags                 = VsDefaultPipelineFlags; // TODO: FLAGS
+        FLAGS(VkPipelineCreate)                   flags                 = VsDefaultPipelineFlags; // TODO: FLAGS
         uint32_t                                      stageCount            = 1u;
         const VkPipelineShaderStageCreateInfo*        pStages               = nullptr;
         uint32_t                                      groupCount            = 1u;
@@ -727,7 +730,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         uint32_t              binding               = 0u;
         VkDescriptorType      descriptorType        = VK_DESCRIPTOR_TYPE_SAMPLER;
         uint32_t              descriptorCount       = 1u;
-        VkShaderStageFlags    stageFlags            = VsDefaultShaderStageFlags;
+        FLAGS(VkShaderStage) stageFlags         = VsDefaultShaderStageFlags;
         const VkSampler*      pImmutableSamplers    = nullptr;
 
         STRUCT_OPERATORS(VkDescriptorSetLayoutBinding)
@@ -736,7 +739,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
 
     // 
     typedef struct VkPushConstantRange {
-        VkShaderStageFlags    stageFlags = VsDefaultShaderStageFlags;
+        FLAGS(VkShaderStage) stageFlags = VsDefaultShaderStageFlags;
         uint32_t              offset     = 0u;
         uint32_t              size       = 16u;
 
@@ -764,7 +767,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         VK_HPP_STRUCT_OPERATORS(VkPipelineLayoutCreateInfo,vk::PipelineLayoutCreateInfo)
     } VkPipelineLayoutCreateInfo;
 
-    // 
+    // TODO: Correct Type of Flags Pointer
     typedef struct VkDescriptorSetLayoutBindingFlagsCreateInfo {
         VkStructureType                       sType         = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_BINDING_FLAGS_CREATE_INFO;
         const void*                           pNext         = nullptr;
@@ -813,7 +816,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
     typedef struct VkDescriptorSetLayoutCreateInfo {
         VkStructureType                        sType        = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
         const void*                            pNext        = nullptr;
-        VkDescriptorSetLayoutCreateFlags       flags        = VsDefaultDescriptorSetLayoutFlags;
+        FLAGS(VkDescriptorSetLayoutCreate)     flags        = VsDefaultDescriptorSetLayoutFlags;
         uint32_t                               bindingCount = 0u;
         const VkDescriptorSetLayoutBinding*    pBindings    = nullptr;
 
@@ -869,11 +872,11 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
     typedef struct VkSubpassDependency {
         uint32_t                srcSubpass      = 0u;
         uint32_t                dstSubpass      = 0u;
-        VkPipelineStageFlags    srcStageMask    = VsDefaultPipelineStageFlags;
-        VkPipelineStageFlags    dstStageMask    = VsDefaultPipelineStageFlags;
-        VkAccessFlags           srcAccessMask   = VsDefaultAccessFlags;
-        VkAccessFlags           dstAccessMask   = VsDefaultAccessFlags;
-        VkDependencyFlags       dependencyFlags = VsDefaultDependencyFlags;
+        FLAGS(VkPipelineStage) srcStageMask    = VsDefaultPipelineStageFlags;
+        FLAGS(VkPipelineStage) dstStageMask    = VsDefaultPipelineStageFlags;
+        FLAGS(VkAccess)        srcAccessMask   = VsDefaultAccessFlags;
+        FLAGS(VkAccess)        dstAccessMask   = VsDefaultAccessFlags;
+        FLAGS(VkDependency)    dependencyFlags = VsDefaultDependencyFlags;
 
         STRUCT_OPERATORS(VkSubpassDependency)
         VK_HPP_STRUCT_OPERATORS(VkSubpassDependency,vk::SubpassDependency)
@@ -976,7 +979,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         const void*          pNext        = nullptr;
         VkGeometryTypeNV     geometryType = VK_GEOMETRY_TYPE_TRIANGLES_NV;
         VkGeometryDataNV     geometry     = {};
-        VkGeometryFlagsNV    flags        = VsDefaultGeometryFlags;
+        FLAGS(VkGeometry, NV) flags   = VsDefaultGeometryFlags;
 
         STRUCT_OPERATORS(VkGeometryNV)
         VK_HPP_STRUCT_OPERATORS(VkGeometryNV,vk::GeometryNV)
@@ -987,7 +990,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         VkStructureType                        sType         = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_INFO_NV;
         const void*                            pNext         = nullptr;
         VkAccelerationStructureTypeNV          type          = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_NV;
-        VkBuildAccelerationStructureFlagsNV    flags         = VsDefaultBuildAccelerationStructureFlags;
+        FLAGS(VkBuildAccelerationStructure, NV) flags    = VsDefaultBuildAccelerationStructureFlags;
         uint32_t                               instanceCount = 0u;
         uint32_t                               geometryCount = 0u;
         const VkGeometryNV*                    pGeometries   = nullptr;
@@ -1029,8 +1032,8 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
     typedef struct VkMemoryBarrier {
         VkStructureType     sType         = VK_STRUCTURE_TYPE_MEMORY_BARRIER;
         const void*         pNext         = nullptr;
-        VkAccessFlags       srcAccessMask = VsDefaultAccessFlags;
-        VkAccessFlags       dstAccessMask = VsDefaultAccessFlags;
+        FLAGS(VkAccess) srcAccessMask = VsDefaultAccessFlags;
+        FLAGS(VkAccess) dstAccessMask = VsDefaultAccessFlags;
 
         STRUCT_OPERATORS(VkMemoryBarrier)
         VK_HPP_STRUCT_OPERATORS(VkMemoryBarrier, vk::MemoryBarrier)
@@ -1043,8 +1046,8 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
 
     //
     typedef struct VkMemoryType {
-        VkMemoryPropertyFlags    propertyFlags  = VsDefaultMemoryPropertyFlags;
-        uint32_t                 heapIndex      = 0u;
+        FLAGS(VkMemoryProperty) propertyFlags  = VsDefaultMemoryPropertyFlags;
+        uint32_t                    heapIndex      = 0u;
 
         STRUCT_OPERATORS(VkMemoryType)
         VK_HPP_STRUCT_OPERATORS(VkMemoryType, vk::MemoryType)
@@ -1053,7 +1056,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
     // 
     typedef struct VkMemoryHeap {
         VkDeviceSize      size  = 0u;
-        VkMemoryHeapFlags flags = VsDefaultMemoryHeapFlags;
+        FLAGS(VkMemoryHeap) flags = VsDefaultMemoryHeapFlags;
 
         STRUCT_OPERATORS(VkMemoryHeap)
         VK_HPP_STRUCT_OPERATORS(VkMemoryHeap, vk::MemoryHeap)
@@ -1253,7 +1256,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         const void*                               pNext         = nullptr;
         VkGeometryTypeKHR                         geometryType  = {};
         VkAccelerationStructureGeometryDataKHR    geometry      = VkAccelerationStructureGeometryDataKHR{ .triangles = {} };
-        VkGeometryFlagsKHR                        flags         = VsDefaultGeometryFlags;
+        FLAGS(VkGeometry, KHR)                flags         = VsDefaultGeometryFlags;
 
         // 
         VkAccelerationStructureGeometryKHR& operator=(const VkAccelerationStructureGeometryTrianglesDataKHR& triangles) { this->geometryType = VK_GEOMETRY_TYPE_TRIANGLES_KHR; this->geometry.triangles = triangles; return *this; };
@@ -1303,7 +1306,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         VkStructureType                                     sType                    = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_GEOMETRY_INFO_KHR;
         const void*                                         pNext                    = nullptr;
         VkAccelerationStructureTypeKHR                      type                     = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR;
-        VkBuildAccelerationStructureFlagsKHR                flags                    = VsDefaultBuildAccelerationStructureFlags;
+        FLAGS(VkBuildAccelerationStructure, KHR)        flags                    = VsDefaultBuildAccelerationStructureFlags;
         VkBool32                                            update                   = false;
         VkAccelerationStructureKHR                          srcAccelerationStructure = {};
         VkAccelerationStructureKHR                          dstAccelerationStructure = {};
@@ -1348,7 +1351,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         const void*                                                pNext             = nullptr;
         VkDeviceSize                                               compactedSize     = 0u;
         VkAccelerationStructureTypeKHR                             type              = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR ;
-        VkBuildAccelerationStructureFlagsKHR                       flags             = VsDefaultBuildAccelerationStructureFlags;
+        FLAGS(VkBuildAccelerationStructure, KHR)               flags             = VsDefaultBuildAccelerationStructureFlags;
         uint32_t                                                   maxGeometryCount  = 0u;
         const VkAccelerationStructureCreateGeometryTypeInfoKHR*    pGeometryInfos    = nullptr;
         VkDeviceAddress                                            deviceAddress     = VK_NULL_HANDLE;
@@ -1399,7 +1402,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
     typedef struct VkRayTracingPipelineCreateInfoKHR {
         VkStructureType                                      sType              = VK_STRUCTURE_TYPE_RAY_TRACING_PIPELINE_CREATE_INFO_KHR;
         const void*                                          pNext              = nullptr;
-        VkPipelineCreateFlags                                flags              = VsDefaultPipelineFlags;
+        FLAGS(VkPipelineCreate)                          flags              = VsDefaultPipelineFlags;
         uint32_t                                             stageCount         = 1u;
         const VkPipelineShaderStageCreateInfo*               pStages            = nullptr;
         uint32_t                                             groupCount         = 1u;
@@ -1507,7 +1510,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
     typedef struct VkExportMemoryAllocateInfo {
         VkStructureType                    sType        = VK_STRUCTURE_TYPE_EXPORT_MEMORY_ALLOCATE_INFO;
         const void*                        pNext        = nullptr;
-        VkExternalMemoryHandleTypeFlags    handleTypes  = {};
+        FLAGS(VkExternalMemoryHandleType) handleTypes  = {};
 
         STRUCT_OPERATORS(VkExportMemoryAllocateInfo)
         VK_HPP_STRUCT_OPERATORS(VkExportMemoryAllocateInfo, vk::ExportMemoryAllocateInfo)
@@ -1557,8 +1560,8 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
     typedef struct VkImageMemoryBarrier {
         VkStructureType            sType                = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
         const void*                pNext                = nullptr;
-        VkAccessFlags              srcAccessMask        = {};
-        VkAccessFlags              dstAccessMask        = {};
+        FLAGS(VkAccess)            srcAccessMask        = {};
+        FLAGS(VkAccess)            dstAccessMask        = {};
         VkImageLayout              oldLayout            = VK_IMAGE_LAYOUT_UNDEFINED;
         VkImageLayout              newLayout            = VK_IMAGE_LAYOUT_GENERAL;
         uint32_t                   srcQueueFamilyIndex  = 0u;
@@ -1617,7 +1620,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
 
     // 
     typedef struct VkQueueFamilyProperties {
-        VkQueueFlags    queueFlags                  = {};
+        FLAGS(VkQueue)  queueFlags                  = {};
         uint32_t        queueCount                  = 0u;
         uint32_t        timestampValidBits          = 0u;
         VkExtent3D      minImageTransferGranularity = {};
@@ -1648,7 +1651,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
     typedef struct VkCommandPoolCreateInfo {
         VkStructureType             sType            = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
         const void*                 pNext            = nullptr;
-        VkCommandPoolCreateFlags    flags            = VsDefaultCommandPoolFlags;
+        FLAGS(VkCommandPoolCreate)  flags            = VsDefaultCommandPoolFlags;
         uint32_t                    queueFamilyIndex = 0u;
 
         STRUCT_OPERATORS(VkCommandPoolCreateInfo)
@@ -1895,7 +1898,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         VkColorSpaceKHR                 imageColorSpace         = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
         VkExtent2D                      imageExtent             = {1u, 1u};
         uint32_t                        imageArrayLayers        = 1u;
-        VkImageUsageFlags               imageUsage              = VsDefaultImageUsageFlags;
+        FLAGS(VkImageUsage)             imageUsage              = VsDefaultImageUsageFlags;
         VkSharingMode                   imageSharingMode        = VK_SHARING_MODE_EXCLUSIVE;
         uint32_t                        queueFamilyIndexCount   = 1u;
         const uint32_t*                 pQueueFamilyIndices     = nullptr;
@@ -1917,12 +1920,12 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
     typedef struct VkMemoryAllocateFlagsInfo {
         VkStructureType          sType      = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_FLAGS_INFO;
         const void*              pNext      = nullptr;
-        VkMemoryAllocateFlags    flags      = VsDefaultMemoryAllocateFlags;
+        FLAGS(VkMemoryAllocate)  flags      = VsDefaultMemoryAllocateFlags;
         uint32_t                 deviceMask = 0u;
 
-        operator VkMemoryAllocateFlags& () { return flags; };
-        operator const VkMemoryAllocateFlags& () const { return flags; };
-        VkMemoryAllocateFlagsInfo& operator=(const VkMemoryAllocateFlags& flags) { this->flags = flags; return *this; };
+        operator FLAGS(VkMemoryAllocate)& () { return flags; };
+        operator const FLAGS(VkMemoryAllocate)& () const { return flags; };
+        VkMemoryAllocateFlagsInfo& operator=(const FLAGS(VkMemoryAllocate)& flags) { this->flags = flags; return *this; };
 
         STRUCT_OPERATORS(VkMemoryAllocateFlagsInfo)
         VK_HPP_STRUCT_OPERATORS(VkMemoryAllocateFlagsInfo, vk::MemoryAllocateFlagsInfo)
@@ -1956,11 +1959,11 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
     typedef struct VkExportSemaphoreCreateInfo {
         VkStructureType                     sType       = VK_STRUCTURE_TYPE_EXPORT_SEMAPHORE_CREATE_INFO;
         const void*                         pNext       = nullptr;
-        VkExternalSemaphoreHandleTypeFlags  handleTypes = VsDefaultExternalSemaphoreHandleTypeFlags;
+        FLAGS(VkExternalSemaphoreHandleType)  handleTypes = VsDefaultExternalSemaphoreHandleTypeFlags;
 
-        operator VkExternalSemaphoreHandleTypeFlags&() { return handleTypes; };
-        operator const VkExternalSemaphoreHandleTypeFlags&() const { return handleTypes; };
-        VkExportSemaphoreCreateInfo& operator=(const VkExternalSemaphoreHandleTypeFlags& handleType) { this->handleTypes = handleTypes; return *this; };
+        operator FLAGS(VkExternalSemaphoreHandleType)&() { return handleTypes; };
+        operator const FLAGS(VkExternalSemaphoreHandleType)&() const { return handleTypes; };
+        VkExportSemaphoreCreateInfo& operator=(const FLAGS(VkExternalSemaphoreHandleType)& handleType) { this->handleTypes = handleTypes; return *this; };
 
         STRUCT_OPERATORS(VkExportSemaphoreCreateInfo)
         VK_HPP_STRUCT_OPERATORS(VkExportSemaphoreCreateInfo, vk::ExportSemaphoreCreateInfo)

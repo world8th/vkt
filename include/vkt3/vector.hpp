@@ -85,7 +85,7 @@ namespace vkt {
             // 
             if (this->info.memUsage == VMA_MEMORY_USAGE_GPU_ONLY) {
                 createInfo->usage.eSharedDeviceAddress = 1; // NEEDS SHARED BIT!
-                allocFlags.flags.eAddress = 1;
+                allocFlags.flags->eAddress = 1;
             };
 
             //this->buffer = this->info.device.createBuffer(*createInfo);
@@ -104,9 +104,9 @@ namespace vkt {
 
             //
 #ifdef VKT_WIN32_DETECTED
-            vkh::VkExportMemoryAllocateInfo exportAllocInfo{ .handleTypes = {.eOpaqueWin32 = 1} };
+            vkh::VkExportMemoryAllocateInfo exportAllocInfo{ .handleTypes = vkh::VkExternalMemoryHandleTypeFlags{.eOpaqueWin32 = 1} };
 #else
-            vkh::VkExportMemoryAllocateInfo exportAllocInfo{ .handleTypes = {.eOpaqueFd = 1} };
+            vkh::VkExportMemoryAllocateInfo exportAllocInfo{ .handleTypes = vkh::VkExternalMemoryHandleTypeFlags{.eOpaqueFd = 1} };
 #endif
 
             //

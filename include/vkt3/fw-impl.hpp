@@ -595,7 +595,7 @@ namespace vkt
             if (surface) {
                 vkh::handleVk(this->instanceDispatch->GetPhysicalDeviceSurfaceSupportKHR(physicalDevice, graphicsFamilyIndex, surface, &support));
             };
-            if (queuefamily.queueFlags.eCompute && queuefamily.queueFlags.eGraphics && (support || !surface)) {
+            if (queuefamily.queueFlags->eCompute && queuefamily.queueFlags->eGraphics && (support || !surface)) {
                 queueCreateInfos.push_back(vkh::VkDeviceQueueCreateInfo{ .queueFamilyIndex = uint32_t(computeFamilyIndex), .queueCount = 1, .pQueuePriorities = &priority });
                 queueFamilyIndices.push_back(uint32_t(graphicsFamilyIndex));
                 queueCreateInfos.back().queueFamilyIndex = uint32_t(graphicsFamilyIndex);
@@ -605,7 +605,7 @@ namespace vkt
 #else
         for (auto queuefamily : gpuQueueProps) {
             computeFamilyIndex++;
-            if (queuefamily.queueFlags.eCompute) { // TODO: vkh helper for getting, bitfeilds support
+            if (queuefamily.queueFlags->eCompute) { // TODO: vkh helper for getting, bitfeilds support
                 queueCreateInfos.push_back(vkh::VkDeviceQueueCreateInfo{ .queueFamilyIndex = uint32_t(computeFamilyIndex), .queueCount = 1, .pQueuePriorities = &priority });
                 queueFamilyIndices.push_back(uint32_t(computeFamilyIndex));
                 queueCreateInfos.back().queueFamilyIndex = uint32_t(computeFamilyIndex);
