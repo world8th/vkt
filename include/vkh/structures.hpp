@@ -613,7 +613,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
     typedef struct VkPipelineShaderStageCreateInfo {
         VkStructureType                     sType               = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
         const void*                         pNext               = nullptr;
-        FLAGS(VkPipelineShaderStageCreate) flags                = VsDefaultPipelineShaderStageFlags; // TODO: FLAGS
+        FLAGS(VkPipelineShaderStageCreate)  flags               = VsDefaultPipelineShaderStageFlags; // TODO: FLAGS
         VkShaderStageFlagBits               stage               = VK_SHADER_STAGE_COMPUTE_BIT;
         VkShaderModule                      module              = VK_NULL_HANDLE;
         const char*                         pName               = "main";
@@ -627,7 +627,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
     typedef struct VkGraphicsPipelineCreateInfo {
         VkStructureType                                  sType                  = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
         const void*                                      pNext                  = nullptr;
-        FLAGS(VkPipelineCreate)                      flags                  = VsDefaultPipelineFlags; // TODO: FLAGS
+        FLAGS(VkPipelineCreate)                          flags                  = VsDefaultPipelineFlags; // TODO: FLAGS
         uint32_t                                         stageCount             = 0u;
         const VkPipelineShaderStageCreateInfo*           pStages                = nullptr;
         const VkPipelineVertexInputStateCreateInfo*      pVertexInputState      = nullptr;
@@ -730,7 +730,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         uint32_t              binding               = 0u;
         VkDescriptorType      descriptorType        = VK_DESCRIPTOR_TYPE_SAMPLER;
         uint32_t              descriptorCount       = 1u;
-        FLAGS(VkShaderStage)  stageFlags         = VsDefaultShaderStageFlags;
+        FLAGS(VkShaderStage)  stageFlags            = VsDefaultShaderStageFlags;
         const VkSampler*      pImmutableSamplers    = nullptr;
 
         STRUCT_OPERATORS(VkDescriptorSetLayoutBinding)
@@ -979,7 +979,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         const void*          pNext        = nullptr;
         VkGeometryTypeNV     geometryType = VK_GEOMETRY_TYPE_TRIANGLES_NV;
         VkGeometryDataNV     geometry     = {};
-        FLAGS(VkGeometry, NV) flags       = VsDefaultGeometryFlags;
+        FLAGS(VkGeometry,NV) flags        = VsDefaultGeometryFlags;
 
         STRUCT_OPERATORS(VkGeometryNV)
         VK_HPP_STRUCT_OPERATORS(VkGeometryNV,vk::GeometryNV)
@@ -990,7 +990,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         VkStructureType                        sType         = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_INFO_NV;
         const void*                            pNext         = nullptr;
         VkAccelerationStructureTypeNV          type          = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_NV;
-        FLAGS(VkBuildAccelerationStructure, NV) flags        = VsDefaultBuildAccelerationStructureFlags;
+        FLAGS(VkBuildAccelerationStructure,NV) flags         = VsDefaultBuildAccelerationStructureFlags;
         uint32_t                               instanceCount = 0u;
         uint32_t                               geometryCount = 0u;
         const VkGeometryNV*                    pGeometries   = nullptr;
@@ -1055,7 +1055,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
 
     // 
     typedef struct VkMemoryHeap {
-        VkDeviceSize      size  = 0u;
+        VkDeviceSize        size  = 0u;
         FLAGS(VkMemoryHeap) flags = VsDefaultMemoryHeapFlags;
 
         STRUCT_OPERATORS(VkMemoryHeap)
@@ -1351,7 +1351,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         const void*                                                pNext             = nullptr;
         VkDeviceSize                                               compactedSize     = 0u;
         VkAccelerationStructureTypeKHR                             type              = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR ;
-        FLAGS(VkBuildAccelerationStructure, KHR)               flags             = VsDefaultBuildAccelerationStructureFlags;
+        FLAGS(VkBuildAccelerationStructure, KHR)                   flags             = VsDefaultBuildAccelerationStructureFlags;
         uint32_t                                                   maxGeometryCount  = 0u;
         const VkAccelerationStructureCreateGeometryTypeInfoKHR*    pGeometryInfos    = nullptr;
         VkDeviceAddress                                            deviceAddress     = VK_NULL_HANDLE;
