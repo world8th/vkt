@@ -367,8 +367,8 @@ namespace vkt {
     struct MemoryBarrierInfo {
         vkt::Instance instanceDispatch = vkGlobal::instance;
         vkt::Device deviceDispatch = vkGlobal::device;
-        vkt::uni_arg<vkh::VkPipelineStageFlags> srcStageMask = {}; bool srcRead = false; bool srcWrite = true;
-        vkt::uni_arg<vkh::VkPipelineStageFlags> dstStageMask = {}; bool dstRead = true; bool dstWrite = false;
+        FLAGS(VkPipelineStage) srcStageMask = {}; bool srcRead = false; bool srcWrite = true;
+        FLAGS(VkPipelineStage) dstStageMask = {}; bool dstRead = true; bool dstWrite = false;
     };
 
     //
@@ -382,7 +382,7 @@ namespace vkt {
         if (info->dstRead) { polyfillAccess(info->dstStageMask, memoryBarrier.dstAccessMask, false); };
 
         // 
-        info->deviceDispatch->vkCmdPipelineBarrier(cmd, *info->srcStageMask, *info->dstStageMask, {},
+        info->deviceDispatch->vkCmdPipelineBarrier(cmd, info->srcStageMask, info->dstStageMask, {},
             1u, memoryBarrier,
             0u, nullptr,
             0u, nullptr);
