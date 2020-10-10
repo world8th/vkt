@@ -1986,24 +1986,35 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
 #pragma pack(push, 1)
     struct uint24_t;
 
-    struct uint24__ { // for compatibility only
-        uint32_t a : 24;
-        operator uint32_t() const { return a; }; // You can not more to overlap...
-        uint24__(const uint24__& a) { *this = a; };
-        uint24__(const uint32_t& a) { *this = a; };
+    // primary 24-bit value
+    struct u24_u8_t { // for compatibility only
+        uint32_t u24 : 24; //
+        uint32_t u8 : 8;// // 
+        operator uint32_t() const { return u24; };
+        u24_u8_t(const u24_u8_t& a) { *this = a; };
+        u24_u8_t(const uint32_t& a) { *this = a; };
         uint24_t& operator=(const uint32_t& a) { uint32_t* ptr = reinterpret_cast<uint32_t*>(this); *ptr = glm::bitfieldInsert(*ptr, uint32_t(a), 0, 24); };
-        uint24_t& operator=(const uint24__& a) { uint32_t* ptr = reinterpret_cast<uint32_t*>(this); *ptr = glm::bitfieldInsert(*ptr, uint32_t(a), 0, 24); };
+        uint24_t& operator=(const u24_u8_t& a) { uint32_t* ptr = reinterpret_cast<uint32_t*>(this); *ptr = glm::bitfieldInsert(*ptr, uint32_t(a), 0, 24); };
     };
 
-    struct uint24_t { // for compatibility only
+    // for compatibility only
+    struct uint24_t {
         glm::u8vec3 a = glm::u8vec3(0u);
-        uint24_t(const uint24__& a) { *this = a; };
-        uint24_t(const uint24_t& a) { *this = a; };
-        uint24_t(const uint32_t& a) { *this = a; };
-        operator uint32_t() const { return reinterpret_cast<const uint24__&>(a); };
+
+        // constructor
+        uint24_t(const uint24_t& a) { this->a = a; };
+        uint24_t(const u24_u8_t& a) { u24_u8_t* ptr = reinterpret_cast<u24_u8_t*>(this); ptr->u24 = a.u24; };
+        uint24_t(const uint32_t& a) { uint32_t* ptr = reinterpret_cast<uint32_t*>(this); *ptr = glm::bitfieldInsert(*ptr, uint32_t(a), 0, 24); };
+
+        // assign operator
+        uint24_t& operator=(const uint24_t& a) { this->a = a; return *this; };
+        uint24_t& operator=(const u24_u8_t& a) { u24_u8_t* ptr = reinterpret_cast<u24_u8_t*>(this); ptr->u24 = a.u24; return *this;};
         uint24_t& operator=(const uint32_t& a) { uint32_t* ptr = reinterpret_cast<uint32_t*>(this); *ptr = glm::bitfieldInsert(*ptr, uint32_t(a), 0, 24); return *this; };
-        uint24_t& operator=(const uint24__& a) { uint32_t* ptr = reinterpret_cast<uint32_t*>(this); *ptr = glm::bitfieldInsert(*ptr, uint32_t(a), 0, 24); return *this; };
-        uint24_t& operator=(const uint24_t& a) { uint32_t* ptr = reinterpret_cast<uint32_t*>(this); *ptr = glm::bitfieldInsert(*ptr, uint32_t(a), 0, 24); return *this; };
+
+        // type conversion
+        operator uint32_t() const { return reinterpret_cast<const u24_u8_t&>(a); };
+        operator const glm::u8vec3& () const { return a; };
+        operator glm::u8vec3& () { return a; };
     };
 
     // CODING EXTRAS...

@@ -157,7 +157,8 @@ namespace vkt {
                 glNamedBufferStorageMemEXT(this->info.glID, std::min(this->info.reqSize, this->info.range), this->info.glMemory, 0u);
             };
 #endif
-
+            // 
+            this->createInfo = createInfo;
             return this;
         };
 
@@ -246,6 +247,7 @@ namespace vkt {
         VkBuffer buffer = VK_NULL_HANDLE; vkh::VkBufferUsageFlags usage = {};
         VkDeviceAddress cached = VK_NULL_HANDLE;
         MemoryAllocationInfo info = {};
+        vkh::VkBufferCreateInfo createInfo = {};
 
     protected: friend BufferAllocation; friend VmaBufferAllocation;
     };
@@ -326,6 +328,7 @@ namespace vkt {
             };
 
             // 
+            this->createInfo = createInfo;
             return this;
         };
         

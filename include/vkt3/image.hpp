@@ -170,12 +170,15 @@ namespace vkt {
                 };
             };
 #endif
+            // 
+            this->createInfo = createInfo;
+
+            // 
             return this;
         };
 
-        virtual bool isManaged() const {
-            return false;
-        };
+        // 
+        virtual bool isManaged() const { return false; };
 
         // 
         virtual const unsigned& getGLImage() const { return this->info.glID; };
@@ -235,6 +238,7 @@ namespace vkt {
     protected: friend VmaImageAllocation; friend ImageAllocation; friend ImageRegion;
         VkImage image = VK_NULL_HANDLE;
         MemoryAllocationInfo info = {};
+        vkh::VkImageCreateInfo createInfo = {};
     };
 
 #ifdef VKT_CORE_USE_VMA
@@ -305,6 +309,9 @@ namespace vkt {
                 this->info.queueFamilyIndices = std::vector<uint32_t>(createInfo->queueFamilyIndexCount);
                 memcpy(this->info.queueFamilyIndices.data(), createInfo->pQueueFamilyIndices, sizeof(uint32_t) * createInfo->queueFamilyIndexCount);
             };
+
+            //
+            this->createInfo = createInfo;
 
             // 
             return this;
@@ -530,12 +537,14 @@ namespace vkt {
 #endif
 
         // 
+        virtual vkh::VkImageCreateInfo& getInfo() { return this->allocation->createInfo; };
         virtual VkImageView& getImageView() { return reinterpret_cast<VkImageView&>(this->imgInfo.imageView); };
         virtual VkImageLayout& getImageLayout() { return reinterpret_cast<VkImageLayout&>(this->imgInfo.imageLayout); };
         virtual VkSampler& getSampler() { return reinterpret_cast<VkSampler&>(this->imgInfo.sampler); };
         virtual vkh::VkImageSubresourceRange& getImageSubresourceRange() { return this->subresourceRange; };
 
         // 
+        virtual const vkh::VkImageCreateInfo& getInfo() const { return this->allocation->createInfo; };
         virtual const VkImageView& getImageView() const { return reinterpret_cast<const VkImageView&>(this->imgInfo.imageView); };
         virtual const VkImageLayout& getImageLayout() const { return reinterpret_cast<const VkImageLayout&>(this->imgInfo.imageLayout); };
         virtual const VkSampler& getSampler() const { return reinterpret_cast<const VkSampler&>(this->imgInfo.sampler); };

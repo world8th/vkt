@@ -127,6 +127,12 @@ namespace vkt
         public: virtual GPUFramework* submitCmd(vkt::uni_arg<VkCommandBuffer> cmds, vkt::uni_arg<vkh::VkSubmitInfo> smbi = vkh::VkSubmitInfo{});
         public: virtual GPUFramework* submitCmd(const std::vector<VkCommandBuffer>& cmds, vkt::uni_arg<vkh::VkSubmitInfo> smbi = vkh::VkSubmitInfo{});
 
+        // For Java
+        public: virtual GPUFramework* submitCmd(std::vector<int64_t> cmds, vkt::uni_arg<vkh::VkSubmitInfo> smbi = vkh::VkSubmitInfo{});
+        public: virtual GPUFramework* submitUtilize(std::vector<int64_t> cmds, vkt::uni_arg<vkh::VkSubmitInfo> smbi = vkh::VkSubmitInfo{});
+        //public: virtual GPUFramework* submitCmd(vkt::uni_arg<VkCommandBuffer> cmds, vkt::uni_arg<vkh::VkSubmitInfo> smbi = vkh::VkSubmitInfo{});
+        //public: virtual GPUFramework* submitUtilize(vkt::uni_arg<VkCommandBuffer> cmds, vkt::uni_arg<vkh::VkSubmitInfo> smbi = vkh::VkSubmitInfo{});
+
         //VkDevice createDevice(bool isComputePrior = true, std::string shaderPath = "./", bool enableAdvancedAcceleration = true);
         inline virtual VkPhysicalDevice& getPhysicalDevice(const uint32_t& gpuID) { physicalDevice = physicalDevices[gpuID]; return physicalDevice; };
         inline virtual VkPhysicalDevice& getPhysicalDevice() { if (!physicalDevice && physicalDevices.size() > 0) { physicalDevice = physicalDevices[0u]; }; return physicalDevice; };
