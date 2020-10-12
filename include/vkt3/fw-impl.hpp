@@ -55,26 +55,6 @@ namespace vkt
         return this;
     };
 
-    // For Java
-    GPUFramework* GPUFramework::submitCmd(std::vector<int64_t> cmds, vkt::uni_arg<vkh::VkSubmitInfo> smbi) {
-        return this->submitCmd(vkt::vector_cast<VkCommandBuffer>(cmds), smbi);
-    };
-
-    // 
-    //GPUFramework* GPUFramework::submitCmd(vkt::uni_arg<VkCommandBuffer> cmds, vkt::uni_arg<vkh::VkSubmitInfo> smbi) {
-    //    return this->submitCmd(cmds, smbi);
-    //};
-
-    // For Java
-    GPUFramework* GPUFramework::submitUtilize(std::vector<int64_t> cmds, vkt::uni_arg<vkh::VkSubmitInfo> smbi) {
-        return this->submitUtilize(vkt::vector_cast<VkCommandBuffer>(cmds), smbi);
-    };
-
-    // 
-    //GPUFramework* GPUFramework::submitUtilize(vkt::uni_arg<VkCommandBuffer> cmds, vkt::uni_arg<vkh::VkSubmitInfo> smbi) {
-    //    return this->submitUtilize(cmds, smbi);
-    //};
-
 #ifdef VKT_USE_GLFW
     SurfaceFormat& GPUFramework::getSurfaceFormat(VkPhysicalDevice gpu)
     {
