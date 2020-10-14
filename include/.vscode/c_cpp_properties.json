@@ -1,0 +1,23 @@
+  
+{
+    "configurations": [
+        {
+            "name": "Win32",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/include",
+                "${workspaceFolder}/../include",
+                "${workspaceFolder}/src"
+            ],
+            "defines": [
+                "USE_VULKAN",
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE"
+            ],
+            "windowsSdkVersion": "10.0.19631.0",
+            "compilerPath": "C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.27.29009/bin/Hostx64/x64/cl.exe"
+        }
+    ],
+    "version": 4
+}
