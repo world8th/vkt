@@ -65,9 +65,8 @@ namespace vkt {
                 }
             }
 
-            std::vector<const char*> wantedLayers = wantedInstanceLayers;
-
             // get validation layers
+            std::vector<const char*> wantedLayers = wantedInstanceLayers;
             std::vector<VkLayerProperties> installedLayers = {};
             vkh::vsEnumerateInstanceLayerProperties(vkGlobal::loader, installedLayers);
             auto layers = std::vector<const char*>();
