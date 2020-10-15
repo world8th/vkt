@@ -22,7 +22,7 @@ namespace vkt {
         std::vector<const char*> layers = {};
 
         // get required extensions
-        std::vector<const char*> wantedExtensions = wantedInstanceExtensions;
+        
 
         // 
         VktInstance(){};
@@ -51,43 +51,50 @@ namespace vkt {
 
             // get our needed extensions
             std::string layerName = "";
+            std::vector<const char*> wantedExtensions = wantedInstanceExtensions;
             std::vector<VkExtensionProperties> installedExtensions = std::vector<VkExtensionProperties>();
             vkh::vsEnumerateInstanceExtensionProperties(vkGlobal::loader, installedExtensions, layerName);
-            auto extensions = std::vector<const char*>(256u);
+
             uint32_t extensionCount = 0u;
+            //auto extensions = std::vector<const char*>();
+            auto extensions = std::vector<const char*>(256u);
             for (auto w : wantedExtensions) {
                 for (auto i : installedExtensions)
                 {
                     if (strcmp(w, i.extensionName) == 0)
                     {
+                        //extensions.emplace_back(w); extensionCount++;
                         extensions[extensionCount++] = w;
-                        //extensions.emplace_back(w);
                         break;
                     }
                 }
             };
-            extensions.resize(extensionCount);
+
+            //extensions.resize(extensionCount);
+            this->extensions = extensions;
+
 
             // get validation layers
             std::vector<const char*> wantedLayers = wantedInstanceLayers;
             std::vector<VkLayerProperties> installedLayers = std::vector<VkLayerProperties>();
             vkh::vsEnumerateInstanceLayerProperties(vkGlobal::loader, installedLayers);
-            auto layers = std::vector<const char*>(256u);
+
             uint32_t layerCount = 0u;
+            //auto layers = std::vector<const char*>();
+            auto layers = std::vector<const char*>(256u);
             for (auto w : wantedLayers) {
                 for (auto i : installedLayers)
                 {
                     if (strcmp(w, i.layerName) == 0)
                     {
+                        //layers.emplace_back(w); layerCount++;
                         layers[layerCount++] = w;
                         break;
                     };
                 };
             };
-            layers.resize(layerCount);
 
-            //
-            this->extensions = extensions;
+            //layers.resize(layerCount);
             this->layers = layers;
 
             // app info
