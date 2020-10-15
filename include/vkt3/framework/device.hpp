@@ -44,8 +44,12 @@ namespace vkt {
         VkDescriptorPool descriptorPool = VK_NULL_HANDLE;
 
         //
-        std::vector<const char*> extensions = {};
-        std::vector<const char*> layers = {};
+        std::vector<std::string> extensions = {};
+        std::vector<std::string> layers = {};
+
+        // 
+        std::vector<const char*> extensions_c_str = {};
+        std::vector<const char*> layers_c_str = {};
 
         // 
         uint32_t queueFamilyIndex = 0;
@@ -78,36 +82,36 @@ namespace vkt {
             this->physical = instance->physicalDevices[deviceID];
 
             // use extensions
-            auto extensions = std::vector<const char*>();
-            uint32_t extensionCount = 0u;
             std::string layerName = "";
+            std::vector<std::string> wantedExtensions = std::vector<std::string>(wantedDeviceExtensions_CStr.begin(), std::end(wantedDeviceExtensions_CStr));
             std::vector<VkExtensionProperties> gpuExtensions = {};
             vkh::vsEnumerateDeviceExtensionProperties(instance->dispatch, this->physical, gpuExtensions, layerName); // TODO: vkh helper for getting
-            for (auto w : wantedDeviceExtensions) {
-                for (auto i : gpuExtensions) {
-                    if (strcmp(w, i.extensionName) == 0) {
-                        extensions[extensionCount++] = w; break;
+            std::vector<std::string> extensions = std::vector<std::string>(std::min(gpuExtensions.size(), wantedExtensions.size())); uint32_t extensionCount = 0u;
+            for (auto& w : wantedExtensions) {
+                for (auto& i : gpuExtensions) {
+                    if (w.compare(i.extensionName) == 0) {
+                        //extensions.emplace_back(std::string(w)); extensionCount++; break;
+                        extensions[extensionCount++] = std::string(w); break;
                     };
                 };
             };
             extensions.resize(extensionCount);
+            this->extensions = extensions;
 
             // use layers
-            auto layers = std::vector<const char*>();
-            uint32_t layerCount = 0u;
+            std::vector<std::string> wantedLayers = std::vector<std::string>(wantedDeviceLayers_CStr.begin(), std::end(wantedDeviceLayers_CStr));
             std::vector<VkLayerProperties> gpuLayers = {};
             vkh::vsEnumerateDeviceLayerProperties(instance->dispatch, this->physical, gpuLayers); // TODO: vkh helper for getting
-            for (auto w : wantedDeviceValidationLayers) {
-                for (auto i : gpuLayers) {
-                    if (strcmp(w, i.layerName) == 0) {
-                        layers[layerCount++] = w; break;
+            std::vector<std::string> layers = std::vector<std::string>(std::min(gpuLayers.size(), wantedLayers.size())); uint32_t layerCount = 0u;
+            for (auto& w : wantedLayers) {
+                for (auto& i : gpuLayers) {
+                    if (w.compare(i.layerName) == 0) {
+                        //layers.emplace_back(std::string(w)); layerCount++; break;
+                        layers[layerCount++] = std::string(w); break;
                     };
                 };
             };
             layers.resize(layerCount);
-
-            //
-            this->extensions = extensions;
             this->layers = layers;
 
             // 
@@ -164,6 +168,14 @@ namespace vkt {
             };
     #endif
 
+            //
+            extensions_c_str = std::vector<const char*>(extensionCount);
+            layers_c_str = std::vector<const char*>(layerCount);
+
+            // 
+            for (uint32_t i = 0; i < extensionCount; i++) { extensions_c_str[i] = extensions[i].c_str(); };
+            for (uint32_t i = 0; i < layerCount; i++) { layers_c_str[i] = layers[i].c_str(); };
+
             // return device with queue pointer
             const uint32_t qptr = 0;
             if ((this->usedQueueCreateInfos = queueCreateInfos).size() > 0) {
@@ -172,11 +184,10 @@ namespace vkt {
                     .pNext = reinterpret_cast<VkPhysicalDeviceFeatures2*>(&features.gFeatures),
                     .queueCreateInfoCount = uint32_t(this->usedQueueCreateInfos.size()),
                     .pQueueCreateInfos = reinterpret_cast<vkh::VkDeviceQueueCreateInfo*>(this->usedQueueCreateInfos.data()),
-                    .enabledLayerCount = uint32_t(this->layers.size()),
-                    .ppEnabledLayerNames = this->layers.data(),
-                    .enabledExtensionCount = uint32_t(this->extensions.size()),
-                    .ppEnabledExtensionNames = this->extensions.data(),
-                    //.pEnabledFeatures = &(VkPhysicalDeviceFeatures&)(gFeatures.features)
+                    .enabledLayerCount = uint32_t(layers_c_str.size()),
+                    .ppEnabledLayerNames = layers_c_str.data(),
+                    .enabledExtensionCount = uint32_t(extensions_c_str.size()),
+                    .ppEnabledExtensionNames = extensions_c_str.data(),
                 }));
                 vkh::handleVk(this->dispatch->CreatePipelineCache(vkh::VkPipelineCacheCreateInfo(), nullptr, &this->pipelineCache));
                 this->device = this->dispatch->handle;

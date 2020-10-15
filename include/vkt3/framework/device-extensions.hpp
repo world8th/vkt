@@ -3,7 +3,7 @@
 
 namespace vkt {
     // default device layers
-    std::vector<const char*> wantedDeviceValidationLayers = {
+    const std::vector<const char*> wantedDeviceLayers_CStr = {
         "VK_LAYER_AMD_switchable_graphics"
         "VK_LAYER_KHRONOS_validation",
         "VK_LAYER_LUNARG_assistant_layer",
@@ -20,7 +20,7 @@ namespace vkt {
     };
 
     // default device extensions
-    std::vector<const char*> wantedDeviceExtensions = {
+    const std::vector<const char*> wantedDeviceExtensions_CStr = {
         "VK_EXT_swapchain_colorspace",
         "VK_EXT_external_memory_host",
         "VK_EXT_queue_family_foreign",
