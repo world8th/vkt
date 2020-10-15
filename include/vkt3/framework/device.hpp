@@ -86,32 +86,36 @@ namespace vkt {
             std::vector<std::string> wantedExtensions = std::vector<std::string>(wantedDeviceExtensions_CStr.begin(), std::end(wantedDeviceExtensions_CStr));
             std::vector<VkExtensionProperties> gpuExtensions = {};
             vkh::vsEnumerateDeviceExtensionProperties(instance->dispatch, this->physical, gpuExtensions, layerName); // TODO: vkh helper for getting
-            std::vector<std::string> extensions = std::vector<std::string>(std::min(gpuExtensions.size(), wantedExtensions.size())); uint32_t extensionCount = 0u;
+            uint32_t extensionCount = 0u;
             for (auto& w : wantedExtensions) {
                 for (auto& i : gpuExtensions) {
-                    if (w.compare(i.extensionName) == 0) {
-                        //extensions.emplace_back(std::string(w)); extensionCount++; break;
-                        extensions[extensionCount++] = std::string(w); break;
-                    };
+                    if (w.compare(i.extensionName) == 0) { extensionCount++; break; };
                 };
             };
-            extensions.resize(extensionCount);
+            std::vector<std::string> extensions = std::vector<std::string>(extensionCount); extensionCount = 0u;
+            for (auto& w : wantedExtensions) {
+                for (auto& i : gpuExtensions) {
+                    if (w.compare(i.extensionName) == 0) { extensions[extensionCount++] = std::string(w); break; };
+                };
+            };
             this->extensions = extensions;
 
             // use layers
             std::vector<std::string> wantedLayers = std::vector<std::string>(wantedDeviceLayers_CStr.begin(), std::end(wantedDeviceLayers_CStr));
             std::vector<VkLayerProperties> gpuLayers = {};
             vkh::vsEnumerateDeviceLayerProperties(instance->dispatch, this->physical, gpuLayers); // TODO: vkh helper for getting
-            std::vector<std::string> layers = std::vector<std::string>(std::min(gpuLayers.size(), wantedLayers.size())); uint32_t layerCount = 0u;
+            uint32_t layerCount = 0u;
             for (auto& w : wantedLayers) {
                 for (auto& i : gpuLayers) {
-                    if (w.compare(i.layerName) == 0) {
-                        //layers.emplace_back(std::string(w)); layerCount++; break;
-                        layers[layerCount++] = std::string(w); break;
-                    };
+                    if (w.compare(i.layerName) == 0) { layerCount++; break; };
                 };
             };
-            layers.resize(layerCount);
+            std::vector<std::string> layers = std::vector<std::string>(layerCount); layerCount = 0u;
+            for (auto& w : wantedLayers) {
+                for (auto& i : gpuLayers) {
+                    if (w.compare(i.layerName) == 0) { layers[layerCount++] = std::string(w); break; };
+                };
+            };
             this->layers = layers;
 
             // 

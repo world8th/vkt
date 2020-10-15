@@ -22,8 +22,10 @@ namespace vkt {
         std::vector<std::string> layers = {};
 
         // 
-        std::vector<const char *> extensions_c_str = {};
-        std::vector<const char*> layers_c_str = {};
+        const char** extensions_c_str = nullptr;
+        const char** layers_c_str = nullptr;
+        //std::vector<const char *> extensions_c_str = {};
+        //std::vector<const char*> layers_c_str = {};
 
         // 
         VktInstance(){};
@@ -88,16 +90,15 @@ namespace vkt {
             };
             this->layers = layers;
 
-
             // app info
             auto appinfo = vkh::VkApplicationInfo{};
             appinfo.pNext = nullptr;
             appinfo.pApplicationName = "VKTest";
             appinfo.apiVersion = VK_MAKE_VERSION(1, 2, 135);
 
-            //
-            extensions_c_str = std::vector<const char*>(extensionCount);
-            layers_c_str = std::vector<const char*>(layerCount);
+            // CANNOT DEALLOCATE!
+            extensions_c_str = (const char**)malloc(extensionCount*sizeof(const char**));
+            layers_c_str = (const char**)malloc(layerCount*sizeof(const char**));
 
             // 
             for (uint32_t i = 0; i < extensionCount; i++) { extensions_c_str[i] = extensions[i].c_str(); };
@@ -106,10 +107,10 @@ namespace vkt {
             // create instance info
             auto cinstanceinfo = vkh::VkInstanceCreateInfo{};
             cinstanceinfo.pApplicationInfo = &(this->applicationInfo = appinfo); // due JabaCPP unable to access
-            cinstanceinfo.enabledExtensionCount = uint32_t(extensions_c_str.size());
-            cinstanceinfo.ppEnabledExtensionNames = extensions_c_str.data();
-            cinstanceinfo.enabledLayerCount = uint32_t(layers_c_str.size());
-            cinstanceinfo.ppEnabledLayerNames = layers_c_str.data();
+            cinstanceinfo.enabledExtensionCount = extensionCount;
+            cinstanceinfo.ppEnabledExtensionNames = extensions_c_str;
+            cinstanceinfo.enabledLayerCount = layerCount;
+            cinstanceinfo.ppEnabledLayerNames = layers_c_str;
 
             // Dynamically Load the Vulkan library
             this->dispatch = std::make_shared<xvk::Instance>(vkt::vkGlobal::loader.get(), (this->createInfo = cinstanceinfo));
