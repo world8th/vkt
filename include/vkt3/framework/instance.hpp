@@ -21,6 +21,10 @@ namespace vkt {
         std::vector<const char*> extensions = {};
         std::vector<const char*> layers = {};
 
+        // get required extensions
+        std::vector<const char*> wantedExtensions = wantedInstanceExtensions;
+
+        // 
         VktInstance(){};
 
         operator VkInstance&(){
@@ -32,28 +36,28 @@ namespace vkt {
         };
 
         virtual VkInstance& create(){
+            vkt::vkGlobal();
             assert((version = vkh::vsEnumerateInstanceVersion(vkGlobal::loader)) >= VK_MAKE_VERSION(1, 2, 131));
 
-            // get required extensions
     #ifdef VKT_USE_GLFW
-    #ifdef VKT_GLFW_LINKED
             uint32_t glfwExtensionCount = 0;
             const char** glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
 
             // add glfw extensions to list
             for (uint32_t i = 0; i < glfwExtensionCount; i++) {
-                wantedExtensions.push_back(glfwExtensions[i]);
+                //wantedExtensions.push_back(glfwExtensions[i]);
             };
-    #endif
     #endif
 
             // get our needed extensions
-            auto installedExtensions = vkh::vsEnumerateInstanceExtensionProperties(vkGlobal::loader);
+            std::string layerName = "";
+            std::vector<VkExtensionProperties> installedExtensions = {};
+            vkh::vsEnumerateInstanceExtensionProperties(vkGlobal::loader, installedExtensions, layerName);
             auto extensions = std::vector<const char*>();
             for (auto w : wantedExtensions) {
                 for (auto i : installedExtensions)
                 {
-                    if (std::string(i.extensionName).compare(w) == 0)
+                    if (strcmp(w, i.extensionName) == 0)
                     {
                         extensions.emplace_back(w);
                         break;
@@ -61,13 +65,16 @@ namespace vkt {
                 }
             }
 
+            std::vector<const char*> wantedLayers = wantedInstanceLayers;
+
             // get validation layers
-            auto installedLayers = vkh::vsEnumerateInstanceLayerProperties(vkGlobal::loader);
+            std::vector<VkLayerProperties> installedLayers = {};
+            vkh::vsEnumerateInstanceLayerProperties(vkGlobal::loader, installedLayers);
             auto layers = std::vector<const char*>();
             for (auto w : wantedLayers) {
                 for (auto i : installedLayers)
                 {
-                    if (std::string(i.layerName).compare(w) == 0)
+                    if (strcmp(w, i.layerName) == 0)
                     {
                         layers.emplace_back(w);
                         break;

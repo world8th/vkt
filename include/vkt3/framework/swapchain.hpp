@@ -61,7 +61,7 @@ namespace vkt {
 
 #ifdef VKT_USE_GLFW
         //
-        inline virtual SurfaceWindow& createWindowOnly(uint32_t WIDTH, uint32_t HEIGHT, std::string title = "TestApp") {
+        inline virtual SurfaceWindow& createWindowOnly(uint32_t WIDTH, uint32_t HEIGHT, const std::string& title = std::string("TestApp")) {
             glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
             surfaceWindow.surfaceSize = VkExtent2D{ WIDTH, HEIGHT };
             surfaceWindow.window = glfwCreateWindow(WIDTH, HEIGHT, title.c_str(), nullptr, nullptr);
@@ -81,7 +81,7 @@ namespace vkt {
         };
 
         // create window and surface for this application (multi-window not supported)
-        inline virtual SurfaceWindow& createWindowSurface(uint32_t WIDTH, uint32_t HEIGHT, std::string title = "TestApp") {
+        inline virtual SurfaceWindow& createWindowSurface(uint32_t WIDTH, uint32_t HEIGHT, const std::string& title = std::string("TestApp")) {
             return this->createWindowSurface(this->createWindowOnly(WIDTH, HEIGHT, title));
         };
 
@@ -154,7 +154,8 @@ namespace vkt {
         virtual SurfaceFormat& getSurfaceFormat()
         {
             const VkPhysicalDevice& gpu = device->physical;
-            const auto surfaceFormats = vkh::vsGetPhysicalDeviceSurfaceFormatsKHR(instance->dispatch, gpu, surfaceWindow.surface);
+            std::vector<VkSurfaceFormatKHR> surfaceFormats = {};
+            vkh::vsGetPhysicalDeviceSurfaceFormatsKHR(instance->dispatch, gpu, surfaceWindow.surface, surfaceFormats);
             const std::vector<VkFormat> preferredFormats = { VK_FORMAT_R16G16B16A16_UNORM, VK_FORMAT_A2B10G10R10_UNORM_PACK32, VK_FORMAT_A2R10G10B10_UNORM_PACK32, VK_FORMAT_R8G8B8A8_SRGB, VK_FORMAT_B8G8R8A8_SRGB, VK_FORMAT_A8B8G8R8_SRGB_PACK32, VK_FORMAT_R8G8B8A8_UNORM, VK_FORMAT_B8G8R8A8_UNORM, VK_FORMAT_A8B8G8R8_UNORM_PACK32 };
             VkFormat surfaceColorFormat = surfaceFormats.size() == 1 && surfaceFormats[0].format == VK_FORMAT_UNDEFINED ? VK_FORMAT_R8G8B8A8_SRGB : surfaceFormats[0].format;
 

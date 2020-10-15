@@ -3,7 +3,7 @@
 
 namespace vkt {
     // instance extensions
-    std::vector<const char*> wantedExtensions = {
+    std::vector<const char*> wantedInstanceExtensions = {
         "VK_KHR_get_physical_device_properties2",
         "VK_KHR_get_surface_capabilities2",
 
@@ -18,11 +18,13 @@ namespace vkt {
         "VK_EXT_debug_report",
         "VK_EXT_debug_utils",
 
+        "VK_KHR_win32_surface",
+
         "VK_NV_device_diagnostic_checkpoints"
     };
 
     // instance layers
-    std::vector<const char*> wantedLayers = {
+    std::vector<const char*> wantedInstanceLayers = {
         "VK_LAYER_KHRONOS_validation",
         "VK_LAYER_LUNARG_assistant_layer",
         "VK_LAYER_LUNARG_standard_validation",

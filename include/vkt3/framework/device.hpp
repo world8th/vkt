@@ -79,22 +79,25 @@ namespace vkt {
 
             // use extensions
             auto deviceExtensions = std::vector<const char*>();
-            auto gpuExtensions = vkh::vsEnumerateDeviceExtensionProperties(instance->dispatch, this->physical); // TODO: vkh helper for getting
+            std::string layerName = "";
+            std::vector<VkExtensionProperties> gpuExtensions = {};
+            vkh::vsEnumerateDeviceExtensionProperties(instance->dispatch, this->physical, gpuExtensions, layerName); // TODO: vkh helper for getting
             for (auto w : wantedDeviceExtensions) {
                 for (auto i : gpuExtensions) {
-                    if (std::string(i.extensionName).compare(w) == 0) {
-                        deviceExtensions.emplace_back(w); break;
+                    if (strcmp(w, i.extensionName) == 0) {
+                        deviceExtensions.emplace_back(i.extensionName); break;
                     };
                 };
             };
 
             // use layers
             auto deviceLayers = std::vector<const char*>();
-            auto gpuLayers = vkh::vsEnumerateDeviceLayerProperties(instance->dispatch, this->physical); // TODO: vkh helper for getting
+            std::vector<VkLayerProperties> gpuLayers = {};
+            vkh::vsEnumerateDeviceLayerProperties(instance->dispatch, this->physical, gpuLayers); // TODO: vkh helper for getting
             for (auto w : wantedDeviceValidationLayers) {
                 for (auto i : gpuLayers) {
-                    if (std::string(i.layerName).compare(w) == 0) {
-                        deviceLayers.emplace_back(w); break;
+                    if (strcmp(w, i.layerName) == 0) {
+                        deviceLayers.emplace_back(i.layerName); break;
                     };
                 };
             };
@@ -122,7 +125,8 @@ namespace vkt {
             vkh::vsGetPhysicalDeviceMemoryProperties2(instance->dispatch, this->physical, this->memoryProperties);
 
             // get features and queue family properties
-            auto gpuQueueProps = vkh::vsGetPhysicalDeviceQueueFamilyProperties(instance->dispatch, this->physical); // TODO: vkh helper for getting
+            std::vector<vkh::VkQueueFamilyProperties> gpuQueueProps = {};
+            vkh::vsGetPhysicalDeviceQueueFamilyProperties(instance->dispatch, this->physical, gpuQueueProps); // TODO: vkh helper for getting
 
             // queue family initial
             float priority = 1.0f;
