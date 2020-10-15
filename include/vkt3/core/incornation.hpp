@@ -15,6 +15,7 @@
 #define ENABLE_EXTENSION_VMA
 #define ENABLE_EXTENSION_RTX
 #define GLFW_INCLUDE_VULKAN
+#define VK_ENABLE_BETA_EXTENSIONS
 
 //
 #ifndef VKT_CORE_USE_XVK
@@ -36,7 +37,10 @@
 #include <vkt3/inline.hpp>
 #include <vkt3/vector.hpp>
 #include <vkt3/image.hpp>
-#include <vkt3/structs.hpp>
+
+//
+#include <vkt3/essential.hpp>
+#include <vkh/helpers.hpp>
 
 namespace vkt {
 

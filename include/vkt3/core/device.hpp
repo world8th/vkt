@@ -4,30 +4,54 @@
 #include "./device-extensions.hpp"
 #include "./instance.hpp"
 
+
 // 
 namespace vkt {
+
+    struct VktProperties {
+        vkh::VkPhysicalDeviceProperties2 gProperties{};
+    };
+
+    struct VktFeatures {
+        vkh::VkPhysicalDeviceFeatures2 gFeatures{};
+        vk::PhysicalDeviceShaderAtomicFloatFeaturesEXT gAtomicFloat{};
+        vk::PhysicalDeviceTransformFeedbackFeaturesEXT gTrasformFeedback{};
+        vk::PhysicalDeviceRayTracingFeaturesKHR gRayTracing{};
+        vk::PhysicalDeviceTexelBufferAlignmentFeaturesEXT gTexelBufferAligment{};
+        vk::PhysicalDevice16BitStorageFeatures gStorage16{};
+        vk::PhysicalDevice8BitStorageFeatures gStorage8{};
+        vk::PhysicalDeviceDescriptorIndexingFeaturesEXT gDescIndexing{};
+        vk::PhysicalDeviceFloat16Int8FeaturesKHR gFloat16U8{}; // Vulkan 1.3
+        vk::PhysicalDeviceBufferDeviceAddressFeatures gDeviceAddress{};
+        vk::PhysicalDeviceFragmentShaderBarycentricFeaturesNV gBarycentric{};
+        vk::PhysicalDeviceExtendedDynamicStateFeaturesEXT gExtendedDynamic{};
+    };
 
     class VktDevice { public:
         std::shared_ptr<VktInstance> instance = {};
 
         vkt::Device dispatch = {};
-        VkDescriptorPool descriptorPool = VK_NULL_HANDLE;
-        VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
-        VkcreateInfoInfo createInfo = {};
+        
+        VkPhysicalDevice physical = VK_NULL_HANDLE;
+        VkDeviceCreateInfo createInfo = {};
         VkDevice device = VK_NULL_HANDLE;
         VkQueue queue = VK_NULL_HANDLE;
         VkCommandPool commandPool = VK_NULL_HANDLE;
         VkPipelineCache pipelineCache = VK_NULL_HANDLE;
         VmaAllocator allocator = {};
+        VktFeatures features = {};
+        VktProperties properties = {};
+        VkDescriptorPool descriptorPool = VK_NULL_HANDLE;
 
         // 
         uint32_t queueFamilyIndex = 0;
         uint32_t version = 0;
 
         // 
-        std::vector<VkPhysicalDevice> physicalDevices = {};
         std::vector<uint32_t> queueFamilyIndices = {};
         vkt::MemoryAllocationInfo memoryAllocInfo = {};
+        vkh::VkPhysicalDeviceMemoryProperties2 memoryProperties = {};
+        std::vector<vkh::VkDeviceQueueCreateInfo> usedQueueCreateInfos = {};
 
         VktDevice(){
             
@@ -37,13 +61,21 @@ namespace vkt {
             
         };
 
+        operator VkDevice&(){
+            return device;
+        };
+
+        operator const VkDevice&() const {
+            return device;
+        };
+
         virtual VkDevice& create(const uint32_t& deviceID = 0u){
             // 
-            physicalDevice = instance->physicalDevices[deviceID];
+            this->physical = instance->physicalDevices[deviceID];
 
             // use extensions
             auto deviceExtensions = std::vector<const char*>();
-            auto gpuExtensions = vkh::vsEnumerateDeviceExtensionProperties(instance->dispatch, physicalDevice); // TODO: vkh helper for getting
+            auto gpuExtensions = vkh::vsEnumerateDeviceExtensionProperties(instance->dispatch, this->physical); // TODO: vkh helper for getting
             for (auto w : wantedDeviceExtensions) {
                 for (auto i : gpuExtensions) {
                     if (std::string(i.extensionName).compare(w) == 0) {
@@ -54,7 +86,7 @@ namespace vkt {
 
             // use layers
             auto deviceLayers = std::vector<const char*>();
-            auto gpuLayers = vkh::vsEnumerateDeviceLayerProperties(instance->dispatch, physicalDevice); // TODO: vkh helper for getting
+            auto gpuLayers = vkh::vsEnumerateDeviceLayerProperties(instance->dispatch, this->physical); // TODO: vkh helper for getting
             for (auto w : wantedDeviceValidationLayers) {
                 for (auto i : gpuLayers) {
                     if (std::string(i.layerName).compare(w) == 0) {
@@ -64,29 +96,25 @@ namespace vkt {
             };
 
             // 
-            this->usedDeviceExtensions = deviceExtensions;
-            this->usedDeviceLayers = deviceLayers;
+            features.gExtendedDynamic.pNext = &features.gAtomicFloat;
+            features.gBarycentric.pNext = &features.gExtendedDynamic;
+            features.gRayTracing.pNext = &features.gBarycentric;
+            features.gTrasformFeedback.pNext = &features.gRayTracing;
+            features.gDeviceAddress.pNext = &features.gTrasformFeedback;
+            features.gTexelBufferAligment.pNext = &features.gDeviceAddress;
+            features.gFloat16U8.pNext = &features.gTexelBufferAligment;
+            features.gStorage8.pNext = &features.gFloat16U8;
+            features.gStorage16.pNext = &features.gStorage8;
+            features.gDescIndexing.pNext = &features.gStorage16;
+            features.gFeatures.pNext = &features.gDescIndexing;
 
             // 
-            this->gExtendedDynamic.pNext = &this->gAtomicFloat;
-            this->gBarycentric.pNext = &this->gExtendedDynamic;
-            this->gRayTracing.pNext = &this->gBarycentric;
-            this->gTrasformFeedback.pNext = &this->gRayTracing;
-            this->gDeviceAddress.pNext = &this->gTrasformFeedback;
-            this->gTexelBufferAligment.pNext = &this->gDeviceAddress;
-            this->gFloat16U8.pNext = &this->gTexelBufferAligment;
-            this->gStorage8.pNext = &this->gFloat16U8;
-            this->gStorage16.pNext = &this->gStorage8;
-            this->gDescIndexing.pNext = &this->gStorage16;
-            this->gFeatures.pNext = &this->gDescIndexing;
-
-            // 
-            vkh::vsGetPhysicalDeviceFeatures2(instance->dispatch, physicalDevice, this->gFeatures);
-            vkh::vsGetPhysicalDeviceProperties2(instance->dispatch, physicalDevice, this->gProperties);
-            vkh::vsGetPhysicalDeviceMemoryProperties2(instance->dispatch, physicalDevice, this->memoryProperties);
+            vkh::vsGetPhysicalDeviceFeatures2(instance->dispatch, this->physical, features.gFeatures);
+            vkh::vsGetPhysicalDeviceProperties2(instance->dispatch, this->physical, properties.gProperties);
+            vkh::vsGetPhysicalDeviceMemoryProperties2(instance->dispatch, this->physical, this->memoryProperties);
 
             // get features and queue family properties
-            auto gpuQueueProps = vkh::vsGetPhysicalDeviceQueueFamilyProperties(instance->dispatch, physicalDevice); // TODO: vkh helper for getting
+            auto gpuQueueProps = vkh::vsGetPhysicalDeviceQueueFamilyProperties(instance->dispatch, this->physical); // TODO: vkh helper for getting
 
             // queue family initial
             float priority = 1.0f;
@@ -101,7 +129,7 @@ namespace vkt {
                 //vkh::handleVk(vkGetPhysicalDeviceSurfaceSupportKHR(physicalDevice, graphicsFamilyIndex, surface(), &support));
                 const auto& surface = this->surface();
                 if (surface) {
-                    vkh::handleVk(instance->dispatch->GetPhysicalDeviceSurfaceSupportKHR(physicalDevice, graphicsFamilyIndex, surface, &support));
+                    vkh::handleVk(instance->dispatch->GetPhysicalDeviceSurfaceSupportKHR(this->physical, graphicsFamilyIndex, surface, &support));
                 };
                 if (queuefamily.queueFlags->eCompute && queuefamily.queueFlags->eGraphics && (support || !surface)) {
                     queueCreateInfos.push_back(vkh::VkDeviceQueueCreateInfo{ .queueFamilyIndex = uint32_t(computeFamilyIndex), .queueCount = 1, .pQueuePriorities = &priority });
@@ -126,14 +154,14 @@ namespace vkt {
             const uint32_t qptr = 0;
             if ((this->usedQueueCreateInfos = queueCreateInfos).size() > 0) {
                 this->queueFamilyIndex = queueFamilyIndices[qptr];
-                this->dispatch = std::make_shared<xvk::Device>(instance->dispatch, this->physicalDevice, (createInfo = vkh::VkcreateInfoInfo{
-                    .pNext = reinterpret_cast<VkPhysicalDeviceFeatures2*>(&gFeatures),
+                this->dispatch = std::make_shared<xvk::Device>(instance->dispatch, this->physical, (createInfo = vkh::VkDeviceCreateInfo{
+                    .pNext = reinterpret_cast<VkPhysicalDeviceFeatures2*>(&features.gFeatures),
                     .queueCreateInfoCount = uint32_t(this->usedQueueCreateInfos.size()),
                     .pQueueCreateInfos = reinterpret_cast<vkh::VkDeviceQueueCreateInfo*>(this->usedQueueCreateInfos.data()),
-                    .enabledLayerCount = uint32_t(this->usedDeviceLayers.size()),
-                    .ppEnabledLayerNames = this->usedDeviceLayers.data(),
-                    .enabledExtensionCount = uint32_t(this->usedDeviceExtensions.size()),
-                    .ppEnabledExtensionNames = this->usedDeviceExtensions.data(),
+                    .enabledLayerCount = uint32_t(deviceLayers.size()),
+                    .ppEnabledLayerNames = deviceLayers.data(),
+                    .enabledExtensionCount = uint32_t(deviceExtensions.size()),
+                    .ppEnabledExtensionNames = deviceExtensions.data(),
                     //.pEnabledFeatures = &(VkPhysicalDeviceFeatures&)(gFeatures.features)
                 }));
                 vkh::handleVk(this->dispatch->CreatePipelineCache(vkh::VkPipelineCacheCreateInfo(), nullptr, &this->pipelineCache));
@@ -176,8 +204,8 @@ namespace vkt {
             VmaAllocatorCreateInfo vma_info = {};
             vma_info.pVulkanFunctions = &func;
             vma_info.device = this->device;
-            vma_info.instance = this->instance;
-            vma_info.physicalDevice = this->physicalDevice;
+            vma_info.instance = *this->instance;
+            vma_info.physicalDevice = this->physical;
             vma_info.flags = VMA_ALLOCATOR_CREATE_BUFFER_DEVICE_ADDRESS_BIT;
             vkh::handleVk(vmaCreateAllocator(&vma_info, &this->allocator));
 
@@ -200,10 +228,45 @@ namespace vkt {
                 .maxSets = 256u, .poolSizeCount = static_cast<uint32_t>(dps.size()), .pPoolSizes = dps.data()
             }, nullptr, &this->descriptorPool));
 
+            // 
             return this->device;
         }
 
+        // 
+        VktDevice* submitUtilize(vkt::uni_arg<VkCommandBuffer> cmds, vkt::uni_arg<vkh::VkSubmitInfo> smbi) {
+            return this->submitUtilize(std::vector<VkCommandBuffer>{ cmds }, smbi);
+        };
 
+        // 
+        VktDevice* submitUtilize(const std::vector<VkCommandBuffer>& cmds, vkt::uni_arg<vkh::VkSubmitInfo> smbi) {
+            vkt::submitUtilize(dispatch, queue, commandPool, cmds, smbi);
+            return this;
+        };
+
+        // 
+        VktDevice* submitOnce(const std::function<void(VkCommandBuffer&)>& cmdFn, vkt::uni_arg<vkh::VkSubmitInfo> smbi) {
+            vkt::submitOnce(dispatch, queue, commandPool, cmdFn, smbi);
+            return this;
+        };
+
+        // Async Version
+        std::future<VktDevice*> submitOnceAsync(const std::function<void(VkCommandBuffer&)>& cmdFn, vkt::uni_arg<vkh::VkSubmitInfo> smbi) {
+            return std::async(std::launch::async | std::launch::deferred, [=, this]() {
+                vkt::submitOnceAsync(dispatch, queue, commandPool, cmdFn, smbi).get();
+                return this;
+            });
+        };
+
+        // 
+        VktDevice* submitCmd(vkt::uni_arg<VkCommandBuffer> cmds, vkt::uni_arg<vkh::VkSubmitInfo> smbi) {
+            return this->submitCmd(std::vector<VkCommandBuffer>{ cmds }, smbi);
+        };
+
+        // 
+        VktDevice* submitCmd(const std::vector<VkCommandBuffer>& cmds, vkt::uni_arg<vkh::VkSubmitInfo> smbi) {
+            vkt::submitCmd(dispatch, queue, cmds, smbi);
+            return this;
+        };
     };
 
 };

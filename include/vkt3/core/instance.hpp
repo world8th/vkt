@@ -9,14 +9,23 @@ namespace vkt {
     class VktInstance {
         public:
         vkt::Instance dispatch = {};
-        VkcreateInfoInfo createInfo = {};
+        VkInstanceCreateInfo createInfo = {};
         VkInstance instance = VK_NULL_HANDLE;
         uint32_t version = 0;
         
+        vkh::VkApplicationInfo applicationInfo = {};
         VkDebugUtilsMessengerEXT messenger = VK_NULL_HANDLE;
         std::vector<VkPhysicalDevice> physicalDevices = {};
 
         VktInstance(){};
+
+        operator VkInstance&(){
+            return instance;
+        };
+
+        operator const VkInstance&() const {
+            return instance;
+        };
 
         virtual VkInstance& create(){
             assert((instanceVersion = vkh::vsEnumerateInstanceVersion(vkGlobal::loader)) >= VK_MAKE_VERSION(1, 2, 131));
@@ -62,10 +71,6 @@ namespace vkt {
                 }
             }
 
-            // 
-            this->usedExtensions = extensions;
-            this->usedLayers = layers;
-
             // app info
             auto appinfo = vkh::VkApplicationInfo{};
             appinfo.pNext = nullptr;
@@ -73,31 +78,20 @@ namespace vkt {
             appinfo.apiVersion = VK_MAKE_VERSION(1, 2, 135);
 
             // create instance info
-            auto cinstanceinfo = vkh::VkcreateInfoInfo{};
+            auto cinstanceinfo = vkh::VkInstanceCreateInfo{};
             cinstanceinfo.pApplicationInfo = &(this->applicationInfo = appinfo); // due JabaCPP unable to access
-            cinstanceinfo.enabledExtensionCount = static_cast<uint32_t>(this->usedExtensions.size());
-            cinstanceinfo.ppEnabledExtensionNames = this->usedExtensions.data();
-            cinstanceinfo.enabledLayerCount = static_cast<uint32_t>(this->usedLayers.size());
-            cinstanceinfo.ppEnabledLayerNames = this->usedLayers.data();
-
-            // create the "debug utils EXT" callback object
-            VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo{};
-            debugCreateInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
-            debugCreateInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
-            debugCreateInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
-            debugCreateInfo.pfnUserCallback = DebugCallback;    // global function
-            debugCreateInfo.pUserData = nullptr;
-
-            // 
-            cinstanceinfo.pNext = &debugCreateInfo;
+            cinstanceinfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
+            cinstanceinfo.ppEnabledExtensionNames = extensions.data();
+            cinstanceinfo.enabledLayerCount = static_cast<uint32_t>(layers.size());
+            cinstanceinfo.ppEnabledLayerNames = layers.data();
 
             // Dynamically Load the Vulkan library
-            this->instanceDispatch = std::make_shared<xvk::Instance>(vkt::vkGlobal::loader.get(), (this->createInfo = cinstanceinfo));
-            this->instance = this->instanceDispatch->handle;
-            vkt::vkGlobal::instance = this->instanceDispatch.get_shared();
+            this->dispatch = std::make_shared<xvk::Instance>(vkt::vkGlobal::loader.get(), (this->createInfo = cinstanceinfo));
+            this->instance = this->dispatch->handle;
+            vkt::vkGlobal::instance = this->dispatch.get_shared();
 
             // get physical device for application
-            physicalDevices = vkh::vsEnumeratePhysicalDevices(this->instanceDispatch.get_shared());
+            physicalDevices = vkh::vsEnumeratePhysicalDevices(this->dispatch.get_shared());
 
             //
             //uint32_t count = 0u; vkh::handleVk(this->instanceDispatch->EnumeratePhysicalDevices(&count, nullptr));
