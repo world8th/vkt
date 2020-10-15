@@ -78,33 +78,37 @@ namespace vkt {
             this->physical = instance->physicalDevices[deviceID];
 
             // use extensions
-            auto deviceExtensions = std::vector<const char*>();
+            auto extensions = std::vector<const char*>();
+            uint32_t extensionCount = 0u;
             std::string layerName = "";
             std::vector<VkExtensionProperties> gpuExtensions = {};
             vkh::vsEnumerateDeviceExtensionProperties(instance->dispatch, this->physical, gpuExtensions, layerName); // TODO: vkh helper for getting
             for (auto w : wantedDeviceExtensions) {
                 for (auto i : gpuExtensions) {
                     if (strcmp(w, i.extensionName) == 0) {
-                        deviceExtensions.emplace_back(i.extensionName); break;
+                        extensions[extensionCount++] = w; break;
                     };
                 };
             };
+            extensions.resize(extensionCount);
 
             // use layers
-            auto deviceLayers = std::vector<const char*>();
+            auto layers = std::vector<const char*>();
+            uint32_t layerCount = 0u;
             std::vector<VkLayerProperties> gpuLayers = {};
             vkh::vsEnumerateDeviceLayerProperties(instance->dispatch, this->physical, gpuLayers); // TODO: vkh helper for getting
             for (auto w : wantedDeviceValidationLayers) {
                 for (auto i : gpuLayers) {
                     if (strcmp(w, i.layerName) == 0) {
-                        deviceLayers.emplace_back(i.layerName); break;
+                        layers[layerCount++] = w; break;
                     };
                 };
             };
+            layers.resize(layerCount);
 
             //
-            this->extensions = deviceExtensions;
-            this->layers = deviceLayers;
+            this->extensions = extensions;
+            this->layers = layers;
 
             // 
             features.gExtendedDynamic.pNext = &features.gAtomicFloat;

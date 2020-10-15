@@ -29,11 +29,8 @@ namespace vkh {
 #define DEFAULT_FENCE_TIMEOUT (30ull*1000ull*1000ull*1000ull) // Default fence timeout in nanoseconds
 
 #ifdef VKT_CORE_USE_XVK
-    inline auto vsEnumeratePhysicalDevices(vkt::Instance instance) {
-        //uint32_t count = 0u; handleVk(vkEnumeratePhysicalDevices(instance->handle, &count, nullptr));
-        uint32_t count = 0u; handleVk(instance->EnumeratePhysicalDevices(&count, nullptr));
-        std::vector<VkPhysicalDevice> data(count);
-        //handleVk(vkEnumeratePhysicalDevices(instance->handle, &count, data.data()));
+    inline auto& vsEnumeratePhysicalDevices(vkt::Instance instance, std::vector<VkPhysicalDevice>& data) {
+        uint32_t count = 0u; handleVk(instance->EnumeratePhysicalDevices(&count, nullptr)); data.resize(count);
         handleVk(instance->EnumeratePhysicalDevices(&count, data.data()));
         return data;
     };

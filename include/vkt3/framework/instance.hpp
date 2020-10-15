@@ -51,35 +51,40 @@ namespace vkt {
 
             // get our needed extensions
             std::string layerName = "";
-            std::vector<VkExtensionProperties> installedExtensions = {};
+            std::vector<VkExtensionProperties> installedExtensions = std::vector<VkExtensionProperties>();
             vkh::vsEnumerateInstanceExtensionProperties(vkGlobal::loader, installedExtensions, layerName);
-            auto extensions = std::vector<const char*>();
+            auto extensions = std::vector<const char*>(256u);
+            uint32_t extensionCount = 0u;
             for (auto w : wantedExtensions) {
                 for (auto i : installedExtensions)
                 {
                     if (strcmp(w, i.extensionName) == 0)
                     {
-                        extensions.emplace_back(w);
+                        extensions[extensionCount++] = w;
+                        //extensions.emplace_back(w);
                         break;
                     }
                 }
-            }
+            };
+            extensions.resize(extensionCount);
 
             // get validation layers
             std::vector<const char*> wantedLayers = wantedInstanceLayers;
-            std::vector<VkLayerProperties> installedLayers = {};
+            std::vector<VkLayerProperties> installedLayers = std::vector<VkLayerProperties>();
             vkh::vsEnumerateInstanceLayerProperties(vkGlobal::loader, installedLayers);
-            auto layers = std::vector<const char*>();
+            auto layers = std::vector<const char*>(256u);
+            uint32_t layerCount = 0u;
             for (auto w : wantedLayers) {
                 for (auto i : installedLayers)
                 {
                     if (strcmp(w, i.layerName) == 0)
                     {
-                        layers.emplace_back(w);
+                        layers[layerCount++] = w;
                         break;
-                    }
-                }
-            }
+                    };
+                };
+            };
+            layers.resize(layerCount);
 
             //
             this->extensions = extensions;
@@ -94,9 +99,9 @@ namespace vkt {
             // create instance info
             auto cinstanceinfo = vkh::VkInstanceCreateInfo{};
             cinstanceinfo.pApplicationInfo = &(this->applicationInfo = appinfo); // due JabaCPP unable to access
-            cinstanceinfo.enabledExtensionCount = static_cast<uint32_t>(this->extensions.size());
+            cinstanceinfo.enabledExtensionCount = extensionCount;
             cinstanceinfo.ppEnabledExtensionNames = this->extensions.data();
-            cinstanceinfo.enabledLayerCount = static_cast<uint32_t>(this->layers.size());
+            cinstanceinfo.enabledLayerCount = layerCount;
             cinstanceinfo.ppEnabledLayerNames = this->layers.data();
 
             // Dynamically Load the Vulkan library
@@ -104,20 +109,8 @@ namespace vkt {
             this->instance = this->dispatch->handle;
             vkt::vkGlobal::instance = this->dispatch.get_shared();
 
-            // get physical device for application
-            physicalDevices = vkh::vsEnumeratePhysicalDevices(this->dispatch.get_shared());
-
-            //
-            //uint32_t count = 0u; vkh::handleVk(this->instanceDispatch->EnumeratePhysicalDevices(&count, nullptr));
-            //this->physicalDevices.resize(count);
-            //vkh::handleVk(this->instanceDispatch->EnumeratePhysicalDevices(&count, this->physicalDevices.data()));
-
-            // 
-    #ifdef VKT_VULKAN_DEBUG
-            if (CreateDebugUtilsMessengerEXT(instance, &debugCreateInfo, nullptr, &reinterpret_cast<VkDebugUtilsMessengerEXT&>(messenger)) != VK_SUCCESS) {
-                throw std::runtime_error("failed to set up debug callback");
-            }
-    #endif
+            // get physical devices for application
+            vkh::vsEnumeratePhysicalDevices(this->dispatch.get_shared(), physicalDevices);
 
             // 
             return instance;
