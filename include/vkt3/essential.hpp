@@ -107,11 +107,7 @@ namespace vkt {
         auto fl = vkh::VkPipelineShaderStageCreateFlags{ .eRequireFullSubgroups = 1u };
         f.spi = makePipelineStageInfoWithoutModule(device, VK_SHADER_STAGE_COMPUTE_BIT, entry);
         f.spi.flags = fl;
-#ifndef VKT_USE_CPP_MODULES
         createShaderModuleIntrusive(device, TempCode = code, (VkShaderModule&)(f.spi.module));
-#else
-        createShaderModuleIntrusive(device, TempCode = code, (VkShaderModule&)(f.spi.modular));
-#endif
         f.sgmp = vkh::VkPipelineShaderStageRequiredSubgroupSizeCreateInfoEXT{};
         f.sgmp.requiredSubgroupSize = subgroupSize;
         if (subgroupSize) f.spi.pNext = &f.sgmp;

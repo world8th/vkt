@@ -33,7 +33,7 @@ namespace vkt {
         vkt::Device dispatch = {};
         
         VkPhysicalDevice physical = VK_NULL_HANDLE;
-        VkDeviceCreateInfo createInfo = {};
+        vkh::VkDeviceCreateInfo createInfo = {};
         VkDevice device = VK_NULL_HANDLE;
         VkQueue queue = VK_NULL_HANDLE;
         VkCommandPool commandPool = VK_NULL_HANDLE;
@@ -42,6 +42,10 @@ namespace vkt {
         VktFeatures features = {};
         VktProperties properties = {};
         VkDescriptorPool descriptorPool = VK_NULL_HANDLE;
+
+        //
+        std::vector<const char*> extensions = {};
+        std::vector<const char*> layers = {};
 
         // 
         uint32_t queueFamilyIndex = 0;
@@ -94,6 +98,10 @@ namespace vkt {
                     };
                 };
             };
+
+            //
+            this->extensions = deviceExtensions;
+            this->layers = deviceLayers;
 
             // 
             features.gExtendedDynamic.pNext = &features.gAtomicFloat;
@@ -156,10 +164,10 @@ namespace vkt {
                     .pNext = reinterpret_cast<VkPhysicalDeviceFeatures2*>(&features.gFeatures),
                     .queueCreateInfoCount = uint32_t(this->usedQueueCreateInfos.size()),
                     .pQueueCreateInfos = reinterpret_cast<vkh::VkDeviceQueueCreateInfo*>(this->usedQueueCreateInfos.data()),
-                    .enabledLayerCount = uint32_t(deviceLayers.size()),
-                    .ppEnabledLayerNames = deviceLayers.data(),
-                    .enabledExtensionCount = uint32_t(deviceExtensions.size()),
-                    .ppEnabledExtensionNames = deviceExtensions.data(),
+                    .enabledLayerCount = uint32_t(this->layers.size()),
+                    .ppEnabledLayerNames = this->layers.data(),
+                    .enabledExtensionCount = uint32_t(this->extensions.size()),
+                    .ppEnabledExtensionNames = this->extensions.data(),
                     //.pEnabledFeatures = &(VkPhysicalDeviceFeatures&)(gFeatures.features)
                 }));
                 vkh::handleVk(this->dispatch->CreatePipelineCache(vkh::VkPipelineCacheCreateInfo(), nullptr, &this->pipelineCache));

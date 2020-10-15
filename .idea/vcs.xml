@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="VcsDirectoryMappings">
+    <mapping directory="$PROJECT_DIR$" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/include/volk" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/include/xvk" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/include/xvk/Vulkan-Headers" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/include/xvk/glfw" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/include/xvk/glm" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/include/xvk/glslang" vcs="Git" />
+  </component>
+</project>

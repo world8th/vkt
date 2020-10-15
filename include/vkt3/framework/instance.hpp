@@ -9,13 +9,17 @@ namespace vkt {
     class VktInstance {
         public:
         vkt::Instance dispatch = {};
-        VkInstanceCreateInfo createInfo = {};
+        vkh::VkInstanceCreateInfo createInfo = {};
         VkInstance instance = VK_NULL_HANDLE;
         uint32_t version = 0;
         
         vkh::VkApplicationInfo applicationInfo = {};
         VkDebugUtilsMessengerEXT messenger = VK_NULL_HANDLE;
         std::vector<VkPhysicalDevice> physicalDevices = {};
+
+        //
+        std::vector<const char*> extensions = {};
+        std::vector<const char*> layers = {};
 
         VktInstance(){};
 
@@ -28,7 +32,7 @@ namespace vkt {
         };
 
         virtual VkInstance& create(){
-            assert((instanceVersion = vkh::vsEnumerateInstanceVersion(vkGlobal::loader)) >= VK_MAKE_VERSION(1, 2, 131));
+            assert((version = vkh::vsEnumerateInstanceVersion(vkGlobal::loader)) >= VK_MAKE_VERSION(1, 2, 131));
 
             // get required extensions
     #ifdef VKT_USE_GLFW
@@ -71,6 +75,10 @@ namespace vkt {
                 }
             }
 
+            //
+            this->extensions = extensions;
+            this->layers = layers;
+
             // app info
             auto appinfo = vkh::VkApplicationInfo{};
             appinfo.pNext = nullptr;
@@ -80,10 +88,10 @@ namespace vkt {
             // create instance info
             auto cinstanceinfo = vkh::VkInstanceCreateInfo{};
             cinstanceinfo.pApplicationInfo = &(this->applicationInfo = appinfo); // due JabaCPP unable to access
-            cinstanceinfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
-            cinstanceinfo.ppEnabledExtensionNames = extensions.data();
-            cinstanceinfo.enabledLayerCount = static_cast<uint32_t>(layers.size());
-            cinstanceinfo.ppEnabledLayerNames = layers.data();
+            cinstanceinfo.enabledExtensionCount = static_cast<uint32_t>(this->extensions.size());
+            cinstanceinfo.ppEnabledExtensionNames = this->extensions.data();
+            cinstanceinfo.enabledLayerCount = static_cast<uint32_t>(this->layers.size());
+            cinstanceinfo.ppEnabledLayerNames = this->layers.data();
 
             // Dynamically Load the Vulkan library
             this->dispatch = std::make_shared<xvk::Instance>(vkt::vkGlobal::loader.get(), (this->createInfo = cinstanceinfo));
