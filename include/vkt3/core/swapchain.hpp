@@ -25,22 +25,28 @@ namespace vkt {
         //VkSemaphore timeline = VK_NULL_HANDLE;
     };
 
-    // TODO: SwapChain 
-    class VktSwapChain {
-        std::shared_ptr<VktInstance> instance = {};
-        std::shared_ptr<VktDevice> device = {};
-
-        // 
+    struct SurfaceWindow {
 #ifdef VKT_USE_GLFW
         GLFWwindow* window = nullptr;
 #endif
+
         SurfaceFormat surfaceFormat = {};
         VkExtent2D surfaceSize = VkExtent2D{ 0u, 0u };
         VkSurfaceKHR surface = VK_NULL_HANDLE;
         VkSwapchainKHR swapchain = VK_NULL_HANDLE;
         VkRenderPass renderPass = VK_NULL_HANDLE;
-        vkt::ImageRegion depthImage = {};
         std::vector<Framebuffer> swapchainBuffers = {};
+    };
+
+    // TODO: SwapChain 
+    class VktSwapChain {
+    public:
+        std::shared_ptr<VktInstance> instance = {};
+        std::shared_ptr<VktDevice> device = {};
+
+        // 
+        SurfaceWindow surfaceWindow = {};
+        vkt::ImageRegion depthImage = {};
 
         // 
         VktSwapChain(){
@@ -54,42 +60,101 @@ namespace vkt {
         }
 
 #ifdef VKT_USE_GLFW
-        inline virtual SurfaceWindow& createWindowSurface(GLFWwindow* window, uint32_t WIDTH, uint32_t HEIGHT) {
-            window = window;
-            surfaceSize = VkExtent2D{ WIDTH, HEIGHT };
+        //
+        inline virtual SurfaceWindow& createWindowOnly(uint32_t WIDTH, uint32_t HEIGHT, std::string title = "TestApp") {
+            glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+            surfaceWindow.surfaceSize = VkExtent2D{ WIDTH, HEIGHT };
+            surfaceWindow.window = glfwCreateWindow(WIDTH, HEIGHT, title.c_str(), nullptr, nullptr);
+            glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
+            return surfaceWindow;
+        };
+
+        // create window and surface for this application (multi-window not supported)
+        inline virtual SurfaceWindow& createWindowSurface(SurfaceWindow& applicationWindow) {
+            applicationWindow.surfaceSize = VkExtent2D{ applicationWindow.surfaceSize.width, applicationWindow.surfaceSize.height };
             glfwMakeContextCurrent(nullptr); // CONTEXT-REQUIRED!
 
-            vkh::handleVk(glfwCreateWindowSurface(*instance, window, nullptr, surface));
+            vkh::handleVk(glfwCreateWindowSurface(*instance, applicationWindow.window, nullptr, (VkSurfaceKHR*)&applicationWindow.surface));
 
-            glfwMakeContextCurrent(window); // CONTEXT-REQUIRED!
+            glfwMakeContextCurrent(applicationWindow.window); // CONTEXT-REQUIRED!
             return applicationWindow;
         };
 
         // create window and surface for this application (multi-window not supported)
         inline virtual SurfaceWindow& createWindowSurface(uint32_t WIDTH, uint32_t HEIGHT, std::string title = "TestApp") {
-            glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
-            //opengl = glfwCreateWindow(WIDTH, HEIGHT, title.c_str(), nullptr, nullptr);
-            glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-            window = glfwCreateWindow(WIDTH, HEIGHT, title.c_str(), nullptr, nullptr);
-            glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
-
-            // Make Surface
-            return this->createWindowSurface(window, WIDTH, HEIGHT);
+            return this->createWindowSurface(this->createWindowOnly(WIDTH, HEIGHT, title));
         };
 
-        //
-        inline virtual SurfaceWindow& createWindowOnly(uint32_t WIDTH, uint32_t HEIGHT, std::string title = "TestApp") {
-            glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-            window = glfwCreateWindow(WIDTH, HEIGHT, title.c_str(), nullptr, nullptr);
-            glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
-            return applicationWindow;
+        // create window and surface for this application (multi-window not supported)
+        inline virtual SurfaceWindow& createWindowSurface(GLFWwindow* window, uint32_t WIDTH, uint32_t HEIGHT) {
+            surfaceWindow.surfaceSize = VkExtent2D{ WIDTH, HEIGHT };
+            surfaceWindow.window = window;
+            return createWindowSurface(surfaceWindow);
         };
 #endif
+
+        VkRenderPass& createRenderPass()
+        { // TODO: Render Pass V2
+            auto formats = surfaceWindow.surfaceFormat;
+            auto render_pass_helper = vkh::VsRenderPassCreateInfoHelper();
+
+            render_pass_helper.addColorAttachment(vkh::VkAttachmentDescription{
+                .format = VkFormat(formats.colorFormat),
+                .loadOp = VK_ATTACHMENT_LOAD_OP_LOAD,
+                .storeOp = VK_ATTACHMENT_STORE_OP_STORE,
+                .stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
+                .stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
+                .initialLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
+                .finalLayout = VK_IMAGE_LAYOUT_GENERAL
+            });
+
+            render_pass_helper.setDepthStencilAttachment(vkh::VkAttachmentDescription{
+                .format = VkFormat(formats.depthFormat),
+                .loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
+                .storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
+                .stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
+                .stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
+                .initialLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
+                .finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL
+            });
+
+            auto dp0 = vkh::VkSubpassDependency{
+                .srcSubpass = VK_SUBPASS_EXTERNAL,
+                .dstSubpass = 0u,
+            };
+
+            auto dp1 = vkh::VkSubpassDependency{
+                .srcSubpass = 0u,
+                .dstSubpass = VK_SUBPASS_EXTERNAL,
+            };
+
+            {
+                auto srcStageMask = vkh::VkPipelineStageFlags{ .eColorAttachmentOutput = 1, .eTransfer = 1, .eBottomOfPipe = 1, };   ASSIGN(dp0, srcStageMask);
+                auto dstStageMask = vkh::VkPipelineStageFlags{ .eColorAttachmentOutput = 1, };                                       ASSIGN(dp0, dstStageMask);
+                auto srcAccessMask = vkh::VkAccessFlags{ .eColorAttachmentWrite = 1 };                                               ASSIGN(dp0, srcAccessMask);
+                auto dstAccessMask = vkh::VkAccessFlags{ .eColorAttachmentRead = 1, .eColorAttachmentWrite = 1 };                    ASSIGN(dp0, dstAccessMask);
+                auto dependencyFlags = vkh::VkDependencyFlags{ .eByRegion = 1 };                                                      ASSIGN(dp0, dependencyFlags);
+            }
+
+            {
+                auto srcStageMask = vkh::VkPipelineStageFlags{ .eColorAttachmentOutput = 1 };                                         ASSIGN(dp1, srcStageMask);
+                auto dstStageMask = vkh::VkPipelineStageFlags{ .eTopOfPipe = 1, .eColorAttachmentOutput = 1, .eTransfer = 1 };        ASSIGN(dp1, dstStageMask);
+                auto srcAccessMask = vkh::VkAccessFlags{ .eColorAttachmentRead = 1, .eColorAttachmentWrite = 1 };                     ASSIGN(dp1, srcAccessMask);
+                auto dstAccessMask = vkh::VkAccessFlags{ .eColorAttachmentRead = 1, .eColorAttachmentWrite = 1 };                     ASSIGN(dp1, dstAccessMask);
+                auto dependencyFlags = vkh::VkDependencyFlags{ .eByRegion = 1 };                                                       ASSIGN(dp1, dependencyFlags);
+            }
+
+            render_pass_helper.addSubpassDependency(dp0);
+            render_pass_helper.addSubpassDependency(dp1);
+
+            vkh::handleVk(device->dispatch->CreateRenderPass(render_pass_helper, nullptr, &surfaceWindow.renderPass));
+            return surfaceWindow.renderPass;
+        }
 
         virtual SurfaceFormat& getSurfaceFormat()
         {
             const VkPhysicalDevice& gpu = device->physical;
-            const auto surfaceFormats = vkh::vsGetPhysicalDeviceSurfaceFormatsKHR(instance->dispatch, gpu, surface);
+            const auto surfaceFormats = vkh::vsGetPhysicalDeviceSurfaceFormatsKHR(instance->dispatch, gpu, surfaceWindow.surface);
             const std::vector<VkFormat> preferredFormats = { VK_FORMAT_R16G16B16A16_UNORM, VK_FORMAT_A2B10G10R10_UNORM_PACK32, VK_FORMAT_A2R10G10B10_UNORM_PACK32, VK_FORMAT_R8G8B8A8_SRGB, VK_FORMAT_B8G8R8A8_SRGB, VK_FORMAT_A8B8G8R8_SRGB_PACK32, VK_FORMAT_R8G8B8A8_UNORM, VK_FORMAT_B8G8R8A8_UNORM, VK_FORMAT_A8B8G8R8_UNORM_PACK32 };
             VkFormat surfaceColorFormat = surfaceFormats.size() == 1 && surfaceFormats[0].format == VK_FORMAT_UNDEFINED ? VK_FORMAT_R8G8B8A8_SRGB : surfaceFormats[0].format;
 
@@ -132,7 +197,7 @@ namespace vkt {
             };
 
             // return format result
-            auto& sfd = surfaceFormat;
+            auto& sfd = surfaceWindow.surfaceFormat;
             sfd.colorSpace = surfaceColorSpace;
             sfd.colorFormat = surfaceColorFormat;
             sfd.depthFormat = surfaceDepthFormat;
@@ -153,7 +218,7 @@ namespace vkt {
             imageInfoVK.flags = VkImageCreateFlagBits{};
             imageInfoVK.pNext = nullptr;
             imageInfoVK.arrayLayers = 1;
-            imageInfoVK.extent = VkExtent3D{ surfaceSize.width, surfaceSize.height, 1u };
+            imageInfoVK.extent = VkExtent3D{ surfaceWindow.surfaceSize.width, surfaceWindow.surfaceSize.height, 1u };
             imageInfoVK.format = { surfaceFormats.depthFormat };
             imageInfoVK.imageType = VK_IMAGE_TYPE_2D;
             imageInfoVK.mipLevels = 1;
@@ -182,7 +247,7 @@ namespace vkt {
                 vkt::VmaMemoryInfo memInfo = {};
                 this->depthImage = vkt::ImageRegion(std::make_shared<vkt::VmaImageAllocation>(this->device->allocator, vkh::VkImageCreateInfo{}.also([=](vkh::VkImageCreateInfo* it) {
                     it->format = surfaceFormats.depthFormat,
-                    it->extent = vkh::VkExtent3D{ surfaceSize.width, surfaceSize.height, 1u },
+                    it->extent = vkh::VkExtent3D{ surfaceWindow.surfaceSize.width, surfaceWindow.surfaceSize.height, 1u },
                     it->usage = depuse;
                     return it;
                 }), memInfo), vkh::VkImageViewCreateInfo{}.also([=](vkh::VkImageViewCreateInfo* it) {
@@ -222,7 +287,7 @@ namespace vkt {
                 views[1] = this->depthImage.getImageView(); // depth view
 
                 // 
-                vkh::handleVk(device->dispatch->CreateFramebuffer(vkh::VkFramebufferCreateInfo{ .flags = {}, .renderPass = renderpass, .attachmentCount = uint32_t(views.size()), .pAttachments = views.data(), .width = surfaceSize.width, .height = surfaceSize.height, .layers = 1u }, nullptr, &swapchainBuffers[i].frameBuffer));
+                vkh::handleVk(device->dispatch->CreateFramebuffer(vkh::VkFramebufferCreateInfo{ .flags = {}, .renderPass = renderpass, .attachmentCount = uint32_t(views.size()), .pAttachments = views.data(), .width = surfaceWindow.surfaceSize.width, .height = surfaceWindow.surfaceSize.height, .layers = 1u }, nullptr, &swapchainBuffers[i].frameBuffer));
             };
 
             vkt::submitOnce(this->device->dispatch, this->device->queue, this->device->commandPool, [&, this](VkCommandBuffer& cmd) {
@@ -240,18 +305,18 @@ namespace vkt {
                     });
                 };
             });
-        }
+        };
 
         virtual VkSwapchainKHR& createSwapchain()
         {
             auto& formats = getSurfaceFormat();
-            auto surfaceCapabilities = vkh::vsGetPhysicalDeviceSurfaceCapabilitiesKHR(instance->dispatch, device->physical, surface);
-            auto surfacePresentModes = vkh::vsGetPhysicalDeviceSurfacePresentModesKHR(instance->dispatch, device->physical, surface);
+            auto surfaceCapabilities = vkh::vsGetPhysicalDeviceSurfaceCapabilitiesKHR(instance->dispatch, device->physical, surfaceWindow.surface);
+            auto surfacePresentModes = vkh::vsGetPhysicalDeviceSurfacePresentModesKHR(instance->dispatch, device->physical, surfaceWindow.surface);
 
             // check the surface width/height.
             if (!(surfaceCapabilities.currentExtent.width == -1 || surfaceCapabilities.currentExtent.height == -1))
             {
-                surfaceSize = surfaceCapabilities.currentExtent;
+                surfaceWindow.surfaceSize = surfaceCapabilities.currentExtent;
             }
 
             // get supported present mode, but prefer mailBox
@@ -267,11 +332,11 @@ namespace vkt {
             // swapchain info
             auto imageUsage = vkh::VkImageUsageFlags{ .eColorAttachment = 1 };
             auto swapchainCreateInfo = vkh::VkSwapchainCreateInfoKHR{};
-            swapchainCreateInfo.surface = surface;
+            swapchainCreateInfo.surface = surfaceWindow.surface;
             swapchainCreateInfo.minImageCount = std::min(surfaceCapabilities.maxImageCount, 3u);
             swapchainCreateInfo.imageFormat = formats.colorFormat;
             swapchainCreateInfo.imageColorSpace = formats.colorSpace;
-            swapchainCreateInfo.imageExtent = surfaceSize;
+            swapchainCreateInfo.imageExtent = surfaceWindow.surfaceSize;
             swapchainCreateInfo.imageArrayLayers = 1;
             swapchainCreateInfo.imageUsage = imageUsage;
             swapchainCreateInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
@@ -281,26 +346,34 @@ namespace vkt {
             swapchainCreateInfo.clipped = true;
 
             // create swapchain
-            vkh::handleVk(device->dispatch->CreateSwapchainKHR(swapchainCreateInfo, nullptr, &swapchain));
-            return swapchain;
+            vkh::handleVk(device->dispatch->CreateSwapchainKHR(swapchainCreateInfo, nullptr, &surfaceWindow.swapchain));
+            return surfaceWindow.swapchain;
         };
 
-        std::vector<Framebuffer>& createSwapchainFramebuffer(VkSwapchainKHR& swapchain, VkRenderPass& renderpass) { // framebuffers vector
-            updateSwapchainFramebuffer(swapchainBuffers, swapchain, renderpass);
-            for (int i = 0; i < swapchainBuffers.size(); i++)
+        virtual std::vector<Framebuffer>& createSwapchainFramebuffer(VkSwapchainKHR& swapchain, VkRenderPass& renderpass) { // framebuffers vector
+            updateSwapchainFramebuffer(surfaceWindow.swapchainBuffers, swapchain, renderpass);
+            for (int i = 0; i < surfaceWindow.swapchainBuffers.size(); i++)
             { // create semaphore
                 VkSemaphoreTypeCreateInfo timeline = {};
                 timeline.semaphoreType = VK_SEMAPHORE_TYPE_TIMELINE;
                 timeline.initialValue = i;
 
                 // 
-                vkh::handleVk(device->dispatch->CreateSemaphore(vkh::VkSemaphoreCreateInfo{}, nullptr, &swapchainBuffers[i].drawSemaphore));
-                vkh::handleVk(device->dispatch->CreateSemaphore(vkh::VkSemaphoreCreateInfo{}, nullptr, &swapchainBuffers[i].computeSemaphore));
-                vkh::handleVk(device->dispatch->CreateSemaphore(vkh::VkSemaphoreCreateInfo{}, nullptr, &swapchainBuffers[i].presentSemaphore));
-                vkh::handleVk(device->dispatch->CreateFence(vkh::VkFenceCreateInfo{ .flags = {1} }, nullptr, &swapchainBuffers[i].waitFence));
+                vkh::handleVk(device->dispatch->CreateSemaphore(vkh::VkSemaphoreCreateInfo{}, nullptr, &surfaceWindow.swapchainBuffers[i].drawSemaphore));
+                vkh::handleVk(device->dispatch->CreateSemaphore(vkh::VkSemaphoreCreateInfo{}, nullptr, &surfaceWindow.swapchainBuffers[i].computeSemaphore));
+                vkh::handleVk(device->dispatch->CreateSemaphore(vkh::VkSemaphoreCreateInfo{}, nullptr, &surfaceWindow.swapchainBuffers[i].presentSemaphore));
+                vkh::handleVk(device->dispatch->CreateFence(vkh::VkFenceCreateInfo{ .flags = {1} }, nullptr, &surfaceWindow.swapchainBuffers[i].waitFence));
             };
-            return swapchainBuffers;
-        }
+            return surfaceWindow.swapchainBuffers;
+        };
+
+        virtual void updateSwapchainFramebuffer() {
+            this->updateSwapchainFramebuffer(surfaceWindow.swapchainBuffers, surfaceWindow.swapchain, surfaceWindow.renderPass);
+        };
+
+        virtual std::vector<Framebuffer>& createSwapchainFramebuffer() {
+            return this->createSwapchainFramebuffer(surfaceWindow.swapchain, surfaceWindow.renderPass);
+        };
     };
     
 };

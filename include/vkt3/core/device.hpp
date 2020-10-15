@@ -69,7 +69,7 @@ namespace vkt {
             return device;
         };
 
-        virtual VkDevice& create(const uint32_t& deviceID = 0u){
+        virtual VkDevice& create(const uint32_t& deviceID = 0u, const VkSurfaceKHR& surface = VK_NULL_HANDLE){
             // 
             this->physical = instance->physicalDevices[deviceID];
 
@@ -126,8 +126,6 @@ namespace vkt {
                 graphicsFamilyIndex++;
 
                 VkBool32 support = false;
-                //vkh::handleVk(vkGetPhysicalDeviceSurfaceSupportKHR(physicalDevice, graphicsFamilyIndex, surface(), &support));
-                const auto& surface = this->surface();
                 if (surface) {
                     vkh::handleVk(instance->dispatch->GetPhysicalDeviceSurfaceSupportKHR(this->physical, graphicsFamilyIndex, surface, &support));
                 };
