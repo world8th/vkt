@@ -27,6 +27,7 @@ namespace vkf {
         vk::PhysicalDeviceExtendedDynamicStateFeaturesEXT gExtendedDynamic{};
     };
 
+    // TODO: DEDICATED QUEUE OBJECT
     class Device { public:
         std::shared_ptr<Instance> instance = {};
 

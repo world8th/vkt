@@ -41,19 +41,23 @@ namespace vkf {
             vkt::vkGlobal();
             assert((version = vkh::vsEnumerateInstanceVersion(vkt::vkGlobal::loader)) >= VK_MAKE_VERSION(1, 2, 131));
 
+            // get our needed extensions
+            std::string layerName = "";
+            std::vector<std::string> wantedExtensions = std::vector<std::string>(wantedInstanceExtensions_CStr.begin(), std::end(wantedInstanceExtensions_CStr));
+
+            // zwezda and stars
     #ifdef VKT_USE_GLFW
+            uintptr_t offset = wantedExtensions.size();
             uint32_t glfwExtensionCount = 0;
             const char** glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
 
             // add glfw extensions to list
+            wantedExtensions.resize(offset + glfwExtensionCount);
             for (uint32_t i = 0; i < glfwExtensionCount; i++) {
-                
+                wantedExtensions[offset + i] = std::string(glfwExtensions[i]);
             };
     #endif
 
-            // get our needed extensions
-            std::string layerName = "";
-            std::vector<std::string> wantedExtensions = std::vector<std::string>(wantedInstanceExtensions_CStr.begin(), std::end(wantedInstanceExtensions_CStr));
             std::vector<VkExtensionProperties> installedExtensions = std::vector<VkExtensionProperties>();
             vkh::vsEnumerateInstanceExtensionProperties(vkt::vkGlobal::loader, installedExtensions, layerName);
             uint32_t extensionCount = 0u;
@@ -95,7 +99,7 @@ namespace vkf {
             appinfo.pApplicationName = "VKTest";
             appinfo.apiVersion = VK_MAKE_VERSION(1, 2, 135);
 
-            // CANNOT DEALLOCATE!
+            // f&cking C++, do not deallocate!
             extensions_c_str = (const char**)malloc(extensionCount*sizeof(const char**));
             layers_c_str = (const char**)malloc(layerCount*sizeof(const char**));
 

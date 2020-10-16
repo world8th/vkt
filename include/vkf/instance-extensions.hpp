@@ -11,14 +11,11 @@ namespace vkf {
         "VK_EXT_swapchain_colorspace",
 
         "VK_KHR_swapchain",
-        "VK_KHR_surface",
         "VK_KHR_display",
 
         "VK_EXT_debug_marker",
         "VK_EXT_debug_report",
         "VK_EXT_debug_utils",
-
-        "VK_KHR_win32_surface",
 
         "VK_NV_device_diagnostic_checkpoints"
     };

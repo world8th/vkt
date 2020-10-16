@@ -38,7 +38,7 @@ namespace vkf {
         std::vector<Framebuffer> swapchainBuffers = {};
     };
 
-    // TODO: SwapChain 
+    //  
     class SwapChain {
     public:
         std::shared_ptr<Instance> instance = {};
