@@ -1,0 +1,189 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\xvk">
+      <UniqueIdentifier>{8c49183a-705b-452c-80a1-d07f26e61c65}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\vma">
+      <UniqueIdentifier>{a24ef580-0775-4a16-95bf-c0f827179c01}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\vkt3">
+      <UniqueIdentifier>{e9e72eeb-4374-4c09-8d28-3c303febf09c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\vulkan">
+      <UniqueIdentifier>{24ec7219-ade1-4ed3-838a-e89087008b54}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\vkh">
+      <UniqueIdentifier>{aa6900e1-3794-41a8-a246-a192a99eb675}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\vkf">
+      <UniqueIdentifier>{f49dba9f-7099-4df9-b7f9-d317503f04e9}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\vkt\include\vma\vk_mem_alloc.h">
+      <Filter>Header Files\vma</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vkt\include\xvk\xvk.hpp">
+      <Filter>Header Files\xvk</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vkt\include\xvk\xvkBase.hpp">
+      <Filter>Header Files\xvk</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vkt\include\xvk\xvkInterface.hpp">
+      <Filter>Header Files\xvk</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vkt\include\vkt3\core.hpp">
+      <Filter>Header Files\vkt3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vkt\include\vkt3\definition.hpp">
+      <Filter>Header Files\vkt3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vkt\include\vkt3\essential.hpp">
+      <Filter>Header Files\vkt3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vkt\include\vkt3\image.hpp">
+      <Filter>Header Files\vkt3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vkt\include\vkt3\inline.hpp">
+      <Filter>Header Files\vkt3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vkt\include\vkt3\utils.hpp">
+      <Filter>Header Files\vkt3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vkt\include\vkt3\vector.hpp">
+      <Filter>Header Files\vkt3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vkt\include\vulkan\vk_icd.h">
+      <Filter>Header Files\vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vkt\include\vulkan\vk_layer.h">
+      <Filter>Header Files\vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vkt\include\vulkan\vk_platform.h">
+      <Filter>Header Files\vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vkt\include\vulkan\vk_sdk_platform.h">
+      <Filter>Header Files\vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vkt\include\vulkan\vulkan.h">
+      <Filter>Header Files\vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vkt\include\vulkan\vulkan.hpp">
+      <Filter>Header Files\vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vkt\include\vulkan\vulkan_android.h">
+      <Filter>Header Files\vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vkt\include\vulkan\vulkan_beta.h">
+      <Filter>Header Files\vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vkt\include\vulkan\vulkan_core.h">
+      <Filter>Header Files\vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vkt\include\vulkan\vulkan_directfb.h">
+      <Filter>Header Files\vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vkt\include\vulkan\vulkan_fuchsia.h">
+      <Filter>Header Files\vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vkt\include\vulkan\vulkan_ggp.h">
+      <Filter>Header Files\vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vkt\include\vulkan\vulkan_ios.h">
+      <Filter>Header Files\vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vkt\include\vulkan\vulkan_macos.h">
+      <Filter>Header Files\vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vkt\include\vulkan\vulkan_metal.h">
+      <Filter>Header Files\vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vkt\include\vulkan\vulkan_vi.h">
+      <Filter>Header Files\vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vkt\include\vulkan\vulkan_wayland.h">
+      <Filter>Header Files\vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vkt\include\vulkan\vulkan_win32.h">
+      <Filter>Header Files\vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vkt\include\vulkan\vulkan_xcb.h">
+      <Filter>Header Files\vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vkt\include\vulkan\vulkan_xlib.h">
+      <Filter>Header Files\vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vkt\include\vulkan\vulkan_xlib_xrandr.h">
+      <Filter>Header Files\vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vkt\include\vkh\bitfields.hpp">
+      <Filter>Header Files\vkh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vkt\include\vkh\enums.hpp">
+      <Filter>Header Files\vkh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vkt\include\vkh\handle.hpp">
+      <Filter>Header Files\vkh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vkt\include\vkh\helpers.hpp">
+      <Filter>Header Files\vkh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vkt\include\vkh\matching.hpp">
+      <Filter>Header Files\vkh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vkt\include\vkh\spirv-mod.hpp">
+      <Filter>Header Files\vkh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vkt\include\vkh\structures.hpp">
+      <Filter>Header Files\vkh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vkt\include\vkf\device.hpp">
+      <Filter>Header Files\vkf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vkt\include\vkf\device-extensions.hpp">
+      <Filter>Header Files\vkf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vkt\include\vkf\framework.hpp">
+      <Filter>Header Files\vkf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vkt\include\vkf\incornation.hpp">
+      <Filter>Header Files\vkf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vkt\include\vkf\instance.hpp">
+      <Filter>Header Files\vkf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vkt\include\vkf\instance-extensions.hpp">
+      <Filter>Header Files\vkf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vkt\include\vkf\swapchain.hpp">
+      <Filter>Header Files\vkf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vkt\include\vkf\queue.hpp">
+      <Filter>Header Files\vkf</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="..\..\vkt\include\vma\vk_mem_alloc.natvis">
+      <Filter>Header Files\vma</Filter>
+    </Natvis>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\vkt\include\vkt3\readme.md">
+      <Filter>Header Files\vkt3</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="test.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
