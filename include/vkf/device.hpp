@@ -6,13 +6,13 @@
 
 
 // 
-namespace vkt {
+namespace vkf {
 
-    struct VktProperties {
+    struct Properties {
         vkh::VkPhysicalDeviceProperties2 gProperties{};
     };
 
-    struct VktFeatures {
+    struct Features {
         vkh::VkPhysicalDeviceFeatures2 gFeatures{};
         vk::PhysicalDeviceShaderAtomicFloatFeaturesEXT gAtomicFloat{};
         vk::PhysicalDeviceTransformFeedbackFeaturesEXT gTrasformFeedback{};
@@ -27,21 +27,23 @@ namespace vkt {
         vk::PhysicalDeviceExtendedDynamicStateFeaturesEXT gExtendedDynamic{};
     };
 
-    class VktDevice { public:
-        std::shared_ptr<VktInstance> instance = {};
+    class Device { public:
+        std::shared_ptr<Instance> instance = {};
 
         vkt::Device dispatch = {};
         
         VkPhysicalDevice physical = VK_NULL_HANDLE;
         vkh::VkDeviceCreateInfo createInfo = {};
         VkDevice device = VK_NULL_HANDLE;
+        VmaAllocator allocator = {};
+
         VkQueue queue = VK_NULL_HANDLE;
         VkCommandPool commandPool = VK_NULL_HANDLE;
         VkPipelineCache pipelineCache = VK_NULL_HANDLE;
-        VmaAllocator allocator = {};
-        VktFeatures features = {};
-        VktProperties properties = {};
         VkDescriptorPool descriptorPool = VK_NULL_HANDLE;
+
+        Features features = {};
+        Properties properties = {};
 
         //
         std::vector<std::string> extensions = {};
@@ -61,11 +63,11 @@ namespace vkt {
         vkh::VkPhysicalDeviceMemoryProperties2 memoryProperties = {};
         std::vector<vkh::VkDeviceQueueCreateInfo> usedQueueCreateInfos = {};
 
-        VktDevice(){
+        Device(){
             
         };
-        
-        VktDevice(std::shared_ptr<VktInstance> instance) : instance(instance) {
+
+        Device(std::shared_ptr<Instance> instance) : instance(instance) {
             
         };
 
@@ -262,24 +264,24 @@ namespace vkt {
         }
 
         // 
-        VktDevice* submitUtilize(vkt::uni_arg<VkCommandBuffer> cmds, vkt::uni_arg<vkh::VkSubmitInfo> smbi) {
+        Device* submitUtilize(vkt::uni_arg<VkCommandBuffer> cmds, vkt::uni_arg<vkh::VkSubmitInfo> smbi) {
             return this->submitUtilize(std::vector<VkCommandBuffer>{ cmds }, smbi);
         };
 
         // 
-        VktDevice* submitUtilize(const std::vector<VkCommandBuffer>& cmds, vkt::uni_arg<vkh::VkSubmitInfo> smbi) {
+        Device* submitUtilize(const std::vector<VkCommandBuffer>& cmds, vkt::uni_arg<vkh::VkSubmitInfo> smbi) {
             vkt::submitUtilize(dispatch, queue, commandPool, cmds, smbi);
             return this;
         };
 
         // 
-        VktDevice* submitOnce(const std::function<void(VkCommandBuffer&)>& cmdFn, vkt::uni_arg<vkh::VkSubmitInfo> smbi) {
+        Device* submitOnce(const std::function<void(VkCommandBuffer&)>& cmdFn, vkt::uni_arg<vkh::VkSubmitInfo> smbi) {
             vkt::submitOnce(dispatch, queue, commandPool, cmdFn, smbi);
             return this;
         };
 
         // Async Version
-        std::future<VktDevice*> submitOnceAsync(const std::function<void(VkCommandBuffer&)>& cmdFn, vkt::uni_arg<vkh::VkSubmitInfo> smbi) {
+        std::future<Device*> submitOnceAsync(const std::function<void(VkCommandBuffer&)>& cmdFn, vkt::uni_arg<vkh::VkSubmitInfo> smbi) {
             return std::async(std::launch::async | std::launch::deferred, [=, this]() {
                 vkt::submitOnceAsync(dispatch, queue, commandPool, cmdFn, smbi).get();
                 return this;
@@ -287,12 +289,12 @@ namespace vkt {
         };
 
         // 
-        VktDevice* submitCmd(vkt::uni_arg<VkCommandBuffer> cmds, vkt::uni_arg<vkh::VkSubmitInfo> smbi) {
+        Device* submitCmd(vkt::uni_arg<VkCommandBuffer> cmds, vkt::uni_arg<vkh::VkSubmitInfo> smbi) {
             return this->submitCmd(std::vector<VkCommandBuffer>{ cmds }, smbi);
         };
 
         // 
-        VktDevice* submitCmd(const std::vector<VkCommandBuffer>& cmds, vkt::uni_arg<vkh::VkSubmitInfo> smbi) {
+        Device* submitCmd(const std::vector<VkCommandBuffer>& cmds, vkt::uni_arg<vkh::VkSubmitInfo> smbi) {
             vkt::submitCmd(dispatch, queue, cmds, smbi);
             return this;
         };

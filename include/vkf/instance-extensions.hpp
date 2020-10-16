@@ -1,7 +1,7 @@
 #include <vector>
 #include <string>
 
-namespace vkt {
+namespace vkf {
     // instance extensions
     const std::vector<const char*> wantedInstanceExtensions_CStr = {
         "VK_KHR_get_physical_device_properties2",

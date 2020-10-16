@@ -5,7 +5,7 @@
 #include "./device.hpp"
 
 // 
-namespace vkt {
+namespace vkf {
 
     struct SurfaceFormat {
         VkFormat colorFormat = VK_FORMAT_UNDEFINED;
@@ -39,23 +39,23 @@ namespace vkt {
     };
 
     // TODO: SwapChain 
-    class VktSwapChain {
+    class SwapChain {
     public:
-        std::shared_ptr<VktInstance> instance = {};
-        std::shared_ptr<VktDevice> device = {};
+        std::shared_ptr<Instance> instance = {};
+        std::shared_ptr<Device> device = {};
 
         // 
         SurfaceWindow surfaceWindow = {};
         vkt::ImageRegion depthImage = {};
 
         // 
-        VktSwapChain(){
+        SwapChain(){
 
         }
-        VktSwapChain(std::shared_ptr<VktInstance> instance, std::shared_ptr<VktDevice> device) : instance(instance), device(device) {
+        SwapChain(std::shared_ptr<Instance> instance, std::shared_ptr<Device> device) : instance(instance), device(device) {
 
         }
-        VktSwapChain(std::shared_ptr<VktDevice> device) : instance(device->instance), device(device) {
+        SwapChain(std::shared_ptr<Device> device) : instance(device->instance), device(device) {
             
         }
 

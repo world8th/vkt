@@ -1,7 +1,7 @@
 #include <vector>
 #include <string>
 
-namespace vkt {
+namespace vkf {
     // default device layers
     const std::vector<const char*> wantedDeviceLayers_CStr = {
         "VK_LAYER_AMD_switchable_graphics"

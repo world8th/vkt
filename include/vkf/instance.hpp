@@ -4,15 +4,16 @@
 #include "./instance-extensions.hpp"
 
 // 
-namespace vkt {
+namespace vkf {
 
-    class VktInstance {
+    class Instance {
         public:
         vkt::Instance dispatch = {};
         vkh::VkInstanceCreateInfo createInfo = {};
         VkInstance instance = VK_NULL_HANDLE;
         uint32_t version = 0;
-        
+
+        // 
         vkh::VkApplicationInfo applicationInfo = {};
         VkDebugUtilsMessengerEXT messenger = VK_NULL_HANDLE;
         std::vector<VkPhysicalDevice> physicalDevices = {};
@@ -24,11 +25,9 @@ namespace vkt {
         // 
         const char** extensions_c_str = nullptr;
         const char** layers_c_str = nullptr;
-        //std::vector<const char *> extensions_c_str = {};
-        //std::vector<const char*> layers_c_str = {};
 
         // 
-        VktInstance(){};
+        Instance(){};
 
         operator VkInstance&(){
             return instance;
@@ -40,7 +39,7 @@ namespace vkt {
 
         virtual VkInstance& create(){
             vkt::vkGlobal();
-            assert((version = vkh::vsEnumerateInstanceVersion(vkGlobal::loader)) >= VK_MAKE_VERSION(1, 2, 131));
+            assert((version = vkh::vsEnumerateInstanceVersion(vkt::vkGlobal::loader)) >= VK_MAKE_VERSION(1, 2, 131));
 
     #ifdef VKT_USE_GLFW
             uint32_t glfwExtensionCount = 0;
@@ -56,7 +55,7 @@ namespace vkt {
             std::string layerName = "";
             std::vector<std::string> wantedExtensions = std::vector<std::string>(wantedInstanceExtensions_CStr.begin(), std::end(wantedInstanceExtensions_CStr));
             std::vector<VkExtensionProperties> installedExtensions = std::vector<VkExtensionProperties>();
-            vkh::vsEnumerateInstanceExtensionProperties(vkGlobal::loader, installedExtensions, layerName);
+            vkh::vsEnumerateInstanceExtensionProperties(vkt::vkGlobal::loader, installedExtensions, layerName);
             uint32_t extensionCount = 0u;
             for (auto& w : wantedExtensions) {
                 for (auto& i : installedExtensions) {
@@ -75,7 +74,7 @@ namespace vkt {
             // get validation layers
             std::vector<std::string> wantedLayers = std::vector<std::string>(wantedInstanceLayers_CStr.begin(), std::end(wantedInstanceLayers_CStr));
             std::vector<VkLayerProperties> installedLayers = std::vector<VkLayerProperties>();
-            vkh::vsEnumerateInstanceLayerProperties(vkGlobal::loader, installedLayers);
+            vkh::vsEnumerateInstanceLayerProperties(vkt::vkGlobal::loader, installedLayers);
             uint32_t layerCount = 0u;
             for (auto& w : wantedLayers) {
                 for (auto& i : installedLayers) {
