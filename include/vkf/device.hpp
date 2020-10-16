@@ -38,8 +38,6 @@ namespace vkf {
         VkDevice device = VK_NULL_HANDLE;
         VmaAllocator allocator = {};
 
-        VkQueue queue = VK_NULL_HANDLE;
-        VkCommandPool commandPool = VK_NULL_HANDLE;
         VkPipelineCache pipelineCache = VK_NULL_HANDLE;
         VkDescriptorPool descriptorPool = VK_NULL_HANDLE;
 
@@ -55,7 +53,6 @@ namespace vkf {
         std::vector<const char*> layers_c_str = {};
 
         // 
-        uint32_t queueFamilyIndex = 0;
         uint32_t version = 0;
 
         // 
@@ -184,9 +181,7 @@ namespace vkf {
             for (uint32_t i = 0; i < layerCount; i++) { layers_c_str[i] = layers[i].c_str(); };
 
             // return device with queue pointer
-            const uint32_t qptr = 0;
             if ((this->usedQueueCreateInfos = queueCreateInfos).size() > 0) {
-                this->queueFamilyIndex = queueFamilyIndices[qptr];
                 this->dispatch = std::make_shared<xvk::Device>(instance->dispatch, this->physical, (createInfo = vkh::VkDeviceCreateInfo{
                     .pNext = reinterpret_cast<VkPhysicalDeviceFeatures2*>(&features.gFeatures),
                     .queueCreateInfoCount = uint32_t(this->usedQueueCreateInfos.size()),
@@ -201,11 +196,6 @@ namespace vkf {
                 vkt::vkGlobal::device = this->dispatch.get_shared();
                 //vkt::vkGlobal::volkDevice();
             };
-
-            //
-            auto resetFlag = vkh::VkCommandPoolCreateFlags{ .eResetCommandBuffer = 1 };
-            this->dispatch->GetDeviceQueue(queueFamilyIndex, 0u, &this->queue);
-            vkh::handleVk(this->dispatch->CreateCommandPool(vkh::VkCommandPoolCreateInfo{ .flags = resetFlag, .queueFamilyIndex = queueFamilyIndex }, nullptr, &this->commandPool));
 
             // REMAP WITH XVK AGAIN!
             VmaVulkanFunctions func = {};
@@ -263,42 +253,7 @@ namespace vkf {
             // 
             return this->device;
         }
-
-        // 
-        Device* submitUtilize(vkt::uni_arg<VkCommandBuffer> cmds, vkt::uni_arg<vkh::VkSubmitInfo> smbi) {
-            return this->submitUtilize(std::vector<VkCommandBuffer>{ cmds }, smbi);
-        };
-
-        // 
-        Device* submitUtilize(const std::vector<VkCommandBuffer>& cmds, vkt::uni_arg<vkh::VkSubmitInfo> smbi) {
-            vkt::submitUtilize(dispatch, queue, commandPool, cmds, smbi);
-            return this;
-        };
-
-        // 
-        Device* submitOnce(const std::function<void(VkCommandBuffer&)>& cmdFn, vkt::uni_arg<vkh::VkSubmitInfo> smbi) {
-            vkt::submitOnce(dispatch, queue, commandPool, cmdFn, smbi);
-            return this;
-        };
-
-        // Async Version
-        std::future<Device*> submitOnceAsync(const std::function<void(VkCommandBuffer&)>& cmdFn, vkt::uni_arg<vkh::VkSubmitInfo> smbi) {
-            return std::async(std::launch::async | std::launch::deferred, [=, this]() {
-                vkt::submitOnceAsync(dispatch, queue, commandPool, cmdFn, smbi).get();
-                return this;
-            });
-        };
-
-        // 
-        Device* submitCmd(vkt::uni_arg<VkCommandBuffer> cmds, vkt::uni_arg<vkh::VkSubmitInfo> smbi) {
-            return this->submitCmd(std::vector<VkCommandBuffer>{ cmds }, smbi);
-        };
-
-        // 
-        Device* submitCmd(const std::vector<VkCommandBuffer>& cmds, vkt::uni_arg<vkh::VkSubmitInfo> smbi) {
-            vkt::submitCmd(dispatch, queue, cmds, smbi);
-            return this;
-        };
+        
     };
 
 };

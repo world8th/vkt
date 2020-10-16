@@ -3,6 +3,7 @@
 #include "./incornation.hpp"
 #include "./instance.hpp"
 #include "./device.hpp"
+#include "./queue.hpp"
 
 // 
 namespace vkf {
@@ -206,7 +207,7 @@ namespace vkf {
             return sfd;
         }
 
-        virtual void updateSwapchainFramebuffer(std::vector<Framebuffer>& swapchainBuffers, VkSwapchainKHR& swapchain, VkRenderPass& renderpass) {
+        virtual void updateSwapchainFramebuffer(std::shared_ptr<Queue> queue, std::vector<Framebuffer>& swapchainBuffers, VkSwapchainKHR& swapchain, VkRenderPass& renderpass) {
             // The swapchain handles allocating frame images.
             auto& surfaceFormats = getSurfaceFormat();
             auto  gpuMemoryProps = vkh::vsGetPhysicalDeviceMemoryProperties(instance->dispatch, device->physical);//physicalDevice.getMemoryProperties();
@@ -291,21 +292,23 @@ namespace vkf {
                 vkh::handleVk(device->dispatch->CreateFramebuffer(vkh::VkFramebufferCreateInfo{ .flags = {}, .renderPass = renderpass, .attachmentCount = uint32_t(views.size()), .pAttachments = views.data(), .width = surfaceWindow.surfaceSize.width, .height = surfaceWindow.surfaceSize.height, .layers = 1u }, nullptr, &swapchainBuffers[i].frameBuffer));
             };
 
-            vkt::submitOnce(this->device->dispatch, this->device->queue, this->device->commandPool, [&, this](VkCommandBuffer& cmd) {
-                this->device->dispatch->CmdClearDepthStencilImage(cmd, this->depthImage.transfer(cmd), this->depthImage.getImageLayout(), vkh::VkClearDepthStencilValue{ .depth = 1.0f, .stencil = 0 }, 1u, depthImage.getImageSubresourceRange());
-                for (int i = 0; i < swapchainImages.size(); i++) {
-                    vkt::imageBarrier(cmd, vkt::ImageBarrierInfo{
-                        .image = swapchainImages[i],
-                        .targetLayout = VK_IMAGE_LAYOUT_GENERAL,
-                        .originLayout = VK_IMAGE_LAYOUT_UNDEFINED,
-                        .subresourceRange = vkh::VkImageSubresourceRange{ {}, 0u, 1u, 0u, 1u }.also([=](auto* it) {
-                            auto aspect = vkh::VkImageAspectFlags{.eColor = 1u };
-                            it->aspectMask = aspect;
-                            return it;
-                        })
-                    });
-                };
-            });
+            if (queue) {
+                queue->submitOnce([&, this](VkCommandBuffer& cmd) {
+                    this->device->dispatch->CmdClearDepthStencilImage(cmd, this->depthImage.transfer(cmd), this->depthImage.getImageLayout(), vkh::VkClearDepthStencilValue{ .depth = 1.0f, .stencil = 0 }, 1u, depthImage.getImageSubresourceRange());
+                    for (int i = 0; i < swapchainImages.size(); i++) {
+                        vkt::imageBarrier(cmd, vkt::ImageBarrierInfo{
+                            .image = swapchainImages[i],
+                            .targetLayout = VK_IMAGE_LAYOUT_GENERAL,
+                            .originLayout = VK_IMAGE_LAYOUT_UNDEFINED,
+                            .subresourceRange = vkh::VkImageSubresourceRange{ {}, 0u, 1u, 0u, 1u }.also([=](auto* it) {
+                                auto aspect = vkh::VkImageAspectFlags{.eColor = 1u };
+                                it->aspectMask = aspect;
+                                return it;
+                            })
+                        });
+                    };
+                });
+            };
         };
 
         virtual VkSwapchainKHR& createSwapchain()
@@ -351,8 +354,8 @@ namespace vkf {
             return surfaceWindow.swapchain;
         };
 
-        virtual std::vector<Framebuffer>& createSwapchainFramebuffer(VkSwapchainKHR& swapchain, VkRenderPass& renderpass) { // framebuffers vector
-            updateSwapchainFramebuffer(surfaceWindow.swapchainBuffers, swapchain, renderpass);
+        virtual std::vector<Framebuffer>& createSwapchainFramebuffer(std::shared_ptr<Queue> queue, VkSwapchainKHR& swapchain, VkRenderPass& renderpass) { // framebuffers vector
+            updateSwapchainFramebuffer(queue, surfaceWindow.swapchainBuffers, swapchain, renderpass);
             for (int i = 0; i < surfaceWindow.swapchainBuffers.size(); i++)
             { // create semaphore
                 VkSemaphoreTypeCreateInfo timeline = {};
@@ -368,12 +371,12 @@ namespace vkf {
             return surfaceWindow.swapchainBuffers;
         };
 
-        virtual void updateSwapchainFramebuffer() {
-            this->updateSwapchainFramebuffer(surfaceWindow.swapchainBuffers, surfaceWindow.swapchain, surfaceWindow.renderPass);
+        virtual void updateSwapchainFramebuffer(std::shared_ptr<Queue> queue) {
+            this->updateSwapchainFramebuffer(queue, surfaceWindow.swapchainBuffers, surfaceWindow.swapchain, surfaceWindow.renderPass);
         };
 
-        virtual std::vector<Framebuffer>& createSwapchainFramebuffer() {
-            return this->createSwapchainFramebuffer(surfaceWindow.swapchain, surfaceWindow.renderPass);
+        virtual std::vector<Framebuffer>& createSwapchainFramebuffer(std::shared_ptr<Queue> queue) {
+            return this->createSwapchainFramebuffer(queue, surfaceWindow.swapchain, surfaceWindow.renderPass);
         };
     };
     
