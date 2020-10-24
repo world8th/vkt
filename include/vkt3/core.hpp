@@ -56,6 +56,8 @@
 #include <glbinding/gl/extension.h>
 #include <glbinding/glbinding.h>
 #endif
+#else
+#define GLFW_INCLUDE_NONE
 #endif
 
 // 

@@ -463,7 +463,7 @@ namespace vkt {
         virtual operator const ::VkDescriptorBufferInfo& () const { return bufInfo; };
         virtual operator const vkh::VkDescriptorBufferInfo& () const { return bufInfo; };
         virtual operator const vkt::uni_ptr<BufferAllocation>& () const { return allocation; };
-        virtual operator const std::shared_ptr<BufferAllocation>& () const { return allocation; };
+        virtual operator const std::shared_ptr<BufferAllocation>& () const { return allocation.get_shared(); };
 
         // 
         virtual operator BufferAllocation* () { return allocation; };

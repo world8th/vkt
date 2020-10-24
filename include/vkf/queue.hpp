@@ -47,24 +47,24 @@ namespace vkf {
         }
 
         // 
-        Queue* submitUtilize(vkt::uni_arg<VkCommandBuffer> cmds, vkt::uni_arg<vkh::VkSubmitInfo> smbi = vkh::VkSubmitInfo{}) {
+        virtual const Queue* submitUtilize(vkt::uni_arg<VkCommandBuffer> cmds, vkt::uni_arg<vkh::VkSubmitInfo> smbi = vkh::VkSubmitInfo{}) const {
             return this->submitUtilize(std::vector<VkCommandBuffer>{ cmds }, smbi);
         };
 
         // 
-        Queue* submitUtilize(const std::vector<VkCommandBuffer>& cmds, vkt::uni_arg<vkh::VkSubmitInfo> smbi = vkh::VkSubmitInfo{}) {
+        virtual const Queue* submitUtilize(const std::vector<VkCommandBuffer>& cmds, vkt::uni_arg<vkh::VkSubmitInfo> smbi = vkh::VkSubmitInfo{}) const {
             vkt::submitUtilize(device->dispatch, queue, commandPool, cmds, smbi);
             return this;
         };
 
         // 
-        Queue* submitOnce(const std::function<void(VkCommandBuffer&)>& cmdFn, vkt::uni_arg<vkh::VkSubmitInfo> smbi = vkh::VkSubmitInfo{}) {
+        virtual const Queue* submitOnce(const std::function<void(VkCommandBuffer&)>& cmdFn, vkt::uni_arg<vkh::VkSubmitInfo> smbi = vkh::VkSubmitInfo{}) const {
             vkt::submitOnce(device->dispatch, queue, commandPool, cmdFn, smbi);
             return this;
         };
 
         // Async Version
-        std::future<Queue*> submitOnceAsync(const std::function<void(VkCommandBuffer&)>& cmdFn, vkt::uni_arg<vkh::VkSubmitInfo> smbi = vkh::VkSubmitInfo{}) {
+        virtual std::future<const Queue*> submitOnceAsync(const std::function<void(VkCommandBuffer&)>& cmdFn, vkt::uni_arg<vkh::VkSubmitInfo> smbi = vkh::VkSubmitInfo{}) const {
             return std::async(std::launch::async | std::launch::deferred, [=, this]() {
                 vkt::submitOnceAsync(device->dispatch, queue, commandPool, cmdFn, smbi).get();
                 return this;
@@ -72,12 +72,12 @@ namespace vkf {
         };
 
         // 
-        Queue* submitCmd(vkt::uni_arg<VkCommandBuffer> cmds, vkt::uni_arg<vkh::VkSubmitInfo> smbi = vkh::VkSubmitInfo{}) {
+        virtual const Queue* submitCmd(vkt::uni_arg<VkCommandBuffer> cmds, vkt::uni_arg<vkh::VkSubmitInfo> smbi = vkh::VkSubmitInfo{}) const {
             return this->submitCmd(std::vector<VkCommandBuffer>{ cmds }, smbi);
         };
 
         // 
-        Queue* submitCmd(const std::vector<VkCommandBuffer>& cmds, vkt::uni_arg<vkh::VkSubmitInfo> smbi = vkh::VkSubmitInfo{}) {
+        virtual const Queue* submitCmd(const std::vector<VkCommandBuffer>& cmds, vkt::uni_arg<vkh::VkSubmitInfo> smbi = vkh::VkSubmitInfo{}) const {
             vkt::submitCmd(device->dispatch, queue, cmds, smbi);
             return this;
         };

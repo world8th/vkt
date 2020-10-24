@@ -48,7 +48,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         inline operator const T&() const { return reinterpret_cast<const T&>(*this); };
     
     #define FLAGS(NAME) vkt::union_t<vkh::NAME##Flags, ::NAME##Flags, ::NAME##FlagBits>
-    #define FLAGS(NAME,FIX) vkt::union_t<vkh::NAME##Flags##FIX, ::NAME##Flags##FIX, ::NAME##FlagBits##FIX>
+    #define FLAGF(NAME,FIX) vkt::union_t<vkh::NAME##Flags##FIX, ::NAME##Flags##FIX, ::NAME##FlagBits##FIX>
 
 
     // GLM-Compatible
@@ -979,7 +979,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         const void*          pNext        = nullptr;
         VkGeometryTypeNV     geometryType = VK_GEOMETRY_TYPE_TRIANGLES_NV;
         VkGeometryDataNV     geometry     = {};
-        FLAGS(VkGeometry,NV) flags        = VsDefaultGeometryFlags;
+        FLAGF(VkGeometry,NV) flags        = VsDefaultGeometryFlags;
 
         STRUCT_OPERATORS(VkGeometryNV)
         VK_HPP_STRUCT_OPERATORS(VkGeometryNV,vk::GeometryNV)
@@ -990,7 +990,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         VkStructureType                        sType         = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_INFO_NV;
         const void*                            pNext         = nullptr;
         VkAccelerationStructureTypeNV          type          = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_NV;
-        FLAGS(VkBuildAccelerationStructure,NV) flags         = VsDefaultBuildAccelerationStructureFlags;
+        FLAGF(VkBuildAccelerationStructure,NV) flags         = VsDefaultBuildAccelerationStructureFlags;
         uint32_t                               instanceCount = 0u;
         uint32_t                               geometryCount = 0u;
         const VkGeometryNV*                    pGeometries   = nullptr;
@@ -1256,7 +1256,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         const void*                               pNext         = nullptr;
         VkGeometryTypeKHR                         geometryType  = {};
         VkAccelerationStructureGeometryDataKHR    geometry      = VkAccelerationStructureGeometryDataKHR{ .triangles = {} };
-        FLAGS(VkGeometry, KHR)                    flags         = VsDefaultGeometryFlags;
+        FLAGF(VkGeometry, KHR)                    flags         = VsDefaultGeometryFlags;
 
         // 
         VkAccelerationStructureGeometryKHR& operator=(const VkAccelerationStructureGeometryTrianglesDataKHR& triangles) { this->geometryType = VK_GEOMETRY_TYPE_TRIANGLES_KHR; this->geometry.triangles = triangles; return *this; };
@@ -1306,7 +1306,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         VkStructureType                                     sType                    = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_GEOMETRY_INFO_KHR;
         const void*                                         pNext                    = nullptr;
         VkAccelerationStructureTypeKHR                      type                     = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR;
-        FLAGS(VkBuildAccelerationStructure, KHR)            flags                    = VsDefaultBuildAccelerationStructureFlags;
+        FLAGF(VkBuildAccelerationStructure, KHR)            flags                    = VsDefaultBuildAccelerationStructureFlags;
         VkBool32                                            update                   = false;
         VkAccelerationStructureKHR                          srcAccelerationStructure = {};
         VkAccelerationStructureKHR                          dstAccelerationStructure = {};
@@ -1351,7 +1351,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         const void*                                                pNext             = nullptr;
         VkDeviceSize                                               compactedSize     = 0u;
         VkAccelerationStructureTypeKHR                             type              = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR ;
-        FLAGS(VkBuildAccelerationStructure, KHR)                   flags             = VsDefaultBuildAccelerationStructureFlags;
+        FLAGF(VkBuildAccelerationStructure, KHR)                   flags             = VsDefaultBuildAccelerationStructureFlags;
         uint32_t                                                   maxGeometryCount  = 0u;
         const VkAccelerationStructureCreateGeometryTypeInfoKHR*    pGeometryInfos    = nullptr;
         VkDeviceAddress                                            deviceAddress     = VK_NULL_HANDLE;
@@ -1793,16 +1793,16 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
     // 
     typedef union VkClearValue {
         VkClearColorValue           color = {};
-        VkClearDepthStencilValue    depthStencil;
+        ::VkClearDepthStencilValue    depthStencil;
 
         operator VkClearColorValue& () { return color; };
-        operator VkClearDepthStencilValue& () { return depthStencil; };
+        operator ::VkClearDepthStencilValue& () { return depthStencil; };
 
         operator const VkClearColorValue& () const { return color; };
-        operator const VkClearDepthStencilValue& () const { return depthStencil; };
+        operator const ::VkClearDepthStencilValue& () const { return depthStencil; };
 
         VkClearValue& operator=(const VkClearColorValue& color) { this->color = color; };
-        VkClearValue& operator=(const VkClearDepthStencilValue& depthStencil) { this->depthStencil = depthStencil; };
+        VkClearValue& operator=(const ::VkClearDepthStencilValue& depthStencil) { this->depthStencil = depthStencil; };
 
         STRUCT_OPERATORS(VkClearValue)
         VK_HPP_STRUCT_OPERATORS(VkClearValue, vk::ClearValue)
@@ -1938,6 +1938,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
 
     //
 //#ifdef VKT_OPENGL_INTEROP
+#ifdef VKT_WIN32_DETECTED
     typedef struct VkSemaphoreGetWin32HandleInfoKHR {
         VkStructureType                          sType      = VK_STRUCTURE_TYPE_SEMAPHORE_GET_WIN32_HANDLE_INFO_KHR;
         const void*                              pNext      = nullptr;
@@ -1955,6 +1956,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         STRUCT_OPERATORS(VkSemaphoreGetWin32HandleInfoKHR)
         VK_HPP_STRUCT_OPERATORS(VkSemaphoreGetWin32HandleInfoKHR, vk::SemaphoreGetWin32HandleInfoKHR)
     } VkSemaphoreGetWin32HandleInfoKHR;
+#endif
 //#endif
 
     // 

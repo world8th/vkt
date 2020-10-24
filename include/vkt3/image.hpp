@@ -491,7 +491,7 @@ namespace vkt {
         // 
         virtual operator const ImageAllocation*() const { return this->allocation; };
         virtual operator const vkt::uni_ptr<ImageAllocation>&() const { return this->allocation; };
-        virtual operator const std::shared_ptr<ImageAllocation>& () const { return this->allocation; };
+        virtual operator const std::shared_ptr<ImageAllocation>& () const { return this->allocation.get_shared(); };
         virtual operator const vkt::MemoryAllocationInfo&() const { return this->allocation->info; };
         virtual operator const vkh::VkImageSubresourceRange&() const { return this->subresourceRange; };
         virtual operator const    ::VkImageSubresourceRange&() const { return this->subresourceRange; };

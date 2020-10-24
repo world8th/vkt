@@ -249,6 +249,7 @@ namespace vkt {
     static inline void createSemaphore(vkt::Device device, VkSemaphore* vkSemaphore, unsigned* unitPtr = nullptr, const void* pNext = nullptr, const bool GL = false) {
         const auto exportable = vkh::VkExportSemaphoreCreateInfo{ .pNext = pNext, .handleTypes = vkh::VkExternalSemaphoreHandleTypeFlags{ .eOpaqueWin32 = 1} };
 
+#ifdef VKT_WIN32_DETECTED
         HANDLE handle{ INVALID_HANDLE_VALUE };
 #ifdef UNICODE
         vkh::handleVk(device->CreateSemaphoreW(vkh::VkSemaphoreCreateInfo{ .pNext = &exportable }, nullptr, vkSemaphore));
@@ -256,7 +257,11 @@ namespace vkt {
         vkh::handleVk(device->CreateSemaphoreA(vkh::VkSemaphoreCreateInfo{ .pNext = &exportable }, nullptr, vkSemaphore));
 #endif
         vkh::handleVk(device->GetSemaphoreWin32HandleKHR(vkh::VkSemaphoreGetWin32HandleInfoKHR{ .semaphore = *vkSemaphore, .handleType = VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_WIN32_BIT }, &handle));
+#else
+        vkh::handleVk(device->CreateSemaphore(vkh::VkSemaphoreCreateInfo{ .pNext = &exportable }, nullptr, vkSemaphore));
+#endif
         if (unitPtr) {
+#ifdef VKT_WIN32_DETECTED
 #ifdef ENABLE_OPTIX_DENOISE
 #ifdef VKT_OPENGL_INTEROP
             if (GL)
@@ -278,6 +283,9 @@ namespace vkt {
                 glGenSemaphoresEXT(1, unitPtr);
                 glImportSemaphoreWin32HandleEXT(*unitPtr, GL_HANDLE_TYPE_OPAQUE_WIN32_EXT, handle);
             };
+#endif
+#else
+
 #endif
         };
         //glCheckError();
