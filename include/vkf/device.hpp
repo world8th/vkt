@@ -77,6 +77,14 @@ namespace vkf {
             return device;
         };
 
+        xvk::Device* operator ->() {
+            return dispatch.get();
+        };
+
+        const xvk::Device* operator ->() const {
+            return dispatch.get();
+        };
+
         virtual VkDevice& create(const uint32_t& deviceID = 0u, const VkSurfaceKHR& surface = VK_NULL_HANDLE){
             // 
             this->physical = instance->physicalDevices[deviceID];

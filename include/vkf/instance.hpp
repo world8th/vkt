@@ -37,6 +37,14 @@ namespace vkf {
             return instance;
         };
 
+        xvk::Instance* operator ->() {
+            return dispatch.get();
+        };
+
+        const xvk::Instance* operator ->() const {
+            return dispatch.get();
+        };
+
         virtual VkInstance& create(){
             vkt::vkGlobal();
             assert((version = vkh::vsEnumerateInstanceVersion(vkt::vkGlobal::loader)) >= VK_MAKE_VERSION(1, 2, 131));
