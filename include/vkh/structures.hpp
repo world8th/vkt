@@ -151,7 +151,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
     typedef struct VkDescriptorBufferInfo {
         VkBuffer        buffer  = VK_NULL_HANDLE;
         VkDeviceSize    offset  = 0u;
-        VkDeviceSize    range   = 16u;
+        VkDeviceSize    range   = VK_WHOLE_SIZE;
 
         STRUCT_OPERATORS(VkDescriptorBufferInfo)
         VK_HPP_STRUCT_OPERATORS(VkDescriptorBufferInfo,vk::DescriptorBufferInfo)
@@ -207,19 +207,6 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         STRUCT_OPERATORS(VkWriteDescriptorSet)
         VK_HPP_STRUCT_OPERATORS(VkWriteDescriptorSet,vk::WriteDescriptorSet)
     } VkWriteDescriptorSet;
-
-    // 
-    typedef struct VkWriteDescriptorSetAccelerationStructureKHR {
-        VkStructureType                  sType                      = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET_ACCELERATION_STRUCTURE_NV;
-        const void*                      pNext                      = nullptr;
-        uint32_t                         accelerationStructureCount = 1u;
-        const VkAccelerationStructureNV* pAccelerationStructures    = nullptr;
-
-        STRUCT_OPERATORS(VkWriteDescriptorSetAccelerationStructureKHR)
-        VK_HPP_STRUCT_OPERATORS(VkWriteDescriptorSetAccelerationStructureKHR, vk::WriteDescriptorSetAccelerationStructureKHR)
-    } VkWriteDescriptorSetAccelerationStructureKHR;
-
-    using VkWriteDescriptorSetAccelerationStructureNV = VkWriteDescriptorSetAccelerationStructureKHR;
 
     // 
     inline constexpr auto VsDefaultDescriptorPoolFlags = VkDescriptorPoolCreateFlags{};
@@ -491,7 +478,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         VkBool32                                   depthClampEnable         = false;
         VkBool32                                   rasterizerDiscardEnable  = false;
         VkPolygonMode                              polygonMode              = VK_POLYGON_MODE_FILL;
-        FLAGS(VkCullMode)                      cullMode                 = VsDefaultCullMode;
+        FLAGS(VkCullMode)                          cullMode                 = VsDefaultCullMode;
         VkFrontFace                                frontFace                = VK_FRONT_FACE_COUNTER_CLOCKWISE ;
         VkBool32                                   depthBiasEnable          = false;
         float                                      depthBiasConstantFactor  = 0.f;
@@ -606,8 +593,8 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
     inline constexpr auto VsDefaultPipelineFlags = VkPipelineCreateFlags{};
     inline constexpr auto VsDefaultPipelineShaderStageFlags = VkPipelineShaderStageCreateFlags{};
     inline constexpr auto VsDefaultFramebufferFlags = VkFramebufferCreateFlags{};
-    inline constexpr auto VsDefaultGeometryFlags = VkGeometryFlagsNV{};
-    inline constexpr auto VsDefaultBuildAccelerationStructureFlags = VkBuildAccelerationStructureFlagsNV{};
+    inline constexpr auto VsDefaultGeometryFlags = VkGeometryFlagsKHR{};
+    inline constexpr auto VsDefaultBuildAccelerationStructureFlags = VkBuildAccelerationStructureFlagsKHR{};
     inline constexpr auto VsDefaultShaderModuleFlags = VkShaderModuleCreateFlags{};
     inline constexpr auto VsDefaultShaderStageFlags = VkShaderStageFlags{};
 
@@ -689,42 +676,6 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         STRUCT_OPERATORS(VkComputePipelineCreateInfo)
         VK_HPP_STRUCT_OPERATORS(VkComputePipelineCreateInfo,vk::ComputePipelineCreateInfo)
     } VkComputePipelineCreateInfo;
-
-    // 
-    typedef struct VkRayTracingShaderGroupCreateInfoNV {
-        VkStructureType                  sType              = VK_STRUCTURE_TYPE_RAY_TRACING_SHADER_GROUP_CREATE_INFO_NV;
-        const void*                      pNext              = nullptr;
-        VkRayTracingShaderGroupTypeNV    type               = VK_RAY_TRACING_SHADER_GROUP_TYPE_GENERAL_NV;
-        uint32_t                         generalShader      = VK_SHADER_UNUSED_NV;
-        uint32_t                         closestHitShader   = VK_SHADER_UNUSED_NV;
-        uint32_t                         anyHitShader       = VK_SHADER_UNUSED_NV;
-        uint32_t                         intersectionShader = VK_SHADER_UNUSED_NV;
-
-        STRUCT_OPERATORS(VkRayTracingShaderGroupCreateInfoNV)
-        VK_HPP_STRUCT_OPERATORS(VkRayTracingShaderGroupCreateInfoNV,vk::RayTracingShaderGroupCreateInfoNV)
-    } VkRayTracingShaderGroupCreateInfoNV;
-
-    //
-    typedef struct VkRayTracingPipelineCreateInfoNV {
-        VkStructureType                               sType                 = VK_STRUCTURE_TYPE_RAY_TRACING_PIPELINE_CREATE_INFO_NV;
-        const void*                                   pNext                 = nullptr;
-        FLAGS(VkPipelineCreate)                       flags                 = VsDefaultPipelineFlags; // TODO: FLAGS
-        uint32_t                                      stageCount            = 1u;
-        const VkPipelineShaderStageCreateInfo*        pStages               = nullptr;
-        uint32_t                                      groupCount            = 1u;
-        const VkRayTracingShaderGroupCreateInfoNV*    pGroups               = nullptr;
-        uint32_t                                      maxRecursionDepth     = 1u;
-        VkPipelineLayout                              layout                = VK_NULL_HANDLE;
-        VkPipeline                                    basePipelineHandle    = VK_NULL_HANDLE;
-        int32_t                                       basePipelineIndex     = 0;
-
-        VkRayTracingPipelineCreateInfoNV& setStages(const std::vector<VkPipelineShaderStageCreateInfo>& V = {}) { pStages = V.data(); stageCount = static_cast<uint32_t>(V.size()); return *this; };
-        VkRayTracingPipelineCreateInfoNV& setGroups(const std::vector<VkRayTracingShaderGroupCreateInfoNV>& V = {}) { pGroups = V.data(); groupCount = static_cast<uint32_t>(V.size()); return *this; };
-
-        STRUCT_OPERATORS(VkRayTracingPipelineCreateInfoNV)
-        VK_HPP_STRUCT_OPERATORS(VkRayTracingPipelineCreateInfoNV,vk::RayTracingPipelineCreateInfoNV)
-    } VkRayTracingPipelineCreateInfoNV;
-
 
 
     //
@@ -923,114 +874,6 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
     } VkFramebufferCreateInfo;
 
     // 
-    typedef struct VkAccelerationStructureMemoryRequirementsInfoNV {
-        VkStructureType                                    sType                    = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_MEMORY_REQUIREMENTS_INFO_NV;
-        const void*                                        pNext                    = nullptr;
-        VkAccelerationStructureMemoryRequirementsTypeNV    type                     = VK_ACCELERATION_STRUCTURE_MEMORY_REQUIREMENTS_TYPE_OBJECT_NV;
-        VkAccelerationStructureNV                          accelerationStructure    = VK_NULL_HANDLE;
-
-        STRUCT_OPERATORS(VkAccelerationStructureMemoryRequirementsInfoNV)
-        VK_HPP_STRUCT_OPERATORS(VkAccelerationStructureMemoryRequirementsInfoNV,vk::AccelerationStructureMemoryRequirementsInfoNV)
-    } VkAccelerationStructureMemoryRequirementsInfoNV;
-
-    // 
-    typedef struct VkGeometryAABBNV {
-        VkStructureType    sType    = VK_STRUCTURE_TYPE_GEOMETRY_AABB_NV;
-        const void*        pNext    = nullptr;
-        VkBuffer           aabbData = VK_NULL_HANDLE;
-        uint32_t           numAABBs = 0u;
-        uint32_t           stride   = 24u;
-        VkDeviceSize       offset   = 0u;
-
-        STRUCT_OPERATORS(VkGeometryAABBNV)
-        VK_HPP_STRUCT_OPERATORS(VkGeometryAABBNV,vk::GeometryAABBNV)
-    } VkGeometryAABBNV;
-
-    // 
-    typedef struct VkGeometryTrianglesNV {
-        VkStructureType    sType            = VK_STRUCTURE_TYPE_GEOMETRY_TRIANGLES_NV;
-        const void*        pNext            = nullptr;
-        VkBuffer           vertexData       = VK_NULL_HANDLE;
-        VkDeviceSize       vertexOffset     = 0u;
-        uint32_t           vertexCount      = 1u;
-        VkDeviceSize       vertexStride     = 16u;
-        VkFormat           vertexFormat     = VK_FORMAT_R32G32B32_SFLOAT;
-        VkBuffer           indexData        = VK_NULL_HANDLE;
-        VkDeviceSize       indexOffset      = 0u;
-        uint32_t           indexCount       = 0u;
-        VkIndexType        indexType        = VK_INDEX_TYPE_NONE_NV;
-        VkBuffer           transformData    = VK_NULL_HANDLE;
-        VkDeviceSize       transformOffset  = 0u;
-
-        STRUCT_OPERATORS(VkGeometryTrianglesNV)
-        VK_HPP_STRUCT_OPERATORS(VkGeometryTrianglesNV,vk::GeometryTrianglesNV)
-    } VkGeometryTrianglesNV;
-
-    // 
-    typedef struct VkGeometryDataNV {
-        VkGeometryTrianglesNV    triangles = {};
-        VkGeometryAABBNV         aabbs     = {};
-
-        STRUCT_OPERATORS(VkGeometryDataNV)
-        VK_HPP_STRUCT_OPERATORS(VkGeometryDataNV,vk::GeometryDataNV)
-    } VkGeometryDataNV;
-
-    // 
-    typedef struct VkGeometryNV {
-        VkStructureType      sType        = VK_STRUCTURE_TYPE_GEOMETRY_NV;
-        const void*          pNext        = nullptr;
-        VkGeometryTypeNV     geometryType = VK_GEOMETRY_TYPE_TRIANGLES_NV;
-        VkGeometryDataNV     geometry     = {};
-        FLAGF(VkGeometry,NV) flags        = VsDefaultGeometryFlags;
-
-        STRUCT_OPERATORS(VkGeometryNV)
-        VK_HPP_STRUCT_OPERATORS(VkGeometryNV,vk::GeometryNV)
-    } VkGeometryNV;
-
-    // 
-    typedef struct VkAccelerationStructureInfoNV {
-        VkStructureType                        sType         = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_INFO_NV;
-        const void*                            pNext         = nullptr;
-        VkAccelerationStructureTypeNV          type          = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_NV;
-        FLAGF(VkBuildAccelerationStructure,NV) flags         = VsDefaultBuildAccelerationStructureFlags;
-        uint32_t                               instanceCount = 0u;
-        uint32_t                               geometryCount = 0u;
-        const VkGeometryNV*                    pGeometries   = nullptr;
-
-        VkAccelerationStructureInfoNV& setGeometries(const std::vector<VkGeometryNV>& V = {}) { pGeometries = V.data(); geometryCount = static_cast<uint32_t>(V.size()); return *this; };
-
-        STRUCT_OPERATORS(VkAccelerationStructureInfoNV)
-        VK_HPP_STRUCT_OPERATORS(VkAccelerationStructureInfoNV,vk::AccelerationStructureInfoNV)
-    } VkAccelerationStructureInfoNV;
-
-    // 
-    typedef struct VkAccelerationStructureCreateInfoNV {
-        VkStructureType                  sType           = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_CREATE_INFO_NV;
-        const void*                      pNext           = nullptr;
-        VkDeviceSize                     compactedSize   = 0u;
-        VkAccelerationStructureInfoNV    info            = {};
-
-        STRUCT_OPERATORS(VkAccelerationStructureCreateInfoNV)
-        VK_HPP_STRUCT_OPERATORS(VkAccelerationStructureCreateInfoNV,vk::AccelerationStructureCreateInfoNV)
-    } VkAccelerationStructureCreateInfoNV;
-
-    // 
-    typedef struct VkBindAccelerationStructureMemoryInfoNV {
-        VkStructureType              sType                  = VK_STRUCTURE_TYPE_BIND_ACCELERATION_STRUCTURE_MEMORY_INFO_NV;
-        const void*                  pNext                  = nullptr;
-        VkAccelerationStructureNV    accelerationStructure  = VK_NULL_HANDLE;
-        VkDeviceMemory               memory                 = VK_NULL_HANDLE;
-        VkDeviceSize                 memoryOffset           = 0ull;
-        uint32_t                     deviceIndexCount       = 0u;
-        const uint32_t*              pDeviceIndices         = nullptr;
-
-        VkBindAccelerationStructureMemoryInfoNV& setDeviceIndices(const std::vector<uint32_t>& V = {}) { pDeviceIndices = V.data(); deviceIndexCount = static_cast<uint32_t>(V.size()); return *this; };
-
-        STRUCT_OPERATORS(VkBindAccelerationStructureMemoryInfoNV)
-        VK_HPP_STRUCT_OPERATORS(VkBindAccelerationStructureMemoryInfoNV,vk::BindAccelerationStructureMemoryInfoNV)
-    } VkBindAccelerationStructureMemoryInfoNV;
-
-    // 
     typedef struct VkMemoryBarrier {
         VkStructureType     sType       = VK_STRUCTURE_TYPE_MEMORY_BARRIER;
         const void*         pNext       = nullptr;
@@ -1181,7 +1024,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         VkDeviceOrHostAddressConstKHR    vertexData     = {};
         VkDeviceSize                     vertexStride   = 16u;
         uint32_t                         maxVertex      = 0u;
-        VkIndexType                      indexType      = VK_INDEX_TYPE_NONE_NV;
+        VkIndexType                      indexType      = VK_INDEX_TYPE_NONE_KHR;
         VkDeviceOrHostAddressConstKHR    indexData      = {};
         VkDeviceOrHostAddressConstKHR    transformData  = {};
 
@@ -1248,18 +1091,16 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         VkAccelerationStructureGeometryKHR& operator=(const VkAccelerationStructureGeometryAabbsDataKHR& aabbs) { this->geometryType = VK_GEOMETRY_TYPE_AABBS_KHR; this->geometry.aabbs = aabbs; return *this; };
 
         // 
-        operator VkAccelerationStructureGeometryTrianglesDataKHR& () { return geometry.triangles; };
-        operator VkAccelerationStructureGeometryInstancesDataKHR& () { return geometry.instances; };
-        operator VkAccelerationStructureGeometryAabbsDataKHR& () { return geometry.aabbs; };
-
-        // 
-        operator const VkAccelerationStructureGeometryTrianglesDataKHR& () const { return geometry.triangles; };
-        operator const VkAccelerationStructureGeometryInstancesDataKHR& () const { return geometry.instances; };
-        operator const VkAccelerationStructureGeometryAabbsDataKHR& () const { return geometry.aabbs; };
-
-        // 
         operator VkAccelerationStructureGeometryDataKHR& () { return geometry; };
+        operator VkAccelerationStructureGeometryTrianglesDataKHR& () { return geometry; };
+        operator VkAccelerationStructureGeometryInstancesDataKHR& () { return geometry; };
+        operator VkAccelerationStructureGeometryAabbsDataKHR& () { return geometry; };
+
+        // 
         operator const VkAccelerationStructureGeometryDataKHR& () const { return geometry; };
+        operator const VkAccelerationStructureGeometryTrianglesDataKHR& () const { return geometry; };
+        operator const VkAccelerationStructureGeometryInstancesDataKHR& () const { return geometry; };
+        operator const VkAccelerationStructureGeometryAabbsDataKHR& () const { return geometry; };
 
         // 
         STRUCT_OPERATORS(VkAccelerationStructureGeometryKHR)
@@ -1301,7 +1142,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         VK_HPP_STRUCT_OPERATORS(VkAccelerationStructureBuildGeometryInfoKHR, vk::AccelerationStructureBuildGeometryInfoKHR)
     } VkAccelerationStructureBuildGeometryInfoKHR;
 
-    // 
+    // TODO: VkDescriptorBufferInfo getter and acceptor
     typedef struct VkAccelerationStructureCreateInfoKHR {
         VkStructureType                          sType          = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_CREATE_INFO_KHR;
         const void*                              pNext          = nullptr;
@@ -1918,7 +1759,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         uint24_t customId = 0u;
         uint8_t mask = 0xFFu;
         uint24_t instanceOffset = 0u;
-        uint8_t flags = VK_GEOMETRY_INSTANCE_TRIANGLE_CULL_DISABLE_BIT_NV;
+        FLAGF(VkGeometryInstance, KHR) flags = { .eTriangleFacingCullDisable = 1 };
 
         //uint24_t instanceId = 0u;
         //uint8_t mask = 0xFF;

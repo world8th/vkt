@@ -292,9 +292,6 @@ namespace vkh {
     };
 
     // 
-    using VkBuildAccelerationStructureFlagsNV = VkBuildAccelerationStructureFlagsKHR;
-
-    // 
     struct VkGeometryFlagsKHR { ::VkFlags
         eOpaque:1,
         eNoDuplicateAnyHitInvocation:1;
@@ -302,9 +299,6 @@ namespace vkh {
         OPERATORS(VkGeometryFlagsKHR, ::VkGeometryFlagBitsKHR, ::VkFlags)
         VK_HPP_OPERATORS(VkGeometryFlagsKHR,vk::GeometryFlagsKHR,vk::GeometryFlagBitsKHR)
     };
-
-    // 
-    using VkGeometryFlagsNV = VkGeometryFlagsKHR;
 
     // 
     struct VkQueueFlags { ::VkFlags
@@ -529,14 +523,14 @@ namespace vkh {
     
     // Extras
 #pragma pack(push, 1)
-    struct VkGeometryInstanceFlagsNV { uint8_t
-        eTriangleCullDisable:1,
+    struct VkGeometryInstanceFlagsKHR { uint8_t
+        eTriangleFacingCullDisable:1,
         eTriangleFrontCounterclockwise:1,
         eForceOpaque:1,
         eForceNoOpaque:1;
 
-        OPERATORS(VkGeometryInstanceFlagsNV, ::VkGeometryInstanceFlagBitsNV, ::uint8_t)
-        VK_HPP_OPERATORS(VkGeometryInstanceFlagsNV,vk::GeometryInstanceFlagsNV,vk::GeometryInstanceFlagBitsNV)
+        OPERATORS(VkGeometryInstanceFlagsKHR, ::VkGeometryInstanceFlagBitsKHR, ::uint8_t)
+        VK_HPP_OPERATORS(VkGeometryInstanceFlagsKHR,vk::GeometryInstanceFlagsKHR,vk::GeometryInstanceFlagBitsKHR)
     };
 #pragma pack(pop)
 
