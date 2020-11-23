@@ -5,9 +5,30 @@ Planned to beat world record as most perfect and most long-time development prod
 Writing for C++20 prior...
 
 
+## Gen 4 announce
+
+I already made dedicated part of gen 4, which contain device, queue and instance. 
+
+Planned:
+- Refactor memory managment
+- Refactor vector and image
+- Add samplers support
+- Add acceleration structure support
+- Add pipelines support (VKh already have helpers for provisional extensions)
+
+
+## VKh 2 announce
+
+Planned:
+- Vulkan-HPP support
+- More C++20 support
+- More utils and helpers
+- Final ray tracing extensions support
+
+
 ## In-Use
 
-- [ValerA](https://github.com/helixd2s/ValerA) - (WIP) Ray Tracing Library and Demo
+- [Incavery](https://github.com/helixd2s/Incavery) - (Planned) final ray tracing engine, third generation...
 - [My Discord](https://discord.gg/NqjBJsG), but currently we have no focus for them... 
 - [My Puzzle](https://vk.cc/afiR3v) for psychologists, psychoanalysts, psychotherapists and students ...
 
