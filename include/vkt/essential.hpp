@@ -83,7 +83,7 @@ namespace vkt {
     };
 
     // create shader module 
-    static inline auto makePipelineStageInfo(vkt::Device device, const std::vector<uint32_t>& code, vkt::uni_arg<VkShaderStageFlagBits> stage = VK_SHADER_STAGE_COMPUTE_BIT, vkt::uni_arg<const char*> entry = "main") {
+    static inline auto makePipelineStageInfo(vkt::Device device, const std::vector<uint32_t>& code, FLAGS(VkShaderStage) stage = VK_SHADER_STAGE_COMPUTE_BIT, vkt::uni_arg<const char*> entry = "main") {
         vkh::VkPipelineShaderStageCreateInfo spi = {};
         createShaderModuleIntrusive(device, code, spi.module);
         spi.pName = entry;
@@ -93,7 +93,7 @@ namespace vkt {
     };
 
     // create shader module 
-    static inline auto makePipelineStageInfoWithoutModule(vkt::Device device, vkt::uni_arg<VkShaderStageFlagBits> stage = VK_SHADER_STAGE_COMPUTE_BIT, vkt::uni_arg<const char*> entry = "main") {
+    static inline auto makePipelineStageInfoWithoutModule(vkt::Device device, FLAGS(VkShaderStage) stage = VK_SHADER_STAGE_COMPUTE_BIT, vkt::uni_arg<const char*> entry = "main") {
         vkh::VkPipelineShaderStageCreateInfo spi = {};
         spi.pName = entry;
         spi.stage = stage;
@@ -182,7 +182,7 @@ namespace vkt {
     };
 
     // submit command (with async wait)
-    static inline auto submitUtilize(vkt::Device device, vkt::uni_arg<VkQueue> queue, vkt::uni_arg<VkCommandPool> cmdPool, std::vector<VkCommandBuffer> cmds, vkt::uni_arg<vkh::VkSubmitInfo> smbi = vkh::VkSubmitInfo{}) {
+    static inline auto submitUtilize(vkt::Device device, vkt::uni_arg<VkQueue> queue, vkt::uni_arg<VkCommandPool> cmdPool, std::vector<VkCommandBuffer> cmds, vkt::uni_arg<vkh::VkSubmitInfo> smbi = vkh::VkSubmitInfo{}, vkt::uni_arg<bool> utilize = true) {
         //
         if (cmds.size() > 0) {
             smbi->commandBufferCount = static_cast<uint32_t>(cmds.size());
@@ -194,15 +194,17 @@ namespace vkt {
         vkh::handleVk(device->QueueSubmit(queue, 1u, *smbi, fence));
 
         // 
-        return std::async(std::launch::async | std::launch::deferred, [](vkt::Device device, vkt::uni_arg<VkQueue> queue, vkt::uni_arg<VkCommandPool> cmdPool, vkt::uni_arg<VkFence> fence, std::vector<VkCommandBuffer> cmds, vkt::uni_arg<vkh::VkSubmitInfo> smbi = vkh::VkSubmitInfo{}) {
+        return std::async(std::launch::async | std::launch::deferred, [](vkt::Device device, vkt::uni_arg<VkQueue> queue, vkt::uni_arg<VkCommandPool> cmdPool, vkt::uni_arg<VkFence> fence, std::vector<VkCommandBuffer> cmds, vkt::uni_arg<vkh::VkSubmitInfo> smbi = vkh::VkSubmitInfo{}, vkt::uni_arg<bool> utilize = true) {
             if (cmds.size() > 0) {
                 smbi->commandBufferCount = static_cast<uint32_t>(cmds.size());
                 smbi->pCommandBuffers = (VkCommandBuffer*)cmds.data();
             };
             vkh::handleVk(device->WaitForFences(1u, fence, true, 30ull * 1000ull * 1000ull * 1000ull));
             device->DestroyFence(fence, nullptr);
-            device->FreeCommandBuffers(cmdPool, smbi->commandBufferCount, smbi->pCommandBuffers);
-        }, device, queue, cmdPool, fence, cmds, smbi);
+            if (*utilize) {
+                device->FreeCommandBuffers(cmdPool, smbi->commandBufferCount, smbi->pCommandBuffers);
+            };
+        }, device, queue, cmdPool, fence, cmds, smbi, utilize);
     };
 
     // submit command (with async wait)
@@ -231,12 +233,9 @@ namespace vkt {
 
     // submit command (with async wait)
     // TODO: return VkResult
-    // BROKEN! 
-    //static inline auto submitCmdAsync(vkt::Device device, vkt::uni_arg<VkQueue> queue, std::vector<VkCommandBuffer> cmds, vkt::uni_arg<vkh::VkSubmitInfo> smbi = vkh::VkSubmitInfo{}) {
-    //    return std::async(std::launch::async | std::launch::deferred, [=]() {
-    //        return submitCmd(device, queue, cmds, smbi);
-    //    });
-    //};
+    static inline auto submitCmdAsync(vkt::Device device, vkt::uni_arg<VkQueue> queue, std::vector<VkCommandBuffer> cmds, vkt::uni_arg<vkh::VkSubmitInfo> smbi = vkh::VkSubmitInfo{}) {
+        return submitUtilize(device, queue, cmdPool, cmds, smbi, false);
+    };
 
     // once submit command buffer
     // TODO: return VkResult
@@ -245,26 +244,38 @@ namespace vkt {
         return submitUtilize(device, queue, cmdPool, { cmdBuf }, smbi);
     };
 
+#ifdef VKT_WIN32_DETECTED
+#ifndef CreateSemaphore
+#ifdef UNICODE
+#define CreateSemaphore CreateSemaphoreW
+#else
+#define CreateSemaphore CreateSemaphoreA
+#endif
+#endif
+#endif
+
     // Dedicated Semaphore Creator
     static inline void createSemaphore(vkt::Device device, VkSemaphore* vkSemaphore, unsigned* unitPtr = nullptr, const void* pNext = nullptr, const bool GL = false) {
-        const auto exportable = vkh::VkExportSemaphoreCreateInfo{ .pNext = pNext, .handleTypes = vkh::VkExternalSemaphoreHandleTypeFlags{ .eOpaqueWin32 = 1} };
+        const auto exportable = vkh::VkExportSemaphoreCreateInfo{ .pNext = pNext, .handleTypes = vkh::VkExternalSemaphoreHandleTypeFlags{ 
+#ifdef VKT_WIN32_DETECTED
+            .eOpaqueWin32 = 1
+#else
+            .eOpaqueFd = 1
+#endif
+        } };
+        vkh::handleVk(device->CreateSemaphore(vkh::VkSemaphoreCreateInfo{ .pNext = &exportable }, nullptr, vkSemaphore));
 
 #ifdef VKT_WIN32_DETECTED
         HANDLE handle{ INVALID_HANDLE_VALUE };
-#ifdef UNICODE
-        vkh::handleVk(device->CreateSemaphoreW(vkh::VkSemaphoreCreateInfo{ .pNext = &exportable }, nullptr, vkSemaphore));
-#else
-        vkh::handleVk(device->CreateSemaphoreA(vkh::VkSemaphoreCreateInfo{ .pNext = &exportable }, nullptr, vkSemaphore));
-#endif
         vkh::handleVk(device->GetSemaphoreWin32HandleKHR(vkh::VkSemaphoreGetWin32HandleInfoKHR{ .semaphore = *vkSemaphore, .handleType = VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_WIN32_BIT }, &handle));
-#else
-        vkh::handleVk(device->CreateSemaphore(vkh::VkSemaphoreCreateInfo{ .pNext = &exportable }, nullptr, vkSemaphore));
 #endif
-        if (unitPtr) {
+
+        if (unitPtr) 
+        {
 #ifdef VKT_WIN32_DETECTED
-#ifdef ENABLE_OPTIX_DENOISE
+#ifdef VKT_CUDA_SUPPORT
 #ifdef VKT_OPENGL_INTEROP
-            if (GL)
+            if (!GL)
 #endif
             {
                 cudaExternalSemaphoreHandleDesc externalSemaphoreHandleDesc = {};
@@ -276,7 +287,7 @@ namespace vkt {
             };
 #endif
 #ifdef VKT_OPENGL_INTEROP
-#ifdef ENABLE_OPTIX_DENOISE
+#ifdef VKT_CUDA_SUPPORT
             if (GL)
 #endif
             {
@@ -290,59 +301,5 @@ namespace vkt {
         };
         //glCheckError();
     };
-
-
-    #ifdef TBA_VULKAN_HPP_DEPRECATED
-    // add dispatch in command buffer (with default pipeline barrier)
-    static inline auto cmdDispatch(const vkt::uni_arg<VkCommandBuffer>& cmd, const vkt::uni_arg<VkPipeline>& pipeline, const vkt::uni_arg<uint32_t>& x = 1u, const vkt::uni_arg<uint32_t>& y = 1u, const vkt::uni_arg<uint32_t>& z = 1u, const vkt::uni_arg<bool>& barrier = true) {
-        cmd->bindPipeline(VkPipelineBindPoint::eCompute, pipeline);
-        cmd->dispatch(x, y, z);
-        if (barrier) {
-            commandBarrier(cmd); // put shader barrier
-        }
-        return VkResult::eSuccess;
-    };
-
-    // low level copy command between (prefer for host and device)
-    static inline auto cmdCopyBufferL(const vkt::uni_arg<VkCommandBuffer>& cmd, const vkt::uni_arg<VkBuffer>& srcBuffer, const vkt::uni_arg<VkBuffer>& dstBuffer, const std::vector<VkBufferCopy>& regions, std::function<void(VkCommandBuffer)> barrierFn = commandBarrier) {
-        if (srcBuffer && dstBuffer && regions.size() > 0) {
-            VkCommandBuffer(cmd).copyBuffer(srcBuffer, dstBuffer, regions); barrierFn(cmd); // put copy barrier
-        };
-        return VkResult::eSuccess;
-    };
-
-
-    // short data set with command buffer (alike push constant)
-    template<class T>
-    static inline auto cmdUpdateBuffer(const vkt::uni_arg<VkCommandBuffer>& cmd, const vkt::uni_arg<VkBuffer>& dstBuffer, const vkt::uni_arg<VkDeviceSize>& offset, const std::vector<T>& data) {
-        VkCommandBuffer(cmd).updateBuffer(dstBuffer, offset, data);
-        //updateCommandBarrier(cmd);
-        return VkResult::eSuccess;
-    };
-
-    // short data set with command buffer (alike push constant)
-    template<class T>
-    static inline auto cmdUpdateBuffer(const vkt::uni_arg<VkCommandBuffer>& cmd, const vkt::uni_arg<VkBuffer>& dstBuffer, const vkt::uni_arg<VkDeviceSize>& offset, const vkt::uni_arg<VkDeviceSize>& size, const vkt::uni_arg<T*> data = nullptr) {
-        VkCommandBuffer(cmd).updateBuffer(dstBuffer, offset, size, data);
-        //updateCommandBarrier(cmd);
-        return VkResult::eSuccess;
-    };
-
-    // template function for fill buffer by constant value
-    // use for create repeat variant
-    template<uint32_t Rv>
-    static inline auto cmdFillBuffer(const vkt::uni_arg<VkCommandBuffer>& cmd, const vkt::uni_arg<VkBuffer>& dstBuffer, const vkt::uni_arg<VkDeviceSize>& size = 0xFFFFFFFFull, const vkt::uni_arg<VkDeviceSize>& offset = 0ull) {
-        VkCommandBuffer(cmd).fillBuffer(VkBuffer(dstBuffer), offset, size, Rv);
-        //updateCommandBarrier(cmd);
-        return VkResult::eSuccess;
-    };
-
-    void debugLabel(const VkCommandBuffer& buildCommand, const std::string& labelName = "", const VkDispatchLoaderDynamic& dispatch = {}) {
-#ifdef VKT_ENABLE_DEBUG_MARK
-        buildCommand.insertDebugUtilsLabelEXT(VkDebugUtilsLabelEXT().setColor({ 1.f,0.75,0.25f }).setPLabelName(labelName.c_str()), dispatch);
-        buildCommand.setCheckpointNV(labelName.c_str(), dispatch);
-#endif
-    };
-    #endif
 
 };

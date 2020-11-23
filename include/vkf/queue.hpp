@@ -44,7 +44,12 @@ namespace vkf {
 
             // 
             return this->queue;
-        }
+        };
+
+        // 
+        virtual VkCommandBuffer createCommandBuffer(vkt::uni_arg<bool> secondary = false, vkt::uni_arg<bool> once = false){
+            return vkt::createCommandBuffer(*device, commandPool, secondary, once);
+        };
 
         // 
         virtual const Queue* submitUtilize(vkt::uni_arg<VkCommandBuffer> cmds, vkt::uni_arg<vkh::VkSubmitInfo> smbi = vkh::VkSubmitInfo{}) const {

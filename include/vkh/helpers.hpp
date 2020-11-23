@@ -231,7 +231,7 @@ namespace vkh {
     };
 
 
-#ifdef VK_ENABLE_BETA_EXTENSIONS
+#if defined(VK_ENABLE_BETA_EXTENSIONS) && defined(VKT_ENABLE_LEGACY_RAY_TRACING)
     // TODO: REMOVE CODE TAFTOLOGY
     class VsRayTracingPipelineCreateInfoHelper { 
     protected: 
@@ -341,31 +341,38 @@ namespace vkh {
         inline operator vk::RayTracingPipelineCreateInfoKHR& () { return format(); };
 #endif
     };
+#else
+// TODO: Final Ray Tracing Extensions
+    
 #endif
 
     // 
     template<class T = uint8_t>
     struct VsDescriptorHandle { //using T = T;
-        VkDescriptorUpdateTemplateEntry entry_t = {};
+        uint32_t count = 0u;
         std::shared_ptr<std::vector<uint8_t>> V_t = {};
         uintptr_t field_t = 0u; // Byte Based
         size_t stride_t = sizeof(T);
 
         // 
         template<class C = T>
-          VsDescriptorHandle(const VsDescriptorHandle<C>& handle) : entry_t(handle.entry_t), field_t(handle.field_t), stride_t(handle.stride_t), V_t(handle.V_t) {};
-          VsDescriptorHandle(const VkDescriptorUpdateTemplateEntry& entry_t, const uintptr_t& field_t = 0ull, const std::shared_ptr<std::vector<uint8_t>>& V_t = {}, const size_t stride_t = sizeof(T)) : V_t(V_t), entry_t(entry_t), field_t(field_t), stride_t(stride_t) {};
+          VsDescriptorHandle(const VsDescriptorHandle<C>& handle) : count(handle.count), field_t(handle.field_t), stride_t(handle.stride_t), V_t(handle.V_t) {};
+          VsDescriptorHandle(const uint32_t& count, const uintptr_t& field_t = 0ull, const std::shared_ptr<std::vector<uint8_t>>& V_t = {}, const size_t stride_t = sizeof(T)) : V_t(V_t), count(count), field_t(field_t), stride_t(stride_t) {};
          ~VsDescriptorHandle() {  };
 
         // any buffers and images can `write` into types
-        template<class M = T> inline VsDescriptorHandle<M> offset(const uint32_t& idx = 0u) { return VsDescriptorHandle<M>(entry_t, stride_t*std::min(idx,entry_t.descriptorCount)+field_t, V_t); };
-        template<class M = T> inline const VsDescriptorHandle<M> offset(const uint32_t& idx = 0u) const { return VsDescriptorHandle<M>(entry_t, stride_t*std::min(idx,entry_t.descriptorCount)+field_t, V_t); };
-        inline const uint32_t& size() const { return entry_t.descriptorCount; };
+        inline VsDescriptorHandle<M> offset(const uint32_t& idx = 0u) { return VsDescriptorHandle<M>(count, stride_t*idx+field_t, V_t); };
+        inline const VsDescriptorHandle<M> offset(const uint32_t& idx = 0u) const { return VsDescriptorHandle<M>(count, stride_t*idx+field_t, V_t); };
+        template<class M> inline VsDescriptorHandle<M> offset(const uint32_t& idx = 0u) { return VsDescriptorHandle<M>(count, sizeof(M)*idx+field_t, V_t); };
+        template<class M> inline const VsDescriptorHandle<M> offset(const uint32_t& idx = 0u) const { return VsDescriptorHandle<M>(count, sizeof(M)*idx+field_t, V_t); };
+        inline const uint32_t& size() const { return count; };
+
+        // new accessor operator
+        inline VsDescriptorHandle<T> operator[](const uint32_t& idx) { return this->offset(idx); };
+        inline VsDescriptorHandle<T> operator[](const uint32_t& idx) const { return this->offset(idx); };
 
         // 
-        template<class C = T> inline VsDescriptorHandle<T>& operator=(const VsDescriptorHandle<C>& d) { stride_t = d.stride_t, entry_t = d.entry_t, field_t = d.field_t, V_t = d.V_t; return *this; };
-        //template<class C = T> inline VsDescriptorHandle<T>& operator=(const C& d) { *reinterpret_cast<C*>(&(*V_t)[this->field_t]) = d; return *this; };
-        //inline VsDescriptorHandle<T>& operator=(const T& d) { *reinterpret_cast<T*>(&(*V_t)[field_t]) = d; return *this; };
+        template<class C = T> inline VsDescriptorHandle<T>& operator=(const VsDescriptorHandle<C>& d) { stride_t = d.stride_t, count = d.count, field_t = d.field_t, V_t = d.V_t; return *this; };
         inline VsDescriptorHandle<T>& operator=(const T& d) { memcpy(&(*V_t)[field_t],&d,sizeof(T)); return *this; }; // Use MEMCPY method
 
         //
@@ -381,13 +388,13 @@ namespace vkh {
         inline const T& operator*()  const { return (const T&)  (*V_t)[field_t]; };
         inline const T* operator&()  const { return (const T*)(&(*V_t)[field_t]); };
         inline const T* operator->() const { return (const T*)(&(*V_t)[field_t]); };
-        
+
         // 
         inline operator T& () { return *reinterpret_cast<T*>((*V_t)[field_t]); };
         inline operator const T& () const { return *reinterpret_cast<T*>((*V_t)[field_t]); };
     };
 
-    // TODO: REMOVE CODE TAFTOLOGY
+    // 
     class VsDescriptorSetCreateInfoHelper { public: uint32_t flags = 0u; using T = uintptr_t; //
         inline  VsDescriptorSetCreateInfoHelper& reset() {
             heap->clear(); heap->resize(0);
@@ -618,7 +625,7 @@ namespace vkh {
         std::vector<::VkDescriptorBindingFlags> binding_flags = {};
     };
 
-    // TODO: REMOVE CODE TAFTOLOGY
+    // TODO: Update for RenderPass v2
     class VsRenderPassCreateInfoHelper { public: 
         VsRenderPassCreateInfoHelper(const VkRenderPassCreateInfo& info = {}) : vk_info(info) {
             
@@ -730,6 +737,7 @@ namespace vkh {
         VkPipelineDepthStencilStateCreateInfo depthStencilState = {};
         VkPipelineColorBlendStateCreateInfo colorBlendState = {};
         VkPipelineDynamicStateCreateInfo dynamicState = {};
+        VkPipelineRasterizationConservativeStateCreateInfoEXT conservativeRasterization = {};
 
         // 
         std::vector<VkDynamicState> dynamicStates = {};
@@ -772,6 +780,7 @@ namespace vkh {
             graphicsPipelineCreateInfo.pDepthStencilState = &depthStencilState;
             graphicsPipelineCreateInfo.pColorBlendState = &colorBlendState;
             graphicsPipelineCreateInfo.pDynamicState = &dynamicState;
+            rasterizationState.pNext = &conservativeRasterization;
             dynamicState.setDynamicStates(dynamicStates);
             colorBlendState.setAttachments(colorBlendAttachmentStates);
             vertexInputState.setVertexAttributeDescriptions(vertexInputAttributeDescriptions);

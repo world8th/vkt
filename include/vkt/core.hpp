@@ -31,7 +31,7 @@
 
 // Currently Windows Only Supported
 #if (defined(_WIN32) || defined(__MINGW32__) || defined(_MSC_VER_) || defined(__MINGW64__) || defined(WIN32) || defined(__WIN32) && !defined(__CYGWIN__))
-#define VKT_WIN32_DETECTED
+#define VKT_WIN32_DETECTED true
 #include <windows.h> // Fix HMODULE Type Error
 #define GLFW_EXPOSE_NATIVE_WIN32
 #define GLFW_EXPOSE_NATIVE_WGL
