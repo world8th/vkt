@@ -311,7 +311,8 @@ namespace vkh {
         };
 
         // official function (not template)
-        inline VsDescriptorHandle<>& pushDescription( const VkDescriptorUpdateTemplateEntry& entry = {} ) {
+        template<class T = uint8_t>
+        inline VsDescriptorHandle<T>& pushDescription( const VkDescriptorUpdateTemplateEntry& entry = {} ) {
             if (entry.descriptorType == VK_DESCRIPTOR_TYPE_STORAGE_BUFFER || entry.descriptorType == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER) {
                 return _push_description<VkDescriptorBufferInfo>(entry);
             } else
@@ -322,7 +323,7 @@ namespace vkh {
                 return _push_description<VkAccelerationStructureKHR>(entry);
             } else 
             if (entry.descriptorType == VK_DESCRIPTOR_TYPE_INLINE_UNIFORM_BLOCK_EXT) {
-                return _push_description<VkWriteDescriptorSetInlineUniformBlockEXT>(entry);
+                return _push_description<T>(entry);
             } else {
                 return _push_description<VkDescriptorImageInfo>(entry);
             };
@@ -400,7 +401,8 @@ namespace vkh {
                     writes[i].pNext = &writes_acs[i];
                 } else 
                 if (entry.descriptorType == VK_DESCRIPTOR_TYPE_INLINE_UNIFORM_BLOCK_EXT) { // Map Inline Uniform Blocks
-                    writes[i].pNext = heap->data()+pt0;
+                    writes[i].pNext = &writes_inline[i];
+                    writes_inline[i].pData = heap->data()+pt0;
                 } else 
                 { // Map Images, Samplers, Combinations...
                     writes[i].pImageInfo = reinterpret_cast<::VkDescriptorImageInfo*>(heap->data()+pt0);
@@ -419,6 +421,8 @@ namespace vkh {
     protected: template<class T = T> // 
         inline VsDescriptorHandle<T>& _push_description( VkDescriptorUpdateTemplateEntry entry ) { // Un-Safe API again
             const uintptr_t pt0 = heap->size(); entry.offset = pt0, entry.stride = sizeof(T);
+
+            // 
             heap->resize(pt0+sizeof(T)*entry.descriptorCount, 0u);
 
             // Default Values
@@ -432,7 +436,8 @@ namespace vkh {
                 *reinterpret_cast<VkAccelerationStructureKHR*>(heap->data()+pt0) = VK_NULL_HANDLE;
             } else 
             if (entry.descriptorType == VK_DESCRIPTOR_TYPE_INLINE_UNIFORM_BLOCK_EXT) {
-                *reinterpret_cast<VkWriteDescriptorSetInlineUniformBlockEXT*>(heap->data()+pt0) = VkWriteDescriptorSetInlineUniformBlockEXT{};
+                //*reinterpret_cast<VkWriteDescriptorSetInlineUniformBlockEXT*>(heap->data()+pt0) = VkWriteDescriptorSetInlineUniformBlockEXT{};
+                
             } else {
                 *reinterpret_cast<VkDescriptorImageInfo*>(heap->data()+pt0) = VkDescriptorImageInfo{};
             };
@@ -442,7 +447,7 @@ namespace vkh {
                 .dstSet = this->set,
                 .dstBinding = entry.dstBinding,
                 .dstArrayElement = entry.dstArrayElement,
-                .descriptorCount = entry.descriptorCount,
+                .descriptorCount = entry.descriptorType == VK_DESCRIPTOR_TYPE_INLINE_UNIFORM_BLOCK_EXT ? (sizeof(T)*entry.descriptorCount) : entry.descriptorCount,
                 .descriptorType = entry.descriptorType,
             });
             writes_acs.push_back(VkWriteDescriptorSetAccelerationStructureKHR{
@@ -455,6 +460,9 @@ namespace vkh {
                 .descriptorType = entry.descriptorType,
                 .offset = pt0,
                 .stride = sizeof(T)
+            });
+            writes_inline.push_back(vkh::VkWriteDescriptorSetInlineUniformBlockEXT{
+                .dataSize = sizeof(T)*entry.descriptorCount
             });
             return handles.back();
         };
@@ -470,6 +478,7 @@ namespace vkh {
         std::vector<VsDescriptorHandle<>> handles = {};
 
         // regular version
+        std::vector<VkWriteDescriptorSetInlineUniformBlockEXT> writes_inline = {};
         std::vector<VkWriteDescriptorSetAccelerationStructureKHR> writes_acs = {};
         std::vector<VkWriteDescriptorSet> writes = {};
     };

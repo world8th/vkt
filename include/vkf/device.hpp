@@ -258,7 +258,7 @@ namespace vkf {
 
             //
             vkh::VkDescriptorPoolInlineUniformBlockCreateInfoEXT inlineUniformPool = {
-                .maxInlineUniformBlockBindings = 256u
+                .maxInlineUniformBlockBindings = 32u
             };
 
             //
