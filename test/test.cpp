@@ -72,9 +72,11 @@ int main() {
     auto indexedf = vkh::VkDescriptorBindingFlags{ .eUpdateAfterBind = 1, .eUpdateUnusedWhilePending = 1, .ePartiallyBound = 1 };
     auto dflags = vkh::VkDescriptorSetLayoutCreateFlags{ .eUpdateAfterBindPool = 1 };
     std::vector<VkDescriptorSetLayout> layouts = {};
-    std::vector<VkDescriptorSet> descriptorSets = {};
     std::vector<vkh::VkPushConstantRange> ranges = { vkh::VkPushConstantRange{.stageFlags = pipusage, .offset = 0u, .size = 16u } };
     vkh::handleVk(device->dispatch->CreatePipelineLayout(vkh::VkPipelineLayoutCreateInfo{  }.setSetLayouts(layouts).setPushConstantRanges(ranges), nullptr, &pipelineLayout));
+
+    // TODO: Descriptor Sets
+    std::vector<VkDescriptorSet> descriptorSets = {};
 
 
     // 
