@@ -21,6 +21,8 @@ file(
     LIST_DIRECTORIES false
     "${_src_root_path}/*/*.hpp*"
     "${_src_root_path}/*/*.h*"
+    "${_src_root_path}/*.hpp*"
+    "${_src_root_path}/*.h*"
 )
 
 foreach(_source IN ITEMS ${_source_list})
