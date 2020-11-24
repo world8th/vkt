@@ -1,7 +1,7 @@
 #pragma once // #
 
 //#define VKT_CORE_USE_XVK
-#include <vkt3/core.hpp>
+#include <vkt/core.hpp>
 #include <vkh/structures.hpp>
 #include <string_view>
 #include <string>

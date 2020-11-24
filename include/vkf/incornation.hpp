@@ -33,13 +33,13 @@
 #endif
 
 // Force include for avoid GLAD problem...
-#include <vkt3/core.hpp>
-#include <vkt3/inline.hpp>
-#include <vkt3/vector.hpp>
-#include <vkt3/image.hpp>
+#include <vkt/core.hpp>
+#include <vkt/inline.hpp>
+#include <vkt/vector.hpp>
+#include <vkt/image.hpp>
 
 //
-#include <vkt3/essential.hpp>
+#include <vkt/essential.hpp>
 #include <vkh/helpers.hpp>
 
 namespace vkf {

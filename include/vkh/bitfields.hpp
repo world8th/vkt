@@ -1,6 +1,6 @@
 #pragma once // #
 
-#include <vkt3/core.hpp>
+#include <vkt/core.hpp>
 #include <glm/glm.hpp>
 
 // 
