@@ -27,9 +27,6 @@
     <Filter Include="Header Files\vkf">
       <UniqueIdentifier>{f49dba9f-7099-4df9-b7f9-d317503f04e9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\NewFilter1">
-      <UniqueIdentifier>{0d7e0929-18e6-4324-93fc-17df6334b8ef}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\vkt\include\vma\vk_mem_alloc.h">

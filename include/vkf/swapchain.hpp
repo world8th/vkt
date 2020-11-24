@@ -246,15 +246,17 @@ namespace vkf {
                 auto depuse = vkh::VkImageUsageFlags{ .eTransferDst = 1, .eSampled = 1, .eDepthStencilAttachment = 1 };
                 depuse.eDepthStencilAttachment = 1;
 
+                vkh::VkImageCreateInfo imageCreate = {};
+                imageCreate.format = surfaceFormats.depthFormat,
+                imageCreate.extent = vkh::VkExtent3D{ surfaceWindow.surfaceSize.width, surfaceWindow.surfaceSize.height, 1u },
+                imageCreate.usage = depuse;
+
+                vkh::VkImageViewCreateInfo imageViewCreate = {};
+                imageViewCreate.format = surfaceFormats.depthFormat,
+                imageViewCreate.subresourceRange = vkh::VkImageSubresourceRange{.aspectMask = aspect };
+
                 vkt::VmaMemoryInfo memInfo = {};
-                this->depthImage = vkt::ImageRegion(std::make_shared<vkt::VmaImageAllocation>(this->device->allocator, vkh::VkImageCreateInfo{
-                    .format = surfaceFormats.depthFormat,
-                    .extent = vkh::VkExtent3D{ surfaceWindow.surfaceSize.width, surfaceWindow.surfaceSize.height, 1u },
-                    .usage = depuse
-                }, memInfo), vkh::VkImageViewCreateInfo{
-                    .format = surfaceFormats.depthFormat,
-                    .subresourceRange = vkh::VkImageSubresourceRange{.aspectMask = aspect }
-                }, VK_IMAGE_LAYOUT_GENERAL);
+                this->depthImage = vkt::ImageRegion(std::make_shared<vkt::VmaImageAllocation>(this->device->allocator, imageCreate, memInfo), imageViewCreate, VK_IMAGE_LAYOUT_GENERAL);
 
                 vkh::handleVk(device->dispatch->CreateSampler(vkh::VkSamplerCreateInfo{
                     .magFilter = VK_FILTER_LINEAR,
@@ -275,14 +277,16 @@ namespace vkf {
                 // Image Views
                 auto flags = VkImageViewCreateFlags{};
                 auto aspect = vkh::VkImageAspectFlags{ .eColor = 1 };
-                vkh::handleVk(device->dispatch->CreateImageView(vkh::VkImageViewCreateInfo{
-                    .flags = {},
-                    .image = swapchainImages[i],
-                    .viewType = VK_IMAGE_VIEW_TYPE_2D,
-                    .format = surfaceFormats.colorFormat,
-                    .components = vkh::VkComponentMapping{},
-                    .subresourceRange = vkh::VkImageSubresourceRange{ aspect, 0, 1, 0, 1 }
-                }, nullptr, &views[0]));
+
+                auto imageViewCreate = vkh::VkImageViewCreateInfo{};
+                imageViewCreate.flags = {},
+                imageViewCreate.image = swapchainImages[i],
+                imageViewCreate.viewType = VK_IMAGE_VIEW_TYPE_2D,
+                imageViewCreate.format = surfaceFormats.colorFormat,
+                imageViewCreate.components = vkh::VkComponentMapping{},
+                imageViewCreate.subresourceRange = vkh::VkImageSubresourceRange{ aspect, 0, 1, 0, 1 };
+
+                vkh::handleVk(device->dispatch->CreateImageView(imageViewCreate, nullptr, &views[0]));
                 views[1] = this->depthImage.getImageView(); // depth view
 
                 // 

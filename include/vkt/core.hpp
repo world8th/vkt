@@ -218,13 +218,13 @@ namespace vkt {
             if (shared && (owner == NULL || owner == &r)) {
                 owner = new std::shared_ptr<T>(shared);
             };
-            return (shared ? &(*shared) : &r);
+            return (T*)((void*)(shared ? &(*shared) : &r));
         };
 
         // 
         virtual inline const T* get_ptr() const {
             const T& r = *regular;
-            return (shared ? &(*shared) : &r);
+            return (T*)((void*)(shared ? &(*shared) : &r));
         };
 
         // 
@@ -298,8 +298,8 @@ namespace vkt {
         virtual inline bool has() const { return this->has_value(); };
 
         // 
-        virtual inline T* ptr() { handle(has()); return &(*storage); };
-        virtual inline const T* ptr() const { handle(has()); return &(*storage); };
+        virtual inline T* ptr() { handle(has()); return (T*)((void*)(&(*storage))); };
+        virtual inline const T* ptr() const { handle(has()); return (T*)((void*)(&(*storage))); };
 
         //
         template<class M = T> inline M* ptr() { handle(has()); return &reinterpret_cast<M&>(this->ref()); };

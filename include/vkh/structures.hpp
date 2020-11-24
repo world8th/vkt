@@ -28,8 +28,8 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         inline const ::NAME* operator &() const { return reinterpret_cast<const ::NAME*>((const void*)this); }; \
         inline NAME& operator =( vkt::uni_arg<::NAME> info ) { memcpy(this, &(*info), sizeof(NAME)); return *this; };\
         inline NAME& operator =( vkt::uni_arg<NAME> info ) { memcpy(this, &(*info), sizeof(NAME)); return *this; }; \
-        inline NAME& also(const std::function<NAME&(NAME&)>& fn) { return fn(*this); };\
-        inline static NAME create(const std::function<NAME&(NAME&)>& fn = {}) { auto data = NAME{}; return (fn ? fn(data) : data); };
+        inline NAME also(const std::function<NAME&(NAME&)>& fn) { return reinterpret_cast<NAME&>(fn(reinterpret_cast<NAME&>(*this))); };\
+        inline static NAME create(const std::function<NAME&(NAME&)>& fn = {}) { auto data = NAME{}; return reinterpret_cast<NAME&>(fn ? fn(reinterpret_cast<NAME&>(data)) : reinterpret_cast<NAME&>(data)); };
 
 #ifdef VULKAN_HPP
     #define VK_HPP_STRUCT_OPERATORS(NAME,VKNAME)\

@@ -419,7 +419,7 @@ namespace vkh {
         inline VsDescriptorHandle<T>& _push_description( VkDescriptorUpdateTemplateEntry entry ) { // Un-Safe API again
             const uintptr_t pt0 = heap->size(); entry.offset = pt0, entry.stride = sizeof(T);
             heap->resize(pt0+sizeof(T)*entry.descriptorCount, 0u);
-            handles.push_back(VsDescriptorHandle<T>(entry, uintptr_t(pt0), heap));
+            handles.push_back(VsDescriptorHandle<T>(entry.descriptorCount, uintptr_t(pt0), heap));
             writes.push_back({
                 .dstSet = this->set,
                 .dstBinding = entry.dstBinding,

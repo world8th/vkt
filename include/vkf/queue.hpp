@@ -53,7 +53,8 @@ namespace vkf {
 
         // 
         virtual const Queue* submitUtilize(vkt::uni_arg<VkCommandBuffer> cmds, vkt::uni_arg<vkh::VkSubmitInfo> smbi = vkh::VkSubmitInfo{}) const {
-            return this->submitUtilize(std::vector<VkCommandBuffer>{ cmds }, smbi);
+            this->submitUtilize(std::vector<VkCommandBuffer>{ cmds }, smbi);
+            return this;
         };
 
         // 
