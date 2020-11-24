@@ -141,6 +141,20 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
     } VkViewport;
 
     // 
+    typedef struct VkAabbPositionsKHR {
+        float   minX = 10000.f;
+        float   minY = 10000.f;
+        float   minZ = 10000.f;
+        float   maxX = -10000.f;
+        float   maxY = -10000.f;
+        float   maxZ = -10000.f;
+
+        // 
+        STRUCT_OPERATORS(VkAabbPositionsKHR)
+        VK_HPP_STRUCT_OPERATORS(VkAabbPositionsKHR,vk::AabbPositionsKHR)
+    } VkAabbPositionsKHR;
+
+    // 
     typedef struct VkVertexInputBindingDescription {
         uint32_t             binding    = 0u;
         uint32_t             stride     = 16u;
@@ -1362,6 +1376,20 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         STRUCT_OPERATORS(VkAccelerationStructureCreateInfoKHR)
         VK_HPP_STRUCT_OPERATORS(VkAccelerationStructureCreateInfoKHR, vk::AccelerationStructureCreateInfoKHR)
     } VkAccelerationStructureCreateInfoKHR;
+
+    // 
+    typedef struct VkAccelerationStructureBuildSizesInfoKHR {
+        VkStructureType    sType                     = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_SIZES_INFO_KHR;
+        const void*        pNext                     = nullptr;
+        VkDeviceSize       accelerationStructureSize = 0ull;
+        VkDeviceSize       updateScratchSize         = 0ull;
+        VkDeviceSize       buildScratchSize          = 0ull;
+
+        // 
+        STRUCT_OPERATORS(VkAccelerationStructureBuildSizesInfoKHR)
+        VK_HPP_STRUCT_OPERATORS(VkAccelerationStructureBuildSizesInfoKHR, vk::AccelerationStructureBuildSizesInfoKHR)
+    } VkAccelerationStructureBuildSizesInfoKHR;
+
 
     // 
     typedef struct VkRayTracingPipelineInterfaceCreateInfoKHR {
