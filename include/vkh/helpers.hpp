@@ -316,6 +316,9 @@ namespace vkh {
             } else 
             if (entry.descriptorType == VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR) {
                 return _push_description<VkAccelerationStructureKHR>(entry);
+            } else 
+            if (entry.descriptorType == VK_DESCRIPTOR_TYPE_INLINE_UNIFORM_BLOCK_EXT) {
+                return _push_description<VkWriteDescriptorSetInlineUniformBlockEXT>(entry);
             } else {
                 return _push_description<VkDescriptorImageInfo>(entry);
             };
@@ -384,15 +387,24 @@ namespace vkh {
 
                 if (entry.descriptorType == VK_DESCRIPTOR_TYPE_STORAGE_BUFFER || entry.descriptorType == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER) { // Map Buffers
                     writes[i].pBufferInfo = reinterpret_cast<::VkDescriptorBufferInfo*>(heap->data()+pt0);
-                } else
+                    *reinterpret_cast<VkDescriptorBufferInfo*>(heap->data()+pt0) = VkDescriptorBufferInfo{};
+                } else 
                 if (entry.descriptorType == VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER || entry.descriptorType == VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER) { // Map Buffer Views
                     writes[i].pTexelBufferView = reinterpret_cast<VkBufferView*>(heap->data()+pt0);
-                } else
+                    *reinterpret_cast<VkBufferView*>(heap->data()+pt0) = VK_NULL_HANDLE;
+                } else 
                 if (entry.descriptorType == VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR) { // Map Accelerator Structures (KHR CUSTOM MAP)
                     writes_acs[i].pAccelerationStructures = reinterpret_cast<VkAccelerationStructureKHR*>(heap->data()+pt0);
+                    *reinterpret_cast<VkAccelerationStructureKHR*>(heap->data()+pt0) = VK_NULL_HANDLE;
                     writes[i].pNext = &writes_acs[i];
-                } else { // Map Images, Samplers, Combinations...
+                } else 
+                if (entry.descriptorType == VK_DESCRIPTOR_TYPE_INLINE_UNIFORM_BLOCK_EXT) { // Map Inline Uniform Blocks
+                    writes[i].pNext = heap->data()+pt0;
+                    *reinterpret_cast<VkWriteDescriptorSetInlineUniformBlockEXT*>(heap->data()+pt0) = VkWriteDescriptorSetInlineUniformBlockEXT{};
+                } else 
+                { // Map Images, Samplers, Combinations...
                     writes[i].pImageInfo = reinterpret_cast<::VkDescriptorImageInfo*>(heap->data()+pt0);
+                    *reinterpret_cast<VkDescriptorImageInfo*>(heap->data()+pt0) = VkDescriptorImageInfo{};
                 };
 
                 writes[i].dstSet = this->set;
