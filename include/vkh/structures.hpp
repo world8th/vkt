@@ -2101,7 +2101,25 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         STRUCT_OPERATORS(VkDescriptorPoolInlineUniformBlockCreateInfoEXT)
         VK_HPP_STRUCT_OPERATORS(VkDescriptorPoolInlineUniformBlockCreateInfoEXT, vk::DescriptorPoolInlineUniformBlockCreateInfoEXT)
     } VkDescriptorPoolInlineUniformBlockCreateInfoEXT;
+    
+    //
+    typedef struct VkWriteDescriptorSetAccelerationStructureKHR {
+        VkStructureType                      sType                      = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET_ACCELERATION_STRUCTURE_KHR;
+        const void*                          pNext                      = nullptr;
+        uint32_t                             accelerationStructureCount = 0u;
+        const VkAccelerationStructureKHR*    pAccelerationStructures    = nullptr;
 
+        //
+        VkWriteDescriptorSetAccelerationStructureKHR& setAccelerationStructures(const std::vector<VkAccelerationStructureKHR>& V = {}) { 
+            this->pAccelerationStructures = V.data();
+            this->accelerationStructureCount = V.size();
+            return *this;
+        };
+
+        //
+        STRUCT_OPERATORS(VkWriteDescriptorSetAccelerationStructureKHR)
+        VK_HPP_STRUCT_OPERATORS(VkWriteDescriptorSetAccelerationStructureKHR, vk::WriteDescriptorSetAccelerationStructureKHR)
+    } VkWriteDescriptorSetAccelerationStructureKHR;
 
 #pragma pack(pop)
 
