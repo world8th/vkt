@@ -137,7 +137,7 @@ namespace vkh {
     public: // get offsets of shader groups
         VkRayTracingPipelineCreateInfoKHR vkInfo = {};
         uintptr_t raygenOffsetIndex() { return 0u; };
-        uintptr_t missOffsetIndex() { return 1u; };
+        uintptr_t missOffsetIndex() { return 1u + raygenOffsetIndex(); };
         uintptr_t hitOffsetIndex() { return missShaderGroups.size() + missOffsetIndex(); };
         uintptr_t groupCount() { return missShaderGroups.size() + hitShaderGroups.size() + 1u; };
 
