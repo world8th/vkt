@@ -1121,7 +1121,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         operator const VkBuffer&() const { return buffer; };
 
         // 
-        void operator=(const VkBuffer& buffer) { this->buffer = buffer; };
+        VkBufferDeviceAddressInfo& operator=(const VkBuffer& buffer) { this->buffer = buffer; return *this; };
 
         // 
         STRUCT_OPERATORS(VkBufferDeviceAddressInfo)
@@ -1139,7 +1139,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         operator const VkAccelerationStructureKHR&() const { return accelerationStructure; };
 
         // 
-        void operator=(const VkAccelerationStructureKHR& accelerationStructure) { this->accelerationStructure = accelerationStructure; };
+        VkAccelerationStructureDeviceAddressInfoKHR& operator=(const VkAccelerationStructureKHR& accelerationStructure) { this->accelerationStructure = accelerationStructure; return *this; };
 
         // 
         STRUCT_OPERATORS(VkAccelerationStructureDeviceAddressInfoKHR)
@@ -1152,7 +1152,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         void*              hostAddress;
 
         // 
-        void operator=(const VkDeviceAddress& deviceAddress) { this->deviceAddress = deviceAddress; };
+        VkDeviceOrHostAddressKHR operator=(const VkDeviceAddress& deviceAddress) { this->deviceAddress = deviceAddress; return *this; };
         //void operator=(void* const& hostAddress) { this->hostAddress = hostAddress; };
 
         // 
@@ -2082,7 +2082,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         template<class T = uint8_t> 
         VkWriteDescriptorSetInlineUniformBlockEXT& setData(const std::vector<T>& V = {}) { 
             this->pData = V.data(); 
-            this->dataSize = V.size(); 
+            this->dataSize = V.size() * sizeof(T); 
             return *this; 
         };
 

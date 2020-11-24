@@ -26,6 +26,7 @@ namespace vkf {
         vk::PhysicalDeviceFragmentShaderBarycentricFeaturesNV gBarycentric{};
         vk::PhysicalDeviceExtendedDynamicStateFeaturesEXT gExtendedDynamic{};
         vk::PhysicalDeviceAccelerationStructureFeaturesKHR gAccelerationStructure{};
+        vk::PhysicalDeviceInlineUniformBlockFeaturesEXT gInlineUniform{};
     };
 
     // TODO: DEDICATED QUEUE OBJECT
@@ -128,6 +129,7 @@ namespace vkf {
             this->layers = layers;
 
             // 
+            features.gAccelerationStructure.pNext = &features.gInlineUniform;
             features.gAtomicFloat.pNext = &features.gAccelerationStructure;
             features.gExtendedDynamic.pNext = &features.gAtomicFloat;
             features.gBarycentric.pNext = &features.gExtendedDynamic;
@@ -255,7 +257,13 @@ namespace vkf {
             };
 
             //
+            vkh::VkDescriptorPoolInlineUniformBlockCreateInfoEXT inlineUniformPool = {
+                .maxInlineUniformBlockBindings = 256u
+            };
+
+            //
             vkh::handleVk(this->dispatch->CreateDescriptorPool(vkh::VkDescriptorPoolCreateInfo{
+                .pNext = &inlineUniformPool,
                 .flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT | VK_DESCRIPTOR_POOL_CREATE_UPDATE_AFTER_BIND_BIT, .maxSets = 256u, 
             }.also([=](vkh::VkDescriptorPoolCreateInfo it) {
                 it.setPoolSizes(dps);

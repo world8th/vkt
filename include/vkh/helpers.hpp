@@ -246,10 +246,10 @@ namespace vkh {
          ~VsDescriptorHandle() {  };
 
         // any buffers and images can `write` into types
-        inline VsDescriptorHandle<T> offset(const uint32_t& idx = 0u) { return VsDescriptorHandle<T>(count, stride_t*idx+field_t, V_t); };
-        inline const VsDescriptorHandle<T> offset(const uint32_t& idx = 0u) const { return VsDescriptorHandle<T>(count, stride_t*idx+field_t, V_t); };
-        template<class M> inline VsDescriptorHandle<M> offset(const uint32_t& idx = 0u) { return VsDescriptorHandle<M>(count, sizeof(M)*idx+field_t, V_t); };
-        template<class M> inline const VsDescriptorHandle<M> offset(const uint32_t& idx = 0u) const { return VsDescriptorHandle<M>(count, sizeof(M)*idx+field_t, V_t); };
+        inline VsDescriptorHandle<T> offset(const uint32_t& idx = 0u) { return VsDescriptorHandle<T>(count, stride_t*idx+field_t, V_t, stride_t); };
+        inline const VsDescriptorHandle<T> offset(const uint32_t& idx = 0u) const { return VsDescriptorHandle<T>(count, stride_t*idx+field_t, V_t, stride_t); };
+        template<class M> inline VsDescriptorHandle<M> offset(const uint32_t& idx = 0u) { return VsDescriptorHandle<M>(count, sizeof(M)*idx+field_t, V_t, sizeof(M)); };
+        template<class M> inline const VsDescriptorHandle<M> offset(const uint32_t& idx = 0u) const { return VsDescriptorHandle<M>(count, sizeof(M)*idx+field_t, V_t, sizeof(M)); };
         inline const uint32_t& size() const { return count; };
 
         // new accessor operator
@@ -277,6 +277,10 @@ namespace vkh {
         // 
         inline operator T& () { return *reinterpret_cast<T*>((*V_t)[field_t]); };
         inline operator const T& () const { return *reinterpret_cast<T*>((*V_t)[field_t]); };
+
+        //
+        template<class M = T> M* handle() { return (M*)(&(*V_t)[field_t]); }
+        template<class M = T> const M* handle() const { return (const M*)(&(*V_t)[field_t]); }
     };
 
     // 
@@ -387,24 +391,19 @@ namespace vkh {
 
                 if (entry.descriptorType == VK_DESCRIPTOR_TYPE_STORAGE_BUFFER || entry.descriptorType == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER) { // Map Buffers
                     writes[i].pBufferInfo = reinterpret_cast<::VkDescriptorBufferInfo*>(heap->data()+pt0);
-                    *reinterpret_cast<VkDescriptorBufferInfo*>(heap->data()+pt0) = VkDescriptorBufferInfo{};
                 } else 
                 if (entry.descriptorType == VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER || entry.descriptorType == VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER) { // Map Buffer Views
                     writes[i].pTexelBufferView = reinterpret_cast<VkBufferView*>(heap->data()+pt0);
-                    *reinterpret_cast<VkBufferView*>(heap->data()+pt0) = VK_NULL_HANDLE;
                 } else 
                 if (entry.descriptorType == VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR) { // Map Accelerator Structures (KHR CUSTOM MAP)
                     writes_acs[i].pAccelerationStructures = reinterpret_cast<VkAccelerationStructureKHR*>(heap->data()+pt0);
-                    *reinterpret_cast<VkAccelerationStructureKHR*>(heap->data()+pt0) = VK_NULL_HANDLE;
                     writes[i].pNext = &writes_acs[i];
                 } else 
                 if (entry.descriptorType == VK_DESCRIPTOR_TYPE_INLINE_UNIFORM_BLOCK_EXT) { // Map Inline Uniform Blocks
                     writes[i].pNext = heap->data()+pt0;
-                    *reinterpret_cast<VkWriteDescriptorSetInlineUniformBlockEXT*>(heap->data()+pt0) = VkWriteDescriptorSetInlineUniformBlockEXT{};
                 } else 
                 { // Map Images, Samplers, Combinations...
                     writes[i].pImageInfo = reinterpret_cast<::VkDescriptorImageInfo*>(heap->data()+pt0);
-                    *reinterpret_cast<VkDescriptorImageInfo*>(heap->data()+pt0) = VkDescriptorImageInfo{};
                 };
 
                 writes[i].dstSet = this->set;
@@ -421,6 +420,23 @@ namespace vkh {
         inline VsDescriptorHandle<T>& _push_description( VkDescriptorUpdateTemplateEntry entry ) { // Un-Safe API again
             const uintptr_t pt0 = heap->size(); entry.offset = pt0, entry.stride = sizeof(T);
             heap->resize(pt0+sizeof(T)*entry.descriptorCount, 0u);
+
+            // Default Values
+            if (entry.descriptorType == VK_DESCRIPTOR_TYPE_STORAGE_BUFFER || entry.descriptorType == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER) {
+                *reinterpret_cast<VkDescriptorBufferInfo*>(heap->data()+pt0) = VkDescriptorBufferInfo{};
+            } else 
+            if (entry.descriptorType == VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER || entry.descriptorType == VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER) {
+                *reinterpret_cast<VkBufferView*>(heap->data()+pt0) = VK_NULL_HANDLE;
+            } else 
+            if (entry.descriptorType == VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR) {
+                *reinterpret_cast<VkAccelerationStructureKHR*>(heap->data()+pt0) = VK_NULL_HANDLE;
+            } else 
+            if (entry.descriptorType == VK_DESCRIPTOR_TYPE_INLINE_UNIFORM_BLOCK_EXT) {
+                *reinterpret_cast<VkWriteDescriptorSetInlineUniformBlockEXT*>(heap->data()+pt0) = VkWriteDescriptorSetInlineUniformBlockEXT{};
+            } else {
+                *reinterpret_cast<VkDescriptorImageInfo*>(heap->data()+pt0) = VkDescriptorImageInfo{};
+            };
+
             handles.push_back(VsDescriptorHandle<T>(entry.descriptorCount, uintptr_t(pt0), heap));
             writes.push_back({
                 .dstSet = this->set,
@@ -466,7 +482,7 @@ namespace vkh {
         };
 
         // 
-        inline VsDescriptorSetLayoutCreateInfoHelper& pushBinding(const VkDescriptorSetLayoutBinding& binding = {}, const VkDescriptorBindingFlags& flags = {}){
+        inline VsDescriptorSetLayoutCreateInfoHelper& pushBinding(const VkDescriptorSetLayoutBinding& binding = {}, const FLAGS(VkDescriptorBinding)& flags = {}){
             binding_flags.push_back(flags);
             bindings.push_back(binding);
             return *this;
@@ -675,19 +691,19 @@ namespace vkh {
     // WILL USED FOR SIMPLER COPYING
 
     // 
-    inline VkResult AllocateDescriptorSetWithUpdate(const vkt::Device& device, vkh::VsDescriptorSetCreateInfoHelper& helper, VkDescriptorSet& descriptorSet, bool& protection) {
+    inline VkResult AllocateDescriptorSetWithUpdate(vkt::Device& device, vkh::VsDescriptorSetCreateInfoHelper& helper, VkDescriptorSet& descriptorSet, bool& protection) {
         if (!protection) {
             // Corrupt... 
             //if (descriptorSet) { vkh::handleVk(device->vkFreeDescriptorSets(device->handle, helper, 1u, &descriptorSet)); descriptorSet = {}; };
 
             // 
             bool created = false;
-            if (!descriptorSet) { vkh::handleVk(device->vkAllocateDescriptorSets(device->handle, helper, &descriptorSet)); created = true; };
+            if (!descriptorSet) { vkh::handleVk(device->AllocateDescriptorSets(helper, &descriptorSet)); created = true; };
 
             //
             if (descriptorSet && created) {
                 const auto& writes = helper.setDescriptorSet(descriptorSet).mapWriteDescriptorSet();
-                device->vkUpdateDescriptorSets(device->handle, uint32_t(writes.size()), reinterpret_cast<const ::VkWriteDescriptorSet*>(writes.data()), 0u, nullptr);
+                device->UpdateDescriptorSets(uint32_t(writes.size()), reinterpret_cast<const ::VkWriteDescriptorSet*>(writes.data()), 0u, nullptr);
             };
 
             // 
