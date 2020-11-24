@@ -147,6 +147,9 @@ namespace vkf {
         //
         "VK_KHR_buffer_device_address",
         //"VK_EXT_buffer_device_address",
-        "VK_NVX_image_view_handle"
+        "VK_NVX_image_view_handle",
+        "VK_KHR_acceleration_structure",
+        "VK_KHR_ray_tracing_pipeline",
+        "VK_KHR_ray_query"
     };
 };

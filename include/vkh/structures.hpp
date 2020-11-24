@@ -1370,7 +1370,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         // For Vector's support
         operator VkDescriptorBufferInfo&() { return *reinterpret_cast<VkDescriptorBufferInfo*>(&buffer); };
         operator const VkDescriptorBufferInfo&() const { return *reinterpret_cast<const VkDescriptorBufferInfo*>(&buffer); };
-        VkAccelerationStructureCreateInfoKHR& operator=(const VkDescriptorBufferInfo& info) {memcpy(&buffer, &info, sizeof(VkDescriptorBufferInfo)); };
+        VkAccelerationStructureCreateInfoKHR& operator=(const VkDescriptorBufferInfo& info) { memcpy(&buffer, &info, sizeof(VkDescriptorBufferInfo)); return *this; };
 
         // 
         STRUCT_OPERATORS(VkAccelerationStructureCreateInfoKHR)
