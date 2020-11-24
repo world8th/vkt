@@ -393,7 +393,7 @@ namespace vkh {
                 const auto& pt0 = entry.offset;
 
                 if (entry.descriptorType == VK_DESCRIPTOR_TYPE_STORAGE_BUFFER || entry.descriptorType == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER) { // Map Buffers
-                    writes[i].pBufferInfo = reinterpret_cast<VkDescriptorBufferInfo*>(heap->data()+pt0);
+                    writes[i].pBufferInfo = reinterpret_cast<::VkDescriptorBufferInfo*>(heap->data()+pt0);
                 } else
                 if (entry.descriptorType == VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER || entry.descriptorType == VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER) { // Map Buffer Views
                     writes[i].pTexelBufferView = reinterpret_cast<VkBufferView*>(heap->data()+pt0);
@@ -402,7 +402,7 @@ namespace vkh {
                     writes_acs[i].pAccelerationStructures = reinterpret_cast<VkAccelerationStructureKHR*>(heap->data()+pt0);
                     writes[i].pNext = &writes_acs[i];
                 } else { // Map Images, Samplers, Combinations...
-                    writes[i].pImageInfo = reinterpret_cast<VkDescriptorImageInfo*>(heap->data()+pt0);
+                    writes[i].pImageInfo = reinterpret_cast<::VkDescriptorImageInfo*>(heap->data()+pt0);
                 };
 
                 writes[i].dstSet = this->set;

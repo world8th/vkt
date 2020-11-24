@@ -28,8 +28,8 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         inline const ::NAME* operator &() const { return reinterpret_cast<const ::NAME*>((const void*)this); }; \
         inline NAME& operator =( vkt::uni_arg<::NAME> info ) { memcpy(this, &(*info), sizeof(NAME)); return *this; };\
         inline NAME& operator =( vkt::uni_arg<NAME> info ) { memcpy(this, &(*info), sizeof(NAME)); return *this; }; \
-        inline NAME also(const std::function<NAME&(NAME&)>& fn) { return reinterpret_cast<NAME&>(fn(reinterpret_cast<NAME&>(*this))); };\
-        inline static NAME create(const std::function<NAME&(NAME&)>& fn = {}) { auto data = NAME{}; return reinterpret_cast<NAME&>(fn ? fn(reinterpret_cast<NAME&>(data)) : reinterpret_cast<NAME&>(data)); };
+        inline NAME also(const std::function<NAME(NAME)>& fn) { auto result = fn(reinterpret_cast<NAME&>(*this)); return reinterpret_cast<NAME&>(result); };\
+        inline static NAME create(const std::function<NAME(NAME)>& fn = {}) { auto data = NAME{}; auto result = fn ? fn(reinterpret_cast<NAME&>(data)) : reinterpret_cast<NAME&>(data); return reinterpret_cast<NAME&>(result); };
 
 #ifdef VULKAN_HPP
     #define VK_HPP_STRUCT_OPERATORS(NAME,VKNAME)\
@@ -228,8 +228,8 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         uint32_t                            dstArrayElement    = 0u;
         uint32_t                            descriptorCount    = 1u;
         VkDescriptorType                    descriptorType     = VK_DESCRIPTOR_TYPE_SAMPLER;
-        const vkh::VkDescriptorImageInfo*   pImageInfo         = nullptr;
-        const vkh::VkDescriptorBufferInfo*  pBufferInfo        = nullptr;
+        const ::VkDescriptorImageInfo*      pImageInfo         = nullptr;
+        const ::VkDescriptorBufferInfo*     pBufferInfo        = nullptr;
         const VkBufferView*                 pTexelBufferView   = nullptr;
 
         // 
@@ -247,7 +247,10 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         VkDescriptorPoolCreateFlags         flags            = {};
         uint32_t                            maxSets          = 256u;
         uint32_t                            poolSizeCount    = 0u;
-        const vkh::VkDescriptorPoolSize*    pPoolSizes       = nullptr;
+        const ::VkDescriptorPoolSize*       pPoolSizes       = nullptr;
+
+        // 
+        VkDescriptorPoolCreateInfo& setPoolSizes(const std::vector<VkDescriptorPoolSize>& V = {}) { this->pPoolSizes = reinterpret_cast<::VkDescriptorPoolSize*>((void*)V.data()); this->poolSizeCount = static_cast<uint32_t>(V.size()); return *this; };
 
         // 
         STRUCT_OPERATORS(VkDescriptorPoolCreateInfo)
@@ -286,7 +289,7 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         const uint32_t*     pQueueFamilyIndices     = nullptr;
 
         // 
-        VkBufferCreateInfo& setQueueFamilyIndices(const std::vector<uint32_t>& V = {}) { pQueueFamilyIndices = V.data(); queueFamilyIndexCount = static_cast<uint32_t>(V.size()); return *this; };
+        VkBufferCreateInfo& setQueueFamilyIndices(const std::vector<uint32_t>& V = {}) { this->pQueueFamilyIndices = V.data(); this->queueFamilyIndexCount = static_cast<uint32_t>(V.size()); return *this; };
 
         // 
         STRUCT_OPERATORS(VkBufferCreateInfo)
@@ -316,7 +319,11 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         VkImageLayout            initialLayout          = VK_IMAGE_LAYOUT_UNDEFINED;
 
         // 
-        VkImageCreateInfo& setQueueFamilyIndices(const std::vector<uint32_t>& V = {}) { pQueueFamilyIndices = V.data(); queueFamilyIndexCount = static_cast<uint32_t>(V.size()); return *this; };
+        VkImageCreateInfo& setQueueFamilyIndices(const std::vector<uint32_t>& V = {}) { 
+            this->pQueueFamilyIndices = V.data(); 
+            this->queueFamilyIndexCount = static_cast<uint32_t>(V.size()); 
+            return *this; 
+        };
 
         // 
         STRUCT_OPERATORS(VkImageCreateInfo)
@@ -463,7 +470,11 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         const VkDescriptorSetLayout*    pSetLayouts        = nullptr;
 
         // 
-        VkDescriptorSetAllocateInfo& setSetLayouts(const std::vector<VkDescriptorSetLayout>& V = {}) { pSetLayouts = V.data(); descriptorSetCount = static_cast<uint32_t>(V.size()); return *this; };
+        VkDescriptorSetAllocateInfo& setSetLayouts(const std::vector<VkDescriptorSetLayout>& V = {}) { 
+            this->pSetLayouts = V.data(); 
+            this->descriptorSetCount = static_cast<uint32_t>(V.size()); 
+            return *this; 
+        };
 
         // 
         STRUCT_OPERATORS(VkDescriptorSetAllocateInfo)
@@ -481,8 +492,16 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         const VkVertexInputAttributeDescription*        pVertexAttributeDescriptions    = nullptr;
 
         // 
-        VkPipelineVertexInputStateCreateInfo& setVertexBindingDescriptions(const std::vector<VkVertexInputBindingDescription>& V = {}) { pVertexBindingDescriptions = V.data(); vertexBindingDescriptionCount = static_cast<uint32_t>(V.size()); return *this; };
-        VkPipelineVertexInputStateCreateInfo& setVertexAttributeDescriptions(const std::vector<VkVertexInputAttributeDescription>& V = {}) { pVertexAttributeDescriptions = V.data(); vertexAttributeDescriptionCount = static_cast<uint32_t>(V.size()); return *this; };
+        VkPipelineVertexInputStateCreateInfo& setVertexBindingDescriptions(const std::vector<VkVertexInputBindingDescription>& V = {}) { 
+            this->pVertexBindingDescriptions = V.data(); 
+            this->vertexBindingDescriptionCount = static_cast<uint32_t>(V.size()); 
+            return *this; 
+        };
+        VkPipelineVertexInputStateCreateInfo& setVertexAttributeDescriptions(const std::vector<VkVertexInputAttributeDescription>& V = {}) { 
+            this->pVertexAttributeDescriptions = V.data(); 
+            this->vertexAttributeDescriptionCount = static_cast<uint32_t>(V.size()); 
+            return *this; 
+        };
         
         // 
         STRUCT_OPERATORS(VkPipelineVertexInputStateCreateInfo)
@@ -512,8 +531,16 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         const ::VkRect2D*                     pScissors     = nullptr;
 
         // 
-        VkPipelineViewportStateCreateInfo& setViewports(const std::vector<VkViewport>& V = {}) { pViewports = reinterpret_cast<::VkViewport*>((void*)V.data()); viewportCount = static_cast<uint32_t>(V.size()); return *this; };
-        VkPipelineViewportStateCreateInfo& setScissors(const std::vector<VkRect2D>& V = {}) { pScissors = reinterpret_cast<::VkRect2D*>((void*)V.data()); scissorCount = static_cast<uint32_t>(V.size()); return *this; };
+        VkPipelineViewportStateCreateInfo& setViewports(const std::vector<VkViewport>& V = {}) { 
+            this->pViewports = reinterpret_cast<::VkViewport*>((void*)V.data()); 
+            this->viewportCount = static_cast<uint32_t>(V.size()); 
+            return *this; 
+        };
+        VkPipelineViewportStateCreateInfo& setScissors(const std::vector<VkRect2D>& V = {}) { 
+            this->pScissors = reinterpret_cast<::VkRect2D*>((void*)V.data()); 
+            this->scissorCount = static_cast<uint32_t>(V.size()); 
+            return *this; 
+        };
 
         // 
         STRUCT_OPERATORS(VkPipelineViewportStateCreateInfo)
@@ -627,7 +654,11 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         //float                                       blendConstants[4];
 
         // 
-        VkPipelineColorBlendStateCreateInfo& setAttachments(const std::vector<VkPipelineColorBlendAttachmentState>& V = {}) { pAttachments = V.data(); attachmentCount = static_cast<uint32_t>(V.size()); return *this; };
+        VkPipelineColorBlendStateCreateInfo& setAttachments(const std::vector<VkPipelineColorBlendAttachmentState>& V = {}) { 
+            this->pAttachments = V.data(); 
+            this->attachmentCount = static_cast<uint32_t>(V.size()); 
+            return *this; 
+        };
         
         // 
         STRUCT_OPERATORS(VkPipelineColorBlendStateCreateInfo)
@@ -643,7 +674,11 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         const VkDynamicState*                pDynamicStates     = nullptr;
 
         // 
-        VkPipelineDynamicStateCreateInfo& setDynamicStates(const std::vector<VkDynamicState>& V = {}) { pDynamicStates = V.data(); dynamicStateCount = static_cast<uint32_t>(V.size()); return *this; };
+        VkPipelineDynamicStateCreateInfo& setDynamicStates(const std::vector<VkDynamicState>& V = {}) { 
+            this->pDynamicStates = V.data();
+            this->dynamicStateCount = static_cast<uint32_t>(V.size());
+            return *this;
+        };
 
         // 
         STRUCT_OPERATORS(VkPipelineDynamicStateCreateInfo)
@@ -697,7 +732,11 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         int32_t                                          basePipelineIndex      = 0;
 
         // 
-        VkGraphicsPipelineCreateInfo& setStages(const std::vector<VkPipelineShaderStageCreateInfo>& V = {}) { pStages = reinterpret_cast<::VkPipelineShaderStageCreateInfo*>((void*)V.data()); stageCount = static_cast<uint32_t>(V.size()); return *this; };
+        VkGraphicsPipelineCreateInfo& setStages(const std::vector<VkPipelineShaderStageCreateInfo>& V = {}) { 
+            this->pStages = reinterpret_cast<::VkPipelineShaderStageCreateInfo*>((void*)V.data()); 
+            this->stageCount = static_cast<uint32_t>(V.size()); 
+            return *this;
+        };
 
         // 
         STRUCT_OPERATORS(VkGraphicsPipelineCreateInfo)
@@ -782,8 +821,18 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         const VkDescriptorSetLayout*    pSetLayouts             = nullptr;
         uint32_t                        pushConstantRangeCount  = 0u;
         const VkPushConstantRange*      pPushConstantRanges     = nullptr; // TODO: NATIVE
-        VkPipelineLayoutCreateInfo& setSetLayouts(const std::vector<VkDescriptorSetLayout>& V = {}) { pSetLayouts = V.data(); setLayoutCount = static_cast<uint32_t>(V.size()); return *this; };
-        VkPipelineLayoutCreateInfo& setPushConstantRanges(const std::vector<VkPushConstantRange>& V = {}) { pPushConstantRanges = V.data(); pushConstantRangeCount = static_cast<uint32_t>(V.size()); return *this; };
+
+        // 
+        VkPipelineLayoutCreateInfo& setSetLayouts(const std::vector<VkDescriptorSetLayout>& V = {}) { 
+            this->pSetLayouts = V.data(); 
+            this->setLayoutCount = static_cast<uint32_t>(V.size()); 
+            return *this; 
+        };
+        VkPipelineLayoutCreateInfo& setPushConstantRanges(const std::vector<VkPushConstantRange>& V = {}) { 
+            this->pPushConstantRanges = V.data();
+            this->pushConstantRangeCount = static_cast<uint32_t>(V.size()); 
+            return *this; 
+        };
 
         // 
         STRUCT_OPERATORS(VkPipelineLayoutCreateInfo)
@@ -798,7 +847,11 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         const ::VkDescriptorBindingFlags*     pBindingFlags = nullptr;
 
         // 
-        VkDescriptorSetLayoutBindingFlagsCreateInfo& setBindingFlags(const std::vector<::VkDescriptorBindingFlags>& V = {}) { pBindingFlags = V.data(); bindingCount = static_cast<uint32_t>(V.size()); return *this; };
+        VkDescriptorSetLayoutBindingFlagsCreateInfo& setBindingFlags(const std::vector<::VkDescriptorBindingFlags>& V = {}) { 
+            this->pBindingFlags = V.data(); 
+            this->bindingCount = static_cast<uint32_t>(V.size()); 
+            return *this; 
+        };
 
         // 
         STRUCT_OPERATORS(VkDescriptorSetLayoutBindingFlagsCreateInfo)
@@ -833,7 +886,11 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         uint32_t                                  set                           = 0u;
 
         // 
-        VkDescriptorUpdateTemplateCreateInfo& setDescriptorUpdateEntries(const std::vector<VkDescriptorUpdateTemplateEntry>& V = {}) { pDescriptorUpdateEntries = V.data(); descriptorUpdateEntryCount = static_cast<uint32_t>(V.size()); return *this; };
+        VkDescriptorUpdateTemplateCreateInfo& setDescriptorUpdateEntries(const std::vector<VkDescriptorUpdateTemplateEntry>& V = {}) { 
+            this->pDescriptorUpdateEntries = V.data(); 
+            this->descriptorUpdateEntryCount = static_cast<uint32_t>(V.size()); 
+            return *this; 
+        };
 
         // 
         STRUCT_OPERATORS(VkDescriptorUpdateTemplateCreateInfo)
@@ -849,7 +906,11 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         const VkDescriptorSetLayoutBinding*    pBindings    = nullptr;
 
         // 
-        VkDescriptorSetLayoutCreateInfo& setBindings(const std::vector<VkDescriptorSetLayoutBinding>& V = {}) { pBindings = V.data(); bindingCount = static_cast<uint32_t>(V.size()); return *this; };
+        VkDescriptorSetLayoutCreateInfo& setBindings(const std::vector<VkDescriptorSetLayoutBinding>& V = {}) { 
+            this->pBindings = V.data(); 
+            this->bindingCount = static_cast<uint32_t>(V.size()); 
+            return *this; 
+        };
 
         // 
         STRUCT_OPERATORS(VkDescriptorSetLayoutCreateInfo)
@@ -887,9 +948,21 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         const uint32_t*                 pPreserveAttachments    = nullptr;
 
         // 
-        VkSubpassDescription& setColorAttachments(const std::vector<VkAttachmentReference>& V = {}) { pColorAttachments = V.data(); colorAttachmentCount = static_cast<uint32_t>(V.size()); return *this; };
-        VkSubpassDescription& setInputAttachments(const std::vector<VkAttachmentReference>& V = {}) { pInputAttachments = V.data(); inputAttachmentCount = static_cast<uint32_t>(V.size()); return *this; };
-        VkSubpassDescription& setPreserveAttachments(const std::vector<uint32_t>& V = {}) { pPreserveAttachments = V.data(); preserveAttachmentCount = static_cast<uint32_t>(V.size()); return *this; };
+        VkSubpassDescription& setColorAttachments(const std::vector<VkAttachmentReference>& V = {}) { 
+            this->pColorAttachments = V.data();
+            this->colorAttachmentCount = static_cast<uint32_t>(V.size()); 
+            return *this; 
+        };
+        VkSubpassDescription& setInputAttachments(const std::vector<VkAttachmentReference>& V = {}) { 
+            this->pInputAttachments = V.data(); 
+            this->inputAttachmentCount = static_cast<uint32_t>(V.size()); 
+            return *this;
+        };
+        VkSubpassDescription& setPreserveAttachments(const std::vector<uint32_t>& V = {}) { 
+            this->pPreserveAttachments = V.data(); 
+            this->preserveAttachmentCount = static_cast<uint32_t>(V.size()); 
+            return *this; 
+        };
 
         // 
         STRUCT_OPERATORS(VkSubpassDescription)
@@ -929,9 +1002,21 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         const VkSubpassDependency*        pDependencies     = nullptr;
 
         // 
-        VkRenderPassCreateInfo& setAttachments(const std::vector<VkAttachmentDescription>& V = {}) { pAttachments = V.data(); attachmentCount = static_cast<uint32_t>(V.size()); return *this; };
-        VkRenderPassCreateInfo& setSubpasses(const std::vector<VkSubpassDescription>& V = {}) { pSubpasses = V.data(); subpassCount = static_cast<uint32_t>(V.size()); return *this; };
-        VkRenderPassCreateInfo& setDependencies(const std::vector<VkSubpassDependency>& V = {}) { pDependencies = V.data(); dependencyCount = static_cast<uint32_t>(V.size()); return *this; };
+        VkRenderPassCreateInfo& setAttachments(const std::vector<VkAttachmentDescription>& V = {}) { 
+            this->pAttachments = V.data(); 
+            this->attachmentCount = static_cast<uint32_t>(V.size()); 
+            return *this; 
+        };
+        VkRenderPassCreateInfo& setSubpasses(const std::vector<VkSubpassDescription>& V = {}) { 
+            this->pSubpasses = V.data(); 
+            this->subpassCount = static_cast<uint32_t>(V.size()); 
+            return *this; 
+        };
+        VkRenderPassCreateInfo& setDependencies(const std::vector<VkSubpassDependency>& V = {}) { 
+            this->pDependencies = V.data(); 
+            this->dependencyCount = static_cast<uint32_t>(V.size()); 
+            return *this; 
+        };
 
         // 
         STRUCT_OPERATORS(VkRenderPassCreateInfo)
@@ -951,7 +1036,11 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         uint32_t                    layers          = 1u;
 
         // 
-        VkFramebufferCreateInfo& setAttachments(const std::vector<VkImageView>& V = {}) { pAttachments = V.data(); attachmentCount = static_cast<uint32_t>(V.size()); return *this; };
+        VkFramebufferCreateInfo& setAttachments(const std::vector<VkImageView>& V = {}) { 
+            this->pAttachments = V.data(); 
+            this->attachmentCount = static_cast<uint32_t>(V.size()); 
+            return *this; 
+        };
 
         // 
         STRUCT_OPERATORS(VkFramebufferCreateInfo)
@@ -1333,7 +1422,11 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         const uint32_t*              pCode      = nullptr;
 
         // 
-        VkShaderModuleCreateInfo& setCode(const std::vector<uint32_t>& V = {}) { pCode = V.data(); codeSize = V.size() * 4ull; return *this; };
+        VkShaderModuleCreateInfo& setCode(const std::vector<uint32_t>& V = {}) { 
+            this->pCode = V.data(); 
+            this->codeSize = V.size() * 4ull; 
+            return *this;
+        };
 
         // 
         STRUCT_OPERATORS(VkShaderModuleCreateInfo)
@@ -1415,8 +1508,16 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         const char* const*          ppEnabledExtensionNames = nullptr;
 
         // 
-        VkInstanceCreateInfo& setEnabledExtensionNames(const std::vector<char *>& V = {}) { ppEnabledExtensionNames = V.data(); enabledExtensionCount = static_cast<uint32_t>(V.size()); return *this; };
-        VkInstanceCreateInfo& setEnabledLayerNames(const std::vector<char *>& V = {}) { ppEnabledLayerNames = V.data(); enabledLayerCount = static_cast<uint32_t>(V.size()); return *this; };
+        VkInstanceCreateInfo& setEnabledExtensionNames(const std::vector<char *>& V = {}) { 
+            this->ppEnabledExtensionNames = V.data(); 
+            this->enabledExtensionCount = static_cast<uint32_t>(V.size()); 
+            return *this; 
+        };
+        VkInstanceCreateInfo& setEnabledLayerNames(const std::vector<char *>& V = {}) { 
+            this->ppEnabledLayerNames = V.data(); 
+            this->enabledLayerCount = static_cast<uint32_t>(V.size()); 
+            return *this; 
+        };
 
         // 
         STRUCT_OPERATORS(VkInstanceCreateInfo)
@@ -1465,9 +1566,21 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         const VkSemaphore*             pSignalSemaphores    = nullptr;
 
         // 
-        VkSubmitInfo& setCommandBuffers(const std::vector<VkCommandBuffer>& V = {}) { pCommandBuffers = V.data(); commandBufferCount = static_cast<uint32_t>(V.size()); return *this; };
-        VkSubmitInfo& setSignalSemaphores(const std::vector<VkSemaphore>& V = {}) { pSignalSemaphores = V.data(); signalSemaphoreCount = static_cast<uint32_t>(V.size()); return *this; };
-        VkSubmitInfo& setWaitSemaphores(const std::vector<VkSemaphore>& V = {}) { pWaitSemaphores = V.data(); waitSemaphoreCount = static_cast<uint32_t>(V.size()); return *this; };
+        VkSubmitInfo& setCommandBuffers(const std::vector<VkCommandBuffer>& V = {}) { 
+            this->pCommandBuffers = V.data(); 
+            this->commandBufferCount = static_cast<uint32_t>(V.size()); 
+            return *this; 
+        };
+        VkSubmitInfo& setSignalSemaphores(const std::vector<VkSemaphore>& V = {}) { 
+            this->pSignalSemaphores = V.data(); 
+            this->signalSemaphoreCount = static_cast<uint32_t>(V.size()); 
+            return *this; 
+        };
+        VkSubmitInfo& setWaitSemaphores(const std::vector<VkSemaphore>& V = {}) { 
+            this->pWaitSemaphores = V.data();
+            this->waitSemaphoreCount = static_cast<uint32_t>(V.size()); 
+            return *this; 
+        };
 
         // 
         STRUCT_OPERATORS(VkSubmitInfo)
@@ -1484,7 +1597,11 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
 
         // 
         template<class T = uint8_t> 
-        VkPipelineCacheCreateInfo& setInitialData(const std::vector<T>& V = {}) { pInitialData = V.data(); initialDataSize = V.size(); return *this; };
+        VkPipelineCacheCreateInfo& setInitialData(const std::vector<T>& V = {}) { 
+            this->pInitialData = V.data(); 
+            this->initialDataSize = V.size();
+            return *this;
+        };
 
         // 
         STRUCT_OPERATORS(VkPipelineCacheCreateInfo)
@@ -1513,7 +1630,11 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         const float*                pQueuePriorities = nullptr;
 
         // 
-        VkDeviceQueueCreateInfo& setQueuePriorities(const std::vector<float>& V = {}) { pQueuePriorities = V.data(); queueCount = static_cast<uint32_t>(V.size()); return *this; };
+        VkDeviceQueueCreateInfo& setQueuePriorities(const std::vector<float>& V = {}) { 
+            this->pQueuePriorities = V.data();
+            this->queueCount = static_cast<uint32_t>(V.size());
+            return *this;
+        };
 
         // 
         STRUCT_OPERATORS(VkDeviceQueueCreateInfo)
@@ -1549,9 +1670,21 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         const VkPhysicalDeviceFeatures*    pEnabledFeatures         = nullptr; // TODO: NATIVE
 
         // 
-        VkDeviceCreateInfo& setQueueCreateInfos(const std::vector<VkDeviceQueueCreateInfo>& V = {}) { pQueueCreateInfos = V.data(); queueCreateInfoCount = static_cast<uint32_t>(V.size()); return *this; };
-        VkDeviceCreateInfo& setPEnabledExtensionNames(const std::vector<const char*>& V = {}) { ppEnabledExtensionNames = V.data(); enabledExtensionCount = static_cast<uint32_t>(V.size()); return *this; };
-        VkDeviceCreateInfo& setPEnabledLayerNames(const std::vector<const char* >& V = {}) { ppEnabledLayerNames = V.data(); enabledLayerCount = static_cast<uint32_t>(V.size()); return *this; };
+        VkDeviceCreateInfo& setQueueCreateInfos(const std::vector<VkDeviceQueueCreateInfo>& V = {}) { 
+            this->pQueueCreateInfos = V.data(); 
+            this->queueCreateInfoCount = static_cast<uint32_t>(V.size()); 
+            return *this; 
+        };
+        VkDeviceCreateInfo& setPEnabledExtensionNames(const std::vector<const char*>& V = {}) { 
+            this->ppEnabledExtensionNames = V.data(); 
+            this->enabledExtensionCount = static_cast<uint32_t>(V.size()); 
+            return *this; 
+        };
+        VkDeviceCreateInfo& setPEnabledLayerNames(const std::vector<const char* >& V = {}) { 
+            this->ppEnabledLayerNames = V.data(); 
+            this->enabledLayerCount = static_cast<uint32_t>(V.size()); 
+            return *this; 
+        };
 
         // 
         STRUCT_OPERATORS(VkDeviceCreateInfo)
@@ -1717,7 +1850,11 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         const VkClearValue* pClearValues    = nullptr;
 
         // 
-        VkRenderPassBeginInfo& setClearValues(const std::vector<VkClearValue>& V = {}) { pClearValues = V.data(); clearValueCount = static_cast<uint32_t>(V.size()); return *this; };
+        VkRenderPassBeginInfo& setClearValues(const std::vector<VkClearValue>& V = {}) { 
+            this->pClearValues = V.data(); 
+            this->clearValueCount = static_cast<uint32_t>(V.size()); 
+            return *this; 
+        };
 
         // 
         STRUCT_OPERATORS(VkRenderPassBeginInfo)
@@ -1761,8 +1898,16 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         VkResult*               pResults            = nullptr;
 
         // 
-        VkPresentInfoKHR& setSwapchains(const std::vector<VkSwapchainKHR>& V = {}) { pSwapchains = V.data(); swapchainCount = static_cast<uint32_t>(V.size()); return *this; };
-        VkPresentInfoKHR& setWaitSemaphores(const std::vector<VkSemaphore>& V = {}) { pWaitSemaphores = V.data(); waitSemaphoreCount = static_cast<uint32_t>(V.size()); return *this; };
+        VkPresentInfoKHR& setSwapchains(const std::vector<VkSwapchainKHR>& V = {}) { 
+            this->pSwapchains = V.data(); 
+            this->swapchainCount = static_cast<uint32_t>(V.size()); 
+            return *this; 
+        };
+        VkPresentInfoKHR& setWaitSemaphores(const std::vector<VkSemaphore>& V = {}) { 
+            this->pWaitSemaphores = V.data(); 
+            this->waitSemaphoreCount = static_cast<uint32_t>(V.size()); 
+            return *this; 
+        };
 
         // 
         STRUCT_OPERATORS(VkPresentInfoKHR)
@@ -1794,7 +1939,11 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         VkSwapchainKHR                  oldSwapchain            = VK_NULL_HANDLE;
 
         // 
-        VkSwapchainCreateInfoKHR& setQueueFamilyIndices(const std::vector<uint32_t>& V = {}) { pQueueFamilyIndices = V.data(); queueFamilyIndexCount = static_cast<uint32_t>(V.size()); return *this; };
+        VkSwapchainCreateInfoKHR& setQueueFamilyIndices(const std::vector<uint32_t>& V = {}) { 
+            this->pQueueFamilyIndices = V.data(); 
+            this->queueFamilyIndexCount = static_cast<uint32_t>(V.size()); 
+            return *this; 
+        };
 
         // 
         STRUCT_OPERATORS(VkSwapchainCreateInfoKHR)
@@ -1892,6 +2041,39 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         STRUCT_OPERATORS(VkExportSemaphoreCreateInfo)
         VK_HPP_STRUCT_OPERATORS(VkExportSemaphoreCreateInfo, vk::ExportSemaphoreCreateInfo)
     } VkExportSemaphoreCreateInfo;
+    
+    // exclusive for VKt-4 and final ray tracing
+    // required for acceleration structure into descriptor set (uint64_t inline)
+    typedef struct VkWriteDescriptorSetInlineUniformBlockEXT {
+        VkStructureType    sType    = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET_INLINE_UNIFORM_BLOCK_EXT;
+        const void*        pNext    = nullptr;
+        uint32_t           dataSize = 0u;
+        const void*        pData    = nullptr;
+
+        // 
+        template<class T = uint8_t> 
+        VkWriteDescriptorSetInlineUniformBlockEXT& setData(const std::vector<T>& V = {}) { 
+            this->pData = V.data(); 
+            this->dataSize = V.size(); 
+            return *this; 
+        };
+
+        // 
+        STRUCT_OPERATORS(VkWriteDescriptorSetInlineUniformBlockEXT)
+        VK_HPP_STRUCT_OPERATORS(VkWriteDescriptorSetInlineUniformBlockEXT, vk::WriteDescriptorSetInlineUniformBlockEXT)
+    } VkWriteDescriptorSetInlineUniformBlockEXT;
+
+    // 
+    typedef struct VkDescriptorPoolInlineUniformBlockCreateInfoEXT {
+        VkStructureType    sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_INLINE_UNIFORM_BLOCK_CREATE_INFO_EXT;
+        const void*        pNext = nullptr;
+        uint32_t           maxInlineUniformBlockBindings = 0u;
+
+        // 
+        STRUCT_OPERATORS(VkDescriptorPoolInlineUniformBlockCreateInfoEXT)
+        VK_HPP_STRUCT_OPERATORS(VkDescriptorPoolInlineUniformBlockCreateInfoEXT, vk::DescriptorPoolInlineUniformBlockCreateInfoEXT)
+    } VkDescriptorPoolInlineUniformBlockCreateInfoEXT;
+
 
 #pragma pack(pop)
 
