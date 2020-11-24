@@ -126,10 +126,8 @@ namespace vkh {
     };
 #endif
 
-#if defined(VK_ENABLE_BETA_EXTENSIONS) && defined(VKT_ENABLE_LEGACY_RAY_TRACING)
-    // TODO: REMOVE CODE TAFTOLOGY
-    class VsRayTracingPipelineCreateInfoHelper { 
-    protected: 
+    class VsRayTracingPipelineCreateInfoHelper {
+    protected:
         VkRayTracingShaderGroupCreateInfoKHR raygenShaderGroup = {};
         std::vector<VkPipelineShaderStageCreateInfo> stages = {};
         std::vector<VkRayTracingShaderGroupCreateInfoKHR> missShaderGroups = {};
@@ -140,7 +138,7 @@ namespace vkh {
         VkRayTracingPipelineCreateInfoKHR vkInfo = {};
         uintptr_t raygenOffsetIndex() { return 0u; };
         uintptr_t missOffsetIndex() { return 1u; };
-        uintptr_t hitOffsetIndex() { return missShaderGroups.size()+missOffsetIndex(); };
+        uintptr_t hitOffsetIndex() { return missShaderGroups.size() + missOffsetIndex(); };
         uintptr_t groupCount() { return missShaderGroups.size() + hitShaderGroups.size() + 1u; };
 
         //
@@ -196,7 +194,7 @@ namespace vkh {
                     };
                     if (stage.stage == VK_SHADER_STAGE_INTERSECTION_BIT_KHR) {
                         group.type = VK_RAY_TRACING_SHADER_GROUP_TYPE_PROCEDURAL_HIT_GROUP_KHR,
-                        group.intersectionShader = static_cast<uint32_t>(lastIdx);
+                            group.intersectionShader = static_cast<uint32_t>(lastIdx);
                     };
                 };
             };
@@ -216,30 +214,22 @@ namespace vkh {
         };
 
         // 
-        inline operator const ::VkRayTracingPipelineCreateInfoKHR* () const { return vkInfo; };
-        inline operator const VkRayTracingPipelineCreateInfoKHR* () { return &vkInfo; };
+        inline operator const ::VkRayTracingPipelineCreateInfoKHR* () const { return &vkInfo; };
+        inline operator ::VkRayTracingPipelineCreateInfoKHR* () { return &format(); };
 
         // 
-        inline operator ::VkRayTracingPipelineCreateInfoKHR* () { return format(); };
-        inline operator VkRayTracingPipelineCreateInfoKHR* () { return &format(); };
+        inline operator const ::VkRayTracingPipelineCreateInfoKHR& () const { return vkInfo; };
+        inline operator const VkRayTracingPipelineCreateInfoKHR& () { return vkInfo; };
 
         // 
-        inline operator const ::VkRayTracingPipelineCreateInfoKHR&() const { return vkInfo; };
-        inline operator const VkRayTracingPipelineCreateInfoKHR&() { return vkInfo; };
-
-        // 
-        inline operator ::VkRayTracingPipelineCreateInfoKHR&() { return format(); };
-        inline operator VkRayTracingPipelineCreateInfoKHR&() { return format(); };
+        inline operator ::VkRayTracingPipelineCreateInfoKHR& () { return format(); };
+        inline operator VkRayTracingPipelineCreateInfoKHR& () { return format(); };
 
 #ifdef VULKAN_HPP // Vulkan-HPP
         inline operator const vk::RayTracingPipelineCreateInfoKHR& () const { return vkInfo; };
         inline operator vk::RayTracingPipelineCreateInfoKHR& () { return format(); };
 #endif
     };
-#else
-// TODO: Final Ray Tracing Extensions
-    
-#endif
 
     // 
     template<class T = uint8_t>
