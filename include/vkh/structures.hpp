@@ -1178,26 +1178,33 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         VkStructureType                           sType         = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR;
         const void*                               pNext         = nullptr;
         VkGeometryTypeKHR                         geometryType  = {};
-        VkAccelerationStructureGeometryDataKHR    geometry      = VkAccelerationStructureGeometryDataKHR{ .triangles = {} };
+        union {
+              VkAccelerationStructureGeometryDataKHR           geometry = { .triangles = {} };
+            ::VkAccelerationStructureGeometryTrianglesDataKHR  triangles;
+            ::VkAccelerationStructureGeometryInstancesDataKHR  instances;
+            ::VkAccelerationStructureGeometryAabbsDataKHR      aabbs    ;
+        };
         FLAGF(VkGeometry, KHR)                    flags         = VsDefaultGeometryFlags;
 
-        // TODO: type depending of `VkAccelerationStructureGeometryDataKHR`
+        // TODO: type depending of `VkAccelerationStructureGeometryDataKHR` argument
         VkAccelerationStructureGeometryKHR& operator=(const VkAccelerationStructureGeometryTrianglesDataKHR& triangles) { this->geometryType = VK_GEOMETRY_TYPE_TRIANGLES_KHR; this->geometry.triangles = triangles; return *this; };
         VkAccelerationStructureGeometryKHR& operator=(const VkAccelerationStructureGeometryInstancesDataKHR& instances) { this->geometryType = VK_GEOMETRY_TYPE_INSTANCES_KHR; this->geometry.instances = instances; return *this; };
         VkAccelerationStructureGeometryKHR& operator=(const VkAccelerationStructureGeometryAabbsDataKHR& aabbs) { this->geometryType = VK_GEOMETRY_TYPE_AABBS_KHR; this->geometry.aabbs = aabbs; return *this; };
+
+        // useless
+        //operator VkAccelerationStructureGeometryAabbsDataKHR& () { return geometry; };
+        //operator const VkAccelerationStructureGeometryAabbsDataKHR& () const { return geometry; };
 
         // 
         operator VkAccelerationStructureGeometryDataKHR& () { return geometry; };
         operator VkAccelerationStructureGeometryTrianglesDataKHR& () { return geometry; };
         operator VkAccelerationStructureGeometryInstancesDataKHR& () { return geometry; };
-        operator VkAccelerationStructureGeometryAabbsDataKHR& () { return geometry; };
-
+        
         // 
         operator const VkAccelerationStructureGeometryDataKHR& () const { return geometry; };
         operator const VkAccelerationStructureGeometryTrianglesDataKHR& () const { return geometry; };
         operator const VkAccelerationStructureGeometryInstancesDataKHR& () const { return geometry; };
-        operator const VkAccelerationStructureGeometryAabbsDataKHR& () const { return geometry; };
-
+        
         // 
         STRUCT_OPERATORS(VkAccelerationStructureGeometryKHR)
         VK_HPP_STRUCT_OPERATORS(VkAccelerationStructureGeometryKHR, vk::AccelerationStructureGeometryKHR)
