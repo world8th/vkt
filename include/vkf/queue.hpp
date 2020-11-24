@@ -48,7 +48,7 @@ namespace vkf {
 
         // 
         virtual VkCommandBuffer createCommandBuffer(vkt::uni_arg<bool> secondary = false, vkt::uni_arg<bool> once = false){
-            return vkt::createCommandBuffer(*device, commandPool, secondary, once);
+            return vkt::createCommandBuffer(device->dispatch, commandPool, secondary, once);
         };
 
         // 
@@ -86,6 +86,13 @@ namespace vkf {
             vkt::submitCmd(device->dispatch, queue, cmds, smbi);
             return this;
         };
+
+        // 
+        virtual const Queue* submitCmdAsync(const std::vector<VkCommandBuffer>& cmds, vkt::uni_arg<vkh::VkSubmitInfo> smbi = vkh::VkSubmitInfo{}) const {
+            vkt::submitCmdAsync(device->dispatch, queue, cmds, smbi);
+            return this;
+        };
+
     };
 
 };

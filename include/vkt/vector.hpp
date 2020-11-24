@@ -84,7 +84,7 @@ namespace vkt {
 
             // 
             if (this->info.memUsage == VMA_MEMORY_USAGE_GPU_ONLY) {
-                createInfo->usage->eSharedDeviceAddress = 1; // NEEDS SHARED BIT!
+                createInfo->usage->eShaderDeviceAddress = 1; // NEEDS SHARED BIT!
                 allocFlags.flags->eAddress = 1;
             };
 
@@ -223,20 +223,20 @@ namespace vkt {
 
         // 
         virtual vkh::VkDeviceOrHostAddressKHR deviceAddress() {
-            if (!this->usage.eSharedDeviceAddress) {
+            if (!this->usage.eShaderDeviceAddress) {
                 std::cerr << "Bad Device Address" << std::endl;
                 assert(true);
             };
-            return vkh::VkDeviceOrHostAddressKHR{ .deviceAddress = this->usage.eSharedDeviceAddress ? this->info.deviceDispatch->GetBufferDeviceAddress(vkh::VkBufferDeviceAddressInfo{.buffer = this->buffer}) : 0ull };
+            return vkh::VkDeviceOrHostAddressKHR{ .deviceAddress = this->usage.eShaderDeviceAddress ? this->info.deviceDispatch->GetBufferDeviceAddress(vkh::VkBufferDeviceAddressInfo{.buffer = this->buffer}) : 0ull };
         };
 
         // 
         virtual vkh::VkDeviceOrHostAddressConstKHR deviceAddress() const {
-            if (!this->usage.eSharedDeviceAddress) {
+            if (!this->usage.eShaderDeviceAddress) {
                 std::cerr << "Bad Device Address" << std::endl;
                 assert(true);
             };
-            return vkh::VkDeviceOrHostAddressConstKHR{ .deviceAddress = this->usage.eSharedDeviceAddress ? const_cast<MemoryAllocationInfo&>(this->info).deviceDispatch->GetBufferDeviceAddress(vkh::VkBufferDeviceAddressInfo{.buffer = this->buffer}) : 0ull };
+            return vkh::VkDeviceOrHostAddressConstKHR{ .deviceAddress = this->usage.eShaderDeviceAddress ? const_cast<MemoryAllocationInfo&>(this->info).deviceDispatch->GetBufferDeviceAddress(vkh::VkBufferDeviceAddressInfo{.buffer = this->buffer}) : 0ull };
         };
             
         // getter by operator (for direct pass)
@@ -283,7 +283,7 @@ namespace vkt {
         ) {
             VmaAllocationCreateInfo vmaInfo = {}; vmaInfo.usage = memInfo->memUsage;
             if (memInfo->memUsage == VMA_MEMORY_USAGE_CPU_TO_GPU || memInfo->memUsage == VMA_MEMORY_USAGE_GPU_TO_CPU) { vmaInfo.flags = VMA_ALLOCATION_CREATE_MAPPED_BIT; };
-            if (memInfo->memUsage == VMA_MEMORY_USAGE_GPU_ONLY) { createInfo->usage->eSharedDeviceAddress = 1; }; // NEEDS SHARED BIT!
+            if (memInfo->memUsage == VMA_MEMORY_USAGE_GPU_ONLY) { createInfo->usage->eShaderDeviceAddress = 1; }; // NEEDS SHARED BIT!
 
             // 
             vkh::handleVk(vmaCreateBuffer(this->allocator = allocator.ref(), *createInfo, &vmaInfo, &reinterpret_cast<VkBuffer&>(this->buffer), &this->allocation, &this->allocationInfo));
@@ -371,20 +371,20 @@ namespace vkt {
 
         //
         virtual vkh::VkDeviceOrHostAddressKHR deviceAddress() {
-            if (!this->usage.eSharedDeviceAddress) {
+            if (!this->usage.eShaderDeviceAddress) {
                 std::cerr << "Bad Device Address" << std::endl;
                 assert(true);
             };
-            return vkh::VkDeviceOrHostAddressKHR{ .deviceAddress = this->usage.eSharedDeviceAddress ? this->info.deviceDispatch->GetBufferDeviceAddress(vkh::VkBufferDeviceAddressInfo{.buffer = this->buffer}) : 0ull };
+            return vkh::VkDeviceOrHostAddressKHR{ .deviceAddress = this->usage.eShaderDeviceAddress ? this->info.deviceDispatch->GetBufferDeviceAddress(vkh::VkBufferDeviceAddressInfo{.buffer = this->buffer}) : 0ull };
         };
 
         // 
         virtual vkh::VkDeviceOrHostAddressConstKHR deviceAddress() const {
-            if (!this->usage.eSharedDeviceAddress) {
+            if (!this->usage.eShaderDeviceAddress) {
                 std::cerr << "Bad Device Address" << std::endl;
                 assert(true);
             };
-            return vkh::VkDeviceOrHostAddressConstKHR{ .deviceAddress = this->usage.eSharedDeviceAddress ? const_cast<MemoryAllocationInfo&>(this->info).deviceDispatch->GetBufferDeviceAddress(vkh::VkBufferDeviceAddressInfo{.buffer = this->buffer}) : 0ull};
+            return vkh::VkDeviceOrHostAddressConstKHR{ .deviceAddress = this->usage.eShaderDeviceAddress ? const_cast<MemoryAllocationInfo&>(this->info).deviceDispatch->GetBufferDeviceAddress(vkh::VkBufferDeviceAddressInfo{.buffer = this->buffer}) : 0ull};
         };
 
     // 
@@ -423,7 +423,7 @@ namespace vkt {
             const auto rangeLim = this->ranged();
             this->allocation = allocation;
             this->bufInfo = vkh::VkDescriptorBufferInfo{ static_cast<VkBuffer>(allocation->buffer), offset, size };
-            this->bufRegion = vkh::VkStridedBufferRegionKHR{ static_cast<VkBuffer>(allocation->buffer), offset, striding, (rangeLim / striding) * striding };
+            this->bufRegion = vkh::VkStridedDeviceAddressRegionKHR{ deviceAddress(), striding, (rangeLim / striding) * striding };
             this->bufInfo.range = rangeLim;
             return this;
         };
@@ -431,9 +431,9 @@ namespace vkt {
         // 
         virtual VkBufferView& createBufferView(const VkFormat& format = VK_FORMAT_UNDEFINED) {
             vkh::handleVk(this->allocation->info.deviceDispatch->CreateBufferView(vkh::VkBufferViewCreateInfo{
-                .buffer = static_cast<VkBuffer>(this->bufRegion.buffer),
+                .buffer = static_cast<VkBuffer>(this->bufInfo.buffer),
                 .format = static_cast<VkFormat>(format),
-                .offset = this->bufRegion.offset,
+                .offset = this->bufInfo.offset,
                 .range = this->bufInfo.range
             }, nullptr, &view));
             return view;
@@ -448,14 +448,14 @@ namespace vkt {
         template<class Tm = T> inline VectorBase& operator=(const vkt::uni_arg<Vector<Tm>>& V) {
             this->allocation = V.uniPtr();
             this->bufInfo = vkh::VkDescriptorBufferInfo{ static_cast<VkBuffer>(V.buffer()), V.offset(), V.ranged() };
-            this->bufRegion = vkh::VkStridedBufferRegionKHR{ static_cast<VkBuffer>(V.buffer()), V.offset(), V.stride(), (V.ranged() / V.stride())*V.stride() };
+            this->bufRegion = vkh::VkStridedDeviceAddressRegionKHR{ V.deviceAddress(), V.stride(), (V.ranged() / V.stride())*V.stride() };
             this->bufInfo.range = this->bufRegion.size;
             return *this;
         };
 
         // 
-        virtual operator    ::VkDescriptorBufferInfo& () { this->bufInfo.buffer = this->bufRegion.buffer = allocation->buffer; return bufInfo; };
-        virtual operator vkh::VkDescriptorBufferInfo& () { this->bufInfo.buffer = this->bufRegion.buffer = allocation->buffer; return bufInfo; };
+        virtual operator    ::VkDescriptorBufferInfo& () { this->bufInfo.buffer = this->bufInfo.buffer = allocation->buffer; return bufInfo; };
+        virtual operator vkh::VkDescriptorBufferInfo& () { this->bufInfo.buffer = this->bufInfo.buffer = allocation->buffer; return bufInfo; };
         virtual operator vkt::uni_ptr<BufferAllocation>& () { return allocation; };
         virtual operator std::shared_ptr<BufferAllocation>& () { return allocation; };
 
@@ -484,8 +484,8 @@ namespace vkt {
         template<class Tm = T> inline const Vector<Tm>& cast() const { return dynamic_cast<const Vector<Tm>&>(*this); };
 
         // 
-        virtual VkDeviceSize& offset() { return this->bufRegion.offset; };
-        virtual const VkDeviceSize& offset() const { return this->bufRegion.offset; };
+        virtual VkDeviceSize& offset() { return this->bufInfo.offset; };
+        virtual const VkDeviceSize& offset() const { return this->bufInfo.offset; };
 
         // LEGACY, used for constructor only
         virtual VkDeviceSize ranged() const { return (this->bufInfo.range != VK_WHOLE_SIZE ? std::min(VkDeviceSize(this->bufInfo.range), VkDeviceSize(this->allocation->range() - this->offset())) : VkDeviceSize(this->allocation->range() - this->offset())); };
@@ -550,8 +550,8 @@ namespace vkt {
         virtual const vkh::VkDescriptorBufferInfo& getDescriptor() const { return bufInfo; };
 
         // 
-        virtual vkh::VkDescriptorBufferInfo* getDescriptorPtr() { return &bufInfo; };
-        virtual const vkh::VkDescriptorBufferInfo* getDescriptorPtr() const { return &bufInfo; };
+        virtual ::VkDescriptorBufferInfo* getDescriptorPtr() { return &bufInfo; };
+        virtual const ::VkDescriptorBufferInfo* getDescriptorPtr() const { return &bufInfo; };
 
         // alias of uniPtr
         virtual vkt::uni_ptr<BufferAllocation>& getAllocation() { return allocation; };
@@ -561,14 +561,18 @@ namespace vkt {
         virtual BufferAllocation* getAllocationPtr() { return allocation.ptr(); };
         virtual const BufferAllocation* getAllocationPtr() const { return allocation.ptr(); };
 
-        // get deviceAddress with offset (currently, prefer unshifted)
+        // get deviceAddress with offset
         virtual vkh::VkDeviceOrHostAddressKHR deviceAddress() {
-            return this->allocation->deviceAddress();
+            auto deviceAddress = this->allocation->deviceAddress();
+            deviceAddress.deviceAddress += this->offset();
+            return deviceAddress;
         };
 
-        // get deviceAddress with offset (currently, prefer unshifted)
+        // get deviceAddress with offset
         virtual vkh::VkDeviceOrHostAddressConstKHR deviceAddress() const {
-            return this->allocation->deviceAddress();
+            auto deviceAddress = this->allocation->deviceAddress();
+            deviceAddress.deviceAddress += this->offset();
+            return deviceAddress;
         };
 
         // 
@@ -576,8 +580,8 @@ namespace vkt {
         virtual const std::vector<uint32_t>& getQueueFamilyIndices() const { return this->allocation->getQueueFamilyIndices(); };
 
         // 
-        virtual vkh::VkStridedBufferRegionKHR& getRegion() { return bufRegion; };
-        virtual const vkh::VkStridedBufferRegionKHR& getRegion() const { return bufRegion; };
+        virtual vkh::VkStridedDeviceAddressRegionKHR& getRegion() { return bufRegion; };
+        virtual const vkh::VkStridedDeviceAddressRegionKHR& getRegion() const { return bufRegion; };
 
         // getter by operator (for direct pass)
         virtual operator vkh::VkDeviceOrHostAddressKHR() { return this->deviceAddress(); };
@@ -598,7 +602,7 @@ namespace vkt {
         //protected: friend Vector<T>; // 
         protected: VkBufferView view = VK_NULL_HANDLE;
         protected: vkh::VkDescriptorBufferInfo bufInfo = { VK_NULL_HANDLE, 0u, VK_WHOLE_SIZE }; // Cached Feature
-        protected: vkh::VkStridedBufferRegionKHR bufRegion = { VK_NULL_HANDLE, 0u, 1u, VK_WHOLE_SIZE };
+        protected: vkh::VkStridedDeviceAddressRegionKHR bufRegion = { 0u, 1u, VK_WHOLE_SIZE };
         protected: vkt::uni_ptr<BufferAllocation> allocation = {};
         protected: uint8_t* pMapped = nullptr;
         //protected: T pMapped[8] = nullptr;
@@ -634,7 +638,7 @@ namespace vkt {
         template<class Tm = T> inline Vector<T>& operator=(const vkt::uni_arg<Vector<Tm>>& V) {
             this->allocation = V.uniPtr();
             this->bufInfo = vkh::VkDescriptorBufferInfo{ static_cast<VkBuffer>(V.buffer()), V.offset(), V.ranged() };
-            this->bufRegion = vkh::VkStridedBufferRegionKHR{ static_cast<VkBuffer>(V.buffer()), V.offset(), V.stride(), (V.ranged() / V.stride())*V.stride() };
+            this->bufRegion = vkh::VkStridedDeviceAddressRegionKHR{ V.deviceAddress(), V.stride(), (V.ranged() / V.stride())*V.stride() };
             this->bufInfo.range = this->bufRegion.size;
             return *this;
         };

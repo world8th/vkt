@@ -256,8 +256,8 @@ namespace vkh {
          ~VsDescriptorHandle() {  };
 
         // any buffers and images can `write` into types
-        inline VsDescriptorHandle<M> offset(const uint32_t& idx = 0u) { return VsDescriptorHandle<M>(count, stride_t*idx+field_t, V_t); };
-        inline const VsDescriptorHandle<M> offset(const uint32_t& idx = 0u) const { return VsDescriptorHandle<M>(count, stride_t*idx+field_t, V_t); };
+        inline VsDescriptorHandle<T> offset(const uint32_t& idx = 0u) { return VsDescriptorHandle<T>(count, stride_t*idx+field_t, V_t); };
+        inline const VsDescriptorHandle<T> offset(const uint32_t& idx = 0u) const { return VsDescriptorHandle<T>(count, stride_t*idx+field_t, V_t); };
         template<class M> inline VsDescriptorHandle<M> offset(const uint32_t& idx = 0u) { return VsDescriptorHandle<M>(count, sizeof(M)*idx+field_t, V_t); };
         template<class M> inline const VsDescriptorHandle<M> offset(const uint32_t& idx = 0u) const { return VsDescriptorHandle<M>(count, sizeof(M)*idx+field_t, V_t); };
         inline const uint32_t& size() const { return count; };
@@ -360,20 +360,12 @@ namespace vkh {
         inline operator VkDescriptorUpdateTemplateCreateInfo& () { return format(); };
 
         // 
-        inline operator ::VkDescriptorSetAllocateInfo* () { return allocate_info; };
-        inline operator ::VkDescriptorUpdateTemplateCreateInfo* () { return format(); };
+        inline operator ::VkDescriptorSetAllocateInfo* () { return &allocate_info; };
+        inline operator ::VkDescriptorUpdateTemplateCreateInfo* () { return &format(); };
 
         // 
-        inline operator VkDescriptorSetAllocateInfo* () { return &allocate_info; };
-        inline operator VkDescriptorUpdateTemplateCreateInfo* () { return &format(); };
-
-        // 
-        inline operator const ::VkDescriptorSetAllocateInfo* () const { return allocate_info; };
-        inline operator const ::VkDescriptorUpdateTemplateCreateInfo* () const { return template_info; };
-
-        // 
-        inline operator const VkDescriptorSetAllocateInfo* () const { return &allocate_info; };
-        inline operator const VkDescriptorUpdateTemplateCreateInfo* () const { return &template_info; };
+        inline operator const ::VkDescriptorSetAllocateInfo* () const { return &allocate_info; };
+        inline operator const ::VkDescriptorUpdateTemplateCreateInfo* () const { return &template_info; };
 
         // 
         inline operator const ::VkDescriptorSetAllocateInfo& () const { return allocate_info; };
@@ -397,7 +389,7 @@ namespace vkh {
             entries.resize(handles.size());
             uint32_t I = 0; for (auto& hndl : handles) {
                 const uint32_t i = I++;
-                const auto& entry = hndl.entry_t;
+                const auto& entry = entries[i];//hndl.entry_t;
                 const auto& pt0 = entry.offset;
 
                 if (entry.descriptorType == VK_DESCRIPTOR_TYPE_STORAGE_BUFFER || entry.descriptorType == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER) { // Map Buffers
@@ -502,12 +494,8 @@ namespace vkh {
         inline operator VkDescriptorSetLayoutCreateInfo&() { return format(); };
 
         // 
-        inline operator const ::VkDescriptorSetLayoutCreateInfo* () const { return vk_info; };
-        inline operator ::VkDescriptorSetLayoutCreateInfo* () { return format(); };
-
-        // 
-        inline operator const VkDescriptorSetLayoutCreateInfo* () const { return &vk_info; };
-        inline operator VkDescriptorSetLayoutCreateInfo* () { return &format(); };
+        inline operator const ::VkDescriptorSetLayoutCreateInfo* () const { return &vk_info; };
+        inline operator ::VkDescriptorSetLayoutCreateInfo* () { return &format(); };
 
         // 
         inline const VkDescriptorSetLayoutCreateInfo& get() const { return vk_info; };
@@ -549,12 +537,8 @@ namespace vkh {
         };
 
         // 
-        inline operator const VkRenderPassCreateInfo* () const { return &vk_info; };
-        inline operator VkRenderPassCreateInfo* () { return &format(); };
-
-        // 
-        inline operator const ::VkRenderPassCreateInfo* () const { return vk_info; };
-        inline operator ::VkRenderPassCreateInfo* () { return format(); };
+        inline operator const ::VkRenderPassCreateInfo* () const { return &vk_info; };
+        inline operator ::VkRenderPassCreateInfo* () { return &format(); };
 
         // 
         inline operator const VkRenderPassCreateInfo& () const { return vk_info; };
@@ -655,12 +639,8 @@ namespace vkh {
 #endif
 
         //
-        inline operator ::VkGraphicsPipelineCreateInfo* () { construct(); return graphicsPipelineCreateInfo; };
-        inline operator const ::VkGraphicsPipelineCreateInfo* () const { return graphicsPipelineCreateInfo; };
-
-        // 
-        inline operator VkGraphicsPipelineCreateInfo* () { construct(); return &graphicsPipelineCreateInfo; };
-        inline operator const VkGraphicsPipelineCreateInfo* () const { return &graphicsPipelineCreateInfo; };
+        inline operator ::VkGraphicsPipelineCreateInfo* () { construct(); return &graphicsPipelineCreateInfo; };
+        inline operator const ::VkGraphicsPipelineCreateInfo* () const { return &graphicsPipelineCreateInfo; };
 
         // 
         inline VsGraphicsPipelineCreateInfoConstruction& operator=(const VkGraphicsPipelineCreateInfo& info) { graphicsPipelineCreateInfo = info; construct(); return *this; };
@@ -684,8 +664,8 @@ namespace vkh {
         };
 
         // direct access operator
-        inline VkGraphicsPipelineCreateInfo* operator->() { construct(); return &graphicsPipelineCreateInfo; };
-        inline const VkGraphicsPipelineCreateInfo* operator->() const { return &graphicsPipelineCreateInfo; };
+        inline ::VkGraphicsPipelineCreateInfo* operator->() { construct(); return &graphicsPipelineCreateInfo; };
+        inline const ::VkGraphicsPipelineCreateInfo* operator->() const { return &graphicsPipelineCreateInfo; };
     };
 
 

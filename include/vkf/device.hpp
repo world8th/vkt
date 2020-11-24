@@ -16,7 +16,7 @@ namespace vkf {
         vkh::VkPhysicalDeviceFeatures2 gFeatures{};
         vk::PhysicalDeviceShaderAtomicFloatFeaturesEXT gAtomicFloat{};
         vk::PhysicalDeviceTransformFeedbackFeaturesEXT gTrasformFeedback{};
-        vk::PhysicalDeviceRayTracingFeaturesKHR gRayTracing{};
+        vk::PhysicalDeviceRayTracingPipelineFeaturesKHR gRayTracing{};
         vk::PhysicalDeviceTexelBufferAlignmentFeaturesEXT gTexelBufferAligment{};
         vk::PhysicalDevice16BitStorageFeatures gStorage16{};
         vk::PhysicalDevice8BitStorageFeatures gStorage8{};
@@ -25,6 +25,7 @@ namespace vkf {
         vk::PhysicalDeviceBufferDeviceAddressFeatures gDeviceAddress{};
         vk::PhysicalDeviceFragmentShaderBarycentricFeaturesNV gBarycentric{};
         vk::PhysicalDeviceExtendedDynamicStateFeaturesEXT gExtendedDynamic{};
+        vk::PhysicalDeviceAccelerationStructureFeaturesKHR gAccelerationStructure{};
     };
 
     // TODO: DEDICATED QUEUE OBJECT
@@ -127,6 +128,7 @@ namespace vkf {
             this->layers = layers;
 
             // 
+            features.gAtomicFloat.pNext = &features.gAccelerationStructure;
             features.gExtendedDynamic.pNext = &features.gAtomicFloat;
             features.gBarycentric.pNext = &features.gExtendedDynamic;
             features.gRayTracing.pNext = &features.gBarycentric;

@@ -39,9 +39,9 @@ namespace vkh {
     #define VK_HPP_OPERATORS(NAME,FTYP,BITS) \
         inline static FTYP cpp() { const auto data = NAME{}; return reinterpret_cast<const FTYP&>(data); };\
         inline NAME& operator=(vkt::uni_arg<BITS> F) { memcpy(this, &(*F), sizeof(NAME)); return *this; };\
-        inline NAME operator|(vkt::uni_arg<FTYP> F) { auto f = (*F) | reinterpret_cast<BITS&>(*this); return std::move(reinterpret_cast<NAME&>(f)); };\
-        inline NAME operator&(vkt::uni_arg<FTYP> F) { auto f = (*F) & reinterpret_cast<BITS&>(*this); return std::move(reinterpret_cast<NAME&>(f)); };\
-        inline NAME operator^(vkt::uni_arg<FTYP> F) { auto f = (*F) ^ reinterpret_cast<BITS&>(*this); return std::move(reinterpret_cast<NAME&>(f)); };\
+        inline NAME operator|(vkt::uni_arg<BITS> F) { auto f = (*F) | reinterpret_cast<BITS&>(*this); return std::move(reinterpret_cast<NAME&>(f)); };\
+        inline NAME operator&(vkt::uni_arg<BITS> F) { auto f = (*F) & reinterpret_cast<BITS&>(*this); return std::move(reinterpret_cast<NAME&>(f)); };\
+        inline NAME operator^(vkt::uni_arg<BITS> F) { auto f = (*F) ^ reinterpret_cast<BITS&>(*this); return std::move(reinterpret_cast<NAME&>(f)); };\
         inline NAME& operator=(vkt::uni_arg<FTYP> F) { memcpy(this, &(*F), sizeof(NAME)); return *this; };\
         inline NAME operator|(vkt::uni_arg<FTYP> F) { auto f = (*F) | reinterpret_cast<FTYP&>(*this); return std::move(reinterpret_cast<NAME&>(f)); };\
         inline NAME operator&(vkt::uni_arg<FTYP> F) { auto f = (*F) & reinterpret_cast<FTYP&>(*this); return std::move(reinterpret_cast<NAME&>(f)); };\
@@ -80,11 +80,14 @@ namespace vkh {
         eVertexBuffer : 1,
         eIndirectBuffer : 1,
         eConditionalRendering : 1,
-        eRayTracing : 1,
+        eShaderBindingTable : 1,
         eTransformFeedbackBuffer : 1,
         eTransformFeedbackCounterBuffer : 1,
-        eUnknown:4,
-        eSharedDeviceAddress : 1;
+         : 4,
+        eShaderDeviceAddress : 1,
+         : 1,
+        eAccelerationStructureBuildInputReadOnly : 1,
+        eAccelerationStructureStorage : 1;
 
         OPERATORS(VkBufferUsageFlags, ::VkBufferUsageFlagBits,::VkFlags)
         VK_HPP_OPERATORS(VkBufferUsageFlags,vk::BufferUsageFlags,vk::BufferUsageFlagBits)
@@ -455,7 +458,7 @@ namespace vkh {
         eCaptureInternalRepresentations:1,
         eFailOnPipelineCompileRequired:1,
         eEarlyReturnOnFailure:1,
-        eUnknown:1,
+        :1,
         eLibrary:1,
         eRayTracingSkipTriangles:1,
         eRayTracingSkipAABBs:1,
@@ -529,7 +532,7 @@ namespace vkh {
         eForceOpaque:1,
         eForceNoOpaque:1;
 
-        OPERATORS(VkGeometryInstanceFlagsKHR, ::VkGeometryInstanceFlagBitsKHR, ::uint8_t)
+        OPERATORS(VkGeometryInstanceFlagsKHR, ::VkGeometryInstanceFlagBitsKHR, ::VkFlags)
         VK_HPP_OPERATORS(VkGeometryInstanceFlagsKHR,vk::GeometryInstanceFlagsKHR,vk::GeometryInstanceFlagBitsKHR)
     };
 #pragma pack(pop)

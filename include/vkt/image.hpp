@@ -632,8 +632,8 @@ namespace vkt {
         virtual const vkh::VkDescriptorImageInfo& getDescriptor() const { return imgInfo; };
 
         // 
-        virtual vkh::VkDescriptorImageInfo* getDescriptorPtr() { return &imgInfo; };
-        virtual const vkh::VkDescriptorImageInfo* getDescriptorPtr() const { return &imgInfo; };
+        virtual ::VkDescriptorImageInfo* getDescriptorPtr() { return &imgInfo; };
+        virtual const ::VkDescriptorImageInfo* getDescriptorPtr() const { return &imgInfo; };
 
     protected: friend VmaImageAllocation; friend ImageAllocation; // 
         vkh::VkDescriptorImageInfo imgInfo = { .sampler = VK_NULL_HANDLE, .imageView = VK_NULL_HANDLE, .imageLayout = VK_IMAGE_LAYOUT_UNDEFINED };

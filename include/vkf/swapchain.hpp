@@ -244,19 +244,17 @@ namespace vkf {
             {
                 auto aspect = vkh::VkImageAspectFlags{ .eDepth = 1, .eStencil = 1 };
                 auto depuse = vkh::VkImageUsageFlags{ .eTransferDst = 1, .eSampled = 1, .eDepthStencilAttachment = 1 };
-                depuse = depuse | VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
+                depuse.eDepthStencilAttachment = 1;
 
                 vkt::VmaMemoryInfo memInfo = {};
-                this->depthImage = vkt::ImageRegion(std::make_shared<vkt::VmaImageAllocation>(this->device->allocator, vkh::VkImageCreateInfo{}.also([=](vkh::VkImageCreateInfo* it) {
-                    it->format = surfaceFormats.depthFormat,
-                    it->extent = vkh::VkExtent3D{ surfaceWindow.surfaceSize.width, surfaceWindow.surfaceSize.height, 1u },
-                    it->usage = depuse;
-                    return it;
-                }), memInfo), vkh::VkImageViewCreateInfo{}.also([=](vkh::VkImageViewCreateInfo* it) {
-                    it->format = surfaceFormats.depthFormat,
-                    it->subresourceRange = vkh::VkImageSubresourceRange{ .aspectMask = aspect };
-                    return it;
-                }), VK_IMAGE_LAYOUT_GENERAL);
+                this->depthImage = vkt::ImageRegion(std::make_shared<vkt::VmaImageAllocation>(this->device->allocator, vkh::VkImageCreateInfo{
+                    .format = surfaceFormats.depthFormat,
+                    .extent = vkh::VkExtent3D{ surfaceWindow.surfaceSize.width, surfaceWindow.surfaceSize.height, 1u },
+                    .usage = depuse
+                }, memInfo), vkh::VkImageViewCreateInfo{
+                    .format = surfaceFormats.depthFormat,
+                    .subresourceRange = vkh::VkImageSubresourceRange{.aspectMask = aspect }
+                }, VK_IMAGE_LAYOUT_GENERAL);
 
                 vkh::handleVk(device->dispatch->CreateSampler(vkh::VkSamplerCreateInfo{
                     .magFilter = VK_FILTER_LINEAR,
@@ -277,15 +275,14 @@ namespace vkf {
                 // Image Views
                 auto flags = VkImageViewCreateFlags{};
                 auto aspect = vkh::VkImageAspectFlags{ .eColor = 1 };
-                vkh::handleVk(device->dispatch->CreateImageView(vkh::VkImageViewCreateInfo{}.also([=](vkh::VkImageViewCreateInfo* it) {
-                    it->flags = {},
-                    it->image = swapchainImages[i],
-                    it->viewType = VK_IMAGE_VIEW_TYPE_2D,
-                    it->format = surfaceFormats.colorFormat,
-                    it->components = vkh::VkComponentMapping{},
-                    it->subresourceRange = vkh::VkImageSubresourceRange{ aspect, 0, 1, 0, 1 };
-                    return it;
-                }), nullptr, &views[0]));
+                vkh::handleVk(device->dispatch->CreateImageView(vkh::VkImageViewCreateInfo{
+                    .flags = {},
+                    .image = swapchainImages[i],
+                    .viewType = VK_IMAGE_VIEW_TYPE_2D,
+                    .format = surfaceFormats.colorFormat,
+                    .components = vkh::VkComponentMapping{},
+                    .subresourceRange = vkh::VkImageSubresourceRange{ aspect, 0, 1, 0, 1 }
+                }, nullptr, &views[0]));
                 views[1] = this->depthImage.getImageView(); // depth view
 
                 // 
@@ -296,15 +293,12 @@ namespace vkf {
                 queue->submitOnce([&, this](VkCommandBuffer& cmd) {
                     this->device->dispatch->CmdClearDepthStencilImage(cmd, this->depthImage.transfer(cmd), this->depthImage.getImageLayout(), vkh::VkClearDepthStencilValue{ .depth = 1.0f, .stencil = 0 }, 1u, depthImage.getImageSubresourceRange());
                     for (int i = 0; i < swapchainImages.size(); i++) {
+                        auto aspect = vkh::VkImageAspectFlags{ .eColor = 1u };
                         vkt::imageBarrier(cmd, vkt::ImageBarrierInfo{
                             .image = swapchainImages[i],
                             .targetLayout = VK_IMAGE_LAYOUT_GENERAL,
                             .originLayout = VK_IMAGE_LAYOUT_UNDEFINED,
-                            .subresourceRange = vkh::VkImageSubresourceRange{ {}, 0u, 1u, 0u, 1u }.also([=](auto* it) {
-                                auto aspect = vkh::VkImageAspectFlags{.eColor = 1u };
-                                it->aspectMask = aspect;
-                                return it;
-                            })
+                            .subresourceRange = vkh::VkImageSubresourceRange{ aspect, 0u, 1u, 0u, 1u }
                         });
                     };
                 });

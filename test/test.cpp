@@ -86,8 +86,8 @@ int main() {
     pipelineInfo.graphicsPipelineCreateInfo.layout = pipelineLayout;
     pipelineInfo.graphicsPipelineCreateInfo.renderPass = renderPass;//context->refRenderPass();
     pipelineInfo.inputAssemblyState.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP;
-    pipelineInfo.viewportState.pViewports = &reinterpret_cast<vkh::VkViewport&>(viewport);
-    pipelineInfo.viewportState.pScissors = &reinterpret_cast<vkh::VkRect2D&>(renderArea);
+    pipelineInfo.viewportState.pViewports = &reinterpret_cast<::VkViewport&>(viewport);
+    pipelineInfo.viewportState.pScissors = &reinterpret_cast<::VkRect2D&>(renderArea);
     pipelineInfo.colorBlendAttachmentStates = { {} }; // Default Blend State
     pipelineInfo.dynamicStates = { VK_DYNAMIC_STATE_SCISSOR, VK_DYNAMIC_STATE_VIEWPORT };
 
@@ -133,28 +133,26 @@ int main() {
             commandBuffer = vkt::createCommandBuffer(device->dispatch, queue->commandPool, false, false); // do reference of cmd buffer
 
             // Use as present image
-            vkt::imageBarrier(commandBuffer, vkt::ImageBarrierInfo{
-                .image = framebuffers[currentBuffer].image,
-                .targetLayout = VK_IMAGE_LAYOUT_GENERAL,
-                .originLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
-                .subresourceRange = vkh::VkImageSubresourceRange{ {}, 0u, 1u, 0u, 1u }.also([=](auto* it) {
-                    auto aspect = vkh::VkImageAspectFlags{.eColor = 1u };
-                    it->aspectMask = aspect;
-                    return it;
-                })
-            });
+            {
+                auto aspect = vkh::VkImageAspectFlags{ .eColor = 1u };
+                vkt::imageBarrier(commandBuffer, vkt::ImageBarrierInfo{
+                    .image = framebuffers[currentBuffer].image,
+                    .targetLayout = VK_IMAGE_LAYOUT_GENERAL,
+                    .originLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
+                    .subresourceRange = vkh::VkImageSubresourceRange{ aspect, 0u, 1u, 0u, 1u }
+                });
+            };
 
             // Reuse depth as general
-            vkt::imageBarrier(commandBuffer, vkt::ImageBarrierInfo{
-                .image = manager->depthImage.getImage(),
-                .targetLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
-                .originLayout = VK_IMAGE_LAYOUT_GENERAL,
-                .subresourceRange = vkh::VkImageSubresourceRange{ {}, 0u, 1u, 0u, 1u }.also([=](auto* it) {
-                    auto aspect = vkh::VkImageAspectFlags{.eDepth = 1u, .eStencil = 1u };
-                    it->aspectMask = aspect;
-                    return it;
-                })
-            });
+            {
+                auto aspect = vkh::VkImageAspectFlags{ .eDepth = 1u, .eStencil = 1u };
+                vkt::imageBarrier(commandBuffer, vkt::ImageBarrierInfo{
+                    .image = manager->depthImage.getImage(),
+                    .targetLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
+                    .originLayout = VK_IMAGE_LAYOUT_GENERAL,
+                    .subresourceRange = vkh::VkImageSubresourceRange{ aspect, 0u, 1u, 0u, 1u }
+                });
+            };
 
             // 
             device->dispatch->CmdBeginRenderPass(commandBuffer, vkh::VkRenderPassBeginInfo{ .renderPass = renderPass, .framebuffer = framebuffers[currentBuffer].frameBuffer, .renderArea = renderArea, .clearValueCount = 2u, .pClearValues = reinterpret_cast<vkh::VkClearValue*>(&clearValues[0]) }, VK_SUBPASS_CONTENTS_INLINE);
@@ -167,28 +165,26 @@ int main() {
             vkt::commandBarrier(device->dispatch, commandBuffer);
 
             // Use as present image
-            vkt::imageBarrier(commandBuffer, vkt::ImageBarrierInfo{
-                .image = framebuffers[currentBuffer].image,
-                .targetLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
-                .originLayout = VK_IMAGE_LAYOUT_GENERAL,
-                .subresourceRange = vkh::VkImageSubresourceRange{ {}, 0u, 1u, 0u, 1u }.also([=](auto* it) {
-                    auto aspect = vkh::VkImageAspectFlags{.eColor = 1u };
-                    it->aspectMask = aspect;
-                    return it;
-                })
-            });
+            {
+                auto aspect = vkh::VkImageAspectFlags{ .eColor = 1u };
+                vkt::imageBarrier(commandBuffer, vkt::ImageBarrierInfo{
+                    .image = framebuffers[currentBuffer].image,
+                    .targetLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
+                    .originLayout = VK_IMAGE_LAYOUT_GENERAL,
+                    .subresourceRange = vkh::VkImageSubresourceRange{ aspect, 0u, 1u, 0u, 1u }
+                });
+            };
 
             // Reuse depth as general
-            vkt::imageBarrier(commandBuffer, vkt::ImageBarrierInfo{
-                .image = manager->depthImage.getImage(),
-                .targetLayout = VK_IMAGE_LAYOUT_GENERAL,
-                .originLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
-                .subresourceRange = vkh::VkImageSubresourceRange{ {}, 0u, 1u, 0u, 1u }.also([=](auto* it) {
-                    auto aspect = vkh::VkImageAspectFlags{.eDepth = 1u, .eStencil = 1u };
-                    it->aspectMask = aspect;
-                    return it;
-                })
-            });
+            {
+                auto aspect = vkh::VkImageAspectFlags{ .eDepth = 1u, .eStencil = 1u };
+                vkt::imageBarrier(commandBuffer, vkt::ImageBarrierInfo{
+                    .image = manager->depthImage.getImage(),
+                    .targetLayout = VK_IMAGE_LAYOUT_GENERAL,
+                    .originLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
+                    .subresourceRange = vkh::VkImageSubresourceRange{ aspect, 0u, 1u, 0u, 1u }
+                });
+            };
 
             // 
             device->dispatch->EndCommandBuffer(commandBuffer);
