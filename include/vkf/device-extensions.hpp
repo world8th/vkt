@@ -151,6 +151,7 @@ namespace vkf {
         "VK_KHR_acceleration_structure",
         "VK_KHR_ray_tracing_pipeline",
         "VK_KHR_ray_query",
-        "VK_EXT_inline_uniform_block"
+        "VK_EXT_inline_uniform_block",
+        "VK_KHR_copy_commands2"
     };
 };

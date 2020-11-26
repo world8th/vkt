@@ -19,6 +19,10 @@ namespace vkf {
         uint32_t queueFamilyIndex = 0;
         uint32_t version = 0;
 
+        // rise up vRt feature
+        vkt::Vector<uint8_t> uploadBuffer = {};
+        vkt::Vector<uint8_t> downloadBuffer = {};
+
         Queue(){
             
         };
@@ -42,8 +46,87 @@ namespace vkf {
             device->dispatch->GetDeviceQueue(this->queueFamilyIndex = device->queueFamilyIndices[queueFamilyID], queueIndex, &this->queue);
             vkh::handleVk(device->dispatch->CreateCommandPool(vkh::VkCommandPoolCreateInfo{ .flags = resetFlag, .queueFamilyIndex = queueFamilyIndex }, nullptr, &this->commandPool));
 
+            {
+                auto size = 1024ull * 1024ull * 256ull;
+                auto bufferCreateInfo = vkh::VkBufferCreateInfo{
+                    .size = size,
+                    .usage = VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_TRANSFER_SRC_BIT
+                };
+                auto vmaCreateInfo = vkt::VmaMemoryInfo{
+                    .memUsage = VMA_MEMORY_USAGE_CPU_TO_GPU,
+                    .instanceDispatch = instance->dispatch,
+                    .deviceDispatch = device->dispatch
+                };
+                auto allocation = std::make_shared<vkt::VmaBufferAllocation>(device->allocator, bufferCreateInfo, vmaCreateInfo);
+                uploadBuffer = vkt::Vector<uint8_t>(allocation, 0ull, size);
+            };
+
+            {
+                auto size = 1024ull * 1024ull * 256ull;
+                auto bufferCreateInfo = vkh::VkBufferCreateInfo{
+                    .size = size,
+                    .usage = VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT
+                };
+                auto vmaCreateInfo = vkt::VmaMemoryInfo{
+                    .memUsage = VMA_MEMORY_USAGE_GPU_TO_CPU,
+                    .instanceDispatch = instance->dispatch,
+                    .deviceDispatch = device->dispatch
+                };
+                auto allocation = std::make_shared<vkt::VmaBufferAllocation>(device->allocator, bufferCreateInfo, vmaCreateInfo);
+                downloadBuffer = vkt::Vector<uint8_t>(allocation, 0ull, size);
+            };
+
             // 
             return this->queue;
+        };
+
+        // 
+        virtual const Queue* downloadFromBuffer(void* data, vkt::VectorBase output, VkDeviceSize size) const {
+            size = std::min(size, output.range());
+            VkBufferCopy2KHR srcCopy = {
+                .sType = VK_STRUCTURE_TYPE_BUFFER_COPY_2_KHR,
+                .pNext = nullptr,
+                .srcOffset = output.offset(),
+                .dstOffset = 0ull,
+                .size = size
+            };
+            VkCopyBufferInfo2KHR copyInfo = {
+                .sType = VK_STRUCTURE_TYPE_COPY_BUFFER_INFO_2_KHR,
+                .pNext = nullptr,
+                .srcBuffer = output,
+                .dstBuffer = downloadBuffer,
+                .regionCount = 1,
+                .pRegions = &srcCopy
+            };
+            auto result = this->submitOnce([&](VkCommandBuffer commandBuffer) {
+                device->dispatch->CmdCopyBuffer2KHR(commandBuffer, &copyInfo);
+            });
+            memcpy(data, downloadBuffer.mappedv(), size);
+            return result;
+        };
+
+        // 
+        virtual const Queue* uploadIntoBuffer(vkt::VectorBase input, const void* data, VkDeviceSize size) {
+            size = std::min(size, input.range());
+            VkBufferCopy2KHR srcCopy = {
+                .sType = VK_STRUCTURE_TYPE_BUFFER_COPY_2_KHR,
+                .pNext = nullptr,
+                .srcOffset = 0ull,
+                .dstOffset = input.offset(),
+                .size = size
+            };
+            VkCopyBufferInfo2KHR copyInfo = {
+                .sType = VK_STRUCTURE_TYPE_COPY_BUFFER_INFO_2_KHR,
+                .pNext = nullptr,
+                .srcBuffer = uploadBuffer,
+                .dstBuffer = input,
+                .regionCount = 1,
+                .pRegions = &srcCopy
+            };
+            memcpy(uploadBuffer.mappedv(), data, size);
+            return this->submitOnce([&](VkCommandBuffer commandBuffer) {
+                device->dispatch->CmdCopyBuffer2KHR(commandBuffer, &copyInfo);
+            });
         };
 
         // 
