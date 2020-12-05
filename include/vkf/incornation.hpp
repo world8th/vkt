@@ -37,6 +37,7 @@
 #include <vkt/inline.hpp>
 #include <vkt/vector.hpp>
 #include <vkt/image.hpp>
+#include <vkh/matching.hpp>
 
 //
 #include <vkt/essential.hpp>

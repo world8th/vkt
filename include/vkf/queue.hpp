@@ -129,17 +129,18 @@ namespace vkf {
             });
         };
 
-        // TODO: complete that utility
-        virtual const Queue* uploadIntoImage(vkt::ImageRegion image, const void* data, VkDeviceSize size) {
-            VkExtent3D extent = image.getInfo().extent;
+        // 
+        virtual const Queue* uploadIntoImage(vkt::ImageRegion image, const void* data, vkh::VkOffset3D offset = {0x0, 0x0, 0x0}, vkh::VkExtent3D extent = {0x10000u, 0x10000u, 0x10000u}) {
+            extent = glm::min(glm::uvec3(extent), glm::uvec3(image.getInfo().extent) - glm::uvec3(glm::ivec3(offset)));
+            vkh::BlockParams params = vkh::getBlockParams(image.getInfo().format);
             VkBufferImageCopy2KHR srcCopy = {
                 .sType = VK_STRUCTURE_TYPE_BUFFER_IMAGE_COPY_2_KHR,
                 .pNext = nullptr, 
                 .bufferOffset = uploadBuffer.offset(),
                 .bufferRowLength = extent.width,
                 .bufferImageHeight = extent.height,
-                .imageOffset = vkh::VkOffset3D{0u,0u,0u},
-                .imageExtent = vkh::VkExtent3D{extent.width, extent.height, 1u}
+                .imageOffset = offset,
+                .imageExtent = extent
             };
             VkCopyBufferToImageInfo2KHR copyInfo = {
                 .sType = VK_STRUCTURE_TYPE_COPY_BUFFER_TO_IMAGE_INFO_2_KHR,
@@ -149,7 +150,7 @@ namespace vkf {
                 .dstImageLayout = image,
                 .regionCount = 1u
             };
-            memcpy(uploadBuffer.mappedv(), data, size);
+            memcpy(uploadBuffer.mappedv(), data, extent.width*extent.height*extent.depth*params.bytesPerBlock);
             return this->submitOnce([&](VkCommandBuffer commandBuffer) {
                 device->dispatch->vkCmdCopyBufferToImage2KHR(commandBuffer, &copyInfo);
             });

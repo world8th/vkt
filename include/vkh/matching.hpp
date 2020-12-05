@@ -1,6 +1,12 @@
 #pragma once // #
 
-#include <vkh/core.hpp>
+// 
+#ifndef VKT_USE_VULKAN_HPP
+#define VKT_USE_VULKAN_HPP
+#endif
+
+//
+#include <vkt/core.hpp>
 #include <vkh/enums.hpp>
 #include <vkh/bitfields.hpp>
 
