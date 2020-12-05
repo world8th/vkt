@@ -137,8 +137,8 @@ namespace vkf {
                 .sType = VK_STRUCTURE_TYPE_BUFFER_IMAGE_COPY_2_KHR,
                 .pNext = nullptr, 
                 .bufferOffset = uploadBuffer.offset(),
-                .bufferRowLength = extent.width,
-                .bufferImageHeight = extent.height,
+                .bufferRowLength = 0u,//extent.width,
+                .bufferImageHeight = 0u,//extent.height,
                 .imageOffset = offset,
                 .imageExtent = extent
             };
