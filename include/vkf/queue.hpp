@@ -87,7 +87,7 @@ namespace vkf {
                 .sType = VK_STRUCTURE_TYPE_BUFFER_COPY_2_KHR,
                 .pNext = nullptr,
                 .srcOffset = output.offset(),
-                .dstOffset = 0ull,
+                .dstOffset = uploadBuffer.offset(),
                 .size = size
             };
             VkCopyBufferInfo2KHR copyInfo = {
@@ -111,7 +111,7 @@ namespace vkf {
             VkBufferCopy2KHR srcCopy = {
                 .sType = VK_STRUCTURE_TYPE_BUFFER_COPY_2_KHR,
                 .pNext = nullptr,
-                .srcOffset = 0ull,
+                .srcOffset = uploadBuffer.offset(),
                 .dstOffset = input.offset(),
                 .size = size
             };
@@ -126,6 +126,32 @@ namespace vkf {
             memcpy(uploadBuffer.mappedv(), data, size);
             return this->submitOnce([&](VkCommandBuffer commandBuffer) {
                 device->dispatch->CmdCopyBuffer2KHR(commandBuffer, &copyInfo);
+            });
+        };
+
+        // TODO: complete that utility
+        virtual const Queue* uploadIntoImage(vkt::ImageRegion image, const void* data, VkDeviceSize size) {
+            VkExtent3D extent = image.getInfo().extent;
+            VkBufferImageCopy2KHR srcCopy = {
+                .sType = VK_STRUCTURE_TYPE_BUFFER_IMAGE_COPY_2_KHR,
+                .pNext = nullptr, 
+                .bufferOffset = uploadBuffer.offset(),
+                .bufferRowLength = extent.width,
+                .bufferImageHeight = extent.height,
+                .imageOffset = vkh::VkOffset3D{0u,0u,0u},
+                .imageExtent = vkh::VkExtent3D{extent.width, extent.height, 1u}
+            };
+            VkCopyBufferToImageInfo2KHR copyInfo = {
+                .sType = VK_STRUCTURE_TYPE_COPY_BUFFER_TO_IMAGE_INFO_2_KHR,
+                .pNext = nullptr,
+                .srcBuffer = uploadBuffer,
+                .dstImage = image,
+                .dstImageLayout = image,
+                .regionCount = 1u
+            };
+            memcpy(uploadBuffer.mappedv(), data, size);
+            return this->submitOnce([&](VkCommandBuffer commandBuffer) {
+                device->dispatch->vkCmdCopyBufferToImage2KHR(commandBuffer, &copyInfo);
             });
         };
 
