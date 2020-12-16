@@ -475,6 +475,11 @@ namespace vkt {
             return const_cast<ImageRegion&>(*this);
         };
 
+        virtual ImageRegion& transfer(VkCommandBuffer& cmdBuf, VkImageLayout dstLayout) {
+            this->imgInfo.imageLayout = dstLayout;
+            return this->transfer(cmdBuf);
+        };
+
         // 
         virtual operator ImageAllocation*() { return this->allocation; };
         virtual operator vkt::uni_ptr<ImageAllocation>&() { return this->allocation; };

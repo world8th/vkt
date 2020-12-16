@@ -27,6 +27,7 @@ namespace vkf {
         vk::PhysicalDeviceExtendedDynamicStateFeaturesEXT gExtendedDynamic{};
         vk::PhysicalDeviceAccelerationStructureFeaturesKHR gAccelerationStructure{};
         vk::PhysicalDeviceInlineUniformBlockFeaturesEXT gInlineUniform{};
+        vk::PhysicalDeviceImagelessFramebufferFeaturesKHR gImagelessFramebuffer{};
     };
 
     // TODO: DEDICATED QUEUE OBJECT
@@ -129,6 +130,7 @@ namespace vkf {
             this->layers = layers;
 
             // 
+            features.gInlineUniform.pNext = &features.gImagelessFramebuffer;
             features.gAccelerationStructure.pNext = &features.gInlineUniform;
             features.gAtomicFloat.pNext = &features.gAccelerationStructure;
             features.gExtendedDynamic.pNext = &features.gAtomicFloat;
