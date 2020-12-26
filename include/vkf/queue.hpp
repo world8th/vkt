@@ -148,7 +148,8 @@ namespace vkf {
                 .srcBuffer = uploadBuffer,
                 .dstImage = image,
                 .dstImageLayout = image,
-                .regionCount = 1u
+                .regionCount = 1u,
+                .pRegions = &srcCopy
             };
             memcpy(uploadBuffer.mappedv(), data, extent.width*extent.height*extent.depth*params.bytesPerBlock);
             return this->submitOnce([&](VkCommandBuffer commandBuffer) {

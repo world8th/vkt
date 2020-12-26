@@ -163,9 +163,9 @@ namespace vkt {
 
     public: friend uni_ptr<T>; // 
         inline uni_ptr() {};
-        inline uni_ptr(const uni_ptr<T>& ptr) : shared(ptr.shared), regular(std::ref(*ptr.regular)), size(ptr.size), owner(ptr.owner) { 
-            if (shared && !owner) { owner = &this->shared; }; // JavaCPP direct shared_ptr
-        };
+        //inline uni_ptr(const uni_ptr<T>& ptr) : shared(ptr.shared), regular(std::ref(*ptr.regular)), size(ptr.size), owner(ptr.owner) { 
+        //    if (shared && !owner) { owner = &this->shared; }; // JavaCPP direct shared_ptr
+        //};
         inline uni_ptr(const std::shared_ptr<T>& shared) : shared(shared), regular(std::ref(*shared)) { 
             if (shared && !owner) { owner = &this->shared; }; // JavaCPP direct shared_ptr
         };
@@ -193,12 +193,12 @@ namespace vkt {
             if (shared && !owner) { owner = &this->shared; }; // JavaCPP direct shared_ptr
             return this;
         };
-        virtual inline uni_ptr* operator= (const uni_ptr<T>& ptr) {
-            T& ref = *ptr.regular;
-            shared = ptr.shared, regular = std::ref(ref), owner = ptr.owner, size = ptr.size;
-            if (shared && !owner) { owner = &this->shared; }; // JavaCPP direct shared_ptr
-            return this;
-        };
+        //virtual inline uni_ptr* operator= (const uni_ptr<T>& ptr) {
+        //    T& ref = *ptr.regular;
+        //    shared = ptr.shared, regular = std::ref(ref), owner = ptr.owner, size = ptr.size;
+        //    if (shared && !owner) { owner = &this->shared; }; // JavaCPP direct shared_ptr
+        //    return this;
+        //};
 
         // 
         template<class M = T>
@@ -270,16 +270,16 @@ namespace vkt {
         std::optional<T> storage = std::nullopt;
     public: // 
         uni_arg() {};
-        uni_arg(const T& t) : storage(t) {};
-        uni_arg(const T* t) : storage(*t) {};
+        uni_arg(const T& t) { storage = t; };
+        uni_arg(const T* t) { if (t) { storage = *t; }; };
         uni_arg(const uni_ptr<T>& p) : storage(*p) {}; // UnUsual and Vain
         uni_arg(const uni_arg<T>& a) : storage(*a) {};
 
         //
         virtual inline uni_arg<T>& operator= (const T& ptr) { storage = ptr; return *this; };
-        virtual inline uni_arg<T>& operator= (const T* ptr) { storage = *ptr; return *this; };
-        virtual inline uni_arg<T>& operator= (uni_arg<T> t) { storage = t.ref(); return *this; };
-        virtual inline uni_arg<T>& operator= (uni_ptr<T> p) { storage = *p.ptr(); return *this; };
+        virtual inline uni_arg<T>& operator= (const T* ptr) { if (ptr) { storage = *ptr; }; return *this; };
+        virtual inline uni_arg<T>& operator= (uni_arg<T> t) { if (t.has()) { storage = t.ref(); }; return *this; };
+        virtual inline uni_arg<T>& operator= (uni_ptr<T> p) { if (p.has()) { storage = *p.ptr(); }; return *this; };
 
         // experimental
         virtual inline operator T& () { return ref(); };
