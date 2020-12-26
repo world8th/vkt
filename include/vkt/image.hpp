@@ -448,7 +448,7 @@ namespace vkt {
         virtual const vkt::uni_ptr<ImageAllocation>& uniPtrVma() const { return this->allocation; };
 
         //virtual vkh::VkImageSubresourceRange& subresourceRange() { return this->subresourceRange; };
-        virtual vkh::VkImageSubresourceLayers subresourceLayers(const uint32_t mipLevel =  0u) const { return {
+        virtual vkh::VkImageSubresourceLayers subresourceLayers(const uint32_t mipLevel = 0u) const { return {
             .aspectMask = this->subresourceRange.aspectMask,
             .mipLevel = this->subresourceRange.baseMipLevel + mipLevel,
             .baseArrayLayer = this->subresourceRange.baseArrayLayer,
@@ -509,11 +509,11 @@ namespace vkt {
         virtual operator const VkSampler&() const { return this->imgInfo.sampler; };
 
         // 
-        virtual operator const vkh::VkImageSubresourceLayers& () const { return this->subresourceLayers(); };
-        virtual operator const    ::VkImageSubresourceLayers& () const { return this->subresourceLayers(); };
+        //virtual operator const vkh::VkImageSubresourceLayers& () const { return this->subresourceLayers(); };
+        //virtual operator const    ::VkImageSubresourceLayers& () const { return this->subresourceLayers(); };
 
         // 
-        virtual operator const VkImageSubresourceLayers() const { return VkImageSubresourceLayers{ reinterpret_cast<const VkImageAspectFlags&>(subresourceRange.aspectMask), subresourceRange.baseMipLevel, subresourceRange.baseArrayLayer, subresourceRange.layerCount }; };
+        //virtual operator const VkImageSubresourceLayers() const { return VkImageSubresourceLayers{ reinterpret_cast<const VkImageAspectFlags&>(subresourceRange.aspectMask), subresourceRange.baseMipLevel, subresourceRange.baseArrayLayer, subresourceRange.layerCount }; };
 
 #ifdef VKT_OPENGL_INTEROP // Bindless Textures Directly
         virtual uint64_t deviceAddress () { 
@@ -556,7 +556,7 @@ namespace vkt {
         virtual const vkh::VkImageSubresourceRange& getImageSubresourceRange() const { return this->subresourceRange; };
 
         // ALIASES
-        virtual vkh::VkImageSubresourceLayers getImageSubresourceLayers() const { return this->subresourceLayers(); };
+        //virtual vkh::VkImageSubresourceLayers getImageSubresourceLayers() const { return this->subresourceLayers(); };
 
         // 
         virtual unsigned& getGL() {

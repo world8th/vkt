@@ -130,7 +130,7 @@ namespace vkf {
         };
 
         // 
-        virtual const Queue* uploadIntoImage(vkt::ImageRegion image, const void* data, vkh::VkOffset3D offset = {0x0, 0x0, 0x0}, vkh::VkExtent3D extent = {0x10000u, 0x10000u, 0x10000u}) {
+        virtual const Queue* uploadIntoImage(vkt::ImageRegion image, const void* data, vkh::VkOffset3D offset = {0x0, 0x0, 0x0}, vkh::VkExtent3D extent = {0x10000u, 0x10000u, 0x10000u}, vkh::VkImageSubresourceLayers subresourceLayers = { VK_IMAGE_ASPECT_COLOR_BIT, 0u, 0u, 1u }) {
             extent = glm::min(glm::uvec3(extent), glm::uvec3(image.getInfo().extent) - glm::uvec3(glm::ivec3(offset)));
             vkh::BlockParams params = vkh::getBlockParams(image.getInfo().format);
             VkBufferImageCopy2KHR srcCopy = {
@@ -139,6 +139,7 @@ namespace vkf {
                 .bufferOffset = uploadBuffer.offset(),
                 .bufferRowLength = 0u,//extent.width,
                 .bufferImageHeight = 0u,//extent.height,
+                .imageSubresource = subresourceLayers, // 
                 .imageOffset = offset,
                 .imageExtent = extent
             };
