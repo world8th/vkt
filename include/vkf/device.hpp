@@ -60,7 +60,7 @@ namespace vkf {
 
         // 
         std::vector<uint32_t> queueFamilyIndices = {};
-        vkt::MemoryAllocationInfo memoryAllocInfo = {};
+        vkf::MemoryAllocationInfo memoryAllocInfo = {};
         vkh::VkPhysicalDeviceMemoryProperties2 memoryProperties = {};
         std::vector<vkh::VkDeviceQueueCreateInfo> usedQueueCreateInfos = {};
 

@@ -47,7 +47,7 @@ namespace vkf {
 
         // 
         SurfaceWindow surfaceWindow = {};
-        vkt::ImageRegion depthImage = {};
+        vkf::ImageRegion depthImage = {};
 
         // 
         SwapChain(){
@@ -255,8 +255,8 @@ namespace vkf {
                 imageViewCreate.format = surfaceFormats.depthFormat,
                 imageViewCreate.subresourceRange = vkh::VkImageSubresourceRange{.aspectMask = aspect };
 
-                vkt::VmaMemoryInfo memInfo = {};
-                this->depthImage = vkt::ImageRegion(std::make_shared<vkt::VmaImageAllocation>(this->device->allocator, imageCreate, memInfo), imageViewCreate, VK_IMAGE_LAYOUT_GENERAL);
+                vkf::VmaMemoryInfo memInfo = {};
+                this->depthImage = vkf::ImageRegion(std::make_shared<vkf::VmaImageAllocation>(this->device->allocator, imageCreate, memInfo), imageViewCreate, VK_IMAGE_LAYOUT_GENERAL);
 
                 vkh::handleVk(device->dispatch->CreateSampler(vkh::VkSamplerCreateInfo{
                     .magFilter = VK_FILTER_LINEAR,

@@ -81,7 +81,9 @@
         "bitset": "cpp",
         "deque": "cpp",
         "stack": "cpp",
-        "coroutine": "cpp"
+        "coroutine": "cpp",
+        "bit": "cpp",
+        "stop_token": "cpp"
     },
     "C_Cpp.default.cppStandard": "c++20",
     "C_Cpp.default.cStandard": "c11"

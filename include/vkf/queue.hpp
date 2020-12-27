@@ -20,8 +20,8 @@ namespace vkf {
         uint32_t version = 0;
 
         // rise up vRt feature
-        vkt::Vector<uint8_t> uploadBuffer = {};
-        vkt::Vector<uint8_t> downloadBuffer = {};
+        vkf::Vector<uint8_t> uploadBuffer = {};
+        vkf::Vector<uint8_t> downloadBuffer = {};
 
         Queue(){
             
@@ -52,13 +52,13 @@ namespace vkf {
                     .size = size,
                     .usage = VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_TRANSFER_SRC_BIT
                 };
-                auto vmaCreateInfo = vkt::VmaMemoryInfo{
+                auto vmaCreateInfo = vkf::VmaMemoryInfo{
                     .memUsage = VMA_MEMORY_USAGE_CPU_TO_GPU,
                     .instanceDispatch = instance->dispatch,
                     .deviceDispatch = device->dispatch
                 };
-                auto allocation = std::make_shared<vkt::VmaBufferAllocation>(device->allocator, bufferCreateInfo, vmaCreateInfo);
-                uploadBuffer = vkt::Vector<uint8_t>(allocation, 0ull, size);
+                auto allocation = std::make_shared<vkf::VmaBufferAllocation>(device->allocator, bufferCreateInfo, vmaCreateInfo);
+                uploadBuffer = vkf::Vector<uint8_t>(allocation, 0ull, size);
             };
 
             {
@@ -67,13 +67,13 @@ namespace vkf {
                     .size = size,
                     .usage = VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT
                 };
-                auto vmaCreateInfo = vkt::VmaMemoryInfo{
+                auto vmaCreateInfo = vkf::VmaMemoryInfo{
                     .memUsage = VMA_MEMORY_USAGE_GPU_TO_CPU,
                     .instanceDispatch = instance->dispatch,
                     .deviceDispatch = device->dispatch
                 };
-                auto allocation = std::make_shared<vkt::VmaBufferAllocation>(device->allocator, bufferCreateInfo, vmaCreateInfo);
-                downloadBuffer = vkt::Vector<uint8_t>(allocation, 0ull, size);
+                auto allocation = std::make_shared<vkf::VmaBufferAllocation>(device->allocator, bufferCreateInfo, vmaCreateInfo);
+                downloadBuffer = vkf::Vector<uint8_t>(allocation, 0ull, size);
             };
 
             // 
@@ -81,7 +81,7 @@ namespace vkf {
         };
 
         // 
-        virtual const Queue* downloadFromBuffer(void* data, vkt::VectorBase output, VkDeviceSize size) const {
+        virtual const Queue* downloadFromBuffer(void* data, vkf::VectorBase output, VkDeviceSize size) const {
             size = std::min(size, output.range());
             VkBufferCopy2KHR srcCopy = {
                 .sType = VK_STRUCTURE_TYPE_BUFFER_COPY_2_KHR,
@@ -106,7 +106,7 @@ namespace vkf {
         };
 
         // 
-        virtual const Queue* uploadIntoBuffer(vkt::VectorBase input, const void* data, VkDeviceSize size) {
+        virtual const Queue* uploadIntoBuffer(vkf::VectorBase input, const void* data, VkDeviceSize size) {
             size = std::min(size, input.range());
             VkBufferCopy2KHR srcCopy = {
                 .sType = VK_STRUCTURE_TYPE_BUFFER_COPY_2_KHR,
@@ -130,9 +130,9 @@ namespace vkf {
         };
 
         // 
-        virtual const Queue* uploadIntoImage(vkt::ImageRegion image, const void* data, vkh::VkOffset3D offset = {0x0, 0x0, 0x0}, vkh::VkExtent3D extent = {0x10000u, 0x10000u, 0x10000u}, vkh::VkImageSubresourceLayers subresourceLayers = { VK_IMAGE_ASPECT_COLOR_BIT, 0u, 0u, 1u }) {
-            extent = glm::min(glm::uvec3(extent), glm::uvec3(image.getInfo().extent) - glm::uvec3(glm::ivec3(offset)));
-            vkh::BlockParams params = vkh::getBlockParams(image.getInfo().format);
+        virtual const Queue* uploadIntoImage(vkf::ImageRegion image, const void* data, vkh::VkOffset3D offset = {0x0, 0x0, 0x0}, vkh::VkExtent3D extent = {0x10000u, 0x10000u, 0x10000u}, vkh::VkImageSubresourceLayers subresourceLayers = { VK_IMAGE_ASPECT_COLOR_BIT, 0u, 0u, 1u }) {
+            extent = glm::min(glm::uvec3(extent), glm::uvec3(image.getCreateInfo().extent) - glm::uvec3(glm::ivec3(offset)));
+            vkh::BlockParams params = vkh::getBlockParams(image.getCreateInfo().format);
             VkBufferImageCopy2KHR srcCopy = {
                 .sType = VK_STRUCTURE_TYPE_BUFFER_IMAGE_COPY_2_KHR,
                 .pNext = nullptr, 

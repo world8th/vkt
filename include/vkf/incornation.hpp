@@ -35,14 +35,17 @@
 // Force include for avoid GLAD problem...
 #include <vkt/core.hpp>
 #include <vkt/inline.hpp>
-#include <vkt/vector.hpp>
-#include <vkt/image.hpp>
 #include <vkh/matching.hpp>
 
 //
 #include <vkt/essential.hpp>
 #include <vkh/helpers.hpp>
 
+// 
+#include "./vector-typed.hpp"
+#include "./image-region.hpp"
+
+//
 namespace vkf {
 
 };
