@@ -7,23 +7,25 @@ Writing for C++20 prior...
 
 ## Gen 4 announce
 
-I already made dedicated part of gen 4, which contain device, queue and instance. 
+Made: 
+- Sorts of refactoring
+- Dedicate into VKf framework
 
-Planned:
-- Refactor memory managment
-- Refactor vector and image
-- Add samplers support
-- Add acceleration structure support
-- Add pipelines support (VKh already have helpers for provisional extensions)
+Planned: 
+- Rewrite some code
+- Far refactoring
+- Add new features
 
 
 ## VKh 2 announce
+
+Made: 
+- Final ray-tracing specification
 
 Planned:
 - Vulkan-HPP support
 - More C++20 support
 - More utils and helpers
-- Final ray tracing extensions support
 
 
 ## In-Use
