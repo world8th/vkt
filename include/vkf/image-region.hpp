@@ -6,10 +6,10 @@
 #endif
 
 //
-#include "./image-allocation.hpp"
-
 #ifdef VKT_CORE_USE_VMA
 #include "./vma-image-allocation.hpp"
+#else
+#include "./image-allocation.hpp"
 #endif
 
 // 

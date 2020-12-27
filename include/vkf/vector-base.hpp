@@ -6,10 +6,10 @@
 #endif
 
 //
-#include "./buffer-allocation.hpp"
-
 #ifdef VKT_CORE_USE_VMA
 #include "./vma-buffer-allocation.hpp"
+#else
+#include "./buffer-allocation.hpp"
 #endif
 
 // 

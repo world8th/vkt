@@ -1,11 +1,6 @@
 #pragma once // #
 
 //
-#ifndef VKT_CORE_USE_VMA
-#define VKT_CORE_USE_VMA
-#endif
-
-//
 #include "./memory-allocation.hpp"
 
 // 
