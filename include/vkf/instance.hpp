@@ -51,7 +51,7 @@ namespace vkf {
 
         virtual VkInstance& create(){
             vkt::vkGlobal();
-            assert((version = vkh::vsEnumerateInstanceVersion(vkt::vkGlobal::loader)) >= VK_MAKE_VERSION(1, 2, 131));
+            assert((version = vkt::vsEnumerateInstanceVersion(vkt::vkGlobal::loader)) >= VK_MAKE_VERSION(1, 2, 131));
 
             // get our needed extensions
             std::string layerName = "";
@@ -71,7 +71,7 @@ namespace vkf {
     #endif
 
             std::vector<VkExtensionProperties> installedExtensions = std::vector<VkExtensionProperties>();
-            vkh::vsEnumerateInstanceExtensionProperties(vkt::vkGlobal::loader, installedExtensions, layerName);
+            vkt::vsEnumerateInstanceExtensionProperties(vkt::vkGlobal::loader, installedExtensions, layerName);
             uint32_t extensionCount = 0u;
             for (auto& w : wantedExtensions) {
                 for (auto& i : installedExtensions) {
@@ -90,7 +90,7 @@ namespace vkf {
             // get validation layers
             std::vector<std::string> wantedLayers = std::vector<std::string>(wantedInstanceLayers_CStr.begin(), std::end(wantedInstanceLayers_CStr));
             std::vector<VkLayerProperties> installedLayers = std::vector<VkLayerProperties>();
-            vkh::vsEnumerateInstanceLayerProperties(vkt::vkGlobal::loader, installedLayers);
+            vkt::vsEnumerateInstanceLayerProperties(vkt::vkGlobal::loader, installedLayers);
             uint32_t layerCount = 0u;
             for (auto& w : wantedLayers) {
                 for (auto& i : installedLayers) {
@@ -133,7 +133,7 @@ namespace vkf {
             vkt::vkGlobal::instance = this->dispatch.get_shared();
 
             // get physical devices for application
-            vkh::vsEnumeratePhysicalDevices(this->dispatch.get_shared(), physicalDevices);
+            vkt::vsEnumeratePhysicalDevices(this->dispatch.get_shared(), physicalDevices);
 
             // 
             return instance;

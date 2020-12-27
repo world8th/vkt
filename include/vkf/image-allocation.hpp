@@ -81,7 +81,7 @@ namespace vkf {
 
             // 
             createInfo->usage = usage;
-            vkh::handleVk(this->info.deviceDispatch->CreateImage(*createInfo, nullptr, &this->image));
+            vkt::handleVk(this->info.deviceDispatch->CreateImage(*createInfo, nullptr, &this->image));
 
             //
             VkMemoryDedicatedRequirementsKHR dedicatedReqs = { VK_STRUCTURE_TYPE_MEMORY_DEDICATED_REQUIREMENTS_KHR, NULL };
@@ -117,8 +117,8 @@ namespace vkf {
             memAllocInfo.memoryTypeIndex = uint32_t(this->info.getMemoryType(memReqs.memoryTypeBits, property));
 
             // 
-            vkh::handleVk(this->info.deviceDispatch->AllocateMemory(memAllocInfo, nullptr, &this->info.memory));
-            vkh::handleVk(this->info.deviceDispatch->BindImageMemory(this->image, this->info.memory, 0u));
+            vkt::handleVk(this->info.deviceDispatch->AllocateMemory(memAllocInfo, nullptr, &this->info.memory));
+            vkt::handleVk(this->info.deviceDispatch->BindImageMemory(this->image, this->info.memory, 0u));
             this->info.initialLayout = createInfo->initialLayout;
 
 #ifdef VKT_WIN32_DETECTED

@@ -50,7 +50,7 @@ namespace vkf {
 
         // 
         virtual VkBufferView& createBufferView(const VkFormat& format = VK_FORMAT_UNDEFINED) {
-            vkh::handleVk(this->allocation->info.deviceDispatch->CreateBufferView(vkh::VkBufferViewCreateInfo{
+            vkt::handleVk(this->allocation->info.deviceDispatch->CreateBufferView(vkh::VkBufferViewCreateInfo{
                 .buffer = static_cast<VkBuffer>(this->bufInfo.buffer),
                 .format = static_cast<VkFormat>(format),
                 .offset = this->bufInfo.offset,

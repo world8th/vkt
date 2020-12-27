@@ -96,7 +96,7 @@ namespace vkf {
             std::string layerName = "";
             std::vector<std::string> wantedExtensions = std::vector<std::string>(wantedDeviceExtensions_CStr.begin(), std::end(wantedDeviceExtensions_CStr));
             std::vector<VkExtensionProperties> gpuExtensions = {};
-            vkh::vsEnumerateDeviceExtensionProperties(instance->dispatch, this->physical, gpuExtensions, layerName); // TODO: vkh helper for getting
+            vkt::vsEnumerateDeviceExtensionProperties(instance->dispatch, this->physical, gpuExtensions, layerName); // TODO: vkh helper for getting
             uint32_t extensionCount = 0u;
             for (auto& w : wantedExtensions) {
                 for (auto& i : gpuExtensions) {
@@ -114,7 +114,7 @@ namespace vkf {
             // use layers
             std::vector<std::string> wantedLayers = std::vector<std::string>(wantedDeviceLayers_CStr.begin(), std::end(wantedDeviceLayers_CStr));
             std::vector<VkLayerProperties> gpuLayers = {};
-            vkh::vsEnumerateDeviceLayerProperties(instance->dispatch, this->physical, gpuLayers); // TODO: vkh helper for getting
+            vkt::vsEnumerateDeviceLayerProperties(instance->dispatch, this->physical, gpuLayers); // TODO: vkh helper for getting
             uint32_t layerCount = 0u;
             for (auto& w : wantedLayers) {
                 for (auto& i : gpuLayers) {
@@ -146,13 +146,13 @@ namespace vkf {
             features.gFeatures.pNext = &features.gDescIndexing;
 
             // 
-            vkh::vsGetPhysicalDeviceFeatures2(instance->dispatch, this->physical, features.gFeatures);
-            vkh::vsGetPhysicalDeviceProperties2(instance->dispatch, this->physical, properties.gProperties);
-            vkh::vsGetPhysicalDeviceMemoryProperties2(instance->dispatch, this->physical, this->memoryProperties);
+            vkt::vsGetPhysicalDeviceFeatures2(instance->dispatch, this->physical, features.gFeatures);
+            vkt::vsGetPhysicalDeviceProperties2(instance->dispatch, this->physical, properties.gProperties);
+            vkt::vsGetPhysicalDeviceMemoryProperties2(instance->dispatch, this->physical, this->memoryProperties);
 
             // get features and queue family properties
             std::vector<vkh::VkQueueFamilyProperties> gpuQueueProps = {};
-            vkh::vsGetPhysicalDeviceQueueFamilyProperties(instance->dispatch, this->physical, gpuQueueProps); // TODO: vkh helper for getting
+            vkt::vsGetPhysicalDeviceQueueFamilyProperties(instance->dispatch, this->physical, gpuQueueProps); // TODO: vkh helper for getting
 
             // queue family initial
             float priority = 1.0f;
@@ -165,7 +165,7 @@ namespace vkf {
 
                 VkBool32 support = false;
                 if (surface) {
-                    vkh::handleVk(instance->dispatch->GetPhysicalDeviceSurfaceSupportKHR(this->physical, graphicsFamilyIndex, surface, &support));
+                    vkt::handleVk(instance->dispatch->GetPhysicalDeviceSurfaceSupportKHR(this->physical, graphicsFamilyIndex, surface, &support));
                 };
                 if (queuefamily.queueFlags->eCompute && queuefamily.queueFlags->eGraphics && (support || !surface)) {
                     queueCreateInfos.push_back(vkh::VkDeviceQueueCreateInfo{ .queueFamilyIndex = uint32_t(computeFamilyIndex), .queueCount = 1, .pQueuePriorities = &priority });
@@ -205,7 +205,7 @@ namespace vkf {
                     .enabledExtensionCount = uint32_t(extensions_c_str.size()),
                     .ppEnabledExtensionNames = extensions_c_str.data(),
                 }));
-                vkh::handleVk(this->dispatch->CreatePipelineCache(vkh::VkPipelineCacheCreateInfo(), nullptr, &this->pipelineCache));
+                vkt::handleVk(this->dispatch->CreatePipelineCache(vkh::VkPipelineCacheCreateInfo(), nullptr, &this->pipelineCache));
                 this->device = this->dispatch->handle;
                 vkt::vkGlobal::device = this->dispatch.get_shared();
                 //vkt::vkGlobal::volkDevice();
@@ -243,7 +243,7 @@ namespace vkf {
             vma_info.instance = *this->instance;
             vma_info.physicalDevice = this->physical;
             vma_info.flags = VMA_ALLOCATOR_CREATE_BUFFER_DEVICE_ADDRESS_BIT;
-            vkh::handleVk(vmaCreateAllocator(&vma_info, &this->allocator));
+            vkt::handleVk(vmaCreateAllocator(&vma_info, &this->allocator));
 
             // Manually Create Descriptor Pool
             auto dps = std::vector<vkh::VkDescriptorPoolSize>{
@@ -264,7 +264,7 @@ namespace vkf {
             };
 
             //
-            vkh::handleVk(this->dispatch->CreateDescriptorPool(vkh::VkDescriptorPoolCreateInfo{
+            vkt::handleVk(this->dispatch->CreateDescriptorPool(vkh::VkDescriptorPoolCreateInfo{
                 .pNext = &inlineUniformPool,
                 .flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT | VK_DESCRIPTOR_POOL_CREATE_UPDATE_AFTER_BIND_BIT, .maxSets = 256u, 
             }.also([=](vkh::VkDescriptorPoolCreateInfo it) {

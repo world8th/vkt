@@ -81,7 +81,7 @@ namespace vkf {
             };
 
             //this->buffer = this->info.device.createBuffer(*createInfo);
-            vkh::handleVk(this->info.deviceDispatch->CreateBuffer(*createInfo, nullptr, &this->buffer));
+            vkt::handleVk(this->info.deviceDispatch->CreateBuffer(*createInfo, nullptr, &this->buffer));
             this->info.range = createInfo->size;
             this->usage = createInfo->usage;
 
@@ -118,8 +118,8 @@ namespace vkf {
 
             // 
             //this->info.device.bindBufferMemory(buffer, info.memory = info.device.allocateMemory(memAllocInfo), 0);
-            vkh::handleVk(this->info.deviceDispatch->AllocateMemory(memAllocInfo, nullptr, &this->info.memory));
-            vkh::handleVk(this->info.deviceDispatch->BindBufferMemory(buffer, this->info.memory, 0u));
+            vkt::handleVk(this->info.deviceDispatch->AllocateMemory(memAllocInfo, nullptr, &this->info.memory));
+            vkt::handleVk(this->info.deviceDispatch->BindBufferMemory(buffer, this->info.memory, 0u));
 
 #ifdef VKT_WIN32_DETECTED
             //this->info.handle = info.device.getMemoryWin32HandleKHR({ info.memory, VkExternalMemoryHandleTypeFlagBits::eOpaqueWin32 }, this->info.dispatch);

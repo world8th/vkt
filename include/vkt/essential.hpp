@@ -71,7 +71,7 @@ namespace vkt {
         if (sizeof(vkh::VkShaderModuleCreateInfo) != sizeof(::VkShaderModuleCreateInfo)) {
             std::cerr << "BROKEN 'vkh::VkShaderModuleCreateInfo' STRUCTURE!" << std::endl; assert(-1);
         };
-        vkh::handleVk(device->CreateShaderModule(makeShaderModuleInfo(TempCode = code), nullptr, hndl.get_ptr()));
+        vkt::handleVk(device->CreateShaderModule(makeShaderModuleInfo(TempCode = code), nullptr, hndl.get_ptr()));
         return hndl;
     };
 
@@ -123,7 +123,7 @@ namespace vkt {
         cmpi.stage = *spi;
         cmpi.basePipelineIndex = -1;
         VkPipeline pipeline = {};
-        vkh::handleVk(device->CreateComputePipelines(cache, 1u, cmpi, nullptr, &pipeline));
+        vkt::handleVk(device->CreateComputePipelines(cache, 1u, cmpi, nullptr, &pipeline));
         return pipeline;
     };
 
@@ -148,7 +148,7 @@ namespace vkt {
         cmdi.level = (secondary ? VK_COMMAND_BUFFER_LEVEL_SECONDARY : VK_COMMAND_BUFFER_LEVEL_PRIMARY);
         cmdi.commandBufferCount = 1;
         //cmdBuffer = (device->allocateCommandBuffers(cmdi))[0];
-        vkh::handleVk(device->AllocateCommandBuffers(cmdi, &cmdBuffer));
+        vkt::handleVk(device->AllocateCommandBuffers(cmdi, &cmdBuffer));
 
         //VkCommandBufferInheritanceInfo inhi = VkCommandBufferInheritanceInfo{};
         //inhi.pipelineStatistics = VkQueryPipelineStatisticFlagBits::eComputeShaderInvocations;
@@ -157,7 +157,7 @@ namespace vkt {
         bgi.flags = once ? VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT : VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT;
         //bgi.pInheritanceInfo = secondary ? &inhi : nullptr;
 
-        vkh::handleVk(device->vkBeginCommandBuffer(cmdBuffer, bgi));
+        vkt::handleVk(device->vkBeginCommandBuffer(cmdBuffer, bgi));
         //cmdBuffer.begin(bgi);
 
         return cmdBuffer;
@@ -177,7 +177,7 @@ namespace vkt {
     static inline auto createFence(vkt::Device device, const vkt::uni_arg<bool>& signaled = true) {
         VkFenceCreateInfo info = {};
         info.flags = signaled & 1;
-        VkFence fence = {}; vkh::handleVk(device->CreateFence(vkh::VkFenceCreateInfo{}, nullptr, &fence));//vkCreateFence(device, vkh::VkFenceCreateInfo{}, nullptr, &fence);
+        VkFence fence = {}; vkt::handleVk(device->CreateFence(vkh::VkFenceCreateInfo{}, nullptr, &fence));//vkCreateFence(device, vkh::VkFenceCreateInfo{}, nullptr, &fence);
         return fence;
     };
 
@@ -191,7 +191,7 @@ namespace vkt {
 
         //
         VkFence fence = createFence(device, false);
-        vkh::handleVk(device->QueueSubmit(queue, 1u, *smbi, fence));
+        vkt::handleVk(device->QueueSubmit(queue, 1u, *smbi, fence));
 
         // 
         return std::async(std::launch::async | std::launch::deferred, [](vkt::Device device, vkt::uni_arg<VkQueue> queue, vkt::uni_arg<VkCommandPool> cmdPool, vkt::uni_arg<VkFence> fence, std::vector<VkCommandBuffer> cmds, vkt::uni_arg<vkh::VkSubmitInfo> smbi = vkh::VkSubmitInfo{}) {
@@ -199,7 +199,7 @@ namespace vkt {
                 smbi->commandBufferCount = static_cast<uint32_t>(cmds.size());
                 smbi->pCommandBuffers = (VkCommandBuffer*)cmds.data();
             };
-            vkh::handleVk(device->WaitForFences(1u, fence, true, 30ull * 1000ull * 1000ull * 1000ull));
+            vkt::handleVk(device->WaitForFences(1u, fence, true, 30ull * 1000ull * 1000ull * 1000ull));
             device->DestroyFence(fence, nullptr);
             device->FreeCommandBuffers(cmdPool, smbi->commandBufferCount, smbi->pCommandBuffers);
         }, device, queue, cmdPool, fence, cmds, smbi);
@@ -214,8 +214,8 @@ namespace vkt {
 
         // 
         VkFence fence = createFence(device, false);
-        vkh::handleVk(device->QueueSubmit(queue, 1u, *smbi, fence));
-        vkh::handleVk(device->WaitForFences(1u, &fence, true, 30ull * 1000ull * 1000ull * 1000ull));
+        vkt::handleVk(device->QueueSubmit(queue, 1u, *smbi, fence));
+        vkt::handleVk(device->WaitForFences(1u, &fence, true, 30ull * 1000ull * 1000ull * 1000ull));
         (device->DestroyFence(fence, nullptr));
 
         // 
@@ -225,7 +225,7 @@ namespace vkt {
     // once submit command buffer
     // TODO: return VkResult
     static inline auto submitOnce(vkt::Device device, vkt::uni_arg<VkQueue> queue, vkt::uni_arg<VkCommandPool> cmdPool, const std::function<void(VkCommandBuffer&)>& cmdFn = {}, const vkt::uni_arg<vkh::VkSubmitInfo>& smbi = vkh::VkSubmitInfo{}) {
-        auto cmdBuf = createCommandBuffer(device, cmdPool, false); cmdFn(cmdBuf); vkh::handleVk(device->EndCommandBuffer(cmdBuf)); //vkEndCommandBuffer(cmdBuf);
+        auto cmdBuf = createCommandBuffer(device, cmdPool, false); cmdFn(cmdBuf); vkt::handleVk(device->EndCommandBuffer(cmdBuf)); //vkEndCommandBuffer(cmdBuf);
         submitCmd(device, queue, { cmdBuf }); device->FreeCommandBuffers(cmdPool, 1u, &cmdBuf);
     };
 
@@ -240,7 +240,7 @@ namespace vkt {
 
         //
         VkFence fence = createFence(device, false);
-        vkh::handleVk(device->QueueSubmit(queue, 1u, *smbi, fence));
+        vkt::handleVk(device->QueueSubmit(queue, 1u, *smbi, fence));
 
         // 
         return std::async(std::launch::async | std::launch::deferred, [](vkt::Device device, vkt::uni_arg<VkQueue> queue, vkt::uni_arg<VkFence> fence, std::vector<VkCommandBuffer> cmds, vkt::uni_arg<vkh::VkSubmitInfo> smbi = vkh::VkSubmitInfo{}) {
@@ -248,7 +248,7 @@ namespace vkt {
                 smbi->commandBufferCount = static_cast<uint32_t>(cmds.size());
                 smbi->pCommandBuffers = (VkCommandBuffer*)cmds.data();
             };
-            vkh::handleVk(device->WaitForFences(1u, fence, true, 30ull * 1000ull * 1000ull * 1000ull));
+            vkt::handleVk(device->WaitForFences(1u, fence, true, 30ull * 1000ull * 1000ull * 1000ull));
             device->DestroyFence(fence, nullptr);
         }, device, queue, fence, cmds, smbi);
     };
@@ -256,7 +256,7 @@ namespace vkt {
     // once submit command buffer
     // TODO: return VkResult
     static inline auto submitOnceAsync(vkt::Device device, vkt::uni_arg<VkQueue> queue, vkt::uni_arg<VkCommandPool> cmdPool, const std::function<void(VkCommandBuffer&)>& cmdFn = {}, const vkt::uni_arg<vkh::VkSubmitInfo>& smbi = vkh::VkSubmitInfo{}) {
-        VkCommandBuffer cmdBuf = createCommandBuffer(device, cmdPool, false); cmdFn(cmdBuf); vkh::handleVk(device->EndCommandBuffer(cmdBuf)); cmdFn(cmdBuf);
+        VkCommandBuffer cmdBuf = createCommandBuffer(device, cmdPool, false); cmdFn(cmdBuf); vkt::handleVk(device->EndCommandBuffer(cmdBuf)); cmdFn(cmdBuf);
         return submitUtilize(device, queue, cmdPool, { cmdBuf }, smbi);
     };
 
@@ -279,11 +279,11 @@ namespace vkt {
             .eOpaqueFd = 1
 #endif
         } };
-        vkh::handleVk(device->CreateSemaphore(vkh::VkSemaphoreCreateInfo{ .pNext = &exportable }, nullptr, vkSemaphore));
+        vkt::handleVk(device->CreateSemaphore(vkh::VkSemaphoreCreateInfo{ .pNext = &exportable }, nullptr, vkSemaphore));
 
 #ifdef VKT_WIN32_DETECTED
         HANDLE handle{ INVALID_HANDLE_VALUE };
-        vkh::handleVk(device->GetSemaphoreWin32HandleKHR(vkh::VkSemaphoreGetWin32HandleInfoKHR{ .semaphore = *vkSemaphore, .handleType = VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_WIN32_BIT }, &handle));
+        vkt::handleVk(device->GetSemaphoreWin32HandleKHR(vkh::VkSemaphoreGetWin32HandleInfoKHR{ .semaphore = *vkSemaphore, .handleType = VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_WIN32_BIT }, &handle));
 #endif
 
         if (unitPtr) 

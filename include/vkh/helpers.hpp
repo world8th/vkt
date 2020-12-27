@@ -28,104 +28,6 @@ namespace vkh {
 #define VK_FLAGS_NONE 0 // Custom define for better code readability
 #define DEFAULT_FENCE_TIMEOUT (30ull*1000ull*1000ull*1000ull) // Default fence timeout in nanoseconds
 
-#ifdef VKT_CORE_USE_XVK
-    inline auto& vsEnumeratePhysicalDevices(vkt::Instance instance, std::vector<VkPhysicalDevice>& data) {
-        uint32_t count = 0u; handleVk(instance->EnumeratePhysicalDevices(&count, nullptr)); data.resize(count);
-        handleVk(instance->EnumeratePhysicalDevices(&count, data.data()));
-        return data;
-    };
-
-    inline auto& vsEnumerateDeviceExtensionProperties(vkt::Instance instance, const VkPhysicalDevice& physicalDevice, std::vector<VkExtensionProperties>& data, const std::string& layerName = std::string("")) {
-        uint32_t count = 0u; handleVk(instance->vkEnumerateDeviceExtensionProperties(physicalDevice, layerName.c_str(), &count, nullptr)); data.resize(count);
-        handleVk(instance->vkEnumerateDeviceExtensionProperties(physicalDevice, layerName.c_str(), &count, data.data()));
-        return data;
-    };
-
-    inline auto& vsEnumerateDeviceLayerProperties(vkt::Instance instance, const VkPhysicalDevice& physicalDevice, std::vector<VkLayerProperties>& data) {
-        uint32_t count = 0u; handleVk(instance->EnumerateDeviceLayerProperties(physicalDevice, &count, nullptr)); data.resize(count);
-        handleVk(instance->EnumerateDeviceLayerProperties(physicalDevice, &count, data.data()));
-        return data;
-    };
-
-    inline auto& vsGetPhysicalDeviceQueueFamilyProperties(vkt::Instance instance, const VkPhysicalDevice& physicalDevice, std::vector<vkh::VkQueueFamilyProperties>& data) {
-        uint32_t count = 0u; (instance->GetPhysicalDeviceQueueFamilyProperties(physicalDevice, &count, nullptr)); data.resize(count);
-        (instance->GetPhysicalDeviceQueueFamilyProperties(physicalDevice, &count, reinterpret_cast<::VkQueueFamilyProperties*>(data.data())));
-        return data;
-    };
-
-    inline auto& vsEnumerateInstanceExtensionProperties(vkt::uni_ptr<xvk::Loader> loader, std::vector<VkExtensionProperties>& data, const std::string& layerName = std::string("")) {
-        uint32_t count = 0u; handleVk(loader->vkEnumerateInstanceExtensionProperties(layerName.c_str(), &count, nullptr)); data.resize(count);
-        handleVk(loader->vkEnumerateInstanceExtensionProperties(layerName.c_str(), &count, data.data()));
-        return data;
-    };
-
-    inline auto& vsEnumerateInstanceLayerProperties(vkt::uni_ptr<xvk::Loader> loader, std::vector<VkLayerProperties>& data) {
-        uint32_t count = 0u; handleVk(loader->vkEnumerateInstanceLayerProperties(&count, nullptr)); data.resize(count);
-        handleVk(loader->vkEnumerateInstanceLayerProperties(&count, data.data()));
-        return data;
-    };
-
-    inline auto vsEnumerateInstanceVersion(vkt::uni_ptr<xvk::Loader> loader) {
-        uint32_t version = 0u; handleVk(loader->vkEnumerateInstanceVersion(&version)); return version;
-    };
-
-    inline auto& vsGetPhysicalDeviceSurfaceFormatsKHR(vkt::Instance instance, const VkPhysicalDevice& physicalDevice, const VkSurfaceKHR& surface, std::vector<VkSurfaceFormatKHR>& data) { // TODO: V2
-        uint32_t count = 0u; handleVk(instance->GetPhysicalDeviceSurfaceFormatsKHR(physicalDevice, surface, &count, nullptr)); data.resize(count);
-        handleVk(instance->GetPhysicalDeviceSurfaceFormatsKHR(physicalDevice, surface, &count, reinterpret_cast<VkSurfaceFormatKHR*>(data.data())));
-        return data;
-    };
-
-    inline auto vsGetPhysicalDeviceFormatProperties(vkt::Instance instance, const VkPhysicalDevice& physicalDevice, const VkFormat& format) {
-        VkFormatProperties props = {}; (instance->GetPhysicalDeviceFormatProperties(physicalDevice, format, &props)); return props;
-    };
-
-
-    inline auto vsGetPhysicalDeviceMemoryProperties(vkt::Instance instance, const VkPhysicalDevice& physicalDevice) {
-        VkPhysicalDeviceMemoryProperties props = {}; (instance->GetPhysicalDeviceMemoryProperties(physicalDevice, &reinterpret_cast<::VkPhysicalDeviceMemoryProperties&>(props))); return props;
-    };
-
-    inline auto vsGetPhysicalDeviceMemoryProperties2(vkt::Instance instance, const VkPhysicalDevice& physicalDevice, vkh::VkPhysicalDeviceMemoryProperties2& props) {
-        (instance->GetPhysicalDeviceMemoryProperties2(physicalDevice, &reinterpret_cast<::VkPhysicalDeviceMemoryProperties2&>(props))); return props;
-    };
-
-
-    inline auto vsGetPhysicalDeviceProperties(vkt::Instance instance, const VkPhysicalDevice& physicalDevice) {
-        VkPhysicalDeviceProperties props = {}; instance->GetPhysicalDeviceProperties(physicalDevice, &reinterpret_cast<::VkPhysicalDeviceProperties&>(props)); return props;
-    };
-
-    inline auto vsGetPhysicalDeviceProperties2(vkt::Instance instance, const VkPhysicalDevice& physicalDevice, vkh::VkPhysicalDeviceProperties2& props) {
-        instance->GetPhysicalDeviceProperties2(physicalDevice, &reinterpret_cast<::VkPhysicalDeviceProperties2&>(props)); return props;
-    };
-
-
-    inline auto vsGetPhysicalDeviceFeatures(vkt::Instance instance, const VkPhysicalDevice& physicalDevice) {
-        VkPhysicalDeviceProperties props = {}; instance->GetPhysicalDeviceFeatures(physicalDevice, &reinterpret_cast<::VkPhysicalDeviceFeatures&>(props)); return props;
-    };
-
-    inline auto vsGetPhysicalDeviceFeatures2(vkt::Instance instance, const VkPhysicalDevice& physicalDevice, vkh::VkPhysicalDeviceFeatures2& props) {
-        instance->GetPhysicalDeviceFeatures2(physicalDevice, &reinterpret_cast<::VkPhysicalDeviceFeatures2&>(props)); return props;
-    };
-
-
-    inline auto vsGetSwapchainImagesKHR(vkt::Device device, const VkSwapchainKHR& swapchain) { // TODO: V2
-        uint32_t count = 0u; device->GetSwapchainImagesKHR(swapchain, &count, nullptr);
-        std::vector<VkImage> data(count);
-        handleVk(device->GetSwapchainImagesKHR(swapchain, &count, reinterpret_cast<VkImage*>(data.data())));
-        return data;
-    };
-
-    inline auto vsGetPhysicalDeviceSurfaceCapabilitiesKHR(vkt::Instance instance, const VkPhysicalDevice& physicalDevice, const VkSurfaceKHR& surface) {
-        VkSurfaceCapabilitiesKHR props = {}; handleVk(instance->GetPhysicalDeviceSurfaceCapabilitiesKHR(physicalDevice, surface, &reinterpret_cast<::VkSurfaceCapabilitiesKHR&>(props))); return props;
-    };
-
-    inline auto vsGetPhysicalDeviceSurfacePresentModesKHR(vkt::Instance instance, const VkPhysicalDevice& physicalDevice, const VkSurfaceKHR& surface) { // TODO: V2
-        uint32_t count = 0u; handleVk(instance->GetPhysicalDeviceSurfacePresentModesKHR(physicalDevice, surface, &count, nullptr));
-        std::vector<VkPresentModeKHR> data(count);
-        handleVk(instance->GetPhysicalDeviceSurfacePresentModesKHR(physicalDevice, surface, &count, reinterpret_cast<::VkPresentModeKHR*>(data.data())));
-        return data;
-    };
-#endif
-
     class VsRayTracingPipelineCreateInfoHelper {
     protected:
         VkRayTracingShaderGroupCreateInfoKHR raygenShaderGroup = {};
@@ -699,29 +601,7 @@ namespace vkh {
     // TODO: IMAGE VIEW REGION IN MIP LEVEL
     // WILL USED FOR SIMPLER COPYING
 
-    // 
-    inline VkResult AllocateDescriptorSetWithUpdate(vkt::Device& device, vkh::VsDescriptorSetCreateInfoHelper& helper, VkDescriptorSet& descriptorSet, bool& protection) {
-        if (!protection) {
-            // Corrupt... 
-            //if (descriptorSet) { vkh::handleVk(device->vkFreeDescriptorSets(device->handle, helper, 1u, &descriptorSet)); descriptorSet = {}; };
-
-            // 
-            bool created = false;
-            if (!descriptorSet) { vkh::handleVk(device->AllocateDescriptorSets(helper, &descriptorSet)); created = true; };
-
-            //
-            if (descriptorSet && created) {
-                const auto& writes = helper.setDescriptorSet(descriptorSet).mapWriteDescriptorSet();
-                device->UpdateDescriptorSets(uint32_t(writes.size()), reinterpret_cast<const ::VkWriteDescriptorSet*>(writes.data()), 0u, nullptr);
-            };
-
-            // 
-            protection = true;
-        };
-
-        // 
-        return VK_SUCCESS;
-    };
+    
 
 
 };

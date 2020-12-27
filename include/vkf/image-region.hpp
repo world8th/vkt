@@ -59,7 +59,7 @@ namespace vkf {
             this->imgInfo.imageLayout = VkImageLayout(*layout);
 
             // 
-            vkh::handleVk(this->allocation->getInfo().deviceDispatch->CreateImageView(*info, nullptr, &this->imgInfo.imageView));
+            vkt::handleVk(this->allocation->getInfo().deviceDispatch->CreateImageView(*info, nullptr, &this->imgInfo.imageView));
 
             // 
 #ifdef VKT_OPENGL_INTEROP

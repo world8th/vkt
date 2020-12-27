@@ -44,7 +44,7 @@ namespace vkf {
             // 
             auto resetFlag = vkh::VkCommandPoolCreateFlags{ .eResetCommandBuffer = 1 };
             device->dispatch->GetDeviceQueue(this->queueFamilyIndex = device->queueFamilyIndices[queueFamilyID], queueIndex, &this->queue);
-            vkh::handleVk(device->dispatch->CreateCommandPool(vkh::VkCommandPoolCreateInfo{ .flags = resetFlag, .queueFamilyIndex = queueFamilyIndex }, nullptr, &this->commandPool));
+            vkt::handleVk(device->dispatch->CreateCommandPool(vkh::VkCommandPoolCreateInfo{ .flags = resetFlag, .queueFamilyIndex = queueFamilyIndex }, nullptr, &this->commandPool));
 
             {
                 auto size = 1024ull * 1024ull * 256ull;

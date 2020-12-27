@@ -272,7 +272,7 @@ namespace vkt
             glfwMakeContextCurrent(nullptr); // CONTEXT-REQUIRED!
 #ifdef VKT_GLFW_SURFACE
 #ifdef VKT_GLFW_LINKED
-            vkh::handleVk(glfwCreateWindowSurface((VkInstance&)(instance), applicationWindow.window, nullptr, (VkSurfaceKHR*)&applicationWindow.surface));
+            vkt::handleVk(glfwCreateWindowSurface((VkInstance&)(instance), applicationWindow.window, nullptr, (VkSurfaceKHR*)&applicationWindow.surface));
 #endif
 #endif
             glfwMakeContextCurrent(window); // CONTEXT-REQUIRED!
@@ -285,7 +285,7 @@ namespace vkt
             glfwMakeContextCurrent(nullptr); // CONTEXT-REQUIRED!
 #ifdef VKT_GLFW_SURFACE
 #ifdef VKT_GLFW_LINKED
-            vkh::handleVk(glfwCreateWindowSurface((VkInstance&)(instance), applicationWindow.window, nullptr, (VkSurfaceKHR*)&applicationWindow.surface));
+            vkt::handleVk(glfwCreateWindowSurface((VkInstance&)(instance), applicationWindow.window, nullptr, (VkSurfaceKHR*)&applicationWindow.surface));
 #endif
 #endif
             glfwMakeContextCurrent(applicationWindow.window); // CONTEXT-REQUIRED!

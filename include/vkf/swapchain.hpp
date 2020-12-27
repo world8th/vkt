@@ -75,7 +75,7 @@ namespace vkf {
             applicationWindow.surfaceSize = VkExtent2D{ applicationWindow.surfaceSize.width, applicationWindow.surfaceSize.height };
             glfwMakeContextCurrent(nullptr); // CONTEXT-REQUIRED!
 
-            vkh::handleVk(glfwCreateWindowSurface(*instance, applicationWindow.window, nullptr, (VkSurfaceKHR*)&applicationWindow.surface));
+            vkt::handleVk(glfwCreateWindowSurface(*instance, applicationWindow.window, nullptr, (VkSurfaceKHR*)&applicationWindow.surface));
 
             glfwMakeContextCurrent(applicationWindow.window); // CONTEXT-REQUIRED!
             return applicationWindow;
@@ -148,7 +148,7 @@ namespace vkf {
             render_pass_helper.addSubpassDependency(dp0);
             render_pass_helper.addSubpassDependency(dp1);
 
-            vkh::handleVk(device->dispatch->CreateRenderPass(render_pass_helper, nullptr, &surfaceWindow.renderPass));
+            vkt::handleVk(device->dispatch->CreateRenderPass(render_pass_helper, nullptr, &surfaceWindow.renderPass));
             return surfaceWindow.renderPass;
         }
 
@@ -156,7 +156,7 @@ namespace vkf {
         {
             const VkPhysicalDevice& gpu = device->physical;
             std::vector<VkSurfaceFormatKHR> surfaceFormats = {};
-            vkh::vsGetPhysicalDeviceSurfaceFormatsKHR(instance->dispatch, gpu, surfaceWindow.surface, surfaceFormats);
+            vkt::vsGetPhysicalDeviceSurfaceFormatsKHR(instance->dispatch, gpu, surfaceWindow.surface, surfaceFormats);
             const std::vector<VkFormat> preferredFormats = { VK_FORMAT_R16G16B16A16_UNORM, VK_FORMAT_A2B10G10R10_UNORM_PACK32, VK_FORMAT_A2R10G10B10_UNORM_PACK32, VK_FORMAT_R8G8B8A8_SRGB, VK_FORMAT_B8G8R8A8_SRGB, VK_FORMAT_A8B8G8R8_SRGB_PACK32, VK_FORMAT_R8G8B8A8_UNORM, VK_FORMAT_B8G8R8A8_UNORM, VK_FORMAT_A8B8G8R8_UNORM_PACK32 };
             VkFormat surfaceColorFormat = surfaceFormats.size() == 1 && surfaceFormats[0].format == VK_FORMAT_UNDEFINED ? VK_FORMAT_R8G8B8A8_SRGB : surfaceFormats[0].format;
 
@@ -182,7 +182,7 @@ namespace vkf {
             VkColorSpaceKHR surfaceColorSpace = surfaceFormats[surfaceFormatID].colorSpace;
 
             // get format properties?
-            auto formatProperties = vkh::vsGetPhysicalDeviceFormatProperties(instance->dispatch, gpu, surfaceColorFormat);//gpu.getFormatProperties(surfaceColorFormat);
+            auto formatProperties = vkt::vsGetPhysicalDeviceFormatProperties(instance->dispatch, gpu, surfaceColorFormat);//gpu.getFormatProperties(surfaceColorFormat);
 
             // only if these depth formats
             std::vector<VkFormat> depthFormats = {
@@ -192,7 +192,7 @@ namespace vkf {
             // choice supported depth format
             VkFormat surfaceDepthFormat = depthFormats[0];
             for (auto format : depthFormats) {
-                auto depthFormatProperties = vkh::vsGetPhysicalDeviceFormatProperties(instance->dispatch, gpu, format);
+                auto depthFormatProperties = vkt::vsGetPhysicalDeviceFormatProperties(instance->dispatch, gpu, format);
                 if (depthFormatProperties.optimalTilingFeatures & VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT) {
                     surfaceDepthFormat = format; break;
                 }
@@ -210,7 +210,7 @@ namespace vkf {
         virtual void updateSwapchainFramebuffer(std::shared_ptr<Queue> queue, std::vector<Framebuffer>& swapchainBuffers, VkSwapchainKHR& swapchain, VkRenderPass& renderpass) {
             // The swapchain handles allocating frame images.
             auto& surfaceFormats = getSurfaceFormat();
-            auto  gpuMemoryProps = vkh::vsGetPhysicalDeviceMemoryProperties(instance->dispatch, device->physical);//physicalDevice.getMemoryProperties();
+            auto  gpuMemoryProps = vkt::vsGetPhysicalDeviceMemoryProperties(instance->dispatch, device->physical);//physicalDevice.getMemoryProperties();
 
             // 
             auto imageUsage = vkh::VkImageUsageFlags{ .eTransferSrc = 1, .eDepthStencilAttachment = 1 };
@@ -258,7 +258,7 @@ namespace vkf {
                 vkf::VmaMemoryInfo memInfo = {};
                 this->depthImage = vkf::ImageRegion(std::make_shared<vkf::VmaImageAllocation>(this->device->allocator, imageCreate, memInfo), imageViewCreate, VK_IMAGE_LAYOUT_GENERAL);
 
-                vkh::handleVk(device->dispatch->CreateSampler(vkh::VkSamplerCreateInfo{
+                vkt::handleVk(device->dispatch->CreateSampler(vkh::VkSamplerCreateInfo{
                     .magFilter = VK_FILTER_LINEAR,
                     .minFilter = VK_FILTER_LINEAR,
                     .addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
@@ -267,7 +267,7 @@ namespace vkf {
             };
 
             // 
-            auto swapchainImages = vkh::vsGetSwapchainImagesKHR(device->dispatch, swapchain);
+            auto swapchainImages = vkt::vsGetSwapchainImagesKHR(device->dispatch, swapchain);
             swapchainBuffers.resize(swapchainImages.size());
             for (int i = 0; i < swapchainImages.size(); i++)
             { // create framebuffers
@@ -286,11 +286,11 @@ namespace vkf {
                 imageViewCreate.components = vkh::VkComponentMapping{},
                 imageViewCreate.subresourceRange = vkh::VkImageSubresourceRange{ aspect, 0, 1, 0, 1 };
 
-                vkh::handleVk(device->dispatch->CreateImageView(imageViewCreate, nullptr, &views[0]));
+                vkt::handleVk(device->dispatch->CreateImageView(imageViewCreate, nullptr, &views[0]));
                 views[1] = this->depthImage.getImageView(); // depth view
 
                 // 
-                vkh::handleVk(device->dispatch->CreateFramebuffer(vkh::VkFramebufferCreateInfo{ .flags = {}, .renderPass = renderpass, .attachmentCount = uint32_t(views.size()), .pAttachments = views.data(), .width = surfaceWindow.surfaceSize.width, .height = surfaceWindow.surfaceSize.height, .layers = 1u }, nullptr, &swapchainBuffers[i].frameBuffer));
+                vkt::handleVk(device->dispatch->CreateFramebuffer(vkh::VkFramebufferCreateInfo{ .flags = {}, .renderPass = renderpass, .attachmentCount = uint32_t(views.size()), .pAttachments = views.data(), .width = surfaceWindow.surfaceSize.width, .height = surfaceWindow.surfaceSize.height, .layers = 1u }, nullptr, &swapchainBuffers[i].frameBuffer));
             };
 
             if (queue) {
@@ -312,8 +312,8 @@ namespace vkf {
         virtual VkSwapchainKHR& createSwapchain()
         {
             auto& formats = getSurfaceFormat();
-            auto surfaceCapabilities = vkh::vsGetPhysicalDeviceSurfaceCapabilitiesKHR(instance->dispatch, device->physical, surfaceWindow.surface);
-            auto surfacePresentModes = vkh::vsGetPhysicalDeviceSurfacePresentModesKHR(instance->dispatch, device->physical, surfaceWindow.surface);
+            auto surfaceCapabilities = vkt::vsGetPhysicalDeviceSurfaceCapabilitiesKHR(instance->dispatch, device->physical, surfaceWindow.surface);
+            auto surfacePresentModes = vkt::vsGetPhysicalDeviceSurfacePresentModesKHR(instance->dispatch, device->physical, surfaceWindow.surface);
 
             // check the surface width/height.
             if (!(surfaceCapabilities.currentExtent.width == -1 || surfaceCapabilities.currentExtent.height == -1))
@@ -348,7 +348,7 @@ namespace vkf {
             swapchainCreateInfo.clipped = true;
 
             // create swapchain
-            vkh::handleVk(device->dispatch->CreateSwapchainKHR(swapchainCreateInfo, nullptr, &surfaceWindow.swapchain));
+            vkt::handleVk(device->dispatch->CreateSwapchainKHR(swapchainCreateInfo, nullptr, &surfaceWindow.swapchain));
             return surfaceWindow.swapchain;
         };
 
@@ -361,10 +361,10 @@ namespace vkf {
                 timeline.initialValue = i;
 
                 // 
-                vkh::handleVk(device->dispatch->CreateSemaphore(vkh::VkSemaphoreCreateInfo{}, nullptr, &surfaceWindow.swapchainBuffers[i].drawSemaphore));
-                vkh::handleVk(device->dispatch->CreateSemaphore(vkh::VkSemaphoreCreateInfo{}, nullptr, &surfaceWindow.swapchainBuffers[i].computeSemaphore));
-                vkh::handleVk(device->dispatch->CreateSemaphore(vkh::VkSemaphoreCreateInfo{}, nullptr, &surfaceWindow.swapchainBuffers[i].presentSemaphore));
-                vkh::handleVk(device->dispatch->CreateFence(vkh::VkFenceCreateInfo{ .flags = {1} }, nullptr, &surfaceWindow.swapchainBuffers[i].waitFence));
+                vkt::handleVk(device->dispatch->CreateSemaphore(vkh::VkSemaphoreCreateInfo{}, nullptr, &surfaceWindow.swapchainBuffers[i].drawSemaphore));
+                vkt::handleVk(device->dispatch->CreateSemaphore(vkh::VkSemaphoreCreateInfo{}, nullptr, &surfaceWindow.swapchainBuffers[i].computeSemaphore));
+                vkt::handleVk(device->dispatch->CreateSemaphore(vkh::VkSemaphoreCreateInfo{}, nullptr, &surfaceWindow.swapchainBuffers[i].presentSemaphore));
+                vkt::handleVk(device->dispatch->CreateFence(vkh::VkFenceCreateInfo{ .flags = {1} }, nullptr, &surfaceWindow.swapchainBuffers[i].waitFence));
             };
             return surfaceWindow.swapchainBuffers;
         };

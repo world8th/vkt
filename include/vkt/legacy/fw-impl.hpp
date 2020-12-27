@@ -172,7 +172,7 @@ namespace vkt
         render_pass_helper.addSubpassDependency(dp0);
         render_pass_helper.addSubpassDependency(dp1);
 
-        vkh::handleVk(this->deviceDispatch->CreateRenderPass(render_pass_helper, nullptr, &applicationWindow.renderPass));
+        vkt::handleVk(this->deviceDispatch->CreateRenderPass(render_pass_helper, nullptr, &applicationWindow.renderPass));
         return applicationWindow.renderPass;
     }
 
@@ -228,7 +228,7 @@ namespace vkt
                 return it;
             }), VK_IMAGE_LAYOUT_GENERAL);
 
-            vkh::handleVk(this->deviceDispatch->CreateSampler(vkh::VkSamplerCreateInfo{
+            vkt::handleVk(this->deviceDispatch->CreateSampler(vkh::VkSamplerCreateInfo{
                 .magFilter = VK_FILTER_LINEAR,
                 .minFilter = VK_FILTER_LINEAR,
                 .addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
@@ -247,7 +247,7 @@ namespace vkt
             // Image Views
             auto flags = VkImageViewCreateFlags{};
             auto aspect = vkh::VkImageAspectFlags{ .eColor = 1 };
-            vkh::handleVk(deviceDispatch->CreateImageView(vkh::VkImageViewCreateInfo{}.also([=](vkh::VkImageViewCreateInfo* it) {
+            vkt::handleVk(deviceDispatch->CreateImageView(vkh::VkImageViewCreateInfo{}.also([=](vkh::VkImageViewCreateInfo* it) {
                 it->flags = {},
                 it->image = swapchainImages[i],
                 it->viewType = VK_IMAGE_VIEW_TYPE_2D,
@@ -259,7 +259,7 @@ namespace vkt
             views[1] = this->depthImage.getImageView(); // depth view
 
             //
-            vkh::handleVk(deviceDispatch->CreateFramebuffer(vkh::VkFramebufferCreateInfo{ .flags = {}, .renderPass = renderpass, .attachmentCount = uint32_t(views.size()), .pAttachments = views.data(), .width = applicationWindow.surfaceSize.width, .height = applicationWindow.surfaceSize.height, .layers = 1u }, nullptr, &swapchainBuffers[i].frameBuffer));
+            vkt::handleVk(deviceDispatch->CreateFramebuffer(vkh::VkFramebufferCreateInfo{ .flags = {}, .renderPass = renderpass, .attachmentCount = uint32_t(views.size()), .pAttachments = views.data(), .width = applicationWindow.surfaceSize.width, .height = applicationWindow.surfaceSize.height, .layers = 1u }, nullptr, &swapchainBuffers[i].frameBuffer));
         };
 
         vkt::submitOnce(this->deviceDispatch, this->queue, this->commandPool, [&, this](VkCommandBuffer& cmd) {
@@ -332,7 +332,7 @@ namespace vkt
         swapchainCreateInfo.clipped = true;
 
         // create swapchain
-        vkh::handleVk(this->deviceDispatch->CreateSwapchainKHR(swapchainCreateInfo, nullptr, &applicationWindow.swapchain));
+        vkt::handleVk(this->deviceDispatch->CreateSwapchainKHR(swapchainCreateInfo, nullptr, &applicationWindow.swapchain));
         return applicationWindow.swapchain;
     };
 
@@ -346,10 +346,10 @@ namespace vkt
             timeline.initialValue = i;
 
             // 
-            vkh::handleVk(this->deviceDispatch->CreateSemaphore(vkh::VkSemaphoreCreateInfo{}, nullptr, &swapchainBuffers[i].drawSemaphore));
-            vkh::handleVk(this->deviceDispatch->CreateSemaphore(vkh::VkSemaphoreCreateInfo{}, nullptr, &swapchainBuffers[i].computeSemaphore));
-            vkh::handleVk(this->deviceDispatch->CreateSemaphore(vkh::VkSemaphoreCreateInfo{}, nullptr, &swapchainBuffers[i].presentSemaphore));
-            vkh::handleVk(this->deviceDispatch->CreateFence(vkh::VkFenceCreateInfo{ .flags = {1} }, nullptr, &swapchainBuffers[i].waitFence));
+            vkt::handleVk(this->deviceDispatch->CreateSemaphore(vkh::VkSemaphoreCreateInfo{}, nullptr, &swapchainBuffers[i].drawSemaphore));
+            vkt::handleVk(this->deviceDispatch->CreateSemaphore(vkh::VkSemaphoreCreateInfo{}, nullptr, &swapchainBuffers[i].computeSemaphore));
+            vkt::handleVk(this->deviceDispatch->CreateSemaphore(vkh::VkSemaphoreCreateInfo{}, nullptr, &swapchainBuffers[i].presentSemaphore));
+            vkt::handleVk(this->deviceDispatch->CreateFence(vkh::VkFenceCreateInfo{ .flags = {1} }, nullptr, &swapchainBuffers[i].waitFence));
         };
         return swapchainBuffers;
     }
@@ -590,10 +590,10 @@ namespace vkt
             graphicsFamilyIndex++;
 
             VkBool32 support = false;
-            //vkh::handleVk(vkGetPhysicalDeviceSurfaceSupportKHR(physicalDevice, graphicsFamilyIndex, surface(), &support));
+            //vkt::handleVk(vkGetPhysicalDeviceSurfaceSupportKHR(physicalDevice, graphicsFamilyIndex, surface(), &support));
             const auto& surface = this->surface();
             if (surface) {
-                vkh::handleVk(this->instanceDispatch->GetPhysicalDeviceSurfaceSupportKHR(physicalDevice, graphicsFamilyIndex, surface, &support));
+                vkt::handleVk(this->instanceDispatch->GetPhysicalDeviceSurfaceSupportKHR(physicalDevice, graphicsFamilyIndex, surface, &support));
             };
             if (queuefamily.queueFlags->eCompute && queuefamily.queueFlags->eGraphics && (support || !surface)) {
                 queueCreateInfos.push_back(vkh::VkDeviceQueueCreateInfo{ .queueFamilyIndex = uint32_t(computeFamilyIndex), .queueCount = 1, .pQueuePriorities = &priority });
@@ -628,7 +628,7 @@ namespace vkt
                 .ppEnabledExtensionNames = this->usedDeviceExtensions.data(),
                 //.pEnabledFeatures = &(VkPhysicalDeviceFeatures&)(gFeatures.features)
                 }));
-            vkh::handleVk(this->deviceDispatch->CreatePipelineCache(vkh::VkPipelineCacheCreateInfo(), nullptr, &this->pipelineCache));
+            vkt::handleVk(this->deviceDispatch->CreatePipelineCache(vkh::VkPipelineCacheCreateInfo(), nullptr, &this->pipelineCache));
             this->device = this->deviceDispatch->handle;
             vkt::vkGlobal::device = this->deviceDispatch.get_shared();
             //vkt::vkGlobal::volkDevice();
@@ -637,8 +637,8 @@ namespace vkt
         //
         auto resetFlag = vkh::VkCommandPoolCreateFlags{ .eResetCommandBuffer = 1 };
         this->deviceDispatch->GetDeviceQueue(queueFamilyIndex, 0u, &this->queue);
-        vkh::handleVk(this->deviceDispatch->CreateFence(vkh::VkFenceCreateInfo{}, nullptr, &this->fence));
-        vkh::handleVk(this->deviceDispatch->CreateCommandPool(vkh::VkCommandPoolCreateInfo{ .flags = resetFlag, .queueFamilyIndex = queueFamilyIndex }, nullptr, &this->commandPool));
+        vkt::handleVk(this->deviceDispatch->CreateFence(vkh::VkFenceCreateInfo{}, nullptr, &this->fence));
+        vkt::handleVk(this->deviceDispatch->CreateCommandPool(vkh::VkCommandPoolCreateInfo{ .flags = resetFlag, .queueFamilyIndex = queueFamilyIndex }, nullptr, &this->commandPool));
 
         // REMAP WITH XVK AGAIN!
         func.vkAllocateMemory = this->deviceDispatch->vkAllocateMemory;
@@ -671,7 +671,7 @@ namespace vkt
         vma_info.instance = this->instance;
         vma_info.physicalDevice = this->physicalDevice;
         vma_info.flags = VMA_ALLOCATOR_CREATE_BUFFER_DEVICE_ADDRESS_BIT;
-        vkh::handleVk(vmaCreateAllocator(&vma_info, &this->allocator));
+        vkt::handleVk(vmaCreateAllocator(&vma_info, &this->allocator));
 
         // Manually Create Descriptor Pool
         auto dps = std::vector<vkh::VkDescriptorPoolSize>{
@@ -687,7 +687,7 @@ namespace vkt
         };
 
         //
-        vkh::handleVk(this->deviceDispatch->CreateDescriptorPool(vkh::VkDescriptorPoolCreateInfo{
+        vkt::handleVk(this->deviceDispatch->CreateDescriptorPool(vkh::VkDescriptorPoolCreateInfo{
             .flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT | VK_DESCRIPTOR_POOL_CREATE_UPDATE_AFTER_BIND_BIT ,
             .maxSets = 256u, .poolSizeCount = static_cast<uint32_t>(dps.size()), .pPoolSizes = dps.data()
         }, nullptr, &this->descriptorPool));
@@ -813,9 +813,9 @@ namespace vkt
         physicalDevices = vkh::vsEnumeratePhysicalDevices(this->instanceDispatch.get_shared());
 
         //
-        //uint32_t count = 0u; vkh::handleVk(this->instanceDispatch->EnumeratePhysicalDevices(&count, nullptr));
+        //uint32_t count = 0u; vkt::handleVk(this->instanceDispatch->EnumeratePhysicalDevices(&count, nullptr));
         //this->physicalDevices.resize(count);
-        //vkh::handleVk(this->instanceDispatch->EnumeratePhysicalDevices(&count, this->physicalDevices.data()));
+        //vkt::handleVk(this->instanceDispatch->EnumeratePhysicalDevices(&count, this->physicalDevices.data()));
 
         // 
 #ifdef VKT_VULKAN_DEBUG

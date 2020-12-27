@@ -50,7 +50,7 @@ namespace vkf {
             if (memInfo->memUsage == VMA_MEMORY_USAGE_GPU_ONLY) { createInfo->usage->eShaderDeviceAddress = 1; }; // NEEDS SHARED BIT!
 
             // 
-            vkh::handleVk(vmaCreateBuffer(this->allocator = allocator.ref(), *createInfo, &vmaInfo, &reinterpret_cast<VkBuffer&>(this->buffer), &this->allocation, &this->allocationInfo));
+            vkt::handleVk(vmaCreateBuffer(this->allocator = allocator.ref(), *createInfo, &vmaInfo, &reinterpret_cast<VkBuffer&>(this->buffer), &this->allocation, &this->allocationInfo));
             this->info.range = createInfo->size;
             this->info.memUsage = memInfo->memUsage;
             this->info.memory = allocationInfo.deviceMemory;
@@ -121,7 +121,7 @@ namespace vkf {
         };
 
         // Get mapped memory
-        virtual void* map() { vkh::handleVk(vmaMapMemory(this->allocator, this->allocation, &this->allocationInfo.pMappedData)); return (this->info.pMapped = this->allocationInfo.pMappedData); };
+        virtual void* map() { vkt::handleVk(vmaMapMemory(this->allocator, this->allocation, &this->allocationInfo.pMappedData)); return (this->info.pMapped = this->allocationInfo.pMappedData); };
         virtual void* mapped() { if (!this->allocationInfo.pMappedData) { map(); }; return (this->info.pMapped = this->allocationInfo.pMappedData); };
         virtual void  unmap() { vmaUnmapMemory(this->allocator, this->allocation);  this->info.pMapped = this->allocationInfo.pMappedData = nullptr; };
 

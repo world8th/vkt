@@ -35,11 +35,10 @@
 // Force include for avoid GLAD problem...
 #include <vkt/core.hpp>
 #include <vkt/inline.hpp>
-#include <vkh/matching.hpp>
-
-//
 #include <vkt/essential.hpp>
-#include <vkh/helpers.hpp>
+
+// 
+#include <vkh/matching.hpp>
 
 // 
 #include "./vector-typed.hpp"
