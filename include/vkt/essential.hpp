@@ -1,7 +1,11 @@
 #pragma once // #
 
+// 
 #include "./definition.hpp"
 #include "./inline.hpp"
+
+// use helpers for essentials
+#include <vkh/helpers.hpp>
 
 // TODO: C++20 Modular
 namespace vkt {
@@ -316,6 +320,30 @@ namespace vkt {
 #endif
         };
         //glCheckError();
+    };
+
+    // REQUIRED VKH
+    inline VkResult AllocateDescriptorSetWithUpdate(vkt::Device& device, vkh::VsDescriptorSetCreateInfoHelper& helper, VkDescriptorSet& descriptorSet, bool& protection) {
+        if (!protection) {
+            // Corrupt... 
+            //if (descriptorSet) { vkt::handleVk(device->vkFreeDescriptorSets(device->handle, helper, 1u, &descriptorSet)); descriptorSet = {}; };
+
+            // 
+            bool created = false;
+            if (!descriptorSet) { vkt::handleVk(device->AllocateDescriptorSets(helper, &descriptorSet)); created = true; };
+
+            //
+            if (descriptorSet && created) {
+                const auto& writes = helper.setDescriptorSet(descriptorSet).mapWriteDescriptorSet();
+                device->UpdateDescriptorSets(uint32_t(writes.size()), reinterpret_cast<const ::VkWriteDescriptorSet*>(writes.data()), 0u, nullptr);
+            };
+
+            // 
+            protection = true;
+        };
+
+        // 
+        return VK_SUCCESS;
     };
 
 };
