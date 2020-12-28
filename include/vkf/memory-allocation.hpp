@@ -6,7 +6,6 @@
 #endif
 
 // 
-#include <vkt/core.hpp>
 #include <vkt/inline.hpp>
 
 // 

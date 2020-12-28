@@ -12,9 +12,9 @@ namespace vkf {
     //class VmaBufferAllocation;
     class BufferAllocation : public std::enable_shared_from_this<BufferAllocation> { public:
         BufferAllocation() {};
-        BufferAllocation(vkt::uni_arg<vkh::VkBufferCreateInfo> createInfo, vkt::uni_arg<MemoryAllocationInfo> allocationInfo = MemoryAllocationInfo{}) : info(allocationInfo) { this->construct(allocationInfo, createInfo); };
-        BufferAllocation(const vkt::uni_ptr   <BufferAllocation>& allocation) : buffer(allocation->buffer), info(allocation->info) { this->assign(allocation); };
-        BufferAllocation(const std::shared_ptr<BufferAllocation>& allocation) : buffer(allocation->buffer), info(allocation->info) { this->assign(vkt::uni_ptr<BufferAllocation>(allocation)); };
+        BufferAllocation(vkh::uni_arg<vkh::VkBufferCreateInfo> createInfo, vkh::uni_arg<MemoryAllocationInfo> allocationInfo = MemoryAllocationInfo{}) : info(allocationInfo) { this->construct(allocationInfo, createInfo); };
+        BufferAllocation(const vkh::uni_ptr   <BufferAllocation>& allocation) : buffer(allocation->buffer), info(allocation->info) { this->assign(allocation); };
+        BufferAllocation(const std::shared_ptr<BufferAllocation>& allocation) : buffer(allocation->buffer), info(allocation->info) { this->assign(vkh::uni_ptr<BufferAllocation>(allocation)); };
         ~BufferAllocation() {
             if (!this->isManaged()) { // Avoid VMA Memory Corruption
                 if ((this->buffer || this->info.memory) && this->info.device) {
@@ -34,14 +34,14 @@ namespace vkf {
         };
 
         virtual BufferAllocation* construct(
-            vkt::uni_arg<MemoryAllocationInfo> allocationInfo,
-            vkt::uni_arg<vkh::VkBufferCreateInfo> createInfo = vkh::VkBufferCreateInfo{}
+            vkh::uni_arg<MemoryAllocationInfo> allocationInfo,
+            vkh::uni_arg<vkh::VkBufferCreateInfo> createInfo = vkh::VkBufferCreateInfo{}
         ) { // 
             this->info = allocationInfo;
 
             // 
             vkh::VkMemoryAllocateFlagsInfo allocFlags = {};
-            vkt::unlock32(allocFlags.flags) = 0u;
+            vkh::unlock32(allocFlags.flags) = 0u;
 
             //
 #ifdef VKT_CORE_USE_XVK
@@ -150,14 +150,14 @@ namespace vkf {
         };
 
         // Dedicated version
-        virtual BufferAllocation& assign(const vkt::uni_ptr<BufferAllocation>& allocation) {
+        virtual BufferAllocation& assign(const vkh::uni_ptr<BufferAllocation>& allocation) {
             this->buffer = allocation->buffer;
             this->info = allocation->info;
             return *this;
         };
           
         // 
-        virtual BufferAllocation& operator=(const vkt::uni_ptr<BufferAllocation>& allocation) {
+        virtual BufferAllocation& operator=(const vkh::uni_ptr<BufferAllocation>& allocation) {
             return this->assign(allocation);
         };
 

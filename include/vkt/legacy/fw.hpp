@@ -61,8 +61,8 @@ namespace vkt
 
     public: friend GPUFramework;
         GPUFramework() { vkt::vkGlobal(); };
-        GPUFramework(vkt::uni_ptr<GPUFramework> fw) { *this = fw; vkt::vkGlobal(); };
-        GPUFramework& operator=(vkt::uni_ptr<GPUFramework> fw);
+        GPUFramework(vkh::uni_ptr<GPUFramework> fw) { *this = fw; vkt::vkGlobal(); };
+        GPUFramework& operator=(vkh::uni_ptr<GPUFramework> fw);
 
         // minimal features
         vkh::VkPhysicalDeviceProperties2 gProperties{};
@@ -120,12 +120,12 @@ namespace vkt
 
 
         // 
-        public: virtual GPUFramework* submitUtilize(vkt::uni_arg<VkCommandBuffer> cmds, vkt::uni_arg<vkh::VkSubmitInfo> smbi = vkh::VkSubmitInfo{});
-        public: virtual GPUFramework* submitUtilize(const std::vector<VkCommandBuffer>& cmds, vkt::uni_arg<vkh::VkSubmitInfo> smbi = vkh::VkSubmitInfo{});
-        public: virtual GPUFramework* submitOnce(const std::function<void(VkCommandBuffer&)>& cmdFn = {}, vkt::uni_arg<vkh::VkSubmitInfo> smbi = vkh::VkSubmitInfo{});
-        public: virtual std::future<GPUFramework*> submitOnceAsync(const std::function<void(VkCommandBuffer&)>& cmdFn = {}, vkt::uni_arg<vkh::VkSubmitInfo> smbi = vkh::VkSubmitInfo{});
-        public: virtual GPUFramework* submitCmd(vkt::uni_arg<VkCommandBuffer> cmds, vkt::uni_arg<vkh::VkSubmitInfo> smbi = vkh::VkSubmitInfo{});
-        public: virtual GPUFramework* submitCmd(const std::vector<VkCommandBuffer>& cmds, vkt::uni_arg<vkh::VkSubmitInfo> smbi = vkh::VkSubmitInfo{});
+        public: virtual GPUFramework* submitUtilize(vkh::uni_arg<VkCommandBuffer> cmds, vkh::uni_arg<vkh::VkSubmitInfo> smbi = vkh::VkSubmitInfo{});
+        public: virtual GPUFramework* submitUtilize(const std::vector<VkCommandBuffer>& cmds, vkh::uni_arg<vkh::VkSubmitInfo> smbi = vkh::VkSubmitInfo{});
+        public: virtual GPUFramework* submitOnce(const std::function<void(VkCommandBuffer&)>& cmdFn = {}, vkh::uni_arg<vkh::VkSubmitInfo> smbi = vkh::VkSubmitInfo{});
+        public: virtual std::future<GPUFramework*> submitOnceAsync(const std::function<void(VkCommandBuffer&)>& cmdFn = {}, vkh::uni_arg<vkh::VkSubmitInfo> smbi = vkh::VkSubmitInfo{});
+        public: virtual GPUFramework* submitCmd(vkh::uni_arg<VkCommandBuffer> cmds, vkh::uni_arg<vkh::VkSubmitInfo> smbi = vkh::VkSubmitInfo{});
+        public: virtual GPUFramework* submitCmd(const std::vector<VkCommandBuffer>& cmds, vkh::uni_arg<vkh::VkSubmitInfo> smbi = vkh::VkSubmitInfo{});
 
         //VkDevice createDevice(bool isComputePrior = true, std::string shaderPath = "./", bool enableAdvancedAcceleration = true);
         inline virtual VkPhysicalDevice& getPhysicalDevice(const uint32_t& gpuID) { physicalDevice = physicalDevices[gpuID]; return physicalDevice; };

@@ -6,7 +6,7 @@
 // 
 #include "./definition.hpp"
 
-//
+// 
 #include <vkh/helpers.hpp>
 
 // Here Will HEADER's ONLY! 
@@ -129,7 +129,7 @@ namespace vkt {
         }
     };
 
-    static inline decltype(auto) handleVk(vkt::uni_arg<VkResult> result) {
+    static inline decltype(auto) handleVk(vkh::uni_arg<VkResult> result) {
         if (result != VK_SUCCESS) { // TODO: Fix Ubuntu Issue
             //std::cerr << "ERROR: VkResult Error Code: " << std::to_string(result) << " (" << errorString(result) << ")..." << std::endl; throw (*result);
 
@@ -154,7 +154,7 @@ namespace vkt {
     }
 
     template <class T>
-    static inline auto strided(const vkt::uni_arg<size_t>& sizeo) { return sizeof(T) * sizeo; }
+    static inline auto strided(const vkh::uni_arg<size_t>& sizeo) { return sizeof(T) * sizeo; }
 
     template <class T> static inline auto makeVector(const T* ptr, const size_t& size = 1) { std::vector<T>v(size); memcpy(v.data(), ptr, strided<T>(size)); return v; };
 
@@ -229,10 +229,10 @@ namespace vkt {
     struct ImageBarrierInfo {
         vkt::Instance instanceDispatch = vkGlobal::instance;
         vkt::Device deviceDispatch = vkGlobal::device;
-        vkt::uni_arg<VkImage> image = {};
-        vkt::uni_arg<VkImageLayout> targetLayout = VK_IMAGE_LAYOUT_GENERAL;
-        vkt::uni_arg<VkImageLayout> originLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-        vkt::uni_arg<vkh::VkImageSubresourceRange> subresourceRange = vkh::VkImageSubresourceRange{ {}, 0u, 1u, 0u, 1u };
+        vkh::uni_arg<VkImage> image = {};
+        vkh::uni_arg<VkImageLayout> targetLayout = VK_IMAGE_LAYOUT_GENERAL;
+        vkh::uni_arg<VkImageLayout> originLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+        vkh::uni_arg<vkh::VkImageSubresourceRange> subresourceRange = vkh::VkImageSubresourceRange{ {}, 0u, 1u, 0u, 1u };
     };
 
 
@@ -286,7 +286,7 @@ namespace vkt {
     };
 
     //
-    static inline auto imageBarrier(const vkt::uni_arg<VkCommandBuffer>& cmd = VkCommandBuffer{}, const vkt::uni_arg<ImageBarrierInfo>& info = ImageBarrierInfo{}) {
+    static inline auto imageBarrier(const vkh::uni_arg<VkCommandBuffer>& cmd = VkCommandBuffer{}, const vkh::uni_arg<ImageBarrierInfo>& info = ImageBarrierInfo{}) {
         VkResult result = VK_SUCCESS; // planned to complete
         if (*info->originLayout == *info->targetLayout) { return result; }; // no need transfering more
 
@@ -396,7 +396,7 @@ namespace vkt {
     };
 
     //
-    static inline auto memoryBarrier(const vkt::uni_arg<VkCommandBuffer>& cmd = VkCommandBuffer{}, const vkt::uni_arg<MemoryBarrierInfo>& info = MemoryBarrierInfo{}) {
+    static inline auto memoryBarrier(const vkh::uni_arg<VkCommandBuffer>& cmd = VkCommandBuffer{}, const vkh::uni_arg<MemoryBarrierInfo>& info = MemoryBarrierInfo{}) {
         vkh::VkMemoryBarrier memoryBarrier = {};
 
         // 
@@ -437,19 +437,19 @@ namespace vkt {
         return data;
     };
 
-    inline auto& vsEnumerateInstanceExtensionProperties(vkt::uni_ptr<xvk::Loader> loader, std::vector<VkExtensionProperties>& data, const std::string& layerName = std::string("")) {
+    inline auto& vsEnumerateInstanceExtensionProperties(vkh::uni_ptr<xvk::Loader> loader, std::vector<VkExtensionProperties>& data, const std::string& layerName = std::string("")) {
         uint32_t count = 0u; vkt::handleVk(loader->vkEnumerateInstanceExtensionProperties(layerName.c_str(), &count, nullptr)); data.resize(count);
         vkt::handleVk(loader->vkEnumerateInstanceExtensionProperties(layerName.c_str(), &count, data.data()));
         return data;
     };
 
-    inline auto& vsEnumerateInstanceLayerProperties(vkt::uni_ptr<xvk::Loader> loader, std::vector<VkLayerProperties>& data) {
+    inline auto& vsEnumerateInstanceLayerProperties(vkh::uni_ptr<xvk::Loader> loader, std::vector<VkLayerProperties>& data) {
         uint32_t count = 0u; vkt::handleVk(loader->vkEnumerateInstanceLayerProperties(&count, nullptr)); data.resize(count);
         vkt::handleVk(loader->vkEnumerateInstanceLayerProperties(&count, data.data()));
         return data;
     };
 
-    inline auto vsEnumerateInstanceVersion(vkt::uni_ptr<xvk::Loader> loader) {
+    inline auto vsEnumerateInstanceVersion(vkh::uni_ptr<xvk::Loader> loader) {
         uint32_t version = 0u; vkt::handleVk(loader->vkEnumerateInstanceVersion(&version)); return version;
     };
 

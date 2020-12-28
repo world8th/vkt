@@ -41,9 +41,6 @@
 #include <future>
 
 // 
-#include "core.hpp"
-
-// 
 #include <vkh/structures.hpp>
 
 // 
@@ -60,7 +57,7 @@
 
 namespace vkt {
 #ifdef VKT_CORE_USE_XVK
-    using Device = vkt::uni_ptr<xvk::Device>;
-    using Instance = vkt::uni_ptr<xvk::Instance>;
+    using Device = vkh::uni_ptr<xvk::Device>;
+    using Instance = vkh::uni_ptr<xvk::Instance>;
 #endif
 };

@@ -20,15 +20,15 @@ namespace vkf {
     // 
     class VmaBufferAllocation : public BufferAllocation { public: 
         VmaBufferAllocation() {};
-        VmaBufferAllocation(const vkt::uni_arg<VmaAllocator>& allocator, const vkt::uni_arg<vkh::VkBufferCreateInfo>& createInfo = vkh::VkBufferCreateInfo{}, vkt::uni_arg<VmaMemoryInfo> vmaInfo = VmaMemoryInfo{.memUsage = VMA_MEMORY_USAGE_GPU_ONLY }) { this->construct(*allocator, createInfo, vmaInfo); };
+        VmaBufferAllocation(const vkh::uni_arg<VmaAllocator>& allocator, const vkh::uni_arg<vkh::VkBufferCreateInfo>& createInfo = vkh::VkBufferCreateInfo{}, vkh::uni_arg<VmaMemoryInfo> vmaInfo = VmaMemoryInfo{.memUsage = VMA_MEMORY_USAGE_GPU_ONLY }) { this->construct(*allocator, createInfo, vmaInfo); };
 
         // 
-        VmaBufferAllocation(const vkt::uni_ptr<VmaBufferAllocation>& allocation) : allocation(allocation->allocation), allocationInfo(allocation->allocationInfo), allocator(allocation->allocator) { this->assign(allocation); };
-        VmaBufferAllocation(const vkt::uni_ptr<BufferAllocation>& allocation) { this->assign(allocation.dyn_cast<VmaBufferAllocation>()); };
+        VmaBufferAllocation(const vkh::uni_ptr<VmaBufferAllocation>& allocation) : allocation(allocation->allocation), allocationInfo(allocation->allocationInfo), allocator(allocation->allocator) { this->assign(allocation); };
+        VmaBufferAllocation(const vkh::uni_ptr<BufferAllocation>& allocation) { this->assign(allocation.dyn_cast<VmaBufferAllocation>()); };
 
         // 
-        VmaBufferAllocation(const std::shared_ptr<VmaBufferAllocation>& allocation) : allocation(allocation->allocation), allocationInfo(allocation->allocationInfo), allocator(allocation->allocator) { this->assign(vkt::uni_ptr<VmaBufferAllocation>(allocation)); };
-        VmaBufferAllocation(const std::shared_ptr<BufferAllocation>& allocation) { this->assign(vkt::uni_ptr<VmaBufferAllocation>(std::dynamic_pointer_cast<VmaBufferAllocation>(allocation))); };
+        VmaBufferAllocation(const std::shared_ptr<VmaBufferAllocation>& allocation) : allocation(allocation->allocation), allocationInfo(allocation->allocationInfo), allocator(allocation->allocator) { this->assign(vkh::uni_ptr<VmaBufferAllocation>(allocation)); };
+        VmaBufferAllocation(const std::shared_ptr<BufferAllocation>& allocation) { this->assign(vkh::uni_ptr<VmaBufferAllocation>(std::dynamic_pointer_cast<VmaBufferAllocation>(allocation))); };
 
         // 
         ~VmaBufferAllocation() {
@@ -41,9 +41,9 @@ namespace vkf {
 
         //
         virtual VmaBufferAllocation* construct(
-            vkt::uni_arg<VmaAllocator> allocator,
-            vkt::uni_arg<vkh::VkBufferCreateInfo> createInfo = vkh::VkBufferCreateInfo{},
-            vkt::uni_arg<VmaMemoryInfo> memInfo = VmaMemoryInfo{ .memUsage = VMA_MEMORY_USAGE_GPU_ONLY }
+            vkh::uni_arg<VmaAllocator> allocator,
+            vkh::uni_arg<vkh::VkBufferCreateInfo> createInfo = vkh::VkBufferCreateInfo{},
+            vkh::uni_arg<VmaMemoryInfo> memInfo = VmaMemoryInfo{ .memUsage = VMA_MEMORY_USAGE_GPU_ONLY }
         ) {
             VmaAllocationCreateInfo vmaInfo = {}; vmaInfo.usage = memInfo->memUsage;
             if (memInfo->memUsage == VMA_MEMORY_USAGE_CPU_TO_GPU || memInfo->memUsage == VMA_MEMORY_USAGE_GPU_TO_CPU) { vmaInfo.flags = VMA_ALLOCATION_CREATE_MAPPED_BIT; };
@@ -97,7 +97,7 @@ namespace vkf {
         };
         
         // Dedicated 
-        virtual VmaBufferAllocation& assign(const vkt::uni_ptr<VmaBufferAllocation>& allocation) {
+        virtual VmaBufferAllocation& assign(const vkh::uni_ptr<VmaBufferAllocation>& allocation) {
             if (allocation->allocation) {
                 vmaDestroyBuffer(allocator, *this, *allocation);  // don't assign into already allocated
             };
@@ -111,7 +111,7 @@ namespace vkf {
         }
 
         // 
-        virtual VmaBufferAllocation& operator=(const vkt::uni_ptr<VmaBufferAllocation>& allocation) {
+        virtual VmaBufferAllocation& operator=(const vkh::uni_ptr<VmaBufferAllocation>& allocation) {
             return this->assign(allocation);
         };
 

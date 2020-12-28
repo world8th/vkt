@@ -1,16 +1,16 @@
 #pragma once // #
 
-// 
-#ifndef VKT_USE_VULKAN_HPP
-#define VKT_USE_VULKAN_HPP
+// TODO: REMOVE GLM REQUIREMENTS
+#ifndef VKT_CORE_USE_GLM
+#define VKT_CORE_USE_GLM
 #endif
 
 //
-#include <vkt/core.hpp>
-#include <vkh/enums.hpp>
-#include <vkh/bitfields.hpp>
+#include "./core.hpp"
+#include "./enums.hpp"
+#include "./bitfields.hpp"
 
-
+//
 namespace vkh {
 
     /// Description of blocks for compressed formats.

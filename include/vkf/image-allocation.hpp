@@ -12,9 +12,9 @@ namespace vkf {
     class ImageAllocation : public std::enable_shared_from_this<ImageAllocation> {
     public:
         ImageAllocation() {};
-        ImageAllocation(vkt::uni_arg<vkh::VkImageCreateInfo> createInfo, vkt::uni_arg<MemoryAllocationInfo> allocationInfo = MemoryAllocationInfo{}) : info(allocationInfo) { this->construct(allocationInfo, createInfo); }
-        ImageAllocation(const vkt::uni_ptr<ImageAllocation>& allocation) : image(allocation->image), info(allocation->info) { *this = allocation; };
-        ImageAllocation(const std::shared_ptr<ImageAllocation>& allocation) : image(allocation->image), info(allocation->info) { *this = vkt::uni_ptr<ImageAllocation>(allocation); };
+        ImageAllocation(vkh::uni_arg<vkh::VkImageCreateInfo> createInfo, vkh::uni_arg<MemoryAllocationInfo> allocationInfo = MemoryAllocationInfo{}) : info(allocationInfo) { this->construct(allocationInfo, createInfo); }
+        ImageAllocation(const vkh::uni_ptr<ImageAllocation>& allocation) : image(allocation->image), info(allocation->info) { *this = allocation; };
+        ImageAllocation(const std::shared_ptr<ImageAllocation>& allocation) : image(allocation->image), info(allocation->info) { *this = vkh::uni_ptr<ImageAllocation>(allocation); };
         ~ImageAllocation() {
             if (!this->isManaged()) { // Avoid VMA Memory Corruption
                 if ((this->image || this->info.memory) && this->info.device) {
@@ -31,8 +31,8 @@ namespace vkf {
 
         // 
         virtual ImageAllocation* construct(
-            vkt::uni_arg<MemoryAllocationInfo> allocationInfo,
-            vkt::uni_arg<vkh::VkImageCreateInfo> createInfo = vkh::VkImageCreateInfo{}
+            vkh::uni_arg<MemoryAllocationInfo> allocationInfo,
+            vkh::uni_arg<vkh::VkImageCreateInfo> createInfo = vkh::VkImageCreateInfo{}
         ) {
             this->info = allocationInfo;
 
@@ -59,7 +59,7 @@ namespace vkf {
 
             // 
             vkh::VkMemoryAllocateFlagsInfo allocFlags = {};
-            vkt::unlock32(allocFlags.flags) = 0u;
+            vkh::unlock32(allocFlags.flags) = 0u;
             if (this->info.memUsage == VMA_MEMORY_USAGE_GPU_ONLY) {
                 allocFlags.flags->eAddress = 1u;
             };
@@ -175,7 +175,7 @@ namespace vkf {
         virtual unsigned& getGLMemory() { return this->info.glMemory; };
 
         // 
-        virtual ImageAllocation& operator=(vkt::uni_ptr<ImageAllocation> allocation) {
+        virtual ImageAllocation& operator=(vkh::uni_ptr<ImageAllocation> allocation) {
             this->image = allocation->image;
             this->info = allocation->info;
             return *this;

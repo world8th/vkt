@@ -1,9 +1,16 @@
 #pragma once // #
 
-#include <vkt/core.hpp>
-#include <vkh/enums.hpp>
-#include <vkh/bitfields.hpp>
+// TODO: REMOVE GLM REQUIREMENTS
+#ifndef VKT_CORE_USE_GLM
+#define VKT_CORE_USE_GLM
+#endif
 
+// 
+#include "./core.hpp"
+#include "./enums.hpp"
+#include "./bitfields.hpp"
+
+// 
 namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
                 // TODO: WIP FULL C++20 SUPPORT
                 // TODO: WIP FULL Vulkan-HPP COMPATIBILITY (but currently can be accessed by casting hacks, for PRO users only)
@@ -26,8 +33,8 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         inline const ::NAME& vk() const { return reinterpret_cast<const ::NAME&>(*this); };\
         inline ::NAME* operator &() { return reinterpret_cast<::NAME*>((void*)this); }; \
         inline const ::NAME* operator &() const { return reinterpret_cast<const ::NAME*>((const void*)this); }; \
-        inline NAME& operator =( vkt::uni_arg<::NAME> info ) { memcpy(this, &(*info), sizeof(NAME)); return *this; };\
-        inline NAME& operator =( vkt::uni_arg<NAME> info ) { memcpy(this, &(*info), sizeof(NAME)); return *this; }; \
+        inline NAME& operator =( vkh::uni_arg<::NAME> info ) { memcpy(this, &(*info), sizeof(NAME)); return *this; };\
+        inline NAME& operator =( vkh::uni_arg<NAME> info ) { memcpy(this, &(*info), sizeof(NAME)); return *this; }; \
         inline NAME also(const std::function<NAME(NAME)>& fn) { auto result = fn(reinterpret_cast<NAME&>(*this)); return reinterpret_cast<NAME&>(result); };\
         inline static NAME create(const std::function<NAME(NAME)>& fn = {}) { auto data = NAME{}; auto result = fn ? fn(reinterpret_cast<NAME&>(data)) : reinterpret_cast<NAME&>(data); return reinterpret_cast<NAME&>(result); };
 
@@ -42,18 +49,18 @@ namespace vkh { // TODO: Coverage ALL of MOST and Common USING Vulkan Structures
         inline const VKNAME* operator->() const { return reinterpret_cast<const VKNAME*>(this); };\
         inline VKNAME& hpp() { return reinterpret_cast<VKNAME&>(*this); };\
         inline const VKNAME& hpp() const { return reinterpret_cast<const VKNAME&>(*this); };\
-        inline NAME& operator =( vkt::uni_arg<VKNAME> info ) { memcpy(this, &(*info), sizeof(NAME)); return *this; };
+        inline NAME& operator =( vkh::uni_arg<VKNAME> info ) { memcpy(this, &(*info), sizeof(NAME)); return *this; };
 #else
         #define VK_HPP_STRUCT_OPERATORS(NAME,VKNAME) // Not Vulkan HPP Support
 #endif
 
     #define STRUCT_TYPE_COMPATIBLE(NAME,T)\
-        inline NAME& operator=(const vkt::uni_arg<T>& V) { memcpy(this, &(*V), sizeof(T)); return *this; };\
+        inline NAME& operator=(const vkh::uni_arg<T>& V) { memcpy(this, &(*V), sizeof(T)); return *this; };\
         inline operator T&() { return reinterpret_cast<T&>(*this); };\
         inline operator const T&() const { return reinterpret_cast<const T&>(*this); };
 
-    #define FLAGS(NAME) vkt::union_t<vkh::NAME##Flags, ::NAME##Flags, ::NAME##FlagBits>
-    #define FLAGF(NAME,FIX) vkt::union_t<vkh::NAME##Flags##FIX, ::NAME##Flags##FIX, ::NAME##FlagBits##FIX>
+    #define FLAGS(NAME) vkh::union_t<vkh::NAME##Flags, ::NAME##Flags, ::NAME##FlagBits>
+    #define FLAGF(NAME,FIX) vkh::union_t<vkh::NAME##Flags##FIX, ::NAME##Flags##FIX, ::NAME##FlagBits##FIX>
 
 
     // GLM-Compatible

@@ -8,9 +8,9 @@ Vulkan API Tools C++ helping library. The most long-live library ever (more than
 Made: 
 - Sorts of refactoring
 - Dedicate into VKf framework
+- Dedicate `core.hpp` into VKh
 
 Planned: 
-- Dedicate `core.hpp` into VKh
 - Rewrite some code
 - Far refactoring
 - Add new features

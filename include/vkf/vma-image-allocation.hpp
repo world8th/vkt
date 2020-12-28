@@ -21,15 +21,15 @@ namespace vkf {
     class VmaImageAllocation : public ImageAllocation {
     public: friend VmaImageAllocation; friend ImageAllocation;// 
         VmaImageAllocation() {};
-        VmaImageAllocation(vkt::uni_arg<VmaAllocator> allocator, vkt::uni_arg<vkh::VkImageCreateInfo> createInfo = vkh::VkImageCreateInfo{}, vkt::uni_arg<VmaMemoryInfo> vmaInfo = VmaMemoryInfo{ .memUsage = VMA_MEMORY_USAGE_GPU_ONLY }) { this->construct(allocator, createInfo, vmaInfo); };
+        VmaImageAllocation(vkh::uni_arg<VmaAllocator> allocator, vkh::uni_arg<vkh::VkImageCreateInfo> createInfo = vkh::VkImageCreateInfo{}, vkh::uni_arg<VmaMemoryInfo> vmaInfo = VmaMemoryInfo{ .memUsage = VMA_MEMORY_USAGE_GPU_ONLY }) { this->construct(allocator, createInfo, vmaInfo); };
 
         // 
-        VmaImageAllocation(const vkt::uni_ptr<VmaImageAllocation>& allocation) : allocation(allocation->allocation), allocationInfo(allocation->allocationInfo), allocator(allocation->allocator) { *this = allocation; };
-        VmaImageAllocation(const vkt::uni_ptr<ImageAllocation>& allocation) { *this = allocation.dyn_cast<VmaImageAllocation>(); };
+        VmaImageAllocation(const vkh::uni_ptr<VmaImageAllocation>& allocation) : allocation(allocation->allocation), allocationInfo(allocation->allocationInfo), allocator(allocation->allocator) { *this = allocation; };
+        VmaImageAllocation(const vkh::uni_ptr<ImageAllocation>& allocation) { *this = allocation.dyn_cast<VmaImageAllocation>(); };
 
         // 
-        VmaImageAllocation(const std::shared_ptr<VmaImageAllocation>& allocation) : allocation(allocation->allocation), allocationInfo(allocation->allocationInfo), allocator(allocation->allocator) { *this = vkt::uni_ptr<VmaImageAllocation>(allocation); };
-        VmaImageAllocation(const std::shared_ptr<ImageAllocation>& allocation) { *this = dynamic_cast<VmaImageAllocation&>(*vkt::uni_ptr<ImageAllocation>(allocation)); };
+        VmaImageAllocation(const std::shared_ptr<VmaImageAllocation>& allocation) : allocation(allocation->allocation), allocationInfo(allocation->allocationInfo), allocator(allocation->allocator) { *this = vkh::uni_ptr<VmaImageAllocation>(allocation); };
+        VmaImageAllocation(const std::shared_ptr<ImageAllocation>& allocation) { *this = dynamic_cast<VmaImageAllocation&>(*vkh::uni_ptr<ImageAllocation>(allocation)); };
 
         //
         ~VmaImageAllocation() {
@@ -42,9 +42,9 @@ namespace vkf {
 
         // 
         virtual VmaImageAllocation* construct(
-            vkt::uni_arg<VmaAllocator> allocator,
-            vkt::uni_arg<vkh::VkImageCreateInfo> createInfo = vkh::VkImageCreateInfo{},
-            vkt::uni_arg<VmaMemoryInfo> memInfo = VmaMemoryInfo{ .memUsage = VMA_MEMORY_USAGE_GPU_ONLY }
+            vkh::uni_arg<VmaAllocator> allocator,
+            vkh::uni_arg<vkh::VkImageCreateInfo> createInfo = vkh::VkImageCreateInfo{},
+            vkh::uni_arg<VmaMemoryInfo> memInfo = VmaMemoryInfo{ .memUsage = VMA_MEMORY_USAGE_GPU_ONLY }
         ) {
             VmaAllocationCreateInfo vmaInfo = {}; vmaInfo.usage = memInfo->memUsage;
             if (memInfo->memUsage == VMA_MEMORY_USAGE_CPU_TO_GPU || memInfo->memUsage == VMA_MEMORY_USAGE_GPU_TO_CPU) { vmaInfo.flags = VMA_ALLOCATION_CREATE_MAPPED_BIT; };

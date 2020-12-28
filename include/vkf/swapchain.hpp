@@ -234,7 +234,7 @@ namespace vkf {
 
             // 
             vkh::VkImageCreateFlags iflg = {};
-            vkt::unlock32(iflg) = 0u;
+            vkh::unlock32(iflg) = 0u;
 
             // 
             auto aspect = vkh::VkImageAspectFlags{ .eColor = 1 };

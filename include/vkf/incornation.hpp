@@ -33,12 +33,12 @@
 #endif
 
 // Force include for avoid GLAD problem...
-#include <vkt/core.hpp>
-#include <vkt/inline.hpp>
-#include <vkt/essential.hpp>
-
 // 
 #include <vkh/matching.hpp>
+
+//
+#include <vkt/inline.hpp>
+#include <vkt/essential.hpp>
 
 // 
 #include "./vector-typed.hpp"

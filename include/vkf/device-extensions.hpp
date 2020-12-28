@@ -1,8 +1,10 @@
 #pragma once
 
+// 
 #include <vector>
 #include <string>
 
+// 
 namespace vkf {
     // default device layers
     const std::vector<const char*> wantedDeviceLayers_CStr = {

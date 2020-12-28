@@ -1,14 +1,5 @@
 ﻿#pragma once // #
 
-//
-#ifndef VKT_CORE_USE_VMA
-#define VKT_CORE_USE_VMA
-#endif
-
-// 
-#include <vkt/core.hpp>
-#include <vkt/inline.hpp>
-
 // 
 #include "./vector-base.hpp"
 
@@ -22,13 +13,13 @@ namespace vkf {
         Vector(): VectorBase() {};
 
         // 
-        Vector(const vkt::uni_ptr<BufferAllocation>& allocation, vkt::uni_arg<VkDeviceSize> offset = VkDeviceSize(0ull), vkt::uni_arg<VkDeviceSize> size = VK_WHOLE_SIZE, vkt::uni_arg<VkDeviceSize> stride = sizeof(T)) : VectorBase(allocation, offset, size, stride) {};
-        Vector(const std::shared_ptr<BufferAllocation>& allocation, vkt::uni_arg<VkDeviceSize> offset = VkDeviceSize(0ull), vkt::uni_arg<VkDeviceSize> size = VK_WHOLE_SIZE, vkt::uni_arg<VkDeviceSize> stride = sizeof(T)) : VectorBase(allocation, offset, size, stride) {};
+        Vector(const vkh::uni_ptr<BufferAllocation>& allocation, vkh::uni_arg<VkDeviceSize> offset = VkDeviceSize(0ull), vkh::uni_arg<VkDeviceSize> size = VK_WHOLE_SIZE, vkh::uni_arg<VkDeviceSize> stride = sizeof(T)) : VectorBase(allocation, offset, size, stride) {};
+        Vector(const std::shared_ptr<BufferAllocation>& allocation, vkh::uni_arg<VkDeviceSize> offset = VkDeviceSize(0ull), vkh::uni_arg<VkDeviceSize> size = VK_WHOLE_SIZE, vkh::uni_arg<VkDeviceSize> stride = sizeof(T)) : VectorBase(allocation, offset, size, stride) {};
         
         //
 #ifdef VKT_CORE_USE_VMA
-        Vector(const vkt::uni_ptr<VmaBufferAllocation>& allocation, vkt::uni_arg<VkDeviceSize> offset = VkDeviceSize(0ull), vkt::uni_arg<VkDeviceSize> size = VK_WHOLE_SIZE, vkt::uni_arg<VkDeviceSize> stride = sizeof(T)) : VectorBase(allocation, offset, size, stride) {};
-        Vector(const std::shared_ptr<VmaBufferAllocation>& allocation, vkt::uni_arg<VkDeviceSize> offset = VkDeviceSize(0ull), vkt::uni_arg<VkDeviceSize> size = VK_WHOLE_SIZE, vkt::uni_arg<VkDeviceSize> stride = sizeof(T)) : VectorBase(allocation, offset, size, stride) {};
+        Vector(const vkh::uni_ptr<VmaBufferAllocation>& allocation, vkh::uni_arg<VkDeviceSize> offset = VkDeviceSize(0ull), vkh::uni_arg<VkDeviceSize> size = VK_WHOLE_SIZE, vkh::uni_arg<VkDeviceSize> stride = sizeof(T)) : VectorBase(allocation, offset, size, stride) {};
+        Vector(const std::shared_ptr<VmaBufferAllocation>& allocation, vkh::uni_arg<VkDeviceSize> offset = VkDeviceSize(0ull), vkh::uni_arg<VkDeviceSize> size = VK_WHOLE_SIZE, vkh::uni_arg<VkDeviceSize> stride = sizeof(T)) : VectorBase(allocation, offset, size, stride) {};
 #endif
 
         // 
@@ -40,8 +31,8 @@ namespace vkf {
         };
 
         // 
-        template<class Tm = T> Vector(const vkt::uni_arg<Vector<Tm>>& V)  { *this = V; };
-        template<class Tm = T> inline Vector<T>& operator=(const vkt::uni_arg<Vector<Tm>>& V) {
+        template<class Tm = T> Vector(const vkh::uni_arg<Vector<Tm>>& V)  { *this = V; };
+        template<class Tm = T> inline Vector<T>& operator=(const vkh::uni_arg<Vector<Tm>>& V) {
             this->allocation = V.uniPtr();
             this->bufInfo = vkh::VkDescriptorBufferInfo{ static_cast<VkBuffer>(V.buffer()), V.offset(), V.ranged() };
             this->bufRegion = vkh::VkStridedDeviceAddressRegionKHR{ V.deviceAddress(), V.stride(), (V.ranged() / V.stride())*V.stride() };
@@ -55,7 +46,7 @@ namespace vkf {
 
         // 
         //template<class Tm = T> Vector<Tm> cast() { return *this; };
-        //template<class Tm = T> const vkt::uni_arg<Vector<Tm>>& cast() const { return Vector<Tm>(reinterpret_cast<Vector<T>&>(*this)); };
+        //template<class Tm = T> const vkh::uni_arg<Vector<Tm>>& cast() const { return Vector<Tm>(reinterpret_cast<Vector<T>&>(*this)); };
 
         // align by typed stride
         virtual Vector<T>& trim() { this->bufRegion.stride = sizeof(T); return *this; };
@@ -95,7 +86,7 @@ namespace vkf {
 
 #ifdef VKT_CORE_USE_VMA
     template<class T = uint8_t>
-    Vector<T>* MakeVmaVector(vkt::uni_ptr<VmaBufferAllocation> allocation, vkt::uni_arg<VkDeviceSize> offset = VkDeviceSize(0ull), vkt::uni_arg<VkDeviceSize> size = VK_WHOLE_SIZE, vkt::uni_arg<VkDeviceSize> stride = sizeof(T)) { return new Vector<T>(allocation, offset, size, stride); };
+    Vector<T>* MakeVmaVector(vkh::uni_ptr<VmaBufferAllocation> allocation, vkh::uni_arg<VkDeviceSize> offset = VkDeviceSize(0ull), vkh::uni_arg<VkDeviceSize> size = VK_WHOLE_SIZE, vkh::uni_arg<VkDeviceSize> stride = sizeof(T)) { return new Vector<T>(allocation, offset, size, stride); };
 #endif
 
 };

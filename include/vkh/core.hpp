@@ -91,12 +91,12 @@
 
 #define ASSIGN(obj,name) obj.name=name;
 
-// 
+// TODO: REMOVE GLM REQUIREMENTS
 #include <glm/glm.hpp>
 
 
 // 
-namespace vkt {
+namespace vkh {
 
     //
     template<class T, class U = uint32_t> class bit_ops { protected: U n = 0u; //friend BitOps<T,U>;
