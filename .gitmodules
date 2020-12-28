@@ -16,3 +16,21 @@
 [submodule "xvk"]
 	path = include/xvk
 	url = https://github.com/Vulkan4D/xvk.git
+[submodule "include/tinygltf"]
+	path = include/tinygltf
+	url = https://github.com/syoyo/tinygltf.git
+[submodule "include/tinyexr"]
+	path = include/tinyexr
+	url = https://github.com/syoyo/tinyexr.git
+[submodule "include/stb"]
+	path = include/stb
+	url = https://github.com/nothings/stb.git
+[submodule "submodule/pcg-cpp"]
+	path = submodule/pcg-cpp
+	url = https://github.com/imneme/pcg-cpp.git
+[submodule "include/args"]
+	path = include/args
+	url = https://github.com/Taywee/args.git
+[submodule "include/soa_vector"]
+	path = include/soa_vector
+	url = https://github.com/Dwarfobserver/soa_vector.git
