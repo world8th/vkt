@@ -10,6 +10,7 @@ Made:
 - Dedicate into VKf framework
 
 Planned: 
+- Dedicate `core.hpp` into VKh
 - Rewrite some code
 - Far refactoring
 - Add new features
