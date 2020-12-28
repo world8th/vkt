@@ -1,12 +1,12 @@
 #pragma once // #
 
 //
-#ifndef VKT_CORE_USE_VMA
-#define VKT_CORE_USE_VMA
+#ifndef VKT_USE_VMA
+#define VKT_USE_VMA
 #endif
 
 //
-#ifdef VKT_CORE_USE_VMA
+#ifdef VKT_USE_VMA
 #include "./vma-buffer-allocation.hpp"
 #else
 #include "./buffer-allocation.hpp"
@@ -24,7 +24,7 @@ namespace vkf {
         VectorBase(const std::shared_ptr<BufferAllocation>& allocation, vkh::uni_arg<VkDeviceSize> offset = uint64_t(0ull), vkh::uni_arg<VkDeviceSize> size = VK_WHOLE_SIZE, vkh::uni_arg<VkDeviceSize> stride = 1u) : allocation(allocation), bufInfo({ allocation->buffer, offset, size }) { this->construct(allocation, offset, size, stride); };
 
         // 
-#ifdef VKT_CORE_USE_VMA
+#ifdef VKT_USE_VMA
         VectorBase(const vkh::uni_ptr<VmaBufferAllocation>& allocation, vkh::uni_arg<VkDeviceSize> offset = uint64_t(0ull), vkh::uni_arg<VkDeviceSize> size = VK_WHOLE_SIZE, vkh::uni_arg<VkDeviceSize> stride = 1u) : allocation(allocation.dyn_cast<BufferAllocation>()), bufInfo({ allocation->buffer, offset, size }) { this->construct(allocation.dyn_cast<BufferAllocation>(), offset, size, stride); };
         VectorBase(const std::shared_ptr<VmaBufferAllocation>& allocation, vkh::uni_arg<VkDeviceSize> offset = uint64_t(0ull), vkh::uni_arg<VkDeviceSize> size = VK_WHOLE_SIZE, vkh::uni_arg<VkDeviceSize> stride = 1u) : allocation(std::dynamic_pointer_cast<BufferAllocation>(allocation)), bufInfo({ allocation->buffer, offset, size }) { this->construct(std::dynamic_pointer_cast<BufferAllocation>(allocation), offset, size, stride); };
 #endif

@@ -56,7 +56,7 @@
 #endif
 
 namespace vkt {
-#ifdef VKT_CORE_USE_XVK
+#ifdef VKH_USE_XVK
     using Device = vkh::uni_ptr<xvk::Device>;
     using Instance = vkh::uni_ptr<xvk::Instance>;
 #endif

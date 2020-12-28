@@ -44,7 +44,7 @@ namespace vkf {
             vkh::unlock32(allocFlags.flags) = 0u;
 
             //
-#ifdef VKT_CORE_USE_XVK
+#ifdef VKH_USE_XVK
             if (!this->info.deviceDispatch) { this->info.deviceDispatch = vkt::vkGlobal::device; };
             if (!this->info.instanceDispatch) { this->info.instanceDispatch = vkt::vkGlobal::instance; };
 

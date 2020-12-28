@@ -1,8 +1,8 @@
 #pragma once // #
 
 // TODO: REMOVE GLM REQUIREMENTS
-#ifndef VKT_CORE_USE_GLM
-#define VKT_CORE_USE_GLM
+#ifndef VKH_USE_GLM
+#define VKH_USE_GLM
 #endif
 
 // 

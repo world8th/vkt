@@ -1,12 +1,12 @@
 #pragma once // #
 
 // 
-#ifndef VKT_CORE_USE_VMA
-#define VKT_CORE_USE_VMA
+#ifndef VKT_USE_VMA
+#define VKT_USE_VMA
 #endif
 
 //
-#ifdef VKT_CORE_USE_VMA
+#ifdef VKT_USE_VMA
 #include "./vma-image-allocation.hpp"
 #else
 #include "./image-allocation.hpp"
@@ -42,7 +42,7 @@ namespace vkf {
         ImageRegion(const vkh::uni_ptr<ImageAllocation>& allocation, vkh::uni_arg<vkh::VkImageViewCreateInfo> info = vkh::VkImageViewCreateInfo{}, vkh::uni_arg<VkImageLayout> layout = VK_IMAGE_LAYOUT_GENERAL) : allocation(allocation), subresourceRange(info->subresourceRange) { this->construct(allocation, info, layout); };
         ImageRegion(const std::shared_ptr<ImageAllocation>& allocation, vkh::uni_arg<vkh::VkImageViewCreateInfo> info = vkh::VkImageViewCreateInfo{}, vkh::uni_arg<VkImageLayout> layout = VK_IMAGE_LAYOUT_GENERAL) : allocation(allocation), subresourceRange(info->subresourceRange) { this->construct(allocation, info, layout); };
 
-#ifdef VKT_CORE_USE_VMA
+#ifdef VKT_USE_VMA
         ImageRegion(const vkh::uni_ptr<VmaImageAllocation>& allocation, vkh::uni_arg<vkh::VkImageViewCreateInfo> info = vkh::VkImageViewCreateInfo{}, vkh::uni_arg<VkImageLayout> layout = VK_IMAGE_LAYOUT_GENERAL) : allocation(allocation.dyn_cast<ImageAllocation>()), subresourceRange(info->subresourceRange) { this->construct(allocation.dyn_cast<ImageAllocation>(), info, layout); };
         ImageRegion(const std::shared_ptr<VmaImageAllocation>& allocation, vkh::uni_arg<vkh::VkImageViewCreateInfo> info = vkh::VkImageViewCreateInfo{}, vkh::uni_arg<VkImageLayout> layout = VK_IMAGE_LAYOUT_GENERAL) : allocation(std::dynamic_pointer_cast<ImageAllocation>(allocation)), subresourceRange(info->subresourceRange) { this->construct(std::dynamic_pointer_cast<ImageAllocation>(allocation), info, layout); };
 #endif
@@ -79,7 +79,7 @@ namespace vkf {
         };
 
         // 
-#ifdef VKT_CORE_USE_VMA
+#ifdef VKT_USE_VMA
         virtual ImageRegion* construct(
             vkh::uni_ptr<VmaImageAllocation> allocation,
             vkh::uni_arg<vkh::VkImageViewCreateInfo> info = vkh::VkImageViewCreateInfo{},

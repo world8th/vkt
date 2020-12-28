@@ -1,22 +1,22 @@
 #pragma once // #
 
 //
-#ifndef VKT_CORE_USE_VMA
-#define VKT_CORE_USE_VMA
+#ifndef VKT_USE_VMA
+#define VKT_USE_VMA
 #endif
 
 // 
 #include "./image-allocation.hpp"
 
 // out of core definition
-#ifdef VKT_CORE_USE_VMA
+#ifdef VKT_USE_VMA
 #include <vma/vk_mem_alloc.h>
 #endif
 
 // 
 namespace vkf {
 
-#ifdef VKT_CORE_USE_VMA
+#ifdef VKT_USE_VMA
     // 
     class VmaImageAllocation : public ImageAllocation {
     public: friend VmaImageAllocation; friend ImageAllocation;// 
@@ -60,7 +60,7 @@ namespace vkf {
             //this->info.dispatch = VkDispatchLoaderDynamic(info.instance, vkGetInstanceProcAddr, this->info.device = info.device, vkGetDeviceProcAddr); // 
 
             // 
-#ifdef VKT_CORE_USE_XVK
+#ifdef VKH_USE_XVK
             this->info.instanceDispatch = memInfo->instanceDispatch;
             this->info.deviceDispatch = memInfo->deviceDispatch;
 

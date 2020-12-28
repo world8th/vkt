@@ -1,8 +1,8 @@
 #pragma once // #
 
 // Resolve conflict with another `core.hpp`
-#ifndef VKT_CORE_HPP
-#define VKT_CORE_HPP
+#ifndef VKH_HPP
+#define VKH_HPP
 
 //#include "utils.hpp"
 //#include "structs.hpp"
@@ -68,11 +68,11 @@
 
 // Enable Vulkan-HPP when defined
 #ifdef VULKAN_HPP
-#define VKT_USE_VULKAN_HPP
+#define VKH_USE_VULKAN_HPP
 #endif
 
 // When enabled, use Vulkan-HPP support...
-#ifdef VKT_USE_VULKAN_HPP
+#ifdef VKH_USE_VULKAN_HPP
 #define VULKAN_HPP_ENABLE_DYNAMIC_LOADER_TOOL 0 // Avoid XVK conflict
 #include <vulkan/vulkan.hpp>
 #else
@@ -80,18 +80,13 @@
 #endif
 
 // 
-#ifdef VKT_CORE_USE_XVK
+#ifdef VKH_USE_XVK
 #include <xvk/xvk.hpp>
-#endif
-
-// 
-#ifdef VKT_CORE_USE_VMA
-#include <vma/vk_mem_alloc.h>
 #endif
 
 #define ASSIGN(obj,name) obj.name=name;
 
-// TODO: REMOVE GLM REQUIREMENTS
+// TODO: remove GLM requirements
 #include <glm/glm.hpp>
 
 

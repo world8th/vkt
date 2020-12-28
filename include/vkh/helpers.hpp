@@ -1,11 +1,6 @@
 #pragma once // #
 
-// TODO: REMOVE GLM REQUIREMENTS
-#ifndef VKT_CORE_USE_GLM
-#define VKT_CORE_USE_GLM
-#endif
-
-//#define VKT_CORE_USE_XVK
+//#define VKH_USE_XVK
 #include "./core.hpp"
 #include "./structures.hpp"
 

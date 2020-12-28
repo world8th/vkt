@@ -1,12 +1,17 @@
 #pragma once // #
 
-//
-#ifndef VKT_CORE_USE_VMA
-#define VKT_CORE_USE_VMA
+// TODO: remove GLM requirements
+#ifndef VKT_USE_VMA
+#define VKT_USE_VMA
 #endif
 
 // 
 #include <vkt/inline.hpp>
+
+// 
+#ifdef VKT_USE_VMA
+#include <vma/vk_mem_alloc.h>
+#endif
 
 // 
 namespace vkf {

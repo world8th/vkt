@@ -18,18 +18,18 @@
 #define VK_ENABLE_BETA_EXTENSIONS
 
 //
-#ifndef VKT_CORE_USE_XVK
-#define VKT_CORE_USE_XVK
+#ifndef VKH_USE_XVK
+#define VKH_USE_XVK
 #endif
 
 //
-#ifndef VKT_CORE_USE_VMA
-#define VKT_CORE_USE_VMA
+#ifndef VKT_USE_VMA
+#define VKT_USE_VMA
 #endif
 
 //
-#ifndef VKT_USE_VULKAN_HPP
-#define VKT_USE_VULKAN_HPP
+#ifndef VKH_USE_VULKAN_HPP
+#define VKH_USE_VULKAN_HPP
 #endif
 
 // Force include for avoid GLAD problem...

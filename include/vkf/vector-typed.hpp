@@ -17,7 +17,7 @@ namespace vkf {
         Vector(const std::shared_ptr<BufferAllocation>& allocation, vkh::uni_arg<VkDeviceSize> offset = VkDeviceSize(0ull), vkh::uni_arg<VkDeviceSize> size = VK_WHOLE_SIZE, vkh::uni_arg<VkDeviceSize> stride = sizeof(T)) : VectorBase(allocation, offset, size, stride) {};
         
         //
-#ifdef VKT_CORE_USE_VMA
+#ifdef VKT_USE_VMA
         Vector(const vkh::uni_ptr<VmaBufferAllocation>& allocation, vkh::uni_arg<VkDeviceSize> offset = VkDeviceSize(0ull), vkh::uni_arg<VkDeviceSize> size = VK_WHOLE_SIZE, vkh::uni_arg<VkDeviceSize> stride = sizeof(T)) : VectorBase(allocation, offset, size, stride) {};
         Vector(const std::shared_ptr<VmaBufferAllocation>& allocation, vkh::uni_arg<VkDeviceSize> offset = VkDeviceSize(0ull), vkh::uni_arg<VkDeviceSize> size = VK_WHOLE_SIZE, vkh::uni_arg<VkDeviceSize> stride = sizeof(T)) : VectorBase(allocation, offset, size, stride) {};
 #endif
@@ -84,7 +84,7 @@ namespace vkf {
         virtual T* data(const uintptr_t& i = 0u) { return mapped(i); };
     };
 
-#ifdef VKT_CORE_USE_VMA
+#ifdef VKT_USE_VMA
     template<class T = uint8_t>
     Vector<T>* MakeVmaVector(vkh::uni_ptr<VmaBufferAllocation> allocation, vkh::uni_arg<VkDeviceSize> offset = VkDeviceSize(0ull), vkh::uni_arg<VkDeviceSize> size = VK_WHOLE_SIZE, vkh::uni_arg<VkDeviceSize> stride = sizeof(T)) { return new Vector<T>(allocation, offset, size, stride); };
 #endif

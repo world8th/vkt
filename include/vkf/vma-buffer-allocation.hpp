@@ -1,22 +1,22 @@
 #pragma once // #
 
 //
-#ifndef VKT_CORE_USE_VMA
-#define VKT_CORE_USE_VMA
+#ifndef VKT_USE_VMA
+#define VKT_USE_VMA
 #endif
 
 // 
 #include "./buffer-allocation.hpp"
 
 // out of core definition
-#ifdef VKT_CORE_USE_VMA
+#ifdef VKT_USE_VMA
 #include <vma/vk_mem_alloc.h>
 #endif
 
 // 
 namespace vkf {
 
-#ifdef VKT_CORE_USE_VMA
+#ifdef VKT_USE_VMA
     // 
     class VmaBufferAllocation : public BufferAllocation { public: 
         VmaBufferAllocation() {};
@@ -66,7 +66,7 @@ namespace vkf {
             vmaGetAllocatorInfo(this->allocator = allocator.ref(), &info);
 
             // 
-#ifdef VKT_CORE_USE_XVK
+#ifdef VKH_USE_XVK
             this->info.deviceDispatch = memInfo->deviceDispatch;
             this->info.instanceDispatch = memInfo->instanceDispatch;
 

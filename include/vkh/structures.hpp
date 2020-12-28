@@ -1,10 +1,5 @@
 #pragma once // #
 
-// TODO: REMOVE GLM REQUIREMENTS
-#ifndef VKT_CORE_USE_GLM
-#define VKT_CORE_USE_GLM
-#endif
-
 // 
 #include "./core.hpp"
 #include "./enums.hpp"

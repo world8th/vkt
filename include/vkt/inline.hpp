@@ -409,7 +409,7 @@ namespace vkt {
             0u, nullptr);
     };
 
-#ifdef VKT_CORE_USE_XVK
+#ifdef VKH_USE_XVK
     inline auto& vsEnumeratePhysicalDevices(vkt::Instance instance, std::vector<VkPhysicalDevice>& data) {
         uint32_t count = 0u; vkt::handleVk(instance->EnumeratePhysicalDevices(&count, nullptr)); data.resize(count);
         handleVk(instance->EnumeratePhysicalDevices(&count, data.data()));

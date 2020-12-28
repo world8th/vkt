@@ -117,7 +117,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NOMINMAX;VKT_USE_GLFW;VKT_CORE_USE_XVK;VKT_CORE_USE_VMA;VKT_USE_CPP_MODULES;VULKAN_HPP_DISABLE_ENHANCED_MODE;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NOMINMAX;VKT_USE_GLFW;VKH_USE_XVK;VKT_USE_VMA;VKT_USE_CPP_MODULES;VULKAN_HPP_DISABLE_ENHANCED_MODE;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
@@ -138,7 +138,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NOMINMAX;VKT_USE_GLFW;VKT_CORE_USE_XVK;VKT_CORE_ENABLE_USE_VMA;VKT_USE_CPP_MODULES;VULKAN_HPP_DISABLE_ENHANCED_MODE;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NOMINMAX;VKT_USE_GLFW;VKH_USE_XVK;VKH_ENABLE_USE_VMA;VKT_USE_CPP_MODULES;VULKAN_HPP_DISABLE_ENHANCED_MODE;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalOptions>/bigobj /experimental:module /std:c++latest /EHsc /MD %(AdditionalOptions)</AdditionalOptions>
       <LanguageStandard>stdcpplatest</LanguageStandard>
