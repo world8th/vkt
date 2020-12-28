@@ -20,6 +20,7 @@ Planned:
 
 Made: 
 - Final ray-tracing specification
+- Merge `core.hpp` into VKh
 
 Planned:
 - Vulkan-HPP support
