@@ -41,7 +41,7 @@ namespace vkt {
     // 
     static inline auto readBinary(vkh::uni_arg<std::string> filePath) {
         const auto vect8u = readBinaryU8(filePath);
-        auto vect32 = std::vector<uint32_t>(tiled(uint64_t(vect8u.size()), uint64_t(4ull)));
+        auto vect32 = std::vector<uint32_t>(vkh::tiled(uint64_t(vect8u.size()), uint64_t(4ull)));
         memcpy(vect32.data(), vect8u.data(), vect8u.size()); return vect32;
     };
 

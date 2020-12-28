@@ -139,27 +139,6 @@ namespace vkt {
         return result;
     };
 
-
-    //#ifdef USE_VULKAN
-    template <typename T>
-    static inline auto sgn(const T& val) { return (T(0) < val) - (val < T(0)); }
-
-    template<class T = uint64_t>
-    static inline T tiled(const T& sz, const T& gmaxtile) {
-        // return (int32_t)ceil((double)sz / (double)gmaxtile);
-        return sz <= 0 ? 0 : (sz / gmaxtile + sgn(sz % gmaxtile));
-    }
-
-    template <class T>
-    static inline auto strided(const vkh::uni_arg<size_t>& sizeo) { return sizeof(T) * sizeo; }
-
-    template <class T> static inline auto makeVector(const T* ptr, const size_t& size = 1) { std::vector<T>v(size); memcpy(v.data(), ptr, strided<T>(size)); return v; };
-
-    template<class T, class Ty = T>
-    std::vector<T> vector_cast(const std::vector<Ty>& Vy) {
-        std::vector<T> V{}; for (auto& v : Vy) { V.push_back(reinterpret_cast<const T&>(v)); }; return std::move(V);
-    };
-
     // 
     struct FixConstruction {
         FixConstruction(vkh::VkPipelineShaderStageCreateInfo spi = {}, vkh::VkPipelineShaderStageRequiredSubgroupSizeCreateInfoEXT sgmp = {}) : spi(spi), sgmp(sgmp) {
@@ -174,8 +153,7 @@ namespace vkt {
         operator const vkh::VkPipelineShaderStageCreateInfo& () const { return spi; };
         operator const vkh::VkPipelineShaderStageRequiredSubgroupSizeCreateInfoEXT& () const { return sgmp; };
     };
-
-
+    
     // 
 #ifdef VULKAN_HPP
     template<class T>
