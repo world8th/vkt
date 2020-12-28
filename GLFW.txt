@@ -1,0 +1,2 @@
+Download here: https://www.glfw.org/download.html
+Or compile from here: https://github.com/glfw/glfw

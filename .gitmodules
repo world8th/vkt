@@ -4,3 +4,15 @@
 [submodule "include/volk"]
 	path = include/volk
 	url = https://github.com/zeux/volk.git
+[submodule "submodule/glm"]
+	path = submodule/glm
+	url = https://github.com/g-truc/glm.git
+[submodule "submodule/VulkanMemoryAllocator"]
+	path = submodule/VulkanMemoryAllocator
+	url = https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator
+[submodule "submodule/Vulkan-Headers"]
+	path = submodule/Vulkan-Headers
+	url = https://github.com/KhronosGroup/Vulkan-Headers.git
+[submodule "xvk"]
+	path = include/xvk
+	url = https://github.com/Vulkan4D/xvk.git

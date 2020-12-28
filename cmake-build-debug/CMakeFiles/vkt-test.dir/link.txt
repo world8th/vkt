@@ -1,3 +1,0 @@
-"C:\Program Files\JetBrains\CLion 203.5784.34\bin\cmake\win\bin\cmake.exe" -E rm -f CMakeFiles\vkt-test.dir/objects.a
-C:\PROGRA~1\MINGW-~1\X86_64~1.0-W\mingw64\bin\ar.exe cr CMakeFiles\vkt-test.dir/objects.a @CMakeFiles\vkt-test.dir\objects1.rsp
-C:\PROGRA~1\MINGW-~1\X86_64~1.0-W\mingw64\bin\G__~1.EXE -g   -Wl,--whole-archive CMakeFiles\vkt-test.dir/objects.a -Wl,--no-whole-archive  -o vkt-test.exe -Wl,--out-implib,libvkt-test.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\vkt-test.dir\linklibs.rsp
