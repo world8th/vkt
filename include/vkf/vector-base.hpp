@@ -20,13 +20,13 @@ namespace vkf {
     class VectorBase : public std::enable_shared_from_this<VectorBase> {
     public: using T = uint8_t;
         VectorBase() {};
-        VectorBase(const vkh::uni_ptr<BufferAllocation>& allocation, vkh::uni_arg<VkDeviceSize> offset = uint64_t(0ull), vkh::uni_arg<VkDeviceSize> size = VK_WHOLE_SIZE, vkh::uni_arg<VkDeviceSize> stride = 1u) : allocation(allocation), bufInfo({ allocation->buffer, offset, size }) { this->construct(allocation, offset, size, stride); };
-        VectorBase(const std::shared_ptr<BufferAllocation>& allocation, vkh::uni_arg<VkDeviceSize> offset = uint64_t(0ull), vkh::uni_arg<VkDeviceSize> size = VK_WHOLE_SIZE, vkh::uni_arg<VkDeviceSize> stride = 1u) : allocation(allocation), bufInfo({ allocation->buffer, offset, size }) { this->construct(allocation, offset, size, stride); };
+        VectorBase(const vkh::uni_ptr<BufferAllocation>& allocation, vkh::uni_arg<VkDeviceSize> offset = uint64_t(0ull), vkh::uni_arg<VkDeviceSize> range = VK_WHOLE_SIZE, vkh::uni_arg<VkDeviceSize> stride = 1u) : allocation(allocation), bufInfo({ allocation->buffer, offset, range }) { this->construct(allocation, offset, range, stride); };
+        VectorBase(const std::shared_ptr<BufferAllocation>& allocation, vkh::uni_arg<VkDeviceSize> offset = uint64_t(0ull), vkh::uni_arg<VkDeviceSize> range = VK_WHOLE_SIZE, vkh::uni_arg<VkDeviceSize> stride = 1u) : allocation(allocation), bufInfo({ allocation->buffer, offset, range }) { this->construct(allocation, offset, range, stride); };
 
         // 
 #ifdef VKT_USE_VMA
-        VectorBase(const vkh::uni_ptr<VmaBufferAllocation>& allocation, vkh::uni_arg<VkDeviceSize> offset = uint64_t(0ull), vkh::uni_arg<VkDeviceSize> size = VK_WHOLE_SIZE, vkh::uni_arg<VkDeviceSize> stride = 1u) : allocation(allocation.dyn_cast<BufferAllocation>()), bufInfo({ allocation->buffer, offset, size }) { this->construct(allocation.dyn_cast<BufferAllocation>(), offset, size, stride); };
-        VectorBase(const std::shared_ptr<VmaBufferAllocation>& allocation, vkh::uni_arg<VkDeviceSize> offset = uint64_t(0ull), vkh::uni_arg<VkDeviceSize> size = VK_WHOLE_SIZE, vkh::uni_arg<VkDeviceSize> stride = 1u) : allocation(std::dynamic_pointer_cast<BufferAllocation>(allocation)), bufInfo({ allocation->buffer, offset, size }) { this->construct(std::dynamic_pointer_cast<BufferAllocation>(allocation), offset, size, stride); };
+        VectorBase(const vkh::uni_ptr<VmaBufferAllocation>& allocation, vkh::uni_arg<VkDeviceSize> offset = uint64_t(0ull), vkh::uni_arg<VkDeviceSize> range = VK_WHOLE_SIZE, vkh::uni_arg<VkDeviceSize> stride = 1u) : allocation(allocation.dyn_cast<BufferAllocation>()), bufInfo({ allocation->buffer, offset, range }) { this->construct(allocation.dyn_cast<BufferAllocation>(), offset, range, stride); };
+        VectorBase(const std::shared_ptr<VmaBufferAllocation>& allocation, vkh::uni_arg<VkDeviceSize> offset = uint64_t(0ull), vkh::uni_arg<VkDeviceSize> range = VK_WHOLE_SIZE, vkh::uni_arg<VkDeviceSize> stride = 1u) : allocation(std::dynamic_pointer_cast<BufferAllocation>(allocation)), bufInfo({ allocation->buffer, offset, range }) { this->construct(std::dynamic_pointer_cast<BufferAllocation>(allocation), offset, range, stride); };
 #endif
 
         //
@@ -38,11 +38,11 @@ namespace vkf {
         virtual uint8_t* const mappedv(const uintptr_t& i = 0u) { this->pMapped = reinterpret_cast<uint8_t*>(allocation->mapped()) + offset(); return &pMapped[i]; };
 
         //
-        virtual VectorBase* construct(vkh::uni_ptr<BufferAllocation> allocation, vkh::uni_arg<VkDeviceSize> offset = uint64_t(0ull), vkh::uni_arg<VkDeviceSize> size = VK_WHOLE_SIZE, vkh::uni_arg<VkDeviceSize> stride = 1u) {
+        virtual VectorBase* construct(vkh::uni_ptr<BufferAllocation> allocation, vkh::uni_arg<VkDeviceSize> offset = uint64_t(0ull), vkh::uni_arg<VkDeviceSize> range = VK_WHOLE_SIZE, vkh::uni_arg<VkDeviceSize> stride = 1u) {
             const auto striding = (*stride != 0ull ? *stride : 1ull);
             const auto rangeLim = this->ranged();
             this->allocation = allocation;
-            this->bufInfo = vkh::VkDescriptorBufferInfo{ static_cast<VkBuffer>(allocation->buffer), offset, size };
+            this->bufInfo = vkh::VkDescriptorBufferInfo{ static_cast<VkBuffer>(allocation->buffer), offset, range };
             this->bufRegion = vkh::VkStridedDeviceAddressRegionKHR{ deviceAddress(), striding, (rangeLim / striding) * striding };
             this->bufInfo.range = rangeLim;
             return this;

@@ -13,13 +13,14 @@ namespace vkf {
         Vector(): VectorBase() {};
 
         // 
-        Vector(const vkh::uni_ptr<BufferAllocation>& allocation, vkh::uni_arg<VkDeviceSize> offset = VkDeviceSize(0ull), vkh::uni_arg<VkDeviceSize> size = VK_WHOLE_SIZE, vkh::uni_arg<VkDeviceSize> stride = sizeof(T)) : VectorBase(allocation, offset, size, stride) {};
-        Vector(const std::shared_ptr<BufferAllocation>& allocation, vkh::uni_arg<VkDeviceSize> offset = VkDeviceSize(0ull), vkh::uni_arg<VkDeviceSize> size = VK_WHOLE_SIZE, vkh::uni_arg<VkDeviceSize> stride = sizeof(T)) : VectorBase(allocation, offset, size, stride) {};
-        
+        Vector(const VectorBase& base) : VectorBase(base.getAllocation(), base.offset(), base.range(), base.stride()) {};
+        Vector(const vkh::uni_ptr<BufferAllocation>& allocation, vkh::uni_arg<VkDeviceSize> offset = VkDeviceSize(0ull), vkh::uni_arg<VkDeviceSize> range = VK_WHOLE_SIZE, vkh::uni_arg<VkDeviceSize> stride = sizeof(T)) : VectorBase(allocation, offset, range, stride) {};
+        Vector(const std::shared_ptr<BufferAllocation>& allocation, vkh::uni_arg<VkDeviceSize> offset = VkDeviceSize(0ull), vkh::uni_arg<VkDeviceSize> range = VK_WHOLE_SIZE, vkh::uni_arg<VkDeviceSize> stride = sizeof(T)) : VectorBase(allocation, offset, range, stride) {};
+
         //
 #ifdef VKT_USE_VMA
-        Vector(const vkh::uni_ptr<VmaBufferAllocation>& allocation, vkh::uni_arg<VkDeviceSize> offset = VkDeviceSize(0ull), vkh::uni_arg<VkDeviceSize> size = VK_WHOLE_SIZE, vkh::uni_arg<VkDeviceSize> stride = sizeof(T)) : VectorBase(allocation, offset, size, stride) {};
-        Vector(const std::shared_ptr<VmaBufferAllocation>& allocation, vkh::uni_arg<VkDeviceSize> offset = VkDeviceSize(0ull), vkh::uni_arg<VkDeviceSize> size = VK_WHOLE_SIZE, vkh::uni_arg<VkDeviceSize> stride = sizeof(T)) : VectorBase(allocation, offset, size, stride) {};
+        Vector(const vkh::uni_ptr<VmaBufferAllocation>& allocation, vkh::uni_arg<VkDeviceSize> offset = VkDeviceSize(0ull), vkh::uni_arg<VkDeviceSize> range = VK_WHOLE_SIZE, vkh::uni_arg<VkDeviceSize> stride = sizeof(T)) : VectorBase(allocation, offset, range, stride) {};
+        Vector(const std::shared_ptr<VmaBufferAllocation>& allocation, vkh::uni_arg<VkDeviceSize> offset = VkDeviceSize(0ull), vkh::uni_arg<VkDeviceSize> range = VK_WHOLE_SIZE, vkh::uni_arg<VkDeviceSize> stride = sizeof(T)) : VectorBase(allocation, offset, range, stride) {};
 #endif
 
         // 
